@@ -1488,18 +1488,18 @@ static u8 CheckValidityOfTradeMons(u8 *aliveMons, u8 playerPartyCount, u8 player
     partnerSpecies = GetMonData(&gEnemyParty[partnerMonIdx], MON_DATA_SPECIES);
 
     // Partner cant trade illegitimate Deoxys or Mew
-    if (partnerSpecies == SPECIES_DEOXYS || partnerSpecies == SPECIES_MEW)
-    {
-        if (!GetMonData(&gEnemyParty[partnerMonIdx], MON_DATA_OBEDIENCE))
-            return PARTNER_MON_INVALID;
-    }
+    //if (partnerSpecies == SPECIES_DEOXYS || partnerSpecies == SPECIES_MEW)
+    //{
+        //if (!GetMonData(&gEnemyParty[partnerMonIdx], MON_DATA_OBEDIENCE))
+            //return PARTNER_MON_INVALID;
+    //}
 
     // Partner cant trade Egg or non-Hoenn mon if player doesn't have National Dex
-    if (!IsNationalPokedexEnabled())
-    {
-        if (sTradeMenuData->isEgg[TRADE_PARTNER][partnerMonIdx] || !IsSpeciesInHoennDex(partnerSpecies))
-            return PARTNER_MON_INVALID;
-    }
+    //if (!IsNationalPokedexEnabled())
+    //{
+        //if (sTradeMenuData->isEgg[TRADE_PARTNER][partnerMonIdx] || !IsSpeciesInHoennDex(partnerSpecies))
+            //return PARTNER_MON_INVALID;
+    //}
 
     if (hasLiveMon)
         hasLiveMon = BOTH_MONS_VALID;
@@ -2304,35 +2304,35 @@ static u32 CanTradeSelectedMon(struct Pokemon *playerParty, int partyCount, int 
     }
 
     // Cant trade Eggs or non-Hoenn mons if player doesn't have National Dex
-    if (!IsNationalPokedexEnabled())
-    {
-        if (species2[monIdx] == SPECIES_EGG)
-            return CANT_TRADE_EGG_YET;
+    //if (!IsNationalPokedexEnabled())
+    //{
+        //if (species2[monIdx] == SPECIES_EGG)
+            //return CANT_TRADE_EGG_YET;
 
-        if (!IsSpeciesInHoennDex(species2[monIdx]))
-            return CANT_TRADE_NATIONAL;
-    }
+        //if (!IsSpeciesInHoennDex(species2[monIdx]))
+            //return CANT_TRADE_NATIONAL;
+    //}
 
-    player = &gLinkPlayers[GetMultiplayerId() ^ 1];
-    if ((player->version & 0xFF) != VERSION_RUBY &&
-        (player->version & 0xFF) != VERSION_SAPPHIRE)
-    {
+    //player = &gLinkPlayers[GetMultiplayerId() ^ 1];
+    //if ((player->version & 0xFF) != VERSION_RUBY &&
+        //(player->version & 0xFF) != VERSION_SAPPHIRE)
+    //{
         // Does partner not have National Dex
-        if (!(player->progressFlagsCopy & 0xF))
-        {
-            if (species2[monIdx] == SPECIES_EGG)
-                return CANT_TRADE_EGG_YET2;
+        //if (!(player->progressFlagsCopy & 0xF))
+        //{
+            //if (species2[monIdx] == SPECIES_EGG)
+                //return CANT_TRADE_EGG_YET2;
 
-            if (!IsSpeciesInHoennDex(species2[monIdx]))
-                return CANT_TRADE_INVALID_MON;
-        }
-    }
+            //if (!IsSpeciesInHoennDex(species2[monIdx]))
+                //return CANT_TRADE_INVALID_MON;
+        //}
+    //}
 
-    if (species[monIdx] == SPECIES_DEOXYS || species[monIdx] == SPECIES_MEW)
-    {
-        if (!GetMonData(&playerParty[monIdx], MON_DATA_OBEDIENCE))
-            return CANT_TRADE_INVALID_MON;
-    }
+    //if (species[monIdx] == SPECIES_DEOXYS || species[monIdx] == SPECIES_MEW)
+    //{
+        //if (!GetMonData(&playerParty[monIdx], MON_DATA_OBEDIENCE))
+            //return CANT_TRADE_INVALID_MON;
+    //}
 
     // Make Eggs not count for numMonsLeft
     for (i = 0; i < partyCount; i++)
@@ -2425,10 +2425,10 @@ int GetUnionRoomTradeMessageId(struct GFtgtGnameSub rfuPlayer, struct GFtgtGname
         }
     }
 
-    if (IsDeoxysOrMewUntradable(playerSpecies, isObedientBitSet))
-    {
-        return UR_TRADE_MSG_MON_CANT_BE_TRADED_2;
-    }
+    //if (IsDeoxysOrMewUntradable(playerSpecies, isObedientBitSet))
+    //{
+        //return UR_TRADE_MSG_MON_CANT_BE_TRADED_2;
+    //}
 
     if (partnerSpecies == SPECIES_EGG)
     {
@@ -2450,50 +2450,50 @@ int GetUnionRoomTradeMessageId(struct GFtgtGnameSub rfuPlayer, struct GFtgtGname
         return UR_TRADE_MSG_MON_CANT_BE_TRADED_1;
     }
 
-    if (!playerHasNationalDex)
-    {
-        if (playerSpecies2 == SPECIES_EGG)
-        {
-            return UR_TRADE_MSG_EGG_CANT_BE_TRADED;
-        }
+    //if (!playerHasNationalDex)
+    //{
+        //if (playerSpecies2 == SPECIES_EGG)
+        //{
+            //return UR_TRADE_MSG_EGG_CANT_BE_TRADED;
+        //}
 
-        if (!IsSpeciesInHoennDex(playerSpecies2))
-        {
-            return UR_TRADE_MSG_MON_CANT_BE_TRADED_2;
-        }
+        //if (!IsSpeciesInHoennDex(playerSpecies2))
+        //{
+            //return UR_TRADE_MSG_MON_CANT_BE_TRADED_2;
+        //}
 
-        if (!IsSpeciesInHoennDex(partnerSpecies))
-        {
-            return UR_TRADE_MSG_PARTNERS_MON_CANT_BE_TRADED;
-        }
-    }
+        //if (!IsSpeciesInHoennDex(partnerSpecies))
+        //{
+            //return UR_TRADE_MSG_PARTNERS_MON_CANT_BE_TRADED;
+        //}
+    //}
 
-    if (!partnerHasNationalDex && !IsSpeciesInHoennDex(playerSpecies2))
-    {
-        return UR_TRADE_MSG_PARTNER_CANT_ACCEPT_MON;
-    }
+    //if (!partnerHasNationalDex && !IsSpeciesInHoennDex(playerSpecies2))
+    //{
+        //return UR_TRADE_MSG_PARTNER_CANT_ACCEPT_MON;
+    //}
 
     return UR_TRADE_MSG_NONE;
 }
 
 int CanRegisterMonForTradingBoard(struct GFtgtGnameSub rfuPlayer, u16 species2, u16 species, u8 isObedientBitSet)
 {
-    bool8 hasNationalDex = rfuPlayer.hasNationalDex;
+    //bool8 hasNationalDex = rfuPlayer.hasNationalDex;
 
-    if (IsDeoxysOrMewUntradable(species, isObedientBitSet))
-        return CANT_REGISTER_MON;
+    //if (IsDeoxysOrMewUntradable(species, isObedientBitSet))
+        //return CANT_REGISTER_MON;
 
-    if (hasNationalDex)
+    //if (hasNationalDex)
         return CAN_REGISTER_MON;
 
     // Eggs can only be traded if the player has the National Dex
-    if (species2 == SPECIES_EGG)
-        return CANT_REGISTER_EGG;
+    //if (species2 == SPECIES_EGG)
+        //return CANT_REGISTER_EGG;
 
-    if (IsSpeciesInHoennDex(species2))
-        return CAN_REGISTER_MON;
+    //if (IsSpeciesInHoennDex(species2))
+       // return CAN_REGISTER_MON;
 
-    return CANT_REGISTER_MON;
+    //return CANT_REGISTER_MON;
 }
 
 // Spin Trade wasnt fully implemented, but this checks if a mon would be valid to Spin Trade

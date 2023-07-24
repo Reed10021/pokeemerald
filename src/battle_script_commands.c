@@ -9819,9 +9819,14 @@ static void Cmd_handleballthrow(void)
                     ballMultiplier = 40;
                 break;
             case ITEM_LUXURY_BALL:
-            case ITEM_PREMIER_BALL:
                 ballMultiplier = 10;
                 break;
+            case ITEM_PREMIER_BALL:
+				if (IsMonShiny(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]])
+					ballMultiplier = 60;
+				else 
+					ballMultiplier = 10;
+				break;
             }
         }
         else

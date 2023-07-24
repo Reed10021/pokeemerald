@@ -388,27 +388,47 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 {
     u8 wildMonIndex = 0;
     u8 level;
+    u32 rerollCount = 1;
 
-    switch (area)
+    if (VarGet(VAR_CHAIN) >= 4) //If we're chaining.
     {
-    case WILD_AREA_LAND:
-        if (TryGetAbilityInfluencedWildMonIndex(wildMonInfo->wildPokemon, TYPE_STEEL, ABILITY_MAGNET_PULL, &wildMonIndex))
-            break;
-        if (TryGetAbilityInfluencedWildMonIndex(wildMonInfo->wildPokemon, TYPE_ELECTRIC, ABILITY_STATIC, &wildMonIndex))
-            break;
-
-        wildMonIndex = ChooseWildMonIndex_Land();
-        break;
-    case WILD_AREA_WATER:
-        if (TryGetAbilityInfluencedWildMonIndex(wildMonInfo->wildPokemon, TYPE_ELECTRIC, ABILITY_STATIC, &wildMonIndex))
-            break;
-
-        wildMonIndex = ChooseWildMonIndex_WaterRock();
-        break;
-    case WILD_AREA_ROCKS:
-        wildMonIndex = ChooseWildMonIndex_WaterRock();
-        break;
+        rerollCount = VarGet(VAR_CHAIN) / 3;
+        if (rerollCount < 2)
+            rerollCount = 2;
     }
+
+    do
+    {
+		switch (area)
+		{
+		case WILD_AREA_LAND:
+			if (TryGetAbilityInfluencedWildMonIndex(wildMonInfo->wildPokemon, TYPE_STEEL, ABILITY_MAGNET_PULL, &wildMonIndex))
+				break;
+			if (TryGetAbilityInfluencedWildMonIndex(wildMonInfo->wildPokemon, TYPE_ELECTRIC, ABILITY_STATIC, &wildMonIndex))
+				break;
+
+			wildMonIndex = ChooseWildMonIndex_Land();
+			break;
+		case WILD_AREA_WATER:
+			if (TryGetAbilityInfluencedWildMonIndex(wildMonInfo->wildPokemon, TYPE_ELECTRIC, ABILITY_STATIC, &wildMonIndex))
+				break;
+
+			wildMonIndex = ChooseWildMonIndex_WaterRock();
+			break;
+		case WILD_AREA_ROCKS:
+			wildMonIndex = ChooseWildMonIndex_WaterRock();
+			break;
+		}
+		rerollCount--;
+		if (VarGet(VAR_CHAIN) >= 4)
+		{
+			if (wildMonInfo->wildPokemon[wildMonIndex].species
+				 == VarGet(VAR_SPECIESCHAINED))
+			{
+				break;
+			}
+		}
+    } while (rerollCount > 0);
 
     level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
     if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))

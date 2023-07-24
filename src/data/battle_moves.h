@@ -197,9 +197,9 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 
     [MOVE_CUT] =
     {
-        .effect = EFFECT_HIT,
-        .power = 50,
-        .type = TYPE_NORMAL,
+        .effect = EFFECT_HIGH_CRITICAL,
+        .power = 60,
+        .type = TYPE_GRASS,
         .accuracy = 95,
         .pp = 30,
         .secondaryEffectChance = 0,
@@ -250,14 +250,14 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_FLY] =
     {
         .effect = EFFECT_SEMI_INVULNERABLE,
-        .power = 70,
+        .power = 85,
         .type = TYPE_FLYING,
         .accuracy = 95,
         .pp = 15,
         .secondaryEffectChance = 0,
         .target = MOVE_TARGET_SELECTED,
         .priority = 0,
-        .flags = FLAG_MAKES_CONTACT | FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED | FLAG_KINGSROCK_AFFECTED,
+        .flags = FLAG_MAKES_CONTACT | FLAG_MIRROR_MOVE_AFFECTED | FLAG_KINGSROCK_AFFECTED,
     },
 
     [MOVE_BIND] =
@@ -1653,12 +1653,12 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 
     [MOVE_WATERFALL] =
     {
-        .effect = EFFECT_HIT,
+        .effect = EFFECT_FLINCH_MINIMIZE_HIT,
         .power = 80,
         .type = TYPE_WATER,
         .accuracy = 100,
         .pp = 15,
-        .secondaryEffectChance = 0,
+        .secondaryEffectChance = 20,
         .target = MOVE_TARGET_SELECTED,
         .priority = 0,
         .flags = FLAG_MAKES_CONTACT | FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED | FLAG_KINGSROCK_AFFECTED,
@@ -3240,7 +3240,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_ROCK_SMASH] =
     {
         .effect = EFFECT_DEFENSE_DOWN_HIT,
-        .power = 20,
+        .power = 60,
         .type = TYPE_FIGHTING,
         .accuracy = 100,
         .pp = 15,
@@ -3786,7 +3786,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_DIVE] =
     {
         .effect = EFFECT_SEMI_INVULNERABLE,
-        .power = 60,
+        .power = 85,
         .type = TYPE_WATER,
         .accuracy = 100,
         .pp = 10,

@@ -1370,13 +1370,13 @@ static const u8 sTM50Desc[] = _(
 
 static const u8 sHM01Desc[] = _(
     "Attacks the foe\n"
-    "with sharp blades\n"
-    "or claws.");
+    "with sharp blades.\n"
+    "High critical ratio.");
 
 static const u8 sHM02Desc[] = _(
-    "Flies up on the\n"
-    "first turn, then\n"
-    "attacks next turn.");
+    "Flies up, and\n"
+    "attacks next turn.\n"
+    "Ignores Protect.");
 
 static const u8 sHM03Desc[] = _(
     "Creates a huge\n"

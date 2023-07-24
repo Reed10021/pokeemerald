@@ -237,6 +237,30 @@ BattleFrontier_OutsideEast_EventScript_Camper:: @ 8242E08
 	msgbox BattleFrontier_OutsideEast_Text_StickyMonWithLongTail, MSGBOX_NPC
 	end
 
+BattleFrontier_OutsideEast_EventScript_Kirby::
+	trainerbattle_single TRAINER_KIRBY, BattleFrontier_OutsideEast_Text_KirbyIntro, BattleFrontier_OutsideEast_Text_KirbyDefeated
+	msgbox BattleFrontier_OutsideEast_Text_KirbyPostBattle, MSGBOX_AUTOCLOSE
+	cleartrainerflag TRAINER_KIRBY
+	end
+
+BattleFrontier_OutsideEast_EventScript_Reed::
+	trainerbattle_single TRAINER_REED_YELLOW, BattleFrontier_OutsideEast_Text_ReedIntro, BattleFrontier_OutsideEast_Text_ReedDefeated
+	msgbox BattleFrontier_OutsideEast_Text_ReedPostBattle, MSGBOX_AUTOCLOSE
+	cleartrainerflag TRAINER_REED_YELLOW
+	end
+
+BattleFrontier_OutsideEast_EventScript_Chris::
+	trainerbattle_single TRAINER_CHRIS_CRYSTAL, BattleFrontier_OutsideEast_Text_ChrisIntro, BattleFrontier_OutsideEast_Text_ChrisDefeated
+	msgbox BattleFrontier_OutsideEast_Text_ChrisPostBattle, MSGBOX_AUTOCLOSE
+	cleartrainerflag TRAINER_CHRIS_CRYSTAL
+	end
+
+BattleFrontier_OutsideEast_EventScript_Kris::
+	trainerbattle_single TRAINER_KRIS, BattleFrontier_OutsideEast_Text_KrisIntro, BattleFrontier_OutsideEast_Text_KrisDefeated
+	msgbox BattleFrontier_OutsideEast_Text_KrisPostBattle, MSGBOX_AUTOCLOSE
+	cleartrainerflag TRAINER_KRIS
+	end
+
 BattleFrontier_OutsideEast_Text_BattleTowerSign: @ 8242E11
 	.string "This is the BATTLE TOWER!\n"
 	.string "Keep the win streak as the toughest\l"
@@ -441,3 +465,39 @@ BattleFrontier_OutsideEast_Text_StickyMonWithLongTail: @ 8243D0B
 	.string "with a long tail up ahead!\p"
 	.string "It was hiding under a boulder, and\n"
 	.string "it kept staring at me!$"
+
+BattleFrontier_OutsideEast_Text_KirbyIntro:
+	.string "...$"
+
+BattleFrontier_OutsideEast_Text_KirbyDefeated:
+	.string "...!$"
+
+BattleFrontier_OutsideEast_Text_KirbyPostBattle:
+	.string "...$"
+
+BattleFrontier_OutsideEast_Text_ReedIntro:
+	.string "...$"
+
+BattleFrontier_OutsideEast_Text_ReedDefeated:
+	.string "...!$"
+
+BattleFrontier_OutsideEast_Text_ReedPostBattle:
+	.string "...$"
+
+BattleFrontier_OutsideEast_Text_ChrisIntro:
+	.string "...$"
+
+BattleFrontier_OutsideEast_Text_ChrisDefeated:
+	.string "...!$"
+
+BattleFrontier_OutsideEast_Text_ChrisPostBattle:
+	.string "...$"
+
+BattleFrontier_OutsideEast_Text_KrisIntro:
+	.string "...$"
+
+BattleFrontier_OutsideEast_Text_KrisDefeated:
+	.string "...!$"
+
+BattleFrontier_OutsideEast_Text_KrisPostBattle:
+	.string "...$"

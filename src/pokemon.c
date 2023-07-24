@@ -2209,12 +2209,11 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     //Determine original trainer ID
     if (otIdType == OT_ID_RANDOM_NO_SHINY) //Pokemon cannot be shiny
     {
-        u32 shinyValue;
-        do
-        {
-            value = Random32();
-            shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
-        } while (shinyValue < SHINY_ODDS);
+        value = gSaveBlock2Ptr->playerTrainerId[0]
+              | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
+              | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
+              | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+
     }
     else if (otIdType == OT_ID_PRESET) //Pokemon has a preset OT ID
     {
@@ -2226,8 +2225,23 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
               | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
               | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
               | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
-    }
 
+        if (VarGet(VAR_CHAIN) >= 4)
+        {
+           if (VarGet(VAR_SPECIESCHAINED) == species)
+            {
+                u32 shinyValue;
+                u32 rolls = VarGet(VAR_CHAIN) / 2;
+                do
+                {
+                    personality = Random32();
+                    shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+                    rolls++;
+                } while (shinyValue >= SHINY_ODDS && rolls <= (VarGet(VAR_CHAIN)));
+            }
+        }
+    }
+    SetBoxMonData(boxMon, MON_DATA_PERSONALITY, &personality);
     SetBoxMonData(boxMon, MON_DATA_OT_ID, &value);
 
     checksum = CalculateBoxMonChecksum(boxMon);
@@ -2260,23 +2274,55 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     else
     {
         u32 iv;
-        value = Random();
+        u32 rolls = 1;
+		if (VarGet(VAR_CHAIN) >= 4)
+        {
+            rolls = VarGet(VAR_CHAIN) / 3;
+        }
 
-        iv = value & 0x1F;
-        SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv);
-        iv = (value & 0x3E0) >> 5;
-        SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv);
-        iv = (value & 0x7C00) >> 10;
-        SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
+        do
+        {
+			value = Random();
 
-        value = Random();
+			iv = value & 0x1F;
+			SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv);
+			iv = (value & 0x3E0) >> 5;
+			SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv);
+			iv = (value & 0x7C00) >> 10;
+			SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
+			if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) > 15
+				&& GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) > 15
+				&& GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) > 15)
+			{
+				break;
+			}
+			rolls--;
+        } while (rolls > 0);
 
-        iv = value & 0x1F;
-        SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv);
-        iv = (value & 0x3E0) >> 5;
-        SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv);
-        iv = (value & 0x7C00) >> 10;
-        SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
+        rolls = 1;
+        if (VarGet(VAR_CHAIN) >= 4)
+        {
+            rolls = VarGet(VAR_CHAIN) / 3;
+        }
+
+        do
+        {
+			value = Random();
+
+			iv = value & 0x1F;
+			SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv);
+			iv = (value & 0x3E0) >> 5;
+			SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv);
+			iv = (value & 0x7C00) >> 10;
+			SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
+			if (GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) > 15
+				&& GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) > 15
+				&& GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) > 15)
+			{
+				break;
+			}
+			rolls--;
+        } while (rolls > 0);
     }
 
     if (gBaseStats[species].abilities[1])
@@ -5419,12 +5465,12 @@ u16 GetEvolutionTargetSpecies(struct Pokemon *mon, u8 type, u16 evolutionItem)
                 break;
             case EVO_FRIENDSHIP_DAY:
                 RtcCalcLocalTime();
-                if (gLocalTime.hours >= 12 && gLocalTime.hours < 24 && friendship >= 220)
+                if (gLocalTime.hours >= DAY_START && gLocalTime.hours < NIGHT_START && friendship >= 220)
                     targetSpecies = gEvolutionTable[species][i].targetSpecies;
                 break;
             case EVO_FRIENDSHIP_NIGHT:
                 RtcCalcLocalTime();
-                if (gLocalTime.hours >= 0 && gLocalTime.hours < 12 && friendship >= 220)
+                if ((gLocalTime.hours >= NIGHT_START || gLocalTime.hours < DAY_START) && friendship >= 220)
                     targetSpecies = gEvolutionTable[species][i].targetSpecies;
                 break;
             case EVO_LEVEL:
@@ -6289,11 +6335,16 @@ u16 GetBattleBGM(void)
             return MUS_VS_GYM_LEADER;
         case TRAINER_CLASS_CHAMPION:
             return MUS_VS_CHAMPION;
+		case TRAINER_CLASS_PKMN_TRAINER_1:
+		case TRAINER_CLASS_PKMN_TRAINER_2:
+			return MUS_RG_VS_CHAMPION;
         case TRAINER_CLASS_PKMN_TRAINER_3:
             if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
                 return MUS_VS_RIVAL;
             if (!StringCompare(gTrainers[gTrainerBattleOpponent_A].trainerName, gText_BattleWallyName))
                 return MUS_VS_TRAINER;
+            if (!StringCompare(gTrainers[gTrainerBattleOpponent_A].trainerName, gText_BattleStevenName))
+                return MUS_VS_CHAMPION;
             return MUS_VS_RIVAL;
         case TRAINER_CLASS_ELITE_FOUR:
             return MUS_VS_ELITE_FOUR;
@@ -6310,7 +6361,38 @@ u16 GetBattleBGM(void)
         }
     }
     else
+	{
+		switch (GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL))
+		{
+		case SPECIES_GROUDON:
+		case SPECIES_KYOGRE:
+			return MUS_VS_KYOGRE_GROUDON;
+		case SPECIES_RAYQUAZA:
+			return MUS_VS_RAYQUAZA;
+		case SPECIES_DEOXYS:
+		case SPECIES_JIRACHI:
+			return MUS_RG_VS_DEOXYS;
+		case SPECIES_REGICE:
+		case SPECIES_REGIROCK:
+		case SPECIES_REGISTEEL:
+			return MUS_VS_REGI;
+		case SPECIES_ARTICUNO:
+		case SPECIES_ZAPDOS:
+		case SPECIES_MOLTRES:
+			return MUS_RG_VS_MEWTWO;
+		case SPECIES_LUGIA:
+		case SPECIES_HO_OH:
+		case SPECIES_RAIKOU:
+		case SPECIES_ENTEI:
+		case SPECIES_SUICUNE:
+		case SPECIES_MEWTWO:
+			return MUS_C_VS_LEGEND_BEAST;
+		case SPECIES_MEW:
+		case SPECIES_CELEBI:
+			return MUS_VS_MEW;
+		}
         return MUS_VS_WILD;
+	}
 }
 
 void PlayBattleBGM(void)

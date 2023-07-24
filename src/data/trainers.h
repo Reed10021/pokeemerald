@@ -11968,4 +11968,60 @@ const struct Trainer gTrainers[] = {
         .partySize = ARRAY_COUNT(sParty_MayLinkPlaceholder),
         .party = {.NoItemDefaultMoves = sParty_MayLinkPlaceholder},
     },
+	
+    [TRAINER_KIRBY] =
+    {
+        .partyFlags = F_TRAINER_PARTY_HELD_ITEM | F_TRAINER_PARTY_CUSTOM_MOVESET,
+        .trainerClass = TRAINER_CLASS_PKMN_TRAINER_1,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
+        .trainerPic = TRAINER_PIC_RED,
+        .trainerName = _("KIRBY"),
+        .items = {ITEM_FULL_RESTORE, ITEM_FULL_RESTORE, ITEM_FULL_RESTORE, ITEM_FULL_RESTORE},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
+        .partySize = ARRAY_COUNT(sParty_Kirby),
+        .party = {.ItemCustomMoves = sParty_Kirby},
+    },
+	
+    [TRAINER_REED_YELLOW] =
+    {
+        .partyFlags = F_TRAINER_PARTY_HELD_ITEM | F_TRAINER_PARTY_CUSTOM_MOVESET,
+        .trainerClass = TRAINER_CLASS_PKMN_TRAINER_1,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
+        .trainerPic = TRAINER_PIC_RED,
+        .trainerName = _("REED"),
+        .items = {ITEM_FULL_RESTORE, ITEM_FULL_RESTORE, ITEM_FULL_RESTORE, ITEM_FULL_RESTORE},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
+        .partySize = ARRAY_COUNT(sParty_Reed_Yellow),
+        .party = {.ItemCustomMoves = sParty_Reed_Yellow},
+    },
+	
+    [TRAINER_CHRIS_CRYSTAL] =
+    {
+        .partyFlags = F_TRAINER_PARTY_HELD_ITEM | F_TRAINER_PARTY_CUSTOM_MOVESET,
+        .trainerClass = TRAINER_CLASS_PKMN_TRAINER_2,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
+        .trainerPic = TRAINER_PIC_RS_BRENDAN,
+        .trainerName = _("CHRIS"),
+        .items = {ITEM_FULL_RESTORE, ITEM_FULL_RESTORE, ITEM_FULL_RESTORE, ITEM_FULL_RESTORE},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
+        .partySize = ARRAY_COUNT(sParty_Chris_Crystal),
+        .party = {.ItemCustomMoves = sParty_Chris_Crystal},
+    },
+	
+    [TRAINER_KRIS] =
+    {
+        .partyFlags = F_TRAINER_PARTY_HELD_ITEM | F_TRAINER_PARTY_CUSTOM_MOVESET,
+        .trainerClass = TRAINER_CLASS_PKMN_TRAINER_2,
+        .encounterMusic_gender = TRAINER_ENCOUNTER_MUSIC_MALE,
+        .trainerPic = TRAINER_PIC_RS_MAY,
+        .trainerName = _("KRIS"),
+        .items = {ITEM_FULL_RESTORE, ITEM_FULL_RESTORE, ITEM_FULL_RESTORE, ITEM_FULL_RESTORE},
+        .doubleBattle = FALSE,
+        .aiFlags = AI_SCRIPT_CHECK_BAD_MOVE | AI_SCRIPT_TRY_TO_FAINT | AI_SCRIPT_CHECK_VIABILITY,
+        .partySize = ARRAY_COUNT(sParty_Kris),
+        .party = {.ItemCustomMoves = sParty_Kris},
+    },
 };

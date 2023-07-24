@@ -58,8 +58,8 @@ static const u8 sSwordsDanceDescription[] = _(
     "sharply raises ATTACK.");
 
 static const u8 sCutDescription[] = _(
-    "Cuts the foe with sharp\n"
-    "scythes, claws, etc.");
+    "Cuts with sharp claws. Has a\n"
+    "high critical-hit ratio.");
 
 static const u8 sGustDescription[] = _(
     "Strikes the foe with a gust\n"
@@ -74,8 +74,8 @@ static const u8 sWhirlwindDescription[] = _(
     "wind and ends the battle.");
 
 static const u8 sFlyDescription[] = _(
-    "Flies up on the first turn,\n"
-    "then strikes the next turn.");
+    "Flies up and strikes on the\n"
+    "next turn. Ignores Protect.");
 
 static const u8 sBindDescription[] = _(
     "Binds and squeezes the foe\n"

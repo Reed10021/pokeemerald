@@ -86,6 +86,9 @@ static void HandleRematchVarsOnBattleEnd(void);
 static const u8 *GetIntroSpeechOfApproachingTrainer(void);
 static const u8 *GetTrainerCantBattleSpeech(void);
 
+extern const u8 ChainNumber[];
+extern const u8 AddChain[];
+
 // ewram vars
 EWRAM_DATA static u16 sTrainerBattleMode = 0;
 EWRAM_DATA u16 gTrainerBattleOpponent_A = 0;
@@ -596,7 +599,7 @@ void StartRegiBattle(void)
     TryUpdateGymLeaderRematchFromWild();
 }
 
-static void CB2_EndWildBattle(void)
+/*static void CB2_EndWildBattle(void)
 {
     CpuFill16(0, (void*)(BG_PLTT), BG_PLTT_SIZE);
     ResetOamRange(0, 128);
@@ -609,6 +612,55 @@ static void CB2_EndWildBattle(void)
     {
         SetMainCallback2(CB2_ReturnToField);
         gFieldCallback = sub_80AF6F0;
+    }
+}*/
+
+static void CB2_EndWildBattle(void)
+{
+    u16 species;
+    u16 ptr;
+    u8 nickname[POKEMON_NAME_LENGTH + 1];
+    u16 lastPokemonFound;
+    species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES);
+    CpuFill16(0, (void*)(BG_PLTT), BG_PLTT_SIZE);
+    ResetOamRange(0, 128);
+    if (IsPlayerDefeated(gBattleOutcome) == TRUE && !InBattlePyramid() && !InBattlePike())
+    {
+        SetMainCallback2(CB2_WhiteOut);
+    }
+    else
+    {
+		if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT)
+		{
+			if (VarGet(VAR_CHAIN) == 0)
+			{
+				VarSet(VAR_SPECIESCHAINED, species);
+				ScriptContext1_SetupScript(AddChain);
+			}
+			else if ((species == VarGet(VAR_SPECIESCHAINED)) && VarGet(VAR_CHAIN) >=4)
+			{
+				GetSpeciesName(gStringVar2 ,VarGet(VAR_SPECIESCHAINED));
+				ScriptContext1_SetupScript(ChainNumber);
+			}
+			else if (species == VarGet(VAR_SPECIESCHAINED))
+				ScriptContext1_SetupScript(AddChain);
+			else if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
+			{
+				VarSet(VAR_CHAIN, 0);
+				VarSet(VAR_SPECIESCHAINED, 0);
+			}
+		}
+		else
+		{
+			if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
+			{
+				VarSet(VAR_CHAIN,0);
+				VarSet(VAR_SPECIESCHAINED,0);
+			}
+		}
+
+		SetMainCallback2(CB2_ReturnToField);
+		gFieldCallback = sub_80AF6F0;
     }
 }
 

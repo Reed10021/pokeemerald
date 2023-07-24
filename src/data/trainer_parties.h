@@ -12434,3 +12434,183 @@ static const struct TrainerMonNoItemDefaultMoves sParty_MayLinkPlaceholder[] = {
     .species = SPECIES_KYOGRE,
     }
 };
+
+static const struct TrainerMonItemCustomMoves sParty_Kirby[] = {
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_PIKACHU,
+    .heldItem = ITEM_LIGHT_BALL,
+    .moves = {MOVE_HYPER_BEAM, MOVE_THUNDER, MOVE_EARTHQUAKE, MOVE_HYDRO_PUMP}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_BLASTOISE,
+    .heldItem = ITEM_NEVER_MELT_ICE,
+    .moves = {MOVE_FLAMETHROWER, MOVE_HYPER_BEAM, MOVE_HYDRO_PUMP, MOVE_BLIZZARD}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_DRAGONITE,
+    .heldItem = ITEM_SOFT_SAND,
+    .moves = {MOVE_EARTHQUAKE, MOVE_DRILL_PECK, MOVE_FIRE_BLAST, MOVE_ICE_BEAM}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_CHARIZARD,
+    .heldItem = ITEM_CHARCOAL,
+    .moves = {MOVE_FIRE_BLAST, MOVE_FLY, MOVE_STOMP, MOVE_THUNDER}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_NIDOKING,
+    .heldItem = ITEM_SILK_SCARF,
+    .moves = {MOVE_EARTHQUAKE, MOVE_DIG, MOVE_SKULL_BASH, MOVE_DRILL_PECK}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_MEW,
+    .heldItem = ITEM_TWISTED_SPOON,
+    .moves = {MOVE_PSYCHIC, MOVE_THUNDERBOLT, MOVE_EGG_BOMB, MOVE_CONFUSION}
+    }
+};
+
+static const struct TrainerMonItemCustomMoves sParty_Reed_Yellow[] = {
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_PIKACHU,
+    .heldItem = ITEM_LIGHT_BALL,
+    .moves = {MOVE_THUNDER, MOVE_PETAL_DANCE, MOVE_FIRE_BLAST, MOVE_HYPER_BEAM}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_VAPOREON,
+    .heldItem = ITEM_MYSTIC_WATER,
+    .moves = {MOVE_WATERFALL, MOVE_AURORA_BEAM, MOVE_DRILL_PECK, MOVE_HYDRO_PUMP}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_RHYDON,
+    .heldItem = ITEM_SOFT_SAND,
+    .moves = {MOVE_THRASH, MOVE_HI_JUMP_KICK, MOVE_ROCK_SLIDE, MOVE_EARTHQUAKE}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_ZAPDOS,
+    .heldItem = ITEM_MAGNET,
+    .moves = {MOVE_THUNDER, MOVE_BLIZZARD, MOVE_PSYBEAM, MOVE_FLY}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_MOLTRES,
+    .heldItem = ITEM_CHARCOAL,
+    .moves = {MOVE_FLAMETHROWER, MOVE_DRILL_PECK, MOVE_THUNDER, MOVE_EXPLOSION}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_MEWTWO,
+    .heldItem = ITEM_SILK_SCARF,
+    .moves = {MOVE_CONFUSION, MOVE_THUNDER_PUNCH, MOVE_HYPER_BEAM, MOVE_FLAMETHROWER}
+    }
+};
+
+static const struct TrainerMonItemCustomMoves sParty_Chris_Crystal[] = {
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_SUICUNE,
+    .heldItem = ITEM_MYSTIC_WATER,
+    .moves = {MOVE_SURF, MOVE_HYDRO_PUMP, MOVE_THUNDER, MOVE_ICE_BEAM}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_ZAPDOS,
+    .heldItem = ITEM_MAGNET,
+    .moves = {MOVE_THUNDERBOLT, MOVE_AEROBLAST, MOVE_THUNDER, MOVE_FLY}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_DRAGONITE,
+    .heldItem = ITEM_DRAGON_FANG,
+    .moves = {MOVE_FIRE_BLAST, MOVE_OUTRAGE, MOVE_EARTHQUAKE, MOVE_AEROBLAST}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_HO_OH,
+    .heldItem = ITEM_SHARP_BEAK,
+    .moves = {MOVE_FLAMETHROWER, MOVE_SACRED_FIRE, MOVE_EARTHQUAKE, MOVE_AEROBLAST}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_MEW,
+    .heldItem = ITEM_TWISTED_SPOON,
+    .moves = {MOVE_PSYCHIC, MOVE_ANCIENT_POWER, MOVE_STOMP, MOVE_THRASH}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_MEWTWO,
+    .heldItem = ITEM_TWISTED_SPOON,
+    .moves = {MOVE_PSYCHIC, MOVE_HYDRO_PUMP, MOVE_THUNDER, MOVE_BLIZZARD}
+    }
+};
+
+static const struct TrainerMonItemCustomMoves sParty_Kris[] = {
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_HERACROSS,
+    .heldItem = ITEM_BLACK_BELT,
+    .moves = {MOVE_MEGAHORN, MOVE_CROSS_CHOP, MOVE_STRENGTH, MOVE_AEROBLAST}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_KINGDRA,
+    .heldItem = ITEM_MYSTIC_WATER,
+    .moves = {MOVE_SURF, MOVE_CRUNCH, MOVE_HEADBUTT, MOVE_OUTRAGE}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_ARTICUNO,
+    .heldItem = ITEM_NEVER_MELT_ICE,
+    .moves = {MOVE_ICE_BEAM, MOVE_FLY, MOVE_HYPER_BEAM, MOVE_BLIZZARD}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_RAIKOU,
+    .heldItem = ITEM_MAGNET,
+    .moves = {MOVE_THUNDERBOLT, MOVE_PETAL_DANCE, MOVE_EXTREME_SPEED, MOVE_THUNDER}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_ENTEI,
+    .heldItem = ITEM_CHARCOAL,
+    .moves = {MOVE_SACRED_FIRE, MOVE_EARTHQUAKE, MOVE_THRASH, MOVE_GROWTH}
+    },
+    {
+    .iv = 255,
+    .lvl = 100,
+    .species = SPECIES_MEWTWO,
+    .heldItem = ITEM_LEFTOVERS,
+    .moves = {MOVE_PSYCHIC, MOVE_SLUDGE_BOMB, MOVE_FIRE_BLAST, MOVE_BLIZZARD}
+    }
+};
