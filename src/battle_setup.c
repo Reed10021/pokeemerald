@@ -633,28 +633,36 @@ static void CB2_EndWildBattle(void)
     {
 		if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT)
 		{
+			// 	If we already have a species
+			if (species == VarGet(VAR_SPECIESCHAINED))
+				ScriptContext1_SetupScript(AddChain);
+			
+			// If we have no species
 			if (VarGet(VAR_CHAIN) == 0)
 			{
 				VarSet(VAR_SPECIESCHAINED, species);
 				ScriptContext1_SetupScript(AddChain);
 			}
+			// else if we have a species and our chain is +3, show textbox.
 			else if ((species == VarGet(VAR_SPECIESCHAINED)) && VarGet(VAR_CHAIN) >=3)
 			{
 				GetSpeciesName(gStringVar2 ,VarGet(VAR_SPECIESCHAINED));
 				ScriptContext1_SetupScript(ChainNumber);
 			}
-			else if (species == VarGet(VAR_SPECIESCHAINED))
-				ScriptContext1_SetupScript(AddChain);
+			// else if we have a species, the species wasn't correct, and the chain is not zero.
 			else if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
 			{
+				// If the chain was 3, show textbox
 				if(VarGet(VAR_CHAIN) >= 3)
 					ScriptContext1_SetupScript(DeleteChain);
+				// Cleanup
 				VarSet(VAR_CHAIN, 0);
 				VarSet(VAR_SPECIESCHAINED, 0);
 			}
 		}
-		else
+		else // Else it wasn't victory
 		{
+			// If we had a chain and the species was correct but we ran from it.
 			if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
 			{
 				if(VarGet(VAR_CHAIN) >= 3)

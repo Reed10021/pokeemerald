@@ -1,5 +1,4 @@
 ChainNumber::
-	addvar VAR_CHAIN, 1
 	buffernumberstring 0, VAR_CHAIN
 	lock
 	msgbox Text_ActiveChain, 2

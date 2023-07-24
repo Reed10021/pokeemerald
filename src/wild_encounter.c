@@ -391,12 +391,11 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     u32 rerollCount = 1;
 
     if (VarGet(VAR_CHAIN) >= 3) //If we're chaining.
-    {
         rerollCount += VarGet(VAR_CHAIN) / 3;
-    }
 
     do
     {
+		rerollCount--;
 		switch (area)
 		{
 		case WILD_AREA_LAND:
@@ -417,19 +416,15 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 			wildMonIndex = ChooseWildMonIndex_WaterRock();
 			break;
 		}
-		rerollCount--;
 		if (VarGet(VAR_CHAIN) >= 3)
-		{
-			if (wildMonInfo->wildPokemon[wildMonIndex].species
-				 == VarGet(VAR_SPECIESCHAINED))
-			{
+			if (wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED))
 				break;
-			}
-		}
     } while (rerollCount > 0);
 
     level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
-    if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
+	// Allow chained pokemon to bypass repel. If not chaining, then no effect on repel.
+    if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level) 
+		&& (VarGet(VAR_CHAIN) >= 3 && wildMonInfo->wildPokemon[wildMonIndex].species != VarGet(VAR_SPECIESCHAINED)))
         return FALSE;
     if (gMapHeader.mapLayoutId != LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS && flags & WILD_CHECK_KEEN_EYE && !IsAbilityAllowingEncounter(level))
         return FALSE;
@@ -440,9 +435,21 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 
 static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 rod)
 {
-    u8 wildMonIndex = ChooseWildMonIndex_Fishing(rod);
-    u8 level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
+	u8 wildMonIndex;
+	u8 level;
+	u32 rerollCount = 1;
+    if (VarGet(VAR_CHAIN) >= 3) //If we're chaining.
+        rerollCount += VarGet(VAR_CHAIN) / 3;
+	do
+	{
+		rerollCount--;
+		wildMonIndex = ChooseWildMonIndex_Fishing(rod);
+		if (VarGet(VAR_CHAIN) >= 3)
+			if (wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED))
+				break;
+	} while (rerollCount > 0);
 
+	level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
     CreateWildMon(wildMonInfo->wildPokemon[wildMonIndex].species, level);
     return wildMonInfo->wildPokemon[wildMonIndex].species;
 }
