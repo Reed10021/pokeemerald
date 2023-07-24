@@ -627,40 +627,51 @@ static void CB2_EndWildBattle(void)
     ResetOamRange(0, 128);
     if (IsPlayerDefeated(gBattleOutcome) == TRUE && !InBattlePyramid() && !InBattlePike())
     {
+		// If we had a chain and the species was correct but we died.
+		if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
+		{
+			if(VarGet(VAR_CHAIN) >= 3)
+				ScriptContext1_SetupScript(DeleteChain);
+			VarSet(VAR_CHAIN,0);
+			VarSet(VAR_SPECIESCHAINED,0);
+		}
         SetMainCallback2(CB2_WhiteOut);
     }
     else
     {
 		if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT)
 		{
-			// 	If we already have a species
-			if (species == VarGet(VAR_SPECIESCHAINED))
-				ScriptContext1_SetupScript(AddChain);
-			
-			// If we have no species
-			if (VarGet(VAR_CHAIN) == 0)
+			// if we have a species, the species wasn't correct, and the chain is not zero, yeet.
+			if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
 			{
-				VarSet(VAR_SPECIESCHAINED, species);
-				ScriptContext1_SetupScript(AddChain);
-			}
-			// else if we have a species and our chain is +3, show textbox.
-			else if ((species == VarGet(VAR_SPECIESCHAINED)) && VarGet(VAR_CHAIN) >=3)
-			{
-				GetSpeciesName(gStringVar2 ,VarGet(VAR_SPECIESCHAINED));
-				ScriptContext1_SetupScript(ChainNumber);
-			}
-			// else if we have a species, the species wasn't correct, and the chain is not zero.
-			else if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
-			{
-				// If the chain was 3, show textbox
+				// If the chain was 3, show textbox showing you messed up.
 				if(VarGet(VAR_CHAIN) >= 3)
+				{
 					ScriptContext1_SetupScript(DeleteChain);
-				// Cleanup
-				VarSet(VAR_CHAIN, 0);
-				VarSet(VAR_SPECIESCHAINED, 0);
+					// Cleanup
+					VarSet(VAR_CHAIN, 0);
+					VarSet(VAR_SPECIESCHAINED, 0);
+				}
+				else // if the chain wasn't +3, then act like we've started chaining this new species and are incrementing the counter.
+				{
+					VarSet(VAR_SPECIESCHAINED, species);
+					VarSet(VAR_CHAIN, 1);
+				}
+			}
+			else
+			{
+				// if no chain, start chaining
+				if(VarGet(VAR_SPECIESCHAINED) == 0)
+					VarSet(VAR_SPECIESCHAINED, species);
+				// if chain, increment chain and maybe show text
+				if(species == VarGet(VAR_SPECIESCHAINED))
+				{
+					GetSpeciesName(gStringVar2 ,VarGet(VAR_SPECIESCHAINED));
+					ScriptContext1_SetupScript(ChainNumber);
+				}
 			}
 		}
-		else // Else it wasn't victory
+		else // Else we ran
 		{
 			// If we had a chain and the species was correct but we ran from it.
 			if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
