@@ -132,7 +132,7 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
         input->dpadDirection = DIR_EAST;
 	
    // If B is pressed, field controls are allowed, and the player is either running or walking.
-   if ((newKeys & B_BUTTON) && (!ArePlayerFieldControlsLocked())
+   if ((newKeys & B_BUTTON) && (!ScriptContext2_IsEnabled())
 	&& (gPlayerAvatar.flags & (PLAYER_AVATAR_FLAG_DASH | PLAYER_AVATAR_FLAG_ON_FOOT)))
    {
        gRunToggleBtnSet = TRUE;
