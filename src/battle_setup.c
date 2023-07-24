@@ -637,7 +637,7 @@ static void CB2_EndWildBattle(void)
 				VarSet(VAR_SPECIESCHAINED, species);
 				ScriptContext1_SetupScript(AddChain);
 			}
-			else if ((species == VarGet(VAR_SPECIESCHAINED)) && VarGet(VAR_CHAIN) >=4)
+			else if ((species == VarGet(VAR_SPECIESCHAINED)) && VarGet(VAR_CHAIN) >=3)
 			{
 				GetSpeciesName(gStringVar2 ,VarGet(VAR_SPECIESCHAINED));
 				ScriptContext1_SetupScript(ChainNumber);
@@ -648,6 +648,7 @@ static void CB2_EndWildBattle(void)
 			{
 				VarSet(VAR_CHAIN, 0);
 				VarSet(VAR_SPECIESCHAINED, 0);
+				ScriptContext1_SetupScript(DeleteChain);
 			}
 		}
 		else
@@ -656,6 +657,7 @@ static void CB2_EndWildBattle(void)
 			{
 				VarSet(VAR_CHAIN,0);
 				VarSet(VAR_SPECIESCHAINED,0);
+				ScriptContext1_SetupScript(DeleteChain);
 			}
 		}
 

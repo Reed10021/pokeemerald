@@ -2226,7 +2226,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
               | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
               | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
 
-        if (VarGet(VAR_CHAIN) >= 4)
+        if (VarGet(VAR_CHAIN) >= 3)
         {
            if (VarGet(VAR_SPECIESCHAINED) == species)
             {
@@ -2275,9 +2275,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     {
         u32 iv;
         u32 rolls = 1;
-		if (VarGet(VAR_CHAIN) >= 4)
+		if (VarGet(VAR_CHAIN) >= 3)
         {
-            rolls = VarGet(VAR_CHAIN) / 3;
+            rolls += VarGet(VAR_CHAIN) / 3;
         }
 
         do
@@ -2290,7 +2290,8 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 			SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv);
 			iv = (value & 0x7C00) >> 10;
 			SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
-			if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) > 15
+			if (VarGet(VAR_CHAIN) >= 3 
+				&& GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) > 15
 				&& GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) > 15
 				&& GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) > 15)
 			{
@@ -2300,9 +2301,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
         } while (rolls > 0);
 
         rolls = 1;
-        if (VarGet(VAR_CHAIN) >= 4)
+        if (VarGet(VAR_CHAIN) >= 3)
         {
-            rolls = VarGet(VAR_CHAIN) / 3;
+            rolls += VarGet(VAR_CHAIN) / 3;
         }
 
         do
@@ -2315,7 +2316,8 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 			SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv);
 			iv = (value & 0x7C00) >> 10;
 			SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
-			if (GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) > 15
+			if (VarGet(VAR_CHAIN) >= 3 
+				&& GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) > 15
 				&& GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) > 15
 				&& GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) > 15)
 			{
@@ -2873,7 +2875,7 @@ void CalculateMonStats(struct Pokemon *mon)
 
     SetMonData(mon, MON_DATA_LEVEL, &level);
 
-    if (species == SPECIES_SHEDINJA)
+    if (gBaseStats[species].baseHP == 1) //species == SPECIES_SHEDINJA
     {
         newMaxHP = 1;
     }
@@ -2895,7 +2897,7 @@ void CalculateMonStats(struct Pokemon *mon)
     CALC_STAT(baseSpAttack, spAttackIV, spAttackEV, STAT_SPATK, MON_DATA_SPATK)
     CALC_STAT(baseSpDefense, spDefenseIV, spDefenseEV, STAT_SPDEF, MON_DATA_SPDEF)
 
-    if (species == SPECIES_SHEDINJA)
+    if (gBaseStats[species].baseHP == 1) //species == SPECIES_SHEDINJA
     {
         if (currentHP != 0 || oldMaxHP == 0)
             currentHP = 1;

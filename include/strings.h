@@ -2989,4 +2989,7 @@ extern const u8 gText_SavingDontTurnOff2[];
 extern const u8 gText_BlenderMaxSpeedRecord[];
 extern const u8 gText_234Players[];
 
+//
+extern const u8 gText_Moves_Menu[];
+
 #endif // GUARD_STRINGS_H

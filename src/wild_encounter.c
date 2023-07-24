@@ -163,7 +163,7 @@ static u8 ChooseWildMonIndex_Land(void)
         return 8;
     else if (rand >= ENCOUNTER_CHANCE_LAND_MONS_SLOT_8 && rand < ENCOUNTER_CHANCE_LAND_MONS_SLOT_9)
         return 9;
-    else if (rand == ENCOUNTER_CHANCE_LAND_MONS_SLOT_9)
+    else if (rand >= ENCOUNTER_CHANCE_LAND_MONS_SLOT_9 && rand < ENCOUNTER_CHANCE_LAND_MONS_SLOT_10)
         return 10;
     else
         return 11;
@@ -216,7 +216,7 @@ static u8 ChooseWildMonIndex_Fishing(u8 rod)
             wildMonIndex = 7;
         if (rand >= ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_7 && rand < ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_8)
             wildMonIndex = 8;
-        if (rand == ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_8)
+        if (rand >= ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_8 && rand < ENCOUNTER_CHANCE_FISHING_MONS_SUPER_ROD_SLOT_9)
             wildMonIndex = 9;
         break;
     }
@@ -390,11 +390,9 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     u8 level;
     u32 rerollCount = 1;
 
-    if (VarGet(VAR_CHAIN) >= 4) //If we're chaining.
+    if (VarGet(VAR_CHAIN) >= 3) //If we're chaining.
     {
-        rerollCount = VarGet(VAR_CHAIN) / 3;
-        if (rerollCount < 2)
-            rerollCount = 2;
+        rerollCount += VarGet(VAR_CHAIN) / 3;
     }
 
     do
@@ -420,7 +418,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 			break;
 		}
 		rerollCount--;
-		if (VarGet(VAR_CHAIN) >= 4)
+		if (VarGet(VAR_CHAIN) >= 3)
 		{
 			if (wildMonInfo->wildPokemon[wildMonIndex].species
 				 == VarGet(VAR_SPECIESCHAINED))

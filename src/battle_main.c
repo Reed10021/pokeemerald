@@ -127,6 +127,7 @@ static void HandleEndTurn_BattleLost(void);
 static void HandleEndTurn_RanFromBattle(void);
 static void HandleEndTurn_MonFled(void);
 static void HandleEndTurn_FinishBattle(void);
+static bool8 partyMonHoldDoublePrizeEffect(void);
 
 
 // EWRAM vars
@@ -339,6 +340,7 @@ const u8 gTypeEffectiveness[336] =
     TYPE_WATER, TYPE_GROUND, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_WATER, TYPE_ROCK, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_WATER, TYPE_DRAGON, TYPE_MUL_NOT_EFFECTIVE,
+	TYPE_WATER, TYPE_ICE, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ELECTRIC, TYPE_WATER, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_ELECTRIC, TYPE_ELECTRIC, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ELECTRIC, TYPE_GRASS, TYPE_MUL_NOT_EFFECTIVE,
@@ -361,7 +363,6 @@ const u8 gTypeEffectiveness[336] =
     TYPE_ICE, TYPE_GROUND, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_ICE, TYPE_FLYING, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_ICE, TYPE_DRAGON, TYPE_MUL_SUPER_EFFECTIVE,
-    TYPE_ICE, TYPE_STEEL, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ICE, TYPE_FIRE, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_FIGHTING, TYPE_NORMAL, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_FIGHTING, TYPE_ICE, TYPE_MUL_SUPER_EFFECTIVE,
@@ -407,7 +408,7 @@ const u8 gTypeEffectiveness[336] =
     TYPE_BUG, TYPE_DARK, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_BUG, TYPE_STEEL, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ROCK, TYPE_FIRE, TYPE_MUL_SUPER_EFFECTIVE,
-    TYPE_ROCK, TYPE_ICE, TYPE_MUL_SUPER_EFFECTIVE,
+    TYPE_ROCK, TYPE_ICE, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ROCK, TYPE_FIGHTING, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ROCK, TYPE_GROUND, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ROCK, TYPE_FLYING, TYPE_MUL_SUPER_EFFECTIVE,
@@ -3068,7 +3069,10 @@ static void BattleStartClearSetData(void)
     *(&gBattleStruct->safariCatchFactor) = gBaseStats[GetMonData(&gEnemyParty[0], MON_DATA_SPECIES)].catchRate * 100 / 1275;
     gBattleStruct->safariEscapeFactor = 3;
     gBattleStruct->wildVictorySong = 0;
-    gBattleStruct->moneyMultiplier = 1;
+    if (partyMonHoldDoublePrizeEffect())
+        gBattleStruct->moneyMultiplier = 2;
+    else
+        gBattleStruct->moneyMultiplier = 1;
 
     for (i = 0; i < 8; i++)
     {
@@ -5175,4 +5179,19 @@ void RunBattleScriptCommands(void)
     if (gBattleControllerExecFlags == 0)
         gBattleScriptingCommandsTable[gBattlescriptCurrInstr[0]]();
 }
+
+static bool8 partyMonHoldDoublePrizeEffect(void)
+{
+    int i;
+    for (i = 0; i < PARTY_SIZE; i++)
+	{
+        u8 item = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+        if (ItemId_GetHoldEffect(item) == HOLD_EFFECT_DOUBLE_PRIZE)
+		{
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 
