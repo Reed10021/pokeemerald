@@ -88,6 +88,7 @@ static const u8 *GetTrainerCantBattleSpeech(void);
 
 extern const u8 ChainNumber[];
 extern const u8 AddChain[];
+extern const u8 DeleteChain[];
 
 // ewram vars
 EWRAM_DATA static u16 sTrainerBattleMode = 0;
