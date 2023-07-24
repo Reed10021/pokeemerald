@@ -1941,9 +1941,9 @@ static bool8 Fishing_CheckMoreDots(struct Task *task)
 static bool8 Fishing_MonOnHook(struct Task *task)
 {
     AlignFishingAnimationFrames();
-//    FillWindowPixelBuffer(0, PIXEL_FILL(1));
-	AddTextPrinterParameterized(0, 1, gText_PokemonOnHook, 0, 17, 1, NULL);
-//    AddTextPrinterParameterized2(0, 1, gText_PokemonOnHook, 1, 0, 2, 1, 3);
+    FillWindowPixelBuffer(0, PIXEL_FILL(1));
+    AddTextPrinterParameterized2(0, 1, gText_PokemonOnHook, 1, 0, 2, 1, 3);
+	RunTextPrinters();
     task->tStep++;
     task->tFrameCounter = 0;
     return FALSE;
@@ -1954,11 +1954,11 @@ static bool8 Fishing_StartEncounter(struct Task *task)
     if (task->tFrameCounter == 0)
         AlignFishingAnimationFrames();
 
-    RunTextPrinters();
+    //RunTextPrinters();
 
     if (task->tFrameCounter == 0)
     {
-        if (!IsTextPrinterActive(0))
+        //if (!IsTextPrinterActive(0))
         {
             struct ObjectEvent *playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
 
