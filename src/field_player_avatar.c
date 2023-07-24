@@ -662,7 +662,7 @@ static void PlayerNotOnBikeMoving(u8 direction, u16 heldKeys)
 			   gRunToggleBtnSet = FALSE;
 			   if (!(heldKeys & B_BUTTON))
 			   {
-				   PlayerWalkNormal(direction);
+				   PlayerGoSpeed1(direction);
 			   }
 			   else
 			   {
