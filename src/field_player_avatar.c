@@ -1941,8 +1941,9 @@ static bool8 Fishing_CheckMoreDots(struct Task *task)
 static bool8 Fishing_MonOnHook(struct Task *task)
 {
     AlignFishingAnimationFrames();
-    FillWindowPixelBuffer(0, PIXEL_FILL(1));
-    AddTextPrinterParameterized2(0, 1, gText_PokemonOnHook, 1, 0, 2, 1, 3);
+//    FillWindowPixelBuffer(0, PIXEL_FILL(1));
+	AddTextPrinterParameterized(0, 1, gText_PokemonOnHook, 0, 17, 1, NULL);
+//    AddTextPrinterParameterized2(0, 1, gText_PokemonOnHook, 1, 0, 2, 1, 3);
     task->tStep++;
     task->tFrameCounter = 0;
     return FALSE;
@@ -1987,11 +1988,12 @@ static bool8 Fishing_StartEncounter(struct Task *task)
 static bool8 Fishing_NotEvenNibble(struct Task *task)
 {
     AlignFishingAnimationFrames();
-    StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingNoCatchDirectionAnimNum(GetPlayerFacingDirection()));
-    FillWindowPixelBuffer(0, PIXEL_FILL(1));
-    AddTextPrinterParameterized2(0, 1, gText_NotEvenANibble, 1, 0, 2, 1, 3);
-    task->tStep = FISHING_SHOW_RESULT;
-    return TRUE;
+    //StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingNoCatchDirectionAnimNum(GetPlayerFacingDirection()));
+    //FillWindowPixelBuffer(0, PIXEL_FILL(1));
+    //AddTextPrinterParameterized2(0, 1, gText_NotEvenANibble, 1, 0, 2, 1, 3);
+    //task->tStep = FISHING_SHOW_RESULT;
+	task->tStep = FISHING_START_ROUND;
+    return FALSE;
 }
 
 static bool8 Fishing_GotAway(struct Task *task)
