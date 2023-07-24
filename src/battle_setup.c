@@ -647,18 +647,20 @@ static void CB2_EndWildBattle(void)
 				ScriptContext1_SetupScript(AddChain);
 			else if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
 			{
+				if(VarGet(VAR_CHAIN) >= 3)
+					ScriptContext1_SetupScript(DeleteChain);
 				VarSet(VAR_CHAIN, 0);
 				VarSet(VAR_SPECIESCHAINED, 0);
-				ScriptContext1_SetupScript(DeleteChain);
 			}
 		}
 		else
 		{
 			if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
 			{
+				if(VarGet(VAR_CHAIN) >= 3)
+					ScriptContext1_SetupScript(DeleteChain);
 				VarSet(VAR_CHAIN,0);
 				VarSet(VAR_SPECIESCHAINED,0);
-				ScriptContext1_SetupScript(DeleteChain);
 			}
 		}
 
