@@ -423,9 +423,15 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 
     level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
 	// Allow chained pokemon to bypass repel. If not chaining, then no effect on repel.
-    if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level) 
-		&& (VarGet(VAR_CHAIN) >= 3 && wildMonInfo->wildPokemon[wildMonIndex].species != VarGet(VAR_SPECIESCHAINED)))
-        return FALSE;
+    if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level)
+	{
+		if(VarGet(VAR_CHAIN) >= 3 && wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED))
+		{
+			// Do nothing if we are chaining and the species we picked is our chained species.
+		}
+		else
+			return FALSE;
+	}
     if (gMapHeader.mapLayoutId != LAYOUT_BATTLE_FRONTIER_BATTLE_PIKE_ROOM_WILD_MONS && flags & WILD_CHECK_KEEN_EYE && !IsAbilityAllowingEncounter(level))
         return FALSE;
 
