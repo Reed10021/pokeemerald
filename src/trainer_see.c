@@ -17,6 +17,7 @@
 #include "constants/event_objects.h"
 #include "constants/event_object_movement.h"
 #include "constants/field_effects.h"
+#include "constants/items.h"
 #include "constants/trainer_types.h"
 
 // this file's functions
