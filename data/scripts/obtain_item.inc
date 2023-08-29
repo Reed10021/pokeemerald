@@ -1,6 +1,6 @@
 Std_ObtainItem:: @ 8271AD3
-	copyvar VAR_0x8004, ITEMID
-	copyvar VAR_0x8005, AMOUNT
+	copyvar VAR_0x8004, VAR_0x8000
+	copyvar VAR_0x8005, VAR_0x8001
 	additem VAR_0x8000, VAR_0x8001
 	copyvar VAR_0x8007, VAR_RESULT
 	compare VAR_0x8007, FALSE
@@ -139,7 +139,7 @@ EventScript_CheckPCSpace::
 	compare VAR_RESULT, POCKET_KEY_ITEMS
 	goto_if_eq EventScript_CheckPCSpaceContinue
 	pyramid_inchallenge
-	copyvar VAR_0x8004, ITEMID  @ pyramid_inchallenge modifies VAR_0x8004
+	copyvar VAR_0x8004, VAR_0x8000  @ pyramid_inchallenge modifies VAR_0x8004
 	compare VAR_RESULT, TRUE
 	goto_if_eq EventScript_CheckPCSpaceContinue
 	checkpcspace VAR_0x8004, VAR_0x8005
