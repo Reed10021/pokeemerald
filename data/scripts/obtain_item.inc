@@ -213,7 +213,7 @@ EventScript_TryAddItemToPCHidden::
 	checkitemtype VAR_0x8005 @ Don't add if it's a key item
 	compare VAR_RESULT, POCKET_KEY_ITEMS
 	goto_if_eq EventScript_TryAddHiddenItemToPCContinue
-	addpcitem VAR_0x8005
+	addpcitem VAR_0x8005, 1
 	compare VAR_RESULT, FALSE
 	call_if_eq EventScript_TryAddHiddenItemToPCContinue
 	setvar VAR_0x8007, 2	 @ (0= full, 1= in pocket, 2=in PC) 
