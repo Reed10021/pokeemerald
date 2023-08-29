@@ -637,7 +637,7 @@ static void HandleInputChooseMove(void)
             sDescriptionSubmenu = FALSE;
             FillWindowPixelBuffer(27, PIXEL_FILL(0));
             ClearStdWindowAndFrame(27, FALSE);
-            CopyWindowToVram(27, COPYWIN_GFX);
+            CopyWindowToVram(27, 2);
             PlaySE(SE_SELECT);
             MoveSelectionDisplayPpNumber();
             MoveSelectionDisplayMoveType();
@@ -1510,7 +1510,7 @@ static void MoveSelectionDisplayMoveDescription(void)
     StringAppend(gDisplayedStringBattle, gText_NewLine);
     StringAppend(gDisplayedStringBattle, gMoveDescriptionPointers[move -1]);
     BattlePutTextOnWindow(gDisplayedStringBattle, 27);
-    CopyWindowToVram(27, COPYWIN_FULL);
+    CopyWindowToVram(27, 3);
 }
 
 
