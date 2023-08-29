@@ -1574,7 +1574,14 @@ u8 *GetMapName(u8 *dest, u16 regionMapId, u16 padLength)
     }
     else if (regionMapId < MAPSEC_NONE)
     {
-        str = StringCopy(dest, gRegionMapEntries[regionMapId].name);
+        if (regionMapId == MAPSEC_ALTERING_CAVE) {
+            str = StringCopy(dest, gRegionMapEntries[regionMapId].name);
+            *str++ = CHAR_SPACE;
+            *str++ = VarGet(VAR_ALTERING_CAVE_WILD_SET);
+            *str++ = EOS;
+        } else {
+            str = StringCopy(dest, gRegionMapEntries[regionMapId].name);
+        }
     }
     else
     {
