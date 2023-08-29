@@ -5,6 +5,7 @@
 #include "overworld.h"
 #include "main.h"
 #include "pokeblock.h"
+#include "pokemon.h"
 #include "safari_zone.h"
 #include "script.h"
 #include "string_util.h"
@@ -99,6 +100,7 @@ void SafariZoneRetirePrompt(void)
 
 void CB2_EndSafariBattle(void)
 {
+    u16 species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES);
     sSafariZonePkblkUses += gBattleResults.pokeblockThrows;
     if (gBattleOutcome == B_OUTCOME_CAUGHT)
         sSafariZoneCaughtMons++;
