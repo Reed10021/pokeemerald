@@ -368,7 +368,7 @@ static const struct WindowTemplate gStandardBattleWindowTemplates[] =
         .paletteNum = 0,
         .baseBlock = 0x00a0,
     },
-    {
+    { // 23
         .bg = 0,
         .tilemapLeft = 19,
         .tilemapTop = 2,
@@ -376,6 +376,42 @@ static const struct WindowTemplate gStandardBattleWindowTemplates[] =
         .height = 2,
         .paletteNum = 0,
         .baseBlock = 0x00b0,
+    },
+    { // 24, super effective
+        .bg = 0,
+        .tilemapLeft = 21,
+        .tilemapTop = 57,
+        .width = 8,
+        .height = 2,
+        .paletteNum = 5,
+        .baseBlock = 0x02a0,
+    },
+    { // 25, not very effective
+        .bg = 0,
+        .tilemapLeft = 21,
+        .tilemapTop = 57,
+        .width = 8,
+        .height = 2,
+        .paletteNum = 5,
+        .baseBlock = 0x02a0,
+    },
+    { // 26, not effective
+        .bg = 0,
+        .tilemapLeft = 21,
+        .tilemapTop = 57,
+        .width = 8,
+        .height = 2,
+        .paletteNum = 5,
+        .baseBlock = 0x02a0,
+    },
+    { // 27, move description
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 47,
+        .width = 18,
+        .height = 6,
+        .paletteNum = 5,
+        .baseBlock = 0x0350,
     },
     DUMMY_WIN_TEMPLATE
 };
@@ -580,7 +616,7 @@ static const struct WindowTemplate gBattleArenaWindowTemplates[] =
         .paletteNum = 5,
         .baseBlock = 0x0148,
     },
-    {
+    { // 22
         .bg = 0,
         .tilemapLeft = 2,
         .tilemapTop = 15,
@@ -588,6 +624,42 @@ static const struct WindowTemplate gBattleArenaWindowTemplates[] =
         .height = 4,
         .paletteNum = 7,
         .baseBlock = 0x0090,
+    },
+    [24] = { // 24, super effective
+        .bg = 0,
+        .tilemapLeft = 21,
+        .tilemapTop = 57,
+        .width = 8,
+        .height = 2,
+        .paletteNum = 5,
+        .baseBlock = 0x02a0,
+    },
+    [25] = { // 25, not very effective
+        .bg = 0,
+        .tilemapLeft = 21,
+        .tilemapTop = 57,
+        .width = 8,
+        .height = 2,
+        .paletteNum = 5,
+        .baseBlock = 0x02a0,
+    },
+    [26] = { // 26, not effective
+        .bg = 0,
+        .tilemapLeft = 21,
+        .tilemapTop = 57,
+        .width = 8,
+        .height = 2,
+        .paletteNum = 5,
+        .baseBlock = 0x02a0,
+    },
+    [27] = { // 27, move description
+        .bg = 0,
+        .tilemapLeft = 1,
+        .tilemapTop = 47,
+        .width = 18,
+        .height = 6,
+        .paletteNum = 5,
+        .baseBlock = 0x0350,
     },
     DUMMY_WIN_TEMPLATE
 };
