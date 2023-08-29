@@ -393,11 +393,9 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     if (VarGet(VAR_CHAIN) >= 3) //If we're chaining.
         rerollCount += VarGet(VAR_CHAIN) / 3;
 
-    do
-    {
-		rerollCount--;
-		switch (area)
-		{
+    do {
+        rerollCount--;
+		switch (area) {
 		case WILD_AREA_LAND:
 			if (TryGetAbilityInfluencedWildMonIndex(wildMonInfo->wildPokemon, TYPE_STEEL, ABILITY_MAGNET_PULL, &wildMonIndex))
 				break;
@@ -416,9 +414,9 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 			wildMonIndex = ChooseWildMonIndex_WaterRock();
 			break;
 		}
-		if (VarGet(VAR_CHAIN) >= 3)
-			if (wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED))
-				break;
+        if (VarGet(VAR_CHAIN) >= 3)
+            if (wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED))
+                break;
     } while (rerollCount > 0);
 
     level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
@@ -440,19 +438,18 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 
 static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 rod)
 {
-	u8 wildMonIndex;
-	u8 level;
-	u32 rerollCount = 1;
+    u8 wildMonIndex;
+    u8 level;
+    u32 rerollCount = 1;
     if (VarGet(VAR_CHAIN) >= 3) //If we're chaining.
         rerollCount += VarGet(VAR_CHAIN) / 3;
-	do
-	{
+    do {
 		rerollCount--;
 		wildMonIndex = ChooseWildMonIndex_Fishing(rod);
 		if (VarGet(VAR_CHAIN) >= 3)
 			if (wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED))
 				break;
-	} while (rerollCount > 0);
+    } while (rerollCount > 0);
 
 	level = ChooseWildMonLevel(&wildMonInfo->wildPokemon[wildMonIndex]);
     CreateWildMon(wildMonInfo->wildPokemon[wildMonIndex].species, level);
