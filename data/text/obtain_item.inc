@@ -8,12 +8,20 @@ gText_PutItemInPocket:: @ 8272A9A
 	.string "{PLAYER} put away the {STR_VAR_2}\n"
 	.string "in the {STR_VAR_3} POCKET.$"
 
+gText_PutItemInPC::
+	.string "{PLAYER} put away the {STR_VAR_2}\n"
+	.string "in the PC since bag is full.$"
+
 gText_PlayerFoundOneItem:: @ 8272ABF
 	.string "{PLAYER} found one {STR_VAR_2}!$"
 
 gText_TooBadBagIsFull:: @ 8272AD0
 	.string "Too bad!\n"
 	.string "The BAG is full…$"
+
+gText_TooBadBagAndPCAreFull::
+	.string "Too bad!\n"
+	.string "The BAG and PC are full…$"
 
 gText_PlayerPutItemInBag:: @ 8272AEA
 	.string "{PLAYER} put away the {STR_VAR_2}\n"

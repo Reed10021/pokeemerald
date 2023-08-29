@@ -28,6 +28,9 @@ extern const u8 SafariZone_EventScript_RetirePrompt[];
 extern const u8 SafariZone_EventScript_OutOfBallsMidBattle[];
 extern const u8 SafariZone_EventScript_OutOfBalls[];
 
+extern const u8 ChainNumber[];
+extern const u8 DeleteChain[];
+
 EWRAM_DATA u8 gNumSafariBalls = 0;
 EWRAM_DATA static u16 sSafariZoneStepCounter = 0;
 EWRAM_DATA static u8 sSafariZoneCaughtMons = 0;
@@ -99,6 +102,54 @@ void CB2_EndSafariBattle(void)
     sSafariZonePkblkUses += gBattleResults.pokeblockThrows;
     if (gBattleOutcome == B_OUTCOME_CAUGHT)
         sSafariZoneCaughtMons++;
+
+    // If in the safari zone, be a little more generous with chaining.
+    // We can chain with a successful catch or a 'mon fleeing.
+    // We do not reset the chain on running out of balls, but do on the trainer running away
+    if(gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_MON_FLED)
+    {
+        // if we have a species, the species wasn't correct, and the chain is not zero, yeet.
+        if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
+        {
+            // If the chain was 3, show textbox showing you messed up.
+            if(VarGet(VAR_CHAIN) >= 3)
+            {
+                ScriptContext1_SetupScript(DeleteChain);
+                // Cleanup
+                VarSet(VAR_CHAIN, 0);
+                VarSet(VAR_SPECIESCHAINED, 0);
+            }
+            else // if the chain wasn't +3, then act like we've started chaining this new species and are incrementing the counter.
+            {
+                VarSet(VAR_SPECIESCHAINED, species);
+                VarSet(VAR_CHAIN, 1);
+            }
+        }
+        else
+        {
+            // if no chain, start chaining
+            if(VarGet(VAR_SPECIESCHAINED) == 0)
+                VarSet(VAR_SPECIESCHAINED, species);
+            // if chain, increment chain and maybe show text
+            if(species == VarGet(VAR_SPECIESCHAINED))
+            {
+                GetSpeciesName(gStringVar2 ,VarGet(VAR_SPECIESCHAINED));
+                ScriptContext1_SetupScript(ChainNumber);
+            }
+        }
+    }
+    else if (gBattleOutcome == B_OUTCOME_RAN)
+    {
+        // If we had a chain and the species was correct but we ran from it.
+        if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
+        {
+            if(VarGet(VAR_CHAIN) >= 3)
+                ScriptContext1_SetupScript(DeleteChain);
+            VarSet(VAR_CHAIN,0);
+            VarSet(VAR_SPECIESCHAINED,0);
+        }
+    }
+
     if (gNumSafariBalls != 0)
     {
         SetMainCallback2(CB2_ReturnToField);

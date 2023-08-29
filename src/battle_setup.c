@@ -87,7 +87,6 @@ static const u8 *GetIntroSpeechOfApproachingTrainer(void);
 static const u8 *GetTrainerCantBattleSpeech(void);
 
 extern const u8 ChainNumber[];
-extern const u8 AddChain[];
 extern const u8 DeleteChain[];
 
 // ewram vars
@@ -639,7 +638,7 @@ static void CB2_EndWildBattle(void)
     }
     else
     {
-		if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT)
+		if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_PLAYER_TELEPORTED || gBattleOutcome == B_OUTCOME_MON_TELEPORTED || gBattleOutcome == B_OUTCOME_MON_FLED)
 		{
 			// if we have a species, the species wasn't correct, and the chain is not zero, yeet.
 			if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
@@ -887,6 +886,9 @@ static u8 GetTrainerBattleTransition(void)
     u8 playerLevel;
 
     if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
+        return B_TRANSITION_CHAMPION;
+
+    if(gTrainerBattleOpponent_A == TRAINER_STEVEN)
         return B_TRANSITION_CHAMPION;
 
     if (gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_ELITE_FOUR)

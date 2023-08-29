@@ -2196,6 +2196,8 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     u32 personality;
     u32 value;
     u16 checksum;
+	u32 chainCount = VarGet(VAR_CHAIN);
+	u8 legendaryCheck = 0;
 
     ZeroBoxMonData(boxMon);
 
@@ -2225,19 +2227,47 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
               | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
               | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
               | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+		
+		// Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
+		switch (species)
+		{
+			case SPECIES_ARTICUNO:
+			case SPECIES_ZAPDOS:
+			case SPECIES_MOLTRES:
+			case SPECIES_MEWTWO:
+			case SPECIES_MEW:
+			case SPECIES_RAIKOU:
+			case SPECIES_ENTEI:
+			case SPECIES_SUICUNE:
+			case SPECIES_LUGIA:
+			case SPECIES_HO_OH:
+			case SPECIES_CELEBI:
+			case SPECIES_REGICE:
+			case SPECIES_REGIROCK:
+			case SPECIES_REGISTEEL:
+			case SPECIES_GROUDON:
+			case SPECIES_KYOGRE:
+			case SPECIES_RAYQUAZA:
+			case SPECIES_DEOXYS:
+			case SPECIES_JIRACHI:
+				chainCount += 50; // Use the current chain and increment it by 50. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
+				// Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (VAR_CHAIN + 50) / 2 shiny rerolls.
+				legendaryCheck = 1;
+		}
 
-        if (VarGet(VAR_CHAIN) >= 3)
+        if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)) // If we're chaining.
         {
-           if (VarGet(VAR_SPECIESCHAINED) == species)
+            // Check the first personality roll.
+            u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+            if(shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
             {
-                u32 shinyValue;
-                u32 rolls = VarGet(VAR_CHAIN) / 2;
+                u32 rolls = chainCount / 2; // We get rolls equal to VAR_CHAIN divided by 2. So a VAR_CHAIN of 24 = 12 additional rolls for shiny.
                 do
                 {
                     personality = Random32();
                     shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
                     rolls++;
-                } while (shinyValue >= SHINY_ODDS && rolls <= (VarGet(VAR_CHAIN)));
+                } while (shinyValue >= SHINY_ODDS && rolls < chainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
             }
         }
     }
@@ -2275,9 +2305,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     {
         u32 iv;
         u32 rolls = 1;
-		if (VarGet(VAR_CHAIN) >= 3)
+		if (chainCount >= 3)
         {
-            rolls += VarGet(VAR_CHAIN) / 3;
+            rolls += chainCount / 3;
         }
 
         do
@@ -2290,7 +2320,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 			SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv);
 			iv = (value & 0x7C00) >> 10;
 			SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
-			if (VarGet(VAR_CHAIN) >= 3 
+			if (chainCount >= 3 
 				&& GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) > 15
 				&& GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) > 15
 				&& GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) > 15)
@@ -2301,9 +2331,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
         } while (rolls > 0);
 
         rolls = 1;
-        if (VarGet(VAR_CHAIN) >= 3)
+        if (chainCount >= 3)
         {
-            rolls += VarGet(VAR_CHAIN) / 3;
+            rolls += chainCount / 3;
         }
 
         do
@@ -2316,7 +2346,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 			SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv);
 			iv = (value & 0x7C00) >> 10;
 			SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
-			if (VarGet(VAR_CHAIN) >= 3 
+			if (chainCount >= 3 
 				&& GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) > 15
 				&& GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) > 15
 				&& GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) > 15)

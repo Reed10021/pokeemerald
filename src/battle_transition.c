@@ -183,7 +183,7 @@ static bool8 Phase2_Shards_Func4(struct Task *task);
 static bool8 Phase2_Shards_Func5(struct Task *task);
 static bool8 Phase2_ShredSplit_Func1(struct Task *task);
 static bool8 Phase2_ShredSplit_Func2(struct Task *task);
-static bool8 Phase2_ShredSplit_Func3(struct Task *task);
+//static bool8 Phase2_ShredSplit_Func3(struct Task *task);
 static bool8 Phase2_ShredSplit_Func4(struct Task *task);
 static bool8 Phase2_Blackhole_Func1(struct Task *task);
 static bool8 Phase2_Blackhole1_Func2(struct Task *task);
@@ -563,7 +563,7 @@ static const TransitionStateFunc sPhase2_ShredSplit_Funcs[] =
 {
     Phase2_ShredSplit_Func1,
     Phase2_ShredSplit_Func2,
-    Phase2_ShredSplit_Func3,
+//    Phase2_ShredSplit_Func3, //ShredSplit_BrokenCheck ?
     Phase2_ShredSplit_Func4
 };
 
@@ -2738,7 +2738,7 @@ static bool8 Phase2_ShredSplit_Func2(struct Task *task)
 // is always false, resulting in the game being stuck in an infinite loop.
 // It's possible this transition is only partially
 // done and the second part was left out.
-static bool8 Phase2_ShredSplit_Func3(struct Task *task)
+/*static bool8 Phase2_ShredSplit_Func3(struct Task *task)
 {
     u16 i;
     bool32 done = TRUE;
@@ -2754,7 +2754,7 @@ static bool8 Phase2_ShredSplit_Func3(struct Task *task)
         task->tState++;
 
     return FALSE;
-}
+}*/
 
 static bool8 Phase2_ShredSplit_Func4(struct Task *task)
 {
