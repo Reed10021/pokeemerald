@@ -1728,7 +1728,7 @@ static const struct BattleWindowText sTextOnWindowsInfo_Normal[] =
     },
     { // 27, move description
         .fillValue = PIXEL_FILL(0xE),
-        .fontId = FONT_NARROW,
+        .fontId = 7,
         .x = 0,
         .y = 1,
         .letterSpacing = 0,
@@ -2056,7 +2056,7 @@ static const struct BattleWindowText sTextOnWindowsInfo_Arena[] =
     },
     [27] = { // 27, move description
         .fillValue = PIXEL_FILL(0xE),
-        .fontId = FONT_NARROW,
+        .fontId = 7,
         .x = 0,
         .y = 1,
         .letterSpacing = 0,
