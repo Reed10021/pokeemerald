@@ -14,7 +14,6 @@
 #include "strings.h"
 #include "task.h"
 #include "trainer_hill.h"
-#include "constants/abilities.h"
 #include "constants/field_poison.h"
 #include "constants/party_menu.h"
 #include "constants/species.h"
