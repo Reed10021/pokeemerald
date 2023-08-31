@@ -101,6 +101,7 @@ void SafariZoneRetirePrompt(void)
 void CB2_EndSafariBattle(void)
 {
     u16 species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES);
+    u16 chainCount = VarGet(VAR_CHAIN);
     sSafariZonePkblkUses += gBattleResults.pokeblockThrows;
     if (gBattleOutcome == B_OUTCOME_CAUGHT)
         sSafariZoneCaughtMons++;
@@ -111,10 +112,10 @@ void CB2_EndSafariBattle(void)
     if(gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_MON_FLED)
     {
         // if we have a species, the species wasn't correct, and the chain is not zero, yeet.
-        if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
+        if (species != VarGet(VAR_SPECIESCHAINED) && chainCount != 0)
         {
             // If the chain was 3, show textbox showing you messed up.
-            if(VarGet(VAR_CHAIN) >= 3)
+            if(chainCount >= 3)
             {
                 ScriptContext1_SetupScript(DeleteChain);
                 // Cleanup
@@ -135,7 +136,7 @@ void CB2_EndSafariBattle(void)
             // if chain, increment chain and maybe show text
             if(species == VarGet(VAR_SPECIESCHAINED))
             {
-                GetSpeciesName(gStringVar2 ,VarGet(VAR_SPECIESCHAINED));
+                GetSpeciesName(gStringVar2 , species);
                 ScriptContext1_SetupScript(ChainNumber);
             }
         }
@@ -143,9 +144,9 @@ void CB2_EndSafariBattle(void)
     else if (gBattleOutcome == B_OUTCOME_RAN)
     {
         // If we had a chain and the species was correct but we ran from it.
-        if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
+        if (chainCount != 0 && species == VarGet(VAR_SPECIESCHAINED))
         {
-            if(VarGet(VAR_CHAIN) >= 3)
+            if(chainCount >= 3)
                 ScriptContext1_SetupScript(DeleteChain);
             VarSet(VAR_CHAIN,0);
             VarSet(VAR_SPECIESCHAINED,0);

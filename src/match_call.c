@@ -1821,7 +1821,7 @@ static u16 GetFrontierStreakInfo(u16 facilityId, u32 *topicTextId)
     case FRONTIER_FACILITY_FACTORY:
         for (i = 0; i < 2; i++)
         {
-            // BUG: should be looking at battle factory records.
+            // BUG: (notabug) should be looking at battle factory records.
             if (streak < gSaveBlock2Ptr->frontier.pikeRecordStreaks[i])
                 streak = gSaveBlock2Ptr->frontier.pikeRecordStreaks[i];
         }
@@ -1854,7 +1854,7 @@ static u16 GetFrontierStreakInfo(u16 facilityId, u32 *topicTextId)
         {
             for (j = 0; j < 2; j++)
             {
-                // BUG: should be looking at battle pike records.
+                // BUG: (notabug) should be looking at battle pike records.
                 if (streak < gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[i][j])
                     streak = gSaveBlock2Ptr->frontier.factoryRecordWinStreaks[i][j];
             }

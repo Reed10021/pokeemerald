@@ -389,9 +389,10 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     u8 wildMonIndex = 0;
     u8 level;
     u32 rerollCount = 1;
+    u16 chainCount = VarGet(VAR_CHAIN);
 
-    if (VarGet(VAR_CHAIN) >= 3) //If we're chaining.
-        rerollCount += VarGet(VAR_CHAIN) / 3;
+    if (chainCount >= 3) //If we're chaining.
+        rerollCount += chainCount / 3;
 
     do {
         rerollCount--;
@@ -414,7 +415,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 			wildMonIndex = ChooseWildMonIndex_WaterRock();
 			break;
 		}
-        if (VarGet(VAR_CHAIN) >= 3)
+        if (chainCount >= 3)
             if (wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED))
                 break;
     } while (rerollCount > 0);
@@ -423,7 +424,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
 	// Allow chained pokemon to bypass repel. If not chaining, then no effect on repel.
     if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(level))
 	{
-		if(VarGet(VAR_CHAIN) >= 3 && wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED)) {
+		if(chainCount >= 3 && wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED)) {
 			// Do nothing if we are chaining and the species we picked is our chained species.
 		}
 		else
@@ -441,12 +442,13 @@ static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 
     u8 wildMonIndex;
     u8 level;
     u32 rerollCount = 1;
-    if (VarGet(VAR_CHAIN) >= 3) //If we're chaining.
-        rerollCount += VarGet(VAR_CHAIN) / 3;
+    u16 chainCount = VarGet(VAR_CHAIN);
+    if (chainCount >= 3) //If we're chaining.
+        rerollCount += chainCount / 3;
     do {
 		rerollCount--;
 		wildMonIndex = ChooseWildMonIndex_Fishing(rod);
-		if (VarGet(VAR_CHAIN) >= 3)
+		if (chainCount >= 3)
 			if (wildMonInfo->wildPokemon[wildMonIndex].species == VarGet(VAR_SPECIESCHAINED))
 				break;
     } while (rerollCount > 0);

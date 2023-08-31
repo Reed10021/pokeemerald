@@ -298,7 +298,7 @@ static const u8 sContextMenuItems_QuizLady[] = {
 
 static const u8 sContextMenu_RegisterKeyItem[] = {
     ITEMMENUACTION_SELECT_BUTTON,   ITEMMENUACTION_L_BUTTON,
-    ITEMMENUACTION_DUMMY,           ITEMMENUACTION_R_BUTTON
+    ITEMMENUACTION_CANCEL,           ITEMMENUACTION_R_BUTTON
 };
 
 

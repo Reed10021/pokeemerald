@@ -476,10 +476,11 @@ static void Task_TryBecomeLinkLeader(u8 taskId)
         }
         break;
     case LL_STATE_MEMBER_LEFT:
-        // BUG: sPlayerActivityGroupSize was meant below, not gPlayerCurrActivity
+        // BUG: (fixed) sPlayerActivityGroupSize was meant below, not gPlayerCurrActivity
         //      This will be false for all but ACTIVITY_BATTLE_DOUBLE and ACTIVITY_DECLINE
         //      All this changes is which of two texts gets printed
-        id = (GROUP_MAX(gPlayerCurrActivity) == 2) ? 1 : 0;
+        //id = (GROUP_MAX(gPlayerCurrActivity) == 2) ? 1 : 0;
+        id = (GROUP_MAX(sPlayerActivityGroupSize) == 2) ? 0 : 1;
         if (PrintOnTextbox(&data->textState, sPlayerUnavailableTexts[id]))
         {
             data->playerCount = sub_8013398(data->field_0);

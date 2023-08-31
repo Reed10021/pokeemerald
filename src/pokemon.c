@@ -2197,6 +2197,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     u32 value;
     u16 checksum;
 	u32 chainCount = VarGet(VAR_CHAIN);
+    u16 eggChainCount = VarGet(VAR_EGG_CHAIN);
 	u8 legendaryCheck = 0;
 
     ZeroBoxMonData(boxMon);
@@ -2227,47 +2228,49 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
               | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
               | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
               | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
-		
-		// Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
-		switch (species)
-		{
-			case SPECIES_ARTICUNO:
-			case SPECIES_ZAPDOS:
-			case SPECIES_MOLTRES:
-			case SPECIES_MEWTWO:
-			case SPECIES_MEW:
-			case SPECIES_RAIKOU:
-			case SPECIES_ENTEI:
-			case SPECIES_SUICUNE:
-			case SPECIES_LUGIA:
-			case SPECIES_HO_OH:
-			case SPECIES_CELEBI:
-			case SPECIES_REGICE:
-			case SPECIES_REGIROCK:
-			case SPECIES_REGISTEEL:
-			case SPECIES_GROUDON:
-			case SPECIES_KYOGRE:
-			case SPECIES_RAYQUAZA:
-			case SPECIES_DEOXYS:
-			case SPECIES_JIRACHI:
-				chainCount += 50; // Use the current chain and increment it by 50. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
-				// Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (VAR_CHAIN + 50) / 2 shiny rerolls.
-				legendaryCheck = 1;
-		}
-
-        if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)) // If we're chaining.
+        if (!hasFixedPersonality) // Respect fixed personality (i.e eggs)
         {
-            // Check the first personality roll.
-            u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
-            if(shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
+            // Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
+            switch (species)
             {
-                u32 rolls = chainCount / 2; // We get rolls equal to VAR_CHAIN divided by 2. So a VAR_CHAIN of 24 = 12 additional rolls for shiny.
-                do
+            case SPECIES_ARTICUNO:
+            case SPECIES_ZAPDOS:
+            case SPECIES_MOLTRES:
+            case SPECIES_MEWTWO:
+            case SPECIES_MEW:
+            case SPECIES_RAIKOU:
+            case SPECIES_ENTEI:
+            case SPECIES_SUICUNE:
+            case SPECIES_LUGIA:
+            case SPECIES_HO_OH:
+            case SPECIES_CELEBI:
+            case SPECIES_REGICE:
+            case SPECIES_REGIROCK:
+            case SPECIES_REGISTEEL:
+            case SPECIES_GROUDON:
+            case SPECIES_KYOGRE:
+            case SPECIES_RAYQUAZA:
+            case SPECIES_DEOXYS:
+            case SPECIES_JIRACHI:
+                chainCount += 50; // Use the current chain and increment it by 50. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
+                // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (VAR_CHAIN + 50) / 2 shiny rerolls.
+                legendaryCheck = 1;
+            }
+
+            if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)) // If we're chaining.
+            {
+                // Check the first personality roll.
+                u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+                if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
                 {
-                    personality = Random32();
-                    shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
-                    rolls++;
-                } while (shinyValue >= SHINY_ODDS && rolls < chainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+                    u32 rolls = chainCount / 2; // We get rolls equal to VAR_CHAIN divided by 2. So a VAR_CHAIN of 24 = 12 additional rolls for shiny.
+                    do
+                    {
+                        personality = Random32();
+                        shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+                        rolls++;
+                    } while (shinyValue >= SHINY_ODDS && rolls < chainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+                }
             }
         }
     }
@@ -2305,10 +2308,16 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     {
         u32 iv;
         u32 rolls = 1;
-		if (chainCount >= 3)
-        {
+        // Yep, this is cheeky. In the case of chainCount, we coooould check the species.
+        // But there's no need to because any pokemon encountered wouldn't be caught or the chainCount would reset.
+        // ...unless we're involving eggs. In which case the chainCount never gets reset.
+        // As for eggChainCount, we don't have both parents so we can't verify anyways.
+        // Three of these IVs get replaced regardless if its an egg, so good luck I guess?
+        // Regardless, you would have to already know of these specific circumstances in order to effectively exploit it.
+        if (chainCount >= 3)
             rolls += chainCount / 3;
-        }
+        if (eggChainCount >= 3)
+            rolls += eggChainCount / 3;
 
         do
         {
@@ -2332,9 +2341,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 
         rolls = 1;
         if (chainCount >= 3)
-        {
             rolls += chainCount / 3;
-        }
+        if (eggChainCount >= 3)
+            rolls += eggChainCount / 3;
 
         do
         {
@@ -3234,9 +3243,9 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
 
     if (attackerHoldEffect == HOLD_EFFECT_CHOICE_BAND)
         attack = (150 * attack) / 100;
-    if (attackerHoldEffect == HOLD_EFFECT_SOUL_DEW && !(gBattleTypeFlags & (BATTLE_TYPE_FRONTIER)) && (attacker->species == SPECIES_LATIAS || attacker->species == SPECIES_LATIOS))
+    if (attackerHoldEffect == HOLD_EFFECT_SOUL_DEW && (attacker->species == SPECIES_LATIAS || attacker->species == SPECIES_LATIOS))
         spAttack = (150 * spAttack) / 100;
-    if (defenderHoldEffect == HOLD_EFFECT_SOUL_DEW && !(gBattleTypeFlags & (BATTLE_TYPE_FRONTIER)) && (defender->species == SPECIES_LATIAS || defender->species == SPECIES_LATIOS))
+    if (defenderHoldEffect == HOLD_EFFECT_SOUL_DEW && (defender->species == SPECIES_LATIAS || defender->species == SPECIES_LATIOS))
         spDefense = (150 * spDefense) / 100;
     if (attackerHoldEffect == HOLD_EFFECT_DEEP_SEA_TOOTH && attacker->species == SPECIES_CLAMPERL)
         spAttack *= 2;
@@ -3274,6 +3283,17 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         gBattleMovePower = (150 * gBattleMovePower) / 100;
     if (gBattleMoves[gCurrentMove].effect == EFFECT_EXPLOSION)
         defense /= 2;
+    //hailing
+    if (WEATHER_HAS_EFFECT2 && gBattleWeather & WEATHER_HAIL_ANY) {
+        // Implement gen 9 snow effect: +50% DEF for hail.
+        if (defender->type1 == TYPE_ICE || defender->type2 == TYPE_ICE)
+            defense = (150 * defense) / 100;
+    }
+    if (WEATHER_HAS_EFFECT2 && gBattleWeather & WEATHER_SANDSTORM_ANY) {
+        // Implement gen 4 sandstorm effect: +50% SPDEF.
+        if (defender->type1 == TYPE_ROCK || defender->type2 == TYPE_ROCK)
+            spDefense = (150 * spDefense) / 100;
+    }
 
     if (IS_TYPE_PHYSICAL(type))
     {
@@ -3367,7 +3387,7 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         // are effects of weather negated with cloud nine or air lock
         if (WEATHER_HAS_EFFECT2)
         {
-            if (gBattleWeather & WEATHER_RAIN_TEMPORARY)
+            if (gBattleWeather & WEATHER_RAIN_ANY)
             {
                 switch (type)
                 {

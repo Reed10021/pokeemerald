@@ -606,7 +606,8 @@ static const struct SpriteSheet gUnknown_08610650[] =
     {gUnknown_0860F53C, sizeof(gUnknown_0860F53C), TAG_TILE_67},
     {gUnknown_0860F63C, sizeof(gUnknown_0860F63C), TAG_TILE_68},
     {gUnknown_0860F6BC, sizeof(gUnknown_0860F6BC), TAG_TILE_69},
-    {gUnknown_0860F7BC, 0x100, TAG_TILE_6A},
+    //{gUnknown_0860F7BC, 0x100, TAG_TILE_6A},
+    {gUnknown_0860F7BC, sizeof(gUnknown_0860F7BC), TAG_TILE_6A},
     {gUnknown_0860F83C, sizeof(gUnknown_0860F83C), TAG_TILE_6B},
     {gUnknown_0860F93C, sizeof(gUnknown_0860F93C), TAG_TILE_6C},
     {gUnknown_0860FA3C, sizeof(gUnknown_0860FA3C), TAG_TILE_6D},
@@ -2042,7 +2043,7 @@ static void sub_819C1D0(u8 taskId)
     {
     case 0:
         task->data[3] = 16;
-        task->data[24] = 224; // BUG: writing outside the array's bounds.
+        task->data[4] = 224; // BUG: (fixed) writing outside the array's bounds.
         task->data[5] = 64;
         task->data[8] = 65;
         SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON);
@@ -2098,7 +2099,7 @@ static void sub_819C2D4(u8 taskId)
         break;
     case 0:
         task->data[3] = 16;
-        task->data[24] = 224; // BUG: writing outside the array's bounds.
+        task->data[4] = 224; // BUG: (fixed) writing outside the array's bounds.
         task->data[5] = 32;
         task->data[8] = 96;
         SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON);
@@ -3889,7 +3890,7 @@ static void Swap_ShowSummaryMonSprite(void)
     personality = GetMonData(mon, MON_DATA_PERSONALITY, NULL);
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
 
-    sFactorySwapScreen->unk2C.field0 = CreateMonPicSprite_HandleDeoxys(species, personality, otId, TRUE, 88, 32, 15, 0xFFFF); // BUG: otId and personality should be switched.
+    sFactorySwapScreen->unk2C.field0 = CreateMonPicSprite_HandleDeoxys(species, otId, personality, TRUE, 88, 32, 15, 0xFFFF); // BUG: (fixed) otId and personality should be switched.
     gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecX = 0;
     gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecY = 0;
 
@@ -4005,7 +4006,7 @@ static void sub_819F69C(u8 taskId)
     {
     case 0:
         task->data[3] = 88;
-        task->data[24] = 152; // BUG: writing outside the array's bounds.
+        task->data[4] = 152; // BUG: (fixed) writing outside the array's bounds.
         task->data[5] = 64;
         task->data[8] = 65;
         SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON);
@@ -4059,7 +4060,7 @@ static void sub_819F7B4(u8 taskId)
         break;
     case 0:
         task->data[3] = 88;
-        task->data[24] = 152; // BUG: writing outside the array's bounds.
+        task->data[4] = 152; // BUG: (fixed) writing outside the array's bounds.
         task->data[5] = 32;
         task->data[8] = 96;
         SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_WIN0_ON);

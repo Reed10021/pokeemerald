@@ -621,15 +621,16 @@ static void CB2_EndWildBattle(void)
     u16 ptr;
     u8 nickname[POKEMON_NAME_LENGTH + 1];
     u16 lastPokemonFound;
+    u16 chainCount = VarGet(VAR_CHAIN);
     species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES);
     CpuFill16(0, (void*)(BG_PLTT), BG_PLTT_SIZE);
     ResetOamRange(0, 128);
     if (IsPlayerDefeated(gBattleOutcome) == TRUE && !InBattlePyramid() && !InBattlePike())
     {
 		// If we had a chain and the species was correct but we died.
-		if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
+		if (chainCount != 0 && species == VarGet(VAR_SPECIESCHAINED))
 		{
-			if(VarGet(VAR_CHAIN) >= 3)
+			if(chainCount >= 3)
 				ScriptContext1_SetupScript(DeleteChain);
 			VarSet(VAR_CHAIN,0);
 			VarSet(VAR_SPECIESCHAINED,0);
@@ -641,10 +642,10 @@ static void CB2_EndWildBattle(void)
 		if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_PLAYER_TELEPORTED || gBattleOutcome == B_OUTCOME_MON_TELEPORTED || gBattleOutcome == B_OUTCOME_MON_FLED)
 		{
 			// if we have a species, the species wasn't correct, and the chain is not zero, yeet.
-			if ((species != VarGet(VAR_SPECIESCHAINED)) && (VarGet(VAR_CHAIN) != 0))
+			if (species != VarGet(VAR_SPECIESCHAINED) && chainCount != 0)
 			{
 				// If the chain was 3, show textbox showing you messed up.
-				if(VarGet(VAR_CHAIN) >= 3)
+				if(chainCount >= 3)
 				{
 					ScriptContext1_SetupScript(DeleteChain);
 					// Cleanup
@@ -665,7 +666,7 @@ static void CB2_EndWildBattle(void)
 				// if chain, increment chain and maybe show text
 				if(species == VarGet(VAR_SPECIESCHAINED))
 				{
-					GetSpeciesName(gStringVar2 ,VarGet(VAR_SPECIESCHAINED));
+					GetSpeciesName(gStringVar2 , species);
 					ScriptContext1_SetupScript(ChainNumber);
 				}
 			}
@@ -673,9 +674,9 @@ static void CB2_EndWildBattle(void)
 		else // Else we ran
 		{
 			// If we had a chain and the species was correct but we ran from it.
-			if (VarGet(VAR_CHAIN) != 0 && species == VarGet(VAR_SPECIESCHAINED))
+			if (chainCount != 0 && species == VarGet(VAR_SPECIESCHAINED))
 			{
-				if(VarGet(VAR_CHAIN) >= 3)
+				if(chainCount >= 3)
 					ScriptContext1_SetupScript(DeleteChain);
 				VarSet(VAR_CHAIN,0);
 				VarSet(VAR_SPECIESCHAINED,0);

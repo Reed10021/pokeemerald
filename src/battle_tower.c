@@ -1337,10 +1337,10 @@ void PutNewBattleTowerRecord(struct EmeraldBattleTowerRecord *newRecordEm)
         {
             for (k = 0; k < PLAYER_NAME_LENGTH; k++)
             {
-                // BUG: Wrong variable used, 'j' instead of 'k'.
-                if (gSaveBlock2Ptr->frontier.towerRecords[i].name[j] != newRecord->name[j])
+                // BUG: (fixed) Wrong variable used, 'j' instead of 'k'.
+                if (gSaveBlock2Ptr->frontier.towerRecords[i].name[k] != newRecord->name[k])
                     break;
-                if (newRecord->name[j] == EOS)
+                if (newRecord->name[k] == EOS)
                 {
                     k = PLAYER_NAME_LENGTH;
                     break;
@@ -2753,7 +2753,7 @@ static void AwardBattleTowerRibbons(void)
 {
     s32 i;
     u32 partyIndex;
-    struct RibbonCounter ribbons[3]; // BUG: 4 Pokemon can receive ribbons in a double battle mode.
+    struct RibbonCounter ribbons[MAX_FRONTIER_PARTY_SIZE]; // BUG: (fixed) 4 Pokemon can receive ribbons in a double battle mode.
     u8 ribbonType = 0;
     u8 lvlMode = gSaveBlock2Ptr->frontier.lvlMode;
     u8 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
@@ -2957,7 +2957,7 @@ static void FillPartnerParty(u16 trainerId)
                       sStevenMons[i].species,
                       sStevenMons[i].level,
                       sStevenMons[i].fixedIV,
-                      TRUE, i, // BUG: personality was stored in the 'j' variable. As a result, Steven's pokemon do not have the intended natures.
+                      TRUE, j, // BUG: (fixed) personality was stored in the 'j' variable. As a result, Steven's pokemon do not have the intended natures.
                       OT_ID_PRESET, STEVEN_OTID);
             for (j = 0; j < PARTY_SIZE; j++)
                 SetMonData(&gPlayerParty[MULTI_PARTY_SIZE + i], MON_DATA_HP_EV + j, &sStevenMons[i].evs[j]);
@@ -3063,14 +3063,14 @@ bool32 RubyBattleTowerRecordToEmerald(struct RSBattleTowerRecord *src, struct Em
     {
         dst->lvlMode = src->lvlMode;
         dst->winStreak = src->winStreak;
-        // BUG: Reading outside the array. sRubyFacilityClassToEmerald has less than FACILITY_CLASSES_COUNT entries.
+        // BUG: (fixed) Reading outside the array. sRubyFacilityClassToEmerald has less than FACILITY_CLASSES_COUNT entries.
         //      Fix by using ARRAY_COUNT(sRubyFacilityClassToEmerald)
-        for (i = 0; i < FACILITY_CLASSES_COUNT; i++)
+        for (i = 0; i < ARRAY_COUNT(sRubyFacilityClassToEmerald); i++)
         {
             if (sRubyFacilityClassToEmerald[i][0] == src->facilityClass)
                 break;
         }
-        if (i != FACILITY_CLASSES_COUNT)
+        if (i != ARRAY_COUNT(sRubyFacilityClassToEmerald))
             dst->facilityClass = sRubyFacilityClassToEmerald[i][1];
         else
             dst->facilityClass = FACILITY_CLASS_YOUNGSTER;
@@ -3113,14 +3113,14 @@ bool32 EmeraldBattleTowerRecordToRuby(struct EmeraldBattleTowerRecord *src, stru
     {
         dst->lvlMode = src->lvlMode;
         dst->winStreak = src->winStreak;
-        // BUG: Reading outside the array. sRubyFacilityClassToEmerald has less than FACILITY_CLASSES_COUNT entries.
+        // BUG: (fixed) Reading outside the array. sRubyFacilityClassToEmerald has less than FACILITY_CLASSES_COUNT entries.
         //      Fix by using ARRAY_COUNT(sRubyFacilityClassToEmerald) instead
-        for (i = 0; i < FACILITY_CLASSES_COUNT; i++)
+        for (i = 0; i < ARRAY_COUNT(sRubyFacilityClassToEmerald); i++)
         {
             if (sRubyFacilityClassToEmerald[i][1] == src->facilityClass)
                 break;
         }
-        if (i != FACILITY_CLASSES_COUNT)
+        if (i != ARRAY_COUNT(sRubyFacilityClassToEmerald))
             dst->facilityClass = sRubyFacilityClassToEmerald[i][0];
         else
             dst->facilityClass = RS_FACILITY_CLASS_YOUNGSTER;

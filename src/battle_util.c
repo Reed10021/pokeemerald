@@ -2343,7 +2343,7 @@ u8 CastformDataTypeChange(u8 battler)
     }
     if (!WEATHER_HAS_EFFECT)
         return CASTFORM_NO_CHANGE;
-    if (!(gBattleWeather & (WEATHER_RAIN_ANY | WEATHER_SUN_ANY | WEATHER_HAIL_ANY)) && !IS_BATTLER_OF_TYPE(battler, TYPE_NORMAL))
+    if (!(gBattleWeather & WEATHER_ANY) && !IS_BATTLER_OF_TYPE(battler, TYPE_NORMAL))
     {
         SET_BATTLER_TYPE(battler, TYPE_NORMAL);
         formChange = CASTFORM_TO_NORMAL;
@@ -2362,6 +2362,12 @@ u8 CastformDataTypeChange(u8 battler)
     {
         SET_BATTLER_TYPE(battler, TYPE_ICE);
         formChange = CASTFORM_TO_ICE;
+    }
+    // Castform doesn't have a specific form for Rock type, but still change his type to Rock so it gets weather ball bonuses.
+    if (gBattleWeather & WEATHER_SANDSTORM_ANY && !IS_BATTLER_OF_TYPE(battler, TYPE_ROCK))
+    {
+        SET_BATTLER_TYPE(battler, TYPE_ROCK);
+        formChange = CASTFORM_TO_NORMAL; //hacky
     }
     return formChange;
 }

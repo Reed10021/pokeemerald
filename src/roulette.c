@@ -464,8 +464,8 @@ static const struct WindowTemplate sWindowTemplates[] =
         .paletteNum = 15,
         .baseBlock = 0xC5
     },
-    // BUG: Array not terminated properly
-    //DUMMY_WIN_TEMPLATE
+    // BUG: (fixed) Array not terminated properly
+    DUMMY_WIN_TEMPLATE,
 };
 
 static const struct GridSelection sGridSelections[NUM_GRID_SELECTIONS + 1] =
@@ -2894,9 +2894,9 @@ static const union AnimCmd sAnim_CreditDigit[] =
     ANIMCMD_FRAME(14, 0), // 7
     ANIMCMD_FRAME(16, 0), // 8
     ANIMCMD_FRAME(18, 0), // 9
-    // BUG: Animation not terminated properly
+    // BUG: (fixed) Animation not terminated properly
     // Doesn't matter in practice, the frames are set directly and not looped
-    //ANIMCMD_END
+    ANIMCMD_END
 };
 
 static const union AnimCmd *const sAnims_CreditDigit[] =

@@ -461,6 +461,26 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
 {
     s32 parent;
     s32 natureTries = 0;
+    u32 shinyValue;
+    u16 eggChainCount = VarGet(VAR_EGG_CHAIN);
+    u16 eggChainParent1 = VarGet(VAR_EGG_CHAIN_PARENT_1);
+    u16 eggChainParent2 = VarGet(VAR_EGG_CHAIN_PARENT_2);
+    u32 value = gSaveBlock2Ptr->playerTrainerId[0]
+        | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
+        | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
+        | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+
+    if (GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES) == eggChainParent1 && GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES) == eggChainParent2)
+    {
+        eggChainCount++;
+        VarSet(VAR_EGG_CHAIN, eggChainCount);
+    } else {
+        // Parents don't match species-wise, so reset the chain starting with this egg (0+1) and store the parents
+        eggChainCount = 1;
+        VarSet(VAR_EGG_CHAIN, eggChainCount);
+        VarSet(VAR_EGG_CHAIN_PARENT_1, GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES));
+        VarSet(VAR_EGG_CHAIN_PARENT_2, GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES));
+    }
 
     SeedRng2(gMain.vblankCounter2);
     parent = GetParentToInheritNature(daycare);
@@ -469,6 +489,21 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
     if (parent < 0)
     {
         daycare->offspringPersonality = (Random2() << 16) | ((Random() % 0xfffe) + 1);
+        if (eggChainCount > 1)
+        {
+            // Check the first personality roll.
+            shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(daycare->offspringPersonality) ^ LOHALF(daycare->offspringPersonality);
+            if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
+            {
+                u32 rolls = eggChainCount / 2; // We get rolls equal to VAR_EGG_CHAIN divided by 2. So a VAR_EGG_CHAIN of 24 = 12 additional rolls for shiny.
+                do
+                {
+                    daycare->offspringPersonality = (Random2() << 16) | ((Random() % 0xfffe) + 1);
+                    shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(daycare->offspringPersonality) ^ LOHALF(daycare->offspringPersonality);
+                    rolls++;
+                } while (shinyValue >= SHINY_ODDS && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+            }
+        }
     }
     // inherit nature
     else
@@ -479,6 +514,20 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
         do
         {
             personality = (Random2() << 16) | (Random());
+            if (eggChainCount > 1)
+            {
+                shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+                if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
+                {
+                    u32 rolls = eggChainCount / 2; // We get rolls equal to VAR_EGG_CHAIN divided by 2. So a VAR_EGG_CHAIN of 24 = 12 additional rolls for shiny.
+                    do
+                    {
+                        personality = (Random2() << 16) | (Random());
+                        shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+                        rolls++;
+                    } while (shinyValue >= SHINY_ODDS && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+                }
+            }
             if (wantedNature == GetNatureFromPersonality(personality) && personality != 0)
                 break; // found a personality with the same nature
 

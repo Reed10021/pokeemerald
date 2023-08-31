@@ -1744,7 +1744,8 @@ static void ContestAICmd_check_user_has_move(void)
 
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
-        u16 move = gContestMons[eContestAI.contestantId].moves[i];
+        //u16 move = gContestMons[eContestAI.contestantId].moves[i];
+        u16 move = gContestMoves[gContestMons[eContestAI.contestantId].moves[i]].effect;
         if (move == targetMove)
         {
             hasMove = TRUE;
