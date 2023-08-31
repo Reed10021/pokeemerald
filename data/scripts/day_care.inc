@@ -339,7 +339,7 @@ Route117_Text_TakeGoodCareOfIt: @ 82921CF
 	.string "Take good care of it.$"
 
 Route117_Text_EggChainInfo:
-	.string "By the way, your current Egg\n."
+	.string "By the way, your current Egg\n"
 	.string "Chain count is {STR_VAR_1}.$"
 
 Route117_Text_FriendlyWithOtherTrainersMon: @ 82921E5
