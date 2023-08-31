@@ -22,6 +22,12 @@ Route117_EventScript_DaycareEggWaiting:: @ 8291C4D
 	msgbox Route117_Text_IWillKeepDoYouWantIt, MSGBOX_YESNO
 	compare VAR_RESULT, YES
 	goto_if_eq Route117_EventScript_DaycareAcceptEgg
+	compare VAR_0x8003, 5
+	goto_if_ne NotShiny @ If equal, then prompt about special egg
+	msgbox Route117_Text_EggIsSpecialAreYouSure, MSGBOX_YESNO
+	compare VAR_RESULT, YES
+	goto_if_eq Route117_EventScript_DaycareAcceptEgg
+NotShiny:
 	msgbox Route117_Text_IllKeepIt, MSGBOX_DEFAULT
 	clearflag FLAG_PENDING_DAYCARE_EGG
 	special RejectEggFromDayCare
@@ -365,6 +371,10 @@ Route117_Text_YourMonsAreDoingFine: @ 8292299
 Route117_Text_IWillKeepDoYouWantIt: @ 82922C6
 	.string "I really will keep it.\n"
 	.string "You do want this, yes?$"
+
+Route117_Text_EggIsSpecialAreYouSure:
+	.string "I have a feeling this egg is special!\n"
+	.string "You really DO want this, right??$"
 
 Route117_PokemonDayCare_Text_WouldYouLikeUsToRaiseAMon: @ 82922F4
 	.string "I'm the DAY-CARE LADY.\p"
