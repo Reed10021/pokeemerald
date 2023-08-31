@@ -462,7 +462,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
     s32 parent;
     s32 natureTries = 0;
     u32 shinyValue;
-    u16 eggChainCount = VarGet(VAR_EGG_CHAIN);
+    u32 eggChainCount = VarGet(VAR_EGG_CHAIN);
     u16 eggChainParent1 = VarGet(VAR_EGG_CHAIN_PARENT_1);
     u16 eggChainParent2 = VarGet(VAR_EGG_CHAIN_PARENT_2);
     u32 value = gSaveBlock2Ptr->playerTrainerId[0]
@@ -473,8 +473,11 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
     if ((GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES) == eggChainParent1 && GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES) == eggChainParent2)
      || (GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES) == eggChainParent2 && GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES) == eggChainParent1))
     {
-        eggChainCount++;
-        VarSet(VAR_EGG_CHAIN, eggChainCount);
+        if (eggChainCount < 65535) // 65535 is the limit for u16, which is what the var is.
+        {
+            eggChainCount++;
+            VarSet(VAR_EGG_CHAIN, eggChainCount);
+        }
     } else {
         // Parents don't match species-wise, so reset the chain starting with this egg (0+1) and store the parents
         eggChainCount = 1;
@@ -485,6 +488,9 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
 
     SeedRng2(gMain.vblankCounter2);
     parent = GetParentToInheritNature(daycare);
+    // Add 10 to the base shiny rate because this game is unforgivable.
+    // Compared to modern standards anyways.
+    eggChainCount += 10; // eggChainCount is u32, so we don't have to worry.
 
     // don't inherit nature
     if (parent < 0)

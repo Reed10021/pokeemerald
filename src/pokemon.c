@@ -2196,9 +2196,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     u32 personality;
     u32 value;
     u16 checksum;
-	u32 chainCount = VarGet(VAR_CHAIN);
+    u32 chainCount = VarGet(VAR_CHAIN) + 10; // Add 10 to the base shiny rate because hard.
     u16 eggChainCount = VarGet(VAR_EGG_CHAIN);
-	u8 legendaryCheck = 0;
+    u8 legendaryCheck = 0;
 
     ZeroBoxMonData(boxMon);
 
@@ -2257,7 +2257,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
                 legendaryCheck = 1;
             }
 
-            if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)) // If we're chaining.
+            if (chainCount >= 3 /* && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)*/) // If we're chaining.
             {
                 // Check the first personality roll.
                 u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);

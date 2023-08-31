@@ -25,6 +25,8 @@ Route117_EventScript_DaycareEggWaiting:: @ 8291C4D
 	msgbox Route117_Text_IllKeepIt, MSGBOX_DEFAULT
 	clearflag FLAG_PENDING_DAYCARE_EGG
 	special RejectEggFromDayCare
+	buffernumberstring 0, VAR_EGG_CHAIN
+	msgbox Route117_Text_EggChainInfo, MSGBOX_DEFAULT
 	release
 	end
 
@@ -78,6 +80,8 @@ Route117_EventScript_CheckOnTwoMons:: @ 8291CE8
 	call Route117_EventScript_CheckMonReceivedMail
 	setvar VAR_0x8004, 1
 	call Route117_EventScript_CheckMonReceivedMail
+	buffernumberstring 0, VAR_EGG_CHAIN
+	msgbox Route117_Text_EggChainInfo, MSGBOX_DEFAULT
 	release
 	end
 
