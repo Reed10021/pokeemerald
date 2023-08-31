@@ -868,16 +868,17 @@ static void EggHatchPrintMessage(u8 windowId, u8* string, u8 x, u8 y, u8 speed)
 u8 GetEggCyclesToSubtract(void)
 {
     u8 count, i;
+    u8 returnVal = 4;
     for (count = CalculatePlayerPartyCount(), i = 0; i < count; i++)
     {
         if (!GetMonData(&gPlayerParty[i], MON_DATA_SANITY_IS_EGG))
         {
             u8 ability = GetMonAbility(&gPlayerParty[i]);
             if (ability == ABILITY_MAGMA_ARMOR || ability == ABILITY_FLAME_BODY)
-                return 4;
+                returnVal += 4;
         }
     }
-    return 2;
+    return returnVal;
 }
 
 u16 CountPartyAliveNonEggMons(void)
