@@ -29,6 +29,7 @@ static void ClearDaycareMonMail(struct DayCareMail *mail);
 static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *daycare);
 static u8 GetDaycareCompatibilityScore(struct DayCare *daycare);
 static void DaycarePrintMonInfo(u8 windowId, s32 daycareSlotId, u8 y);
+static bool8 IsEggShiny(struct DayCare* daycare);
 
 // RAM buffers used to assist with BuildEggMoveset()
 EWRAM_DATA static u16 sHatchedEggLevelUpMoves[EGG_LVL_UP_MOVES_ARRAY_COUNT] = {0};
@@ -989,6 +990,7 @@ static bool8 IsEggShiny(struct DayCare* daycare)
         | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
         | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
         | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+
     return (HIHALF(value) ^ LOHALF(value) ^ HIHALF(daycare->offspringPersonality) ^ LOHALF(daycare->offspringPersonality)) < SHINY_ODDS;
 }
 
