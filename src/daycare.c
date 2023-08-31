@@ -470,7 +470,8 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
         | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
         | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
 
-    if (GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES) == eggChainParent1 && GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES) == eggChainParent2)
+    if ((GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES) == eggChainParent1 && GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES) == eggChainParent2)
+     || (GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES) == eggChainParent2 && GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES) == eggChainParent1))
     {
         eggChainCount++;
         VarSet(VAR_EGG_CHAIN, eggChainCount);

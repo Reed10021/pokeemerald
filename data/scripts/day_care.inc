@@ -44,6 +44,8 @@ Route117_EventScript_DaycareReceiveEgg:: @ 8291C9D
 	msgbox Route117_Text_TakeGoodCareOfIt, MSGBOX_DEFAULT
 	special GiveEggFromDaycare
 	clearflag FLAG_PENDING_DAYCARE_EGG
+	buffernumberstring 0, VAR_EGG_CHAIN
+	msgbox Route117_Text_EggChainInfo, MSGBOX_DEFAULT
 	release
 	end
 
@@ -335,6 +337,10 @@ Route117_Text_ReceivedEgg: @ 82921A4
 
 Route117_Text_TakeGoodCareOfIt: @ 82921CF
 	.string "Take good care of it.$"
+
+Route117_Text_EggChainInfo:
+	.string "By the way, your current Egg\n."
+	.string "Chain count is {STR_VAR_1}.$"
 
 Route117_Text_FriendlyWithOtherTrainersMon: @ 82921E5
 	.string "By the way, about your {STR_VAR_1},\n"
