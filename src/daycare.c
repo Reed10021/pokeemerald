@@ -484,9 +484,9 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
 
     SeedRng2(gMain.vblankCounter2);
     parent = GetParentToInheritNature(daycare);
-    // Add 10 to the base shiny rate because this game is unforgivable.
+    // Add 20 to the base shiny rate because this game is unforgivable.
     // Compared to modern standards anyways.
-    eggChainCount += 10; // eggChainCount is u32, so we don't have to worry.
+    eggChainCount += 20; // eggChainCount is u32, so we don't have to worry.
 
     // don't inherit nature
     if (parent < 0)

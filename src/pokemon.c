@@ -2196,7 +2196,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     u32 personality;
     u32 value;
     u16 checksum;
-    u32 chainCount = VarGet(VAR_CHAIN) + 10; // Add 10 to the base shiny rate because hard.
+    u32 chainCount = VarGet(VAR_CHAIN) + 20; // Add 20 to the base shiny rate because hard.
     u16 eggChainCount = VarGet(VAR_EGG_CHAIN);
     u8 legendaryCheck = 0;
 
@@ -2307,16 +2307,10 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     else
     {
         u32 iv;
-        u32 rolls = 1;
-        // Yep, this is cheeky. In the case of chainCount, we coooould check the species.
-        // But there's no need to because any pokemon encountered wouldn't be caught or the chainCount would reset.
-        // ...unless we're involving eggs. In which case the chainCount never gets reset.
-        // As for eggChainCount, we don't have both parents so we can't verify anyways.
-        // Three of these IVs get replaced regardless if its an egg, so good luck I guess?
-        // Regardless, you would have to already know of these specific circumstances in order to effectively exploit it.
-        if (chainCount >= 3)
+        u32 rolls = 2;
+        if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)
             rolls += chainCount / 3;
-        if (eggChainCount >= 3)
+        if (eggChainCount >= 3) // TODO: How to figure out if this is an egg without using hasFixedPersonality?
             rolls += eggChainCount / 3;
 
         do
@@ -2339,8 +2333,8 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 			rolls--;
         } while (rolls > 0);
 
-        rolls = 1;
-        if (chainCount >= 3)
+        rolls = 2;
+        if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)
             rolls += chainCount / 3;
         if (eggChainCount >= 3)
             rolls += eggChainCount / 3;
