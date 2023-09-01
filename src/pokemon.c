@@ -2308,7 +2308,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     {
         u32 iv;
         u32 rolls = 2;
-        if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)
+        if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1))
             rolls += chainCount / 3;
         if (eggChainCount >= 3) // TODO: How to figure out if this is an egg without using hasFixedPersonality?
             rolls += eggChainCount / 3;
@@ -2334,7 +2334,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
         } while (rolls > 0);
 
         rolls = 2;
-        if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1)
+        if (chainCount >= 3 && (VarGet(VAR_SPECIESCHAINED) == species || legendaryCheck == 1))
             rolls += chainCount / 3;
         if (eggChainCount >= 3)
             rolls += eggChainCount / 3;
