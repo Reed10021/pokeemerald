@@ -499,7 +499,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
             // Check the first personality roll.
             if (!IsPersonalityShiny(personality)) // If not already shiny, do the additional rolls. That way the first roll counts.
             {
-                u32 rolls = eggChainCount; // We start rolls at 0. So a VAR_EGG_CHAIN of 24 = 24 additional rolls for shiny.
+                u32 rolls = 0; // We start rolls at 0. So a VAR_EGG_CHAIN of 24 = 24 additional rolls for shiny.
                 do
                 {
                     personality = (Random2() << 16) | ((Random() % 0xfffe) + 1);
@@ -519,7 +519,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
             {
                 if (!IsPersonalityShiny(personality)) // If not already shiny, do the additional rolls. That way the first roll counts.
                 {
-                    u32 rolls = eggChainCount / 2; // We get rolls equal to VAR_EGG_CHAIN divided by 2. So a VAR_EGG_CHAIN of 24 = 12 additional rolls for shiny.
+                    u32 rolls = 0; // We get rolls equal to VAR_EGG_CHAIN divided by 2. So a VAR_EGG_CHAIN of 24 = 12 additional rolls for shiny.
                     do
                     {
                         personality = (Random2() << 16) | (Random());
