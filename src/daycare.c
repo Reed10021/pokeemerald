@@ -30,6 +30,7 @@ static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *
 static u8 GetDaycareCompatibilityScore(struct DayCare *daycare);
 static void DaycarePrintMonInfo(u8 windowId, s32 daycareSlotId, u8 y);
 static bool8 IsEggShiny(struct DayCare* daycare);
+static bool8 IsPersonalityShiny(u32 personality);
 
 // RAM buffers used to assist with BuildEggMoveset()
 EWRAM_DATA static u16 sHatchedEggLevelUpMoves[EGG_LVL_UP_MOVES_ARRAY_COUNT] = {0};
@@ -462,6 +463,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
 {
     s32 parent;
     s32 natureTries = 0;
+    u32 personality;
     u32 eggChainCount = VarGet(VAR_EGG_CHAIN);
     u16 eggChainParent1 = VarGet(VAR_EGG_CHAIN_PARENT_1);
     u16 eggChainParent2 = VarGet(VAR_EGG_CHAIN_PARENT_2);
@@ -484,25 +486,25 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
 
     SeedRng2(gMain.vblankCounter2);
     parent = GetParentToInheritNature(daycare);
-    // Add 20 to the base shiny rate because this game is unforgivable.
+    // Add 20 to the base shiny rate because this game is unforgivable. And slow.
     // Compared to modern standards anyways.
     eggChainCount += 20; // eggChainCount is u32, so we don't have to worry.
 
     // don't inherit nature
     if (parent < 0)
     {
-        daycare->offspringPersonality = (Random2() << 16) | ((Random() % 0xfffe) + 1);
+        personality = (Random2() << 16) | ((Random() % 0xfffe) + 1);
         if (eggChainCount > 1)
         {
             // Check the first personality roll.
-            if (!IsEggShiny(daycare)) // If not already shiny, do the additional rolls. That way the first roll counts.
+            if (!IsPersonalityShiny(personality)) // If not already shiny, do the additional rolls. That way the first roll counts.
             {
-                u32 rolls = eggChainCount / 2; // We get rolls equal to VAR_EGG_CHAIN divided by 2. So a VAR_EGG_CHAIN of 24 = 12 additional rolls for shiny.
+                u32 rolls = eggChainCount; // We start rolls at 0. So a VAR_EGG_CHAIN of 24 = 24 additional rolls for shiny.
                 do
                 {
-                    daycare->offspringPersonality = (Random2() << 16) | ((Random() % 0xfffe) + 1);
+                    personality = (Random2() << 16) | ((Random() % 0xfffe) + 1);
                     rolls++;
-                } while (!IsEggShiny(daycare) && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+                } while (!IsPersonalityShiny(personality) && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
             }
         }
     }
@@ -510,21 +512,19 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
     else
     {
         u8 wantedNature = GetNatureFromPersonality(GetBoxMonData(&daycare->mons[parent].mon, MON_DATA_PERSONALITY, NULL));
-        u32 personality;
-
         do
         {
             personality = (Random2() << 16) | (Random());
             if (eggChainCount > 1)
             {
-                if (!IsEggShiny(daycare)) // If not already shiny, do the additional rolls. That way the first roll counts.
+                if (!IsPersonalityShiny(personality)) // If not already shiny, do the additional rolls. That way the first roll counts.
                 {
                     u32 rolls = eggChainCount / 2; // We get rolls equal to VAR_EGG_CHAIN divided by 2. So a VAR_EGG_CHAIN of 24 = 12 additional rolls for shiny.
                     do
                     {
                         personality = (Random2() << 16) | (Random());
                         rolls++;
-                    } while (!IsEggShiny(daycare) && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+                    } while (!IsPersonalityShiny(personality) && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
                 }
             }
             if (wantedNature == GetNatureFromPersonality(personality) && personality != 0)
@@ -532,9 +532,8 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
 
             natureTries++;
         } while (natureTries <= 2400);
-
-        daycare->offspringPersonality = personality;
     }
+    daycare->offspringPersonality = personality;
 
     FlagSet(FLAG_PENDING_DAYCARE_EGG);
 }
@@ -990,8 +989,20 @@ static bool8 IsEggShiny(struct DayCare* daycare)
         | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
         | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
         | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+    u32 shinyValue = (HIHALF(value) ^ LOHALF(value) ^ HIHALF(daycare->offspringPersonality) ^ LOHALF(daycare->offspringPersonality));
 
-    return (HIHALF(value) ^ LOHALF(value) ^ HIHALF(daycare->offspringPersonality) ^ LOHALF(daycare->offspringPersonality)) < SHINY_ODDS;
+    return shinyValue < SHINY_ODDS;
+}
+
+static bool8 IsPersonalityShiny(u32 personality)
+{
+    u32 value = gSaveBlock2Ptr->playerTrainerId[0]
+        | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
+        | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
+        | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+    u32 shinyValue = (HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality));
+
+    return shinyValue < SHINY_ODDS;
 }
 
 // gStringVar1 = first mon's nickname
@@ -1030,9 +1041,9 @@ u8 GetDaycareState(void)
     if (IsEggPending(&gSaveBlock1Ptr->daycare))
     {
         if (IsEggShiny(&gSaveBlock1Ptr->daycare)) // Let player know the egg may be special
-            gSpecialVar_0x8003 = 5;
+            gSpecialVar_0x8006 = 5;
         else
-            gSpecialVar_0x8003 = 0;
+            gSpecialVar_0x8006 = 0;
         return DAYCARE_EGG_WAITING;
     }
 

@@ -22,7 +22,7 @@ Route117_EventScript_DaycareEggWaiting:: @ 8291C4D
 	msgbox Route117_Text_IWillKeepDoYouWantIt, MSGBOX_YESNO
 	compare VAR_RESULT, YES
 	goto_if_eq Route117_EventScript_DaycareAcceptEgg
-	compare VAR_0x8003, 5
+	compare VAR_0x8006, 5
 	goto_if_ne NotShiny @ If equal, then prompt about special egg
 	msgbox Route117_Text_EggIsSpecialAreYouSure, MSGBOX_YESNO
 	compare VAR_RESULT, YES
