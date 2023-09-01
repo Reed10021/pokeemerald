@@ -876,8 +876,9 @@ void CreateEgg(struct Pokemon *mon, u16 species, bool8 setHotSpringsLocation)
     u16 ball;
     u8 language;
     u8 metLocation;
-    u8 isEgg;
+    u8 isEgg = TRUE;
 
+    SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
     CreateMon(mon, species, EGG_HATCH_LEVEL, 32, FALSE, 0, OT_ID_PLAYER_ID, 0);
     metLevel = 0;
     ball = ITEM_POKE_BALL;
@@ -892,19 +893,17 @@ void CreateEgg(struct Pokemon *mon, u16 species, bool8 setHotSpringsLocation)
         metLocation = METLOC_SPECIAL_EGG;
         SetMonData(mon, MON_DATA_MET_LOCATION, &metLocation);
     }
-
-    isEgg = TRUE;
-    SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
 }
 
 static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *daycare)
 {
-    u32 personality;
+    u32 personality = daycare->offspringPersonality;
     u16 ball;
     u8 metLevel;
     u8 language;
+    u8 isEgg = TRUE;
 
-    personality = daycare->offspringPersonality;
+    SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
     CreateMon(mon, species, EGG_HATCH_LEVEL, 32, TRUE, personality, OT_ID_PLAYER_ID, 0);
     metLevel = 0;
     ball = ITEM_POKE_BALL;
