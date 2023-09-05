@@ -3953,9 +3953,9 @@ static bool32 HasObedientBitSet(u8 battlerId)
         return TRUE;
     // If Deoxys or Mew, then we get to this line of code and add the legality bit to their pokedata.
     // If not Deoxys or Mew, then we never reach this line because of the above line.
-    if (!GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerId]], MON_DATA_EVENT_LEGAL, NULL)) {
+    if (!GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerId]], MON_DATA_OBEDIENCE, NULL)) {
         bool32 isEventLegal = TRUE;
-        SetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerId]], MON_DATA_EVENT_LEGAL, &isEventLegal);
+        SetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerId]], MON_DATA_OBEDIENCE, &isEventLegal);
     }
     return GetMonData(&gPlayerParty[gBattlerPartyIndexes[battlerId]], MON_DATA_OBEDIENCE, NULL);
 }
