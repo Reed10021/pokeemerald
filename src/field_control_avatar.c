@@ -105,7 +105,7 @@ void FieldGetPlayerInput(struct FieldInput *input, u16 newKeys, u16 heldKeys)
                 input->pressedAButton = TRUE;
             if (newKeys & B_BUTTON)
                 input->pressedBButton = TRUE;
-            if (newKeys & L_BUTTON)
+            if (newKeys & L_BUTTON && gSaveBlock2Ptr->optionsButtonMode != OPTIONS_BUTTON_MODE_L_EQUALS_A) // Make sure we don't trigger the L-bound item AND A at the same time in L=A mode.
                 input->pressedLButton = TRUE;
             if (newKeys & R_BUTTON)
                 input->pressedRButton = TRUE;

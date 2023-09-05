@@ -13,13 +13,14 @@ EventScript_RepelWoreOff:: @ 82A4B2A
 	bufferitemname 1, VAR_REPEL_LAST_USED
 	removeitem VAR_REPEL_LAST_USED, 1
 	playse SE_REPEL
-	msgbox gText_PlayerUsedVar2, MSGBOX_SIGN
+	msgbox gText_PlayerUsedVar2, MSGBOX_DEFAULT
+	closemessage
 	goto EventScript_RepelWoreOff_End
 EventScript_RepelWoreOff_ChooseNo:
 	closemessage
 	goto EventScript_RepelWoreOff_End
 EventScript_RepelWoreOff_NoMoreRepels:
-	msgbox Text_RepelWoreOff, MSGBOX_SIGN
+	msgbox Text_RepelWoreOff, MSGBOX_DEFAULT
 EventScript_RepelWoreOff_End:
 	releaseall
 	end

@@ -5,10 +5,10 @@ ChainNumber::
 NoIncrement:
 	compare VAR_CHAIN, 3
 	goto_if_lt NoText
+	lockall
 	buffernumberstring 0, VAR_CHAIN
-	lock
-	msgbox Text_ActiveChain, 2
-	release
+	msgbox Text_ActiveChain, MSGBOX_DEFAULT
+	releaseall
 NoText:
 	end
 	
@@ -16,9 +16,9 @@ Text_ActiveChain::
 	.string "Chain Level: {STR_VAR_1}\nChained POKéMON: {STR_VAR_2}.$"
 	
 DeleteChain::
-	lock
+	lockall
 	msgbox Text_DeleteChain, MSGBOX_DEFAULT
-	release
+	releaseall
 	end
 	
 Text_DeleteChain::
