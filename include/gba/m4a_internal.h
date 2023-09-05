@@ -292,7 +292,7 @@ struct Song
 extern const struct MusicPlayer gMPlayTable[];
 extern const struct Song gSongTable[];
 
-#define MAX_DIRECTSOUND_CHANNELS 12
+#define MAX_DIRECTSOUND_CHANNELS 5 //12
 
 #define PCM_DMA_BUF_SIZE 1584 // size of Direct Sound buffer
 
