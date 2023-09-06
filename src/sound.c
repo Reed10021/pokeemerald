@@ -152,6 +152,10 @@ void FadeOutAndPlayNewMapMusic(u16 songNum, u8 speed)
 {
     FadeOutMapMusic(speed);
     sCurrentMapMusic = 0;
+    if (songNum == MUS_POKE_CENTER) {
+        if(Random() % 10 == 0)
+            songNum = MUS_C_COMM_CENTER
+    }
     sNextMapMusic = songNum;
     sMapMusicState = 6;
 }

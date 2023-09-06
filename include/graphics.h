@@ -2868,6 +2868,27 @@ extern const u32 gMonShinyPalette_DoubleQuestionMark[];
 extern const u32 gMonStillFrontPic_DoubleQuestionMark[];
 extern const u16 gMonIconPalettes[][16];
 
+extern const u32 gMonFrontPic_Deoxys_Attack[];
+extern const u32 gMonPalette_Deoxys_Attack[];
+extern const u32 gMonBackPic_Deoxys_Attack[];
+extern const u32 gMonShinyPalette_Deoxys_Attack[];
+extern const u32 gMonStillFrontPic_Deoxys_Attack[];
+extern const u8 gMonIcon_Deoxys_Attack[];
+
+extern const u32 gMonFrontPic_Deoxys_Defense[];
+extern const u32 gMonPalette_Deoxys_Defense[];
+extern const u32 gMonBackPic_Deoxys_Defense[];
+extern const u32 gMonShinyPalette_Deoxys_Defense[];
+extern const u32 gMonStillFrontPic_Deoxys_Defense[];
+extern const u8 gMonIcon_Deoxys_Defense[];
+
+extern const u32 gMonFrontPic_Deoxys_Speed[];
+extern const u32 gMonPalette_Deoxys_Speed[];
+extern const u32 gMonBackPic_Deoxys_Speed[];
+extern const u32 gMonShinyPalette_Deoxys_Speed[];
+extern const u32 gMonStillFrontPic_Deoxys_Speed[];
+extern const u8 gMonIcon_Deoxys_Speed[];
+
 // trainer sprites
 extern const u32 gTrainerFrontPic_Hiker[];
 extern const u32 gTrainerFrontPic_AquaGruntM[];

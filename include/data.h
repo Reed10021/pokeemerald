@@ -69,6 +69,7 @@ struct Trainer
 };
 
 #define TRAINER_ENCOUNTER_MUSIC(trainer)((gTrainers[trainer].encounterMusic_gender & 0x7F))
+#define MON_COORDS_SIZE(width, height)(DIV_ROUND_UP(width, 8) << 4 | DIV_ROUND_UP(height, 8))
 
 extern const u16 gUnknown_082FF1D8[];
 extern const u32 gUnknown_082FF1F8[];

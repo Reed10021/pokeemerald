@@ -1078,6 +1078,7 @@ static const u16 sUnknown_0859E64C[] = {
     EC_WORD_ELLIPSIS,
 };
 
+//sRestrictedWordSpecies
 static const u16 sUnknown_0859E658[] = {
     SPECIES_DEOXYS,
 };

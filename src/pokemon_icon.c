@@ -465,6 +465,9 @@ const u8 *const gMonIconTable[] =
     [SPECIES_UNOWN_Z] = gMonIcon_UnownZ,
     [SPECIES_UNOWN_EMARK] = gMonIcon_UnownExclamationMark,
     [SPECIES_UNOWN_QMARK] = gMonIcon_UnownQuestionMark,
+    [SPECIES_DEOXYS_ATTACK] = gMonIcon_Deoxys_Attack,
+    [SPECIES_DEOXYS_DEFENSE] = gMonIcon_Deoxys_Defense,
+    [SPECIES_DEOXYS_SPEED] = gMonIcon_Deoxys_Speed,
 };
 
 const u8 gMonIconPaletteIndices[] =
@@ -909,6 +912,9 @@ const u8 gMonIconPaletteIndices[] =
     [SPECIES_UNOWN_Z] = 0,
     [SPECIES_UNOWN_EMARK] = 0,
     [SPECIES_UNOWN_QMARK] = 0,
+    [SPECIES_DEOXYS_ATTACK] = 0,
+    [SPECIES_DEOXYS_DEFENSE] = 0,
+    [SPECIES_DEOXYS_SPEED] = 0,
 };
 
 const struct SpritePalette gMonIconPaletteTable[] =
@@ -1190,10 +1196,10 @@ void SpriteCB_MonIcon(struct Sprite *sprite)
 const u8* GetMonIconTiles(u16 species, bool32 handleDeoxys)
 {
     const u8* iconSprite = gMonIconTable[species];
-    if (species == SPECIES_DEOXYS && handleDeoxys == TRUE)
-    {
-        iconSprite = (const u8*)(0x400 + (u32)iconSprite); // use the specific Deoxys form icon (Speed in this case)
-    }
+    //if (species == SPECIES_DEOXYS && handleDeoxys == TRUE)
+    //{
+    //    iconSprite = (const u8*)(0x400 + (u32)iconSprite); // use the specific Deoxys form icon (Speed in this case)
+    //}
     return iconSprite;
 }
 

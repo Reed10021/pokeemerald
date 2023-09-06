@@ -2695,11 +2695,28 @@ const u32 gMonPalette_Deoxys[] = INCBIN_U32("graphics/pokemon/deoxys/normal.gbap
 const u32 gMonBackPic_Deoxys[] = INCBIN_U32("graphics/pokemon/deoxys/back.4bpp.lz");
 const u32 gMonShinyPalette_Deoxys[] = INCBIN_U32("graphics/pokemon/deoxys/shiny.gbapal.lz");
 const u8 gMonIcon_Deoxys[] = INCBIN_U8("graphics/pokemon/deoxys/icon.4bpp");
-const u8 gMonIcon_DeoxysSpeed[] = INCBIN_U8("graphics/pokemon/deoxys/icon_speed.4bpp");
 const u8 gMonIcon_DeoxysSpeedWide[] = INCBIN_U8("graphics/unused/deoxys_speed_icon_wide.4bpp");
 
+const u32 gMonStillFrontPic_Deoxys_Attack[] = INCBIN_U32("graphics/pokemon/deoxys/attack/front.4bpp.lz");
+const u32 gMonPalette_Deoxys_Attack[] = INCBIN_U32("graphics/pokemon/deoxys/attack/normal.gbapal.lz");
+const u32 gMonBackPic_Deoxys_Attack[] = INCBIN_U32("graphics/pokemon/deoxys/attack/back.4bpp.lz");
+const u32 gMonShinyPalette_Deoxys_Attack[] = INCBIN_U32("graphics/pokemon/deoxys/attack/shiny.gbapal.lz");
+const u8 gMonIcon_Deoxys_Attack[] = INCBIN_U8("graphics/pokemon/deoxys/attack/icon.4bpp");
+
+const u32 gMonStillFrontPic_Deoxys_Defense[] = INCBIN_U32("graphics/pokemon/deoxys/defense/front.4bpp.lz");
+const u32 gMonPalette_Deoxys_Defense[] = INCBIN_U32("graphics/pokemon/deoxys/defense/normal.gbapal.lz");
+const u32 gMonBackPic_Deoxys_Defense[] = INCBIN_U32("graphics/pokemon/deoxys/defense/back.4bpp.lz");
+const u32 gMonShinyPalette_Deoxys_Defense[] = INCBIN_U32("graphics/pokemon/deoxys/defense/shiny.gbapal.lz");
+const u8 gMonIcon_Deoxys_Defense[] = INCBIN_U8("graphics/pokemon/deoxys/defense/icon.4bpp");
+
+const u32 gMonStillFrontPic_Deoxys_Speed[] = INCBIN_U32("graphics/pokemon/deoxys/speed/front.4bpp.lz");
+const u32 gMonPalette_Deoxys_Speed[] = INCBIN_U32("graphics/pokemon/deoxys/speed/normal.gbapal.lz");
+const u32 gMonBackPic_Deoxys_Speed[] = INCBIN_U32("graphics/pokemon/deoxys/speed/back.4bpp.lz");
+const u32 gMonShinyPalette_Deoxys_Speed[] = INCBIN_U32("graphics/pokemon/deoxys/speed/shiny.gbapal.lz");
+const u8 gMonIcon_Deoxys_Speed[] = INCBIN_U8("graphics/pokemon/deoxys/speed/icon.4bpp");
+
 // Probably the leftover space from the other Deoxys forms
-static const u8 sEmpty[0x6800] = {0};
+//static const u8 sEmpty[0x6800] = {0};
 
 const u16 gUnknown_D437F8[] = INCBIN_U16("graphics/unknown/unknown_D437F8.bin");
 

@@ -3961,9 +3961,9 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
     case 0:
         if (gMain.inBattle)
         {
-            if (sub_80688F8(3, sMonSummaryScreen->curMonIndex))
+           /* if (sub_80688F8(3, sMonSummaryScreen->curMonIndex))
                 HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonFrontPicTable[summary->species2], gMonSpritesGfxPtr->sprites[1], summary->species2, summary->pid);
-            else
+            else*/
                 HandleLoadSpecialPokePic_2(&gMonFrontPicTable[summary->species2], gMonSpritesGfxPtr->sprites[1], summary->species2, summary->pid);
         }
         else

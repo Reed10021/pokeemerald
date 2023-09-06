@@ -2050,10 +2050,15 @@ const struct MonCoords gMonBackPicCoords[] =
         .size = 0x87,
         .y_offset = 5,
     },
-    [SPECIES_DEOXYS] =
-    {
-        .size = 0x86,
-        .y_offset = 9,
+    //[SPECIES_DEOXYS] =
+    //{
+    //    .size = 0x86,
+    //    .y_offset = 9,
+    //},
+    [SPECIES_DEOXYS] = 
+    { 
+        .size = MON_COORDS_SIZE(64, 56),
+        .y_offset = 6,
     },
     [SPECIES_CHIMECHO] =
     {
@@ -2199,6 +2204,21 @@ const struct MonCoords gMonBackPicCoords[] =
     {
         .size = 0x47,
         .y_offset = 6,
+    },
+    [SPECIES_DEOXYS_ATTACK] = 
+    { 
+        .size = MON_COORDS_SIZE(64, 64),
+        .y_offset = 1,
+    },
+    [SPECIES_DEOXYS_DEFENSE] = 
+    { 
+        .size = MON_COORDS_SIZE(64, 56),
+        .y_offset = 8,
+    },
+    [SPECIES_DEOXYS_SPEED] = 
+    { 
+        .size = MON_COORDS_SIZE(64, 64),
+        .y_offset = 0,
     },
 };
 

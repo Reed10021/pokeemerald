@@ -4805,6 +4805,63 @@ static const union AnimCmd sAnim_UNOWN_QMARK_1[] =
     ANIMCMD_END,
 };
 
+static const union AnimCmd sAnim_DEOXYSATTACK_1[] =
+{
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 26),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYSATTACK_2[] =
+{
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYSDEFENSE_1[] =
+{
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 26),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYSDEFENSE_2[] =
+{
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYSSPEED_1[] =
+{
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 26),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYSSPEED_2[] =
+{
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_END,
+};
+
 static const union AnimCmd *const sAnims_NONE[] ={
     sAnim_GeneralFrame0,
     sAnim_NONE_1,
@@ -6945,6 +7002,24 @@ static const union AnimCmd *const sAnims_UNOWN_QMARK[] ={
     sAnim_UNOWN_QMARK_1,
 };
 
+static const union AnimCmd* const sAnims_DEOXYSATTACK[] = {
+    sAnim_GeneralFrame0,
+    sAnim_DEOXYSATTACK_1,
+    sAnim_DEOXYSATTACK_2,
+};
+
+static const union AnimCmd* const sAnims_DEOXYSDEFENSE[] = {
+    sAnim_GeneralFrame0,
+    sAnim_DEOXYSDEFENSE_1,
+    sAnim_DEOXYSDEFENSE_2,
+};
+
+static const union AnimCmd* const sAnims_DEOXYSSPEED[] = {
+    sAnim_GeneralFrame0,
+    sAnim_DEOXYSSPEED_1,
+    sAnim_DEOXYSSPEED_2,
+};
+
 #define ANIM_CMD(name)             [SPECIES_##name] = sAnims_##name
 #define ANIM_CMD_FULL(name, anims) [SPECIES_##name] = anims
 
@@ -7390,6 +7465,9 @@ const union AnimCmd *const *const gMonFrontAnimsPtrTable[] =
     ANIM_CMD(UNOWN_Z),
     ANIM_CMD(UNOWN_EMARK),
     ANIM_CMD(UNOWN_QMARK),
+    ANIM_CMD(DEOXYSATTACK),
+    ANIM_CMD(DEOXYSDEFENSE),
+    ANIM_CMD(DEOXYSSPEED),
 };
 
 #undef ANIM_CMD

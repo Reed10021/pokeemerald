@@ -1010,7 +1010,7 @@ static void CB2_HandleStartBattle(void)
             gTasks[taskId].data[4] = gBlockRecvBuffer[enemyMultiplayerId][1];
             sub_8185F90(gBlockRecvBuffer[playerMultiplayerId][1]);
             sub_8185F90(gBlockRecvBuffer[enemyMultiplayerId][1]);
-            SetDeoxysStats();
+            //SetDeoxysStats();
             gBattleCommunication[MULTIUSE_STATE]++;
         }
         break;
@@ -1589,7 +1589,7 @@ static void CB2_HandleStartMultiBattle(void)
             ResetBlockReceivedFlags();
             sub_8036EB8(4, playerMultiplayerId);
             SetAllPlayersBerryData();
-            SetDeoxysStats();
+            //SetDeoxysStats();
             var = CreateTask(InitLinkBattleVsScreen, 0);
             gTasks[var].data[1] = 0x10E;
             gTasks[var].data[2] = 0x5A;

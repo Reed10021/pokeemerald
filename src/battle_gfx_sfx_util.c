@@ -621,7 +621,7 @@ void BattleLoadPlayerMonSpriteGfx(struct Pokemon *mon, u8 battlerId)
     otId = GetMonData(mon, MON_DATA_OT_ID);
     position = GetBattlerPosition(battlerId);
 
-    if (sub_80688F8(1, battlerId) == 1 || gBattleSpritesDataPtr->battlerData[battlerId].transformSpecies != SPECIES_NONE)
+    if (/*sub_80688F8(1, battlerId) == 1 ||*/ gBattleSpritesDataPtr->battlerData[battlerId].transformSpecies != SPECIES_NONE)
     {
         HandleLoadSpecialPokePic_DontHandleDeoxys(&gMonBackPicTable[species],
                                                   gMonSpritesGfxPtr->sprites[position],

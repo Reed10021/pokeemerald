@@ -922,6 +922,9 @@ const u16 gSpeciesToNationalPokedexNum[] = // Assigns all species to the Nationa
     SPECIES_TO_NATIONAL(JIRACHI),
     SPECIES_TO_NATIONAL(DEOXYS),
     SPECIES_TO_NATIONAL(CHIMECHO),
+    [SPECIES_DEOXYS_ATTACK - 1] = NATIONAL_DEX_DEOXYS,
+    [SPECIES_DEOXYS_DEFENSE - 1] = NATIONAL_DEX_DEOXYS,
+    [SPECIES_DEOXYS_SPEED - 1] = NATIONAL_DEX_DEOXYS,
 };
 
 const u16 gHoennToNationalOrder[] = // Assigns Hoenn Dex Pokémon (Using National Dex Index)
@@ -1803,6 +1806,9 @@ static const u8 sMonFrontAnimIdsTable[] =
     [SPECIES_JIRACHI - 1] = 0x0d,
     [SPECIES_DEOXYS - 1] = 0x1b,
     [SPECIES_CHIMECHO - 1] = 0x1d,
+    [SPECIES_DEOXYS_ATTACK - 1] = 0x1b,
+    [SPECIES_DEOXYS_DEFENSE - 1] = 0x1b,
+    [SPECIES_DEOXYS_SPEED - 1] = 0x1b,
 };
 
 static const u8 sMonAnimationDelayTable[NUM_SPECIES - 1] =
@@ -1885,15 +1891,15 @@ const u8 gStatStageRatios[MAX_STAT_STAGE + 1][2] =
     {40, 10}, // +6, MAX_STAT_STAGE
 };
 
-static const u16 sDeoxysBaseStats[] =
-{
-    [STAT_HP]    = 50,
-    [STAT_ATK]   = 95,
-    [STAT_DEF]   = 90,
-    [STAT_SPEED] = 180,
-    [STAT_SPATK] = 95,
-    [STAT_SPDEF] = 90,
-};
+//static const u16 sDeoxysBaseStats[] =
+//{
+//    [STAT_HP]    = 50,
+//    [STAT_ATK]   = 95,
+//    [STAT_DEF]   = 90,
+//    [STAT_SPEED] = 180,
+//    [STAT_SPATK] = 95,
+//    [STAT_SPDEF] = 90,
+//};
 
 const u16 gLinkPlayerFacilityClasses[NUM_MALE_LINK_FACILITY_CLASSES + NUM_FEMALE_LINK_FACILITY_CLASSES] =
 {
@@ -2711,106 +2717,108 @@ void CreateObedientMon(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u
     SetMonData(mon, MON_DATA_OBEDIENCE, &obedient);
 }
 
-bool8 sub_80688F8(u8 caseId, u8 battlerId)
-{
-    switch (caseId)
-    {
-    case 0:
-    default:
-        return FALSE;
-    case 1:
-        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
-            return FALSE;
-        if (!gMain.inBattle)
-            return FALSE;
-        if (gLinkPlayers[GetMultiplayerId()].id == battlerId)
-            return FALSE;
-        break;
-    case 2:
-        break;
-    case 3:
-        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
-            return FALSE;
-        if (!gMain.inBattle)
-            return FALSE;
-        if (battlerId == 1 || battlerId == 4 || battlerId == 5)
-            return TRUE;
-        return FALSE;
-    case 4:
-        break;
-    case 5:
-        if (gBattleTypeFlags & BATTLE_TYPE_LINK)
-        {
-            if (!gMain.inBattle)
-                return FALSE;
-            if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
-            {
-                if (gLinkPlayers[GetMultiplayerId()].id == battlerId)
-                    return FALSE;
-            }
-            else
-            {
-                if (GetBattlerSide(battlerId) == B_SIDE_PLAYER)
-                    return FALSE;
-            }
-        }
-        else
-        {
-            if (!gMain.inBattle)
-                return FALSE;
-            if (GetBattlerSide(battlerId) == B_SIDE_PLAYER)
-                return FALSE;
-        }
-        break;
-    }
+// If FALSE, should load this game's Deoxys form. If TRUE, should load normal Deoxys form
+// ShouldIgnoreDeoxysForm
+//bool8 sub_80688F8(u8 caseId, u8 battlerId)
+//{
+//    switch (caseId)
+//    {
+//    case 0:
+//    default:
+//        return FALSE;
+//    case 1:
+//        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+//            return FALSE;
+//        if (!gMain.inBattle)
+//            return FALSE;
+//        if (gLinkPlayers[GetMultiplayerId()].id == battlerId)
+//            return FALSE;
+//        break;
+//    case 2:
+//        break;
+//    case 3:
+//        if (!(gBattleTypeFlags & BATTLE_TYPE_MULTI))
+//            return FALSE;
+//        if (!gMain.inBattle)
+//            return FALSE;
+//        if (battlerId == 1 || battlerId == 4 || battlerId == 5)
+//            return TRUE;
+//        return FALSE;
+//    case 4:
+//        break;
+//    case 5:
+//        if (gBattleTypeFlags & BATTLE_TYPE_LINK)
+//        {
+//            if (!gMain.inBattle)
+//                return FALSE;
+//            if (gBattleTypeFlags & BATTLE_TYPE_MULTI)
+//            {
+//                if (gLinkPlayers[GetMultiplayerId()].id == battlerId)
+//                    return FALSE;
+//            }
+//            else
+//            {
+//                if (GetBattlerSide(battlerId) == B_SIDE_PLAYER)
+//                    return FALSE;
+//            }
+//        }
+//        else
+//        {
+//            if (!gMain.inBattle)
+//                return FALSE;
+//            if (GetBattlerSide(battlerId) == B_SIDE_PLAYER)
+//                return FALSE;
+//        }
+//        break;
+//    }
+//
+//    return TRUE;
+//}
 
-    return TRUE;
-}
-
-static u16 GetDeoxysStat(struct Pokemon *mon, s32 statId)
-{
-    s32 ivVal, evVal;
-    u16 statValue = 0;
-    u8 nature;
-
-    if (gBattleTypeFlags & BATTLE_TYPE_20 || GetMonData(mon, MON_DATA_SPECIES, NULL) != SPECIES_DEOXYS)
-        return 0;
-
-    ivVal = GetMonData(mon, MON_DATA_HP_IV + statId, NULL);
-    evVal = GetMonData(mon, MON_DATA_HP_EV + statId, NULL);
-    statValue = ((sDeoxysBaseStats[statId] * 2 + ivVal + evVal / 4) * mon->level) / 100 + 5;
-    nature = GetNature(mon);
-    statValue = ModifyStatByNature(nature, statValue, (u8)statId);
-    return statValue;
-}
-
-void SetDeoxysStats(void)
-{
-    s32 i, value;
-
-    for (i = 0; i < PARTY_SIZE; i++)
-    {
-        struct Pokemon *mon = &gPlayerParty[i];
-
-        if (GetMonData(mon, MON_DATA_SPECIES, NULL) != SPECIES_DEOXYS)
-            continue;
-
-        value = GetMonData(mon, MON_DATA_ATK, NULL);
-        SetMonData(mon, MON_DATA_ATK, &value);
-
-        value = GetMonData(mon, MON_DATA_DEF, NULL);
-        SetMonData(mon, MON_DATA_DEF, &value);
-
-        value = GetMonData(mon, MON_DATA_SPEED, NULL);
-        SetMonData(mon, MON_DATA_SPEED, &value);
-
-        value = GetMonData(mon, MON_DATA_SPATK, NULL);
-        SetMonData(mon, MON_DATA_SPATK, &value);
-
-        value = GetMonData(mon, MON_DATA_SPDEF, NULL);
-        SetMonData(mon, MON_DATA_SPDEF, &value);
-    }
-}
+//static u16 GetDeoxysStat(struct Pokemon *mon, s32 statId)
+//{
+//    s32 ivVal, evVal;
+//    u16 statValue = 0;
+//    u8 nature;
+//
+//    if (gBattleTypeFlags & BATTLE_TYPE_20 || GetMonData(mon, MON_DATA_SPECIES, NULL) != SPECIES_DEOXYS)
+//        return 0;
+//
+//    ivVal = GetMonData(mon, MON_DATA_HP_IV + statId, NULL);
+//    evVal = GetMonData(mon, MON_DATA_HP_EV + statId, NULL);
+//    statValue = ((sDeoxysBaseStats[statId] * 2 + ivVal + evVal / 4) * mon->level) / 100 + 5;
+//    nature = GetNature(mon);
+//    statValue = ModifyStatByNature(nature, statValue, (u8)statId);
+//    return statValue;
+//}
+//
+//void SetDeoxysStats(void)
+//{
+//    s32 i, value;
+//
+//    for (i = 0; i < PARTY_SIZE; i++)
+//    {
+//        struct Pokemon *mon = &gPlayerParty[i];
+//
+//        if (GetMonData(mon, MON_DATA_SPECIES, NULL) != SPECIES_DEOXYS)
+//            continue;
+//
+//        value = GetMonData(mon, MON_DATA_ATK, NULL);
+//        SetMonData(mon, MON_DATA_ATK, &value);
+//
+//        value = GetMonData(mon, MON_DATA_DEF, NULL);
+//        SetMonData(mon, MON_DATA_DEF, &value);
+//
+//        value = GetMonData(mon, MON_DATA_SPEED, NULL);
+//        SetMonData(mon, MON_DATA_SPEED, &value);
+//
+//        value = GetMonData(mon, MON_DATA_SPATK, NULL);
+//        SetMonData(mon, MON_DATA_SPATK, &value);
+//
+//        value = GetMonData(mon, MON_DATA_SPDEF, NULL);
+//        SetMonData(mon, MON_DATA_SPDEF, &value);
+//    }
+//}
 
 u16 GetUnionRoomTrainerPic(void)
 {
@@ -3710,28 +3718,28 @@ u32 GetMonData(struct Pokemon *mon, s32 field, u8* data)
         ret = mon->maxHP;
         break;
     case MON_DATA_ATK:
-        ret = GetDeoxysStat(mon, STAT_ATK);
-        if (!ret)
+        //ret = GetDeoxysStat(mon, STAT_ATK);
+        //if (!ret)
             ret = mon->attack;
         break;
     case MON_DATA_DEF:
-        ret = GetDeoxysStat(mon, STAT_DEF);
-        if (!ret)
+        //ret = GetDeoxysStat(mon, STAT_DEF);
+        //if (!ret)
             ret = mon->defense;
         break;
     case MON_DATA_SPEED:
-        ret = GetDeoxysStat(mon, STAT_SPEED);
-        if (!ret)
+        //ret = GetDeoxysStat(mon, STAT_SPEED);
+        //if (!ret)
             ret = mon->speed;
         break;
     case MON_DATA_SPATK:
-        ret = GetDeoxysStat(mon, STAT_SPATK);
-        if (!ret)
+        //ret = GetDeoxysStat(mon, STAT_SPATK);
+        //if (!ret)
             ret = mon->spAttack;
         break;
     case MON_DATA_SPDEF:
-        ret = GetDeoxysStat(mon, STAT_SPDEF);
-        if (!ret)
+        //ret = GetDeoxysStat(mon, STAT_SPDEF);
+        //if (!ret)
             ret = mon->spDefense;
         break;
     case MON_DATA_ATK2:
@@ -6930,7 +6938,6 @@ const u8 *GetTrainerNameFromId(u16 trainerId)
 bool8 HasTwoFramesAnimation(u16 species)
 {
     return (species != SPECIES_CASTFORM
-            && species != SPECIES_DEOXYS
             && species != SPECIES_SPINDA
             && species != SPECIES_UNOWN);
 }

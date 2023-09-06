@@ -29,6 +29,8 @@
 #include "constants/mauville_old_man.h"
 #include "constants/trainer_types.h"
 #include "constants/union_room.h"
+#include "constants/metatile_behaviors.h"
+#include "bike.h"
 
 // this file was known as evobjmv.c in Game Freak's original source
 
@@ -7760,7 +7762,8 @@ u8 GetLedgeJumpDirection(s16 x, s16 y, u8 z)
     index--;
     b = MapGridGetMetatileBehaviorAt(x, y);
 
-    if (unknown_08376040[index](b) == 1)
+    if (unknown_08376040[index](b) == 1 || (gPlayerAvatar.acroBikeState == ACRO_STATE_BUNNY_HOP
+        + && MB_JUMP_EAST <= behavior && behavior <= MB_JUMP_SOUTH))
         return index + 1;
 
     return 0;
