@@ -264,7 +264,6 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko::
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_TORCHIC
-	setmonmetlocation VAR_RESULT, 0
 	releaseall
 	end
 
@@ -282,7 +281,6 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic::
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_MUDKIP
-	setmonmetlocation VAR_RESULT, 0
 	releaseall
 	end
 
@@ -300,7 +298,6 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip::
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_TREECKO
-	setmonmetlocation VAR_RESULT, 0
 	releaseall
 	end
 

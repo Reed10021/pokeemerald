@@ -175,7 +175,6 @@ RustboroCity_DevonCorp_3F_EventScript_MrStoneEeveeEgg::
 	message RustboroCity_DevonCorp_3F_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_EEVEE
-	setmonmetlocation VAR_RESULT, 0
 	closemessage
 	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
 	waitmovement 0

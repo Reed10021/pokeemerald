@@ -59,7 +59,6 @@ FortreeCity_EventScript_OldMan_StarterThree_Treecko::
 	message FortreeCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_MUDKIP
-	setmonmetlocation VAR_RESULT, 0
 	releaseall
 	end
 
@@ -77,7 +76,6 @@ FortreeCity_EventScript_OldMan_StarterThree_Torchic::
 	message FortreeCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_TREECKO
-	setmonmetlocation VAR_RESULT, 0
 	releaseall
 	end
 
@@ -95,7 +93,6 @@ FortreeCity_EventScript_OldMan_StarterThree_Mudkip::
 	message FortreeCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_TORCHIC
-	setmonmetlocation VAR_RESULT, 0
 	releaseall
 	end
 

@@ -93,15 +93,15 @@ MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle::
 	release
 	compare VAR_RESULT, NO
 	goto_if_eq jirachiReturn
+	playse SE_THUNDERSTORM_STOP
 	special ShakeCamera
 	delay 30
-	delay 50
 	waitse
 	playmoncry SPECIES_JIRACHI, 2
 	waitmoncry
 	delay 20
 	setvar VAR_0x8004, SPECIES_JIRACHI
-	setvar VAR_0x8005, 70  @ level
+	setvar VAR_0x8005, 50  @ level
 	setvar VAR_0x8006, ITEM_STAR_PIECE
 	special CreateObedientEnemyMon
 	special BattleSetup_StartLegendaryBattle
@@ -350,8 +350,9 @@ MossdeepCity_SpaceCenter_1F_Text_SuccessfulLaunchNumber: @ 82232C8
 	.string "That's successful launch no. {STR_VAR_1}!$"
 
 MossdeepCity_SpaceCenter_1F_Text_JirachiFound:
-	.string "Wow! A strange POKéMON has come from space!\n"
-	.string "TRAINER! Can you investigate this POKéMON?$"
+	.string "Wow! A strange POKéMON has come\n"
+	.string "from space!\l"
+	.string "Can you investigate this POKéMON?$"
 
 MossdeepCity_SpaceCenter_1F_Text_HaywireButRocketLaunchImminent: @ 8223305
 	.string "I know that things are a little\n"
