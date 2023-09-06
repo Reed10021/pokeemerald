@@ -121,6 +121,7 @@
     f;                       \
 })
 
+#define DIV_ROUND_UP(val, roundBy)(((val) / (roundBy)) + (((val) % (roundBy)) ? 1 : 0))
 #define ROUND_BITS_TO_BYTES(numBits)(((numBits) / 8) + (((numBits) % 8) ? 1 : 0))
 
 #define DEX_FLAGS_NO (ROUND_BITS_TO_BYTES(POKEMON_SLOTS_NUMBER))
