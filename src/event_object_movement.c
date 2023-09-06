@@ -7763,7 +7763,7 @@ u8 GetLedgeJumpDirection(s16 x, s16 y, u8 z)
     b = MapGridGetMetatileBehaviorAt(x, y);
 
     if (unknown_08376040[index](b) == 1 || (gPlayerAvatar.acroBikeState == ACRO_STATE_BUNNY_HOP
-        + && MB_JUMP_EAST <= behavior && behavior <= MB_JUMP_SOUTH))
+        && MB_JUMP_EAST <= behavior && behavior <= MB_JUMP_SOUTH))
         return index + 1;
 
     return 0;
