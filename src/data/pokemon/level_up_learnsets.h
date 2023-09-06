@@ -5600,7 +5600,7 @@ static const u16 sJirachiLevelUpLearnset[] = {
 //    LEVEL_UP_END
 //};
 
-static const struct u16 sDeoxysLevelUpLearnset[] = {
+static const u16 sDeoxysLevelUpLearnset[] = {
     LEVEL_UP_MOVE(1, MOVE_LEER),
     LEVEL_UP_MOVE(1, MOVE_WRAP),
     LEVEL_UP_MOVE(5, MOVE_NIGHT_SHADE),
@@ -5616,7 +5616,7 @@ static const struct u16 sDeoxysLevelUpLearnset[] = {
     LEVEL_UP_END
 };
 
-static const struct u16 sDeoxysAttackLevelUpLearnset[] = {
+static const u16 sDeoxysAttackLevelUpLearnset[] = {
     LEVEL_UP_MOVE(1, MOVE_LEER),
     LEVEL_UP_MOVE(1, MOVE_WRAP),
     LEVEL_UP_MOVE(5, MOVE_NIGHT_SHADE),
@@ -5632,7 +5632,7 @@ static const struct u16 sDeoxysAttackLevelUpLearnset[] = {
     LEVEL_UP_END
 };
 
-static const struct u16 sDeoxysDefenseLevelUpLearnset[] = {
+static const u16 sDeoxysDefenseLevelUpLearnset[] = {
     LEVEL_UP_MOVE(1, MOVE_LEER),
     LEVEL_UP_MOVE(1, MOVE_WRAP),
     LEVEL_UP_MOVE(5, MOVE_NIGHT_SHADE),
@@ -5650,7 +5650,7 @@ static const struct u16 sDeoxysDefenseLevelUpLearnset[] = {
     LEVEL_UP_END
 };
 
-static const struct u16 sDeoxysSpeedLevelUpLearnset[] = {
+static const u16 sDeoxysSpeedLevelUpLearnset[] = {
     LEVEL_UP_MOVE(1, MOVE_LEER),
     LEVEL_UP_MOVE(1, MOVE_WRAP),
     LEVEL_UP_MOVE(5, MOVE_NIGHT_SHADE),
