@@ -183,7 +183,7 @@ static bool8 Phase2_Shards_Func4(struct Task *task);
 static bool8 Phase2_Shards_Func5(struct Task *task);
 static bool8 Phase2_ShredSplit_Func1(struct Task *task);
 static bool8 Phase2_ShredSplit_Func2(struct Task *task);
-//static bool8 Phase2_ShredSplit_Func3(struct Task *task);
+static bool8 Phase2_ShredSplit_Func3(struct Task *task);
 static bool8 Phase2_ShredSplit_Func4(struct Task *task);
 static bool8 Phase2_Blackhole_Func1(struct Task *task);
 static bool8 Phase2_Blackhole1_Func2(struct Task *task);
