@@ -237,7 +237,82 @@ PetalburgCity_EventScript_CitySign:: @ 81DC47F
 	end
 
 PetalburgCity_EventScript_Gentleman:: @ 81DC488
+	lock
+	faceplayer
 	msgbox PetalburgCity_Text_FullPartyExplanation, MSGBOX_NPC
+	goto_if_set FLAG_DEFEATED_PETALBURG_GYM, PetalburgCity_EventScript_Gentleman_StarterTwo
+	release
+	end
+
+PetalburgCity_EventScript_Gentleman_StarterTwo:
+	goto_if_set FLAG_STARTER_TWO_EGG, PetalburgCity_EventScript_Gentleman_StarterTwo_Received
+	switch VAR_STARTER_MON
+	case 0, PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko
+	case 1, PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic
+	case 2, PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip
+	release
+	end
+
+PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko:
+	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq PetalburgCity_EventScript_DeclineEgg
+	getpartysize
+	compare VAR_RESULT, PARTY_SIZE
+	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
+	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
+	setflag FLAG_STARTER_TWO_EGG
+	playfanfare MUS_OBTAIN_ITEM
+	message PetalburgCity_Text_ReceivedTheEgg
+	waitfanfare
+	giveegg SPECIES_TORCHIC
+	release
+	end
+
+PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic:
+	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq PetalburgCity_EventScript_DeclineEgg
+	getpartysize
+	compare VAR_RESULT, PARTY_SIZE
+	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
+	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
+	setflag FLAG_STARTER_TWO_EGG
+	playfanfare MUS_OBTAIN_ITEM
+	message PetalburgCity_Text_ReceivedTheEgg
+	waitfanfare
+	giveegg SPECIES_MUDKIP
+	release
+	end
+
+PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip:
+	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq PetalburgCity_EventScript_DeclineEgg
+	getpartysize
+	compare VAR_RESULT, PARTY_SIZE
+	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
+	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
+	setflag FLAG_STARTER_TWO_EGG
+	playfanfare MUS_OBTAIN_ITEM
+	message PetalburgCity_Text_ReceivedTheEgg
+	waitfanfare
+	giveegg SPECIES_TREECKO
+	release
+	end
+
+PetalburgCity_EventScript_Gentleman_StarterTwo_Received:
+	release
+	end
+
+PetalburgCity_EventScript_DeclineEgg::
+	msgbox PetalburgCity_Text_AsYouWishThen, MSGBOX_DEFAULT
+	release
+	end
+
+PetalburgCity_EventScript_NoRoomForEgg::
+	msgbox PetalburgCity_Text_NoRoomForThisEgg, MSGBOX_DEFAULT
+	release
 	end
 
 PetalburgCity_EventScript_WallyHouseSign:: @ 81DC491
@@ -781,3 +856,28 @@ PetalburgCity_Text_ImLookingForTalentedTrainers: @ 81DCC09
 	.string "I'm roaming the land in search of\n"
 	.string "talented TRAINERS.\p"
 	.string "I'm sorry to have taken your time.$"
+
+PetalburgCity_Text_HaveEggWillYouTakeIt:
+	.string "Speaking of a full party, I have\n"
+	.string "an EGG here. I personally don't\l"
+	.string "have time to care for it.\p"
+	.string "But I've heard that you beat NORMAN.\n"
+	.string "A capable TRAINER like yourself would\l"
+	.string "be able to take care of this EGG.\p"
+	.string "Will you take this EGG?$"
+
+PetalburgCity_Text_HopeYoullWalkPlentyWithEgg:
+	.string "Good! I hope you'll walk plenty with\n"
+	.string "my EGG!$"
+
+PetalburgCity_Text_ReceivedTheEgg:
+	.string "{PLAYER} received the EGG.$"
+
+PetalburgCity_Text_NoRoomForThisEgg:
+	.string "Oh? You've too many POKéMON.\n"
+	.string "Unlike caught POKéMON, EGGs\l"
+	.string "don't go to the PC automatically.$"
+
+PetalburgCity_Text_AsYouWishThen:
+	.string "If you have a change of heart about\n"
+	.string "taking this EGG, I will be here.$"

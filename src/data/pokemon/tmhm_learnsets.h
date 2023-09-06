@@ -6875,7 +6875,10 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(TM44_REST)
                                         | TMHM(TM45_ATTRACT)
                                         | TMHM(TM46_THIEF)
-                                        | TMHM(HM05_FLASH)),
+                                        | TMHM(HM03_SURF)
+                                        | TMHM(HM05_FLASH))
+                                        | TMHM(HM07_WATERFALL)
+                                        | TMHM(HM08_DIVE)),
 
     [SPECIES_MASQUERAIN]  = TMHM_LEARNSET(TMHM(TM03_WATER_PULSE)
                                         | TMHM(TM06_TOXIC)
@@ -6898,7 +6901,11 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(TM44_REST)
                                         | TMHM(TM45_ATTRACT)
                                         | TMHM(TM46_THIEF)
-                                        | TMHM(HM05_FLASH)),
+                                        | TMHM(HM02_FLY)
+                                        | TMHM(HM03_SURF)
+                                        | TMHM(HM05_FLASH))
+                                        | TMHM(HM07_WATERFALL)
+                                        | TMHM(HM08_DIVE)),
 
     [SPECIES_WAILMER]     = TMHM_LEARNSET(TMHM(TM03_WATER_PULSE)
                                         | TMHM(TM05_ROAR)
@@ -8257,6 +8264,7 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(TM26_EARTHQUAKE)
                                         | TMHM(TM27_RETURN)
                                         | TMHM(TM32_DOUBLE_TEAM)
+                                        | TMHM(TM39_ROCK_TOMB)
                                         | TMHM(TM40_AERIAL_ACE)
                                         | TMHM(TM42_FACADE)
                                         | TMHM(TM43_SECRET_POWER)

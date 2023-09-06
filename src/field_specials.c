@@ -4372,6 +4372,27 @@ u8 Script_TryGainNewFanFromCounter(void)
     return TryGainNewFanFromCounter(gSpecialVar_0x8004);
 }
 
+void IsDeoxysInParty(void)
+{
+    u8 i;
+    u16 species;
+    struct Pokemon* pokemon;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        pokemon = &gPlayerParty[i];
+        if (GetMonData(pokemon, MON_DATA_SANITY_HAS_SPECIES) && !GetMonData(pokemon, MON_DATA_IS_EGG))
+        {
+            species = GetMonData(pokemon, MON_DATA_SPECIES);
+            if (species == SPECIES_DEOXYS || species == SPECIES_DEOXYS_ATTACK || species == SPECIES_DEOXYS_DEFENSE || species == SPECIES_DEOXYS_SPEED)
+            {
+                gSpecialVar_Result = TRUE;
+                return;
+            }
+        }
+    }
+    gSpecialVar_Result = FALSE;
+}
+
 
 // Changes a Deoxys' form if the following conditions are met:
 // -gSpecialVar_0x8004 is currently hosting a Deoxys form.
@@ -4411,6 +4432,14 @@ bool16 TryChangeDeoxysForm(void)
             gSpecialVar_Result = FALSE;
             return;
         }
+
+        // No change, so don't change.
+        if (baseSpecies == targetSpecies)
+        {
+            gSpecialVar_Result = FALSE;
+            return;
+        }
+
 
         SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPECIES, &targetSpecies);
         CalculateMonStats(&gPlayerParty[gSpecialVar_0x8004]);
