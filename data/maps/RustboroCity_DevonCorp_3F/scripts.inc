@@ -152,9 +152,46 @@ RustboroCity_DevonCorp_3F_Movement_PlayerApproachDesk: @ 8212566
 RustboroCity_DevonCorp_3F_EventScript_MrStone:: @ 821256C
 	lock
 	faceplayer
+	goto_if_unset FLAG_EEVEE_EGG,RustboroCity_DevonCorp_3F_EventScript_MrStoneEeveeEgg
 	goto_if_set FLAG_RECEIVED_EXP_SHARE, RustboroCity_DevonCorp_3F_EventScript_MrStoneAfterFavor
 	goto_if_set FLAG_DELIVERED_STEVEN_LETTER, RustboroCity_DevonCorp_3F_EventScript_GiveExpShare
 	msgbox RustboroCity_DevonCorp_3F_Text_CountingOnYou, MSGBOX_DEFAULT
+	closemessage
+	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+RustboroCity_DevonCorp_3F_EventScript_MrStoneEeveeEgg::
+	msgbox RustboroCity_DevonCorp_3F_Text_IHaveAnEgg, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq RustboroCity_DevonCorp_3F_EventScript_MrStoneDeclineEeveeEgg
+	getpartysize
+	compare VAR_RESULT, PARTY_SIZE
+	goto_if_eq RustboroCity_DevonCorp_3F_EventScript_MrStoneNoRoomForEeveeEgg
+	msgbox RustboroCity_DevonCorp_3F_EventScript_MrStoneEeveeEggAccepted, MSGBOX_DEFAULT
+	setflag FLAG_EEVEE_EGG
+	playfanfare MUS_OBTAIN_ITEM
+	message RustboroCity_DevonCorp_3F_Text_ReceivedTheEgg
+	waitfanfare
+	giveegg SPECIES_EEVEE
+	setmonmetlocation VAR_RESULT, 0
+	closemessage
+	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+RustboroCity_DevonCorp_3F_EventScript_MrStoneDeclineEeveeEgg::
+	msgbox RustboroCity_DevonCorp_3F_Text_AsYouWishThen, MSGBOX_DEFAULT
+	closemessage
+	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+RustboroCity_DevonCorp_3F_EventScript_MrStoneNoRoomForEeveeEgg::
+	msgbox RustboroCity_DevonCorp_3F_Text_NoRoomForThisEgg, MSGBOX_DEFAULT
 	closemessage
 	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
 	waitmovement 0
@@ -269,6 +306,12 @@ RustboroCity_DevonCorp_3F_Text_NotFamiliarWithTrends: @ 8212B78
 	.string "But do young people all want to be\n"
 	.string "TRAINERS in the POKéMON LEAGUE?$"
 
+RustboroCity_DevonCorp_3F_Text_IHaveAnEgg:
+	.string "MR. STONE: Since you've saved our\n"
+	.string "staff twice, I'd like to reward you.\p"
+	.string "I have a POKéMON EGG here.\n"
+	.string "Would you like it?$"
+
 RustboroCity_DevonCorp_3F_Text_ThisIs3rdFloorWaitHere: @ 8212C37
 	.string "This is the DEVON CORPORATION's\n"
 	.string "third floor.\p"
@@ -308,3 +351,18 @@ RustboroCity_DevonCorp_3F_Text_RareRocksDisplay: @ 8212EE9
 	.string "It's a collection of rare rocks and\n"
 	.string "stones assembled by the PRESIDENT.$"
 
+RustboroCity_DevonCorp_3F_EventScript_MrStoneEeveeEggAccepted:
+	.string "Good deal! When you hatch that\n"
+	.string "EGG, you'll have a valuable\l"
+	.string "addition to your team!$"
+
+RustboroCity_DevonCorp_3F_Text_ReceivedTheEgg:
+	.string "{PLAYER} received the EGG.$"
+
+RustboroCity_DevonCorp_3F_Text_NoRoomForThisEgg:
+	.string "Oh? You've too many POKéMON.\n"
+	.string "You'll have to make some room.$"
+
+RustboroCity_DevonCorp_3F_Text_AsYouWishThen:
+	.string "If you have a change of heart about\n"
+	.string "taking this EGG, I will be here.$"

@@ -237,14 +237,11 @@ PetalburgCity_EventScript_CitySign:: @ 81DC47F
 	end
 
 PetalburgCity_EventScript_Gentleman:: @ 81DC488
-	lock
-	faceplayer
 	msgbox PetalburgCity_Text_FullPartyExplanation, MSGBOX_NPC
 	goto_if_set FLAG_DEFEATED_PETALBURG_GYM, PetalburgCity_EventScript_Gentleman_StarterTwo
-	release
 	end
 
-PetalburgCity_EventScript_Gentleman_StarterTwo:
+PetalburgCity_EventScript_Gentleman_StarterTwo::
 	goto_if_set FLAG_STARTER_TWO_EGG, PetalburgCity_EventScript_Gentleman_StarterTwo_Received
 	switch VAR_STARTER_MON
 	case 0, PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko
@@ -253,66 +250,71 @@ PetalburgCity_EventScript_Gentleman_StarterTwo:
 	release
 	end
 
-PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko:
+PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko::
+	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
-	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
+	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
 	setflag FLAG_STARTER_TWO_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_TORCHIC
-	release
+	setmonmetlocation VAR_RESULT, 0
+	releaseall
 	end
 
-PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic:
+PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic::
+	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
-	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
+	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
 	setflag FLAG_STARTER_TWO_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_MUDKIP
-	release
+	setmonmetlocation VAR_RESULT, 0
+	releaseall
 	end
 
-PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip:
+PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip::
+	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
-	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
+	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
 	setflag FLAG_STARTER_TWO_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_TREECKO
-	release
+	setmonmetlocation VAR_RESULT, 0
+	releaseall
 	end
 
 PetalburgCity_EventScript_Gentleman_StarterTwo_Received:
-	release
 	end
 
 PetalburgCity_EventScript_DeclineEgg::
-	msgbox PetalburgCity_Text_AsYouWishThen, MSGBOX_DEFAULT
-	release
+	msgbox PetalburgCity_Text_AsYouWishThen, MSGBOX_NPC
+	releaseall
 	end
 
 PetalburgCity_EventScript_NoRoomForEgg::
-	msgbox PetalburgCity_Text_NoRoomForThisEgg, MSGBOX_DEFAULT
-	release
+	msgbox PetalburgCity_Text_NoRoomForThisEgg, MSGBOX_NPC
+	releaseall
 	end
 
 PetalburgCity_EventScript_WallyHouseSign:: @ 81DC491

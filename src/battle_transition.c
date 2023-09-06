@@ -563,7 +563,7 @@ static const TransitionStateFunc sPhase2_ShredSplit_Funcs[] =
 {
     Phase2_ShredSplit_Func1,
     Phase2_ShredSplit_Func2,
-//    Phase2_ShredSplit_Func3, //ShredSplit_BrokenCheck ?
+    Phase2_ShredSplit_Func3, //ShredSplit_BrokenCheck ?
     Phase2_ShredSplit_Func4
 };
 
@@ -2738,23 +2738,23 @@ static bool8 Phase2_ShredSplit_Func2(struct Task *task)
 // is always false, resulting in the game being stuck in an infinite loop.
 // It's possible this transition is only partially
 // done and the second part was left out.
-/*static bool8 Phase2_ShredSplit_Func3(struct Task *task)
+static bool8 Phase2_ShredSplit_Func3(struct Task *task)
 {
     u16 i;
-    bool32 done = TRUE;
     u16 checkVar2 = 0xFF10;
 
     for (i = 0; i < 0xA0; i++)
     {
-        if (gScanlineEffectRegBuffers[1][i] != 0xF0 && gScanlineEffectRegBuffers[1][i] != checkVar2)
-            done = FALSE; // a break statement should be put here
+        if (gScanlineEffectRegBuffers[1][i] == DISPLAY_WIDTH && gScanlineEffectRegBuffers[1][i] == checkVar2)
+            break;
+            //done = FALSE; // a break statement should be put here
     }
 
-    if (done == TRUE)
+    //if (done == TRUE)
         task->tState++;
 
     return FALSE;
-}*/
+}
 
 static bool8 Phase2_ShredSplit_Func4(struct Task *task)
 {

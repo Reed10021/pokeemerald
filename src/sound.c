@@ -130,7 +130,8 @@ void PlayNewMapMusic(u16 songNum)
 {
     if (songNum == MUS_POKE_CENTER)
     {
-        if (Random() % 5 == 0)
+        // Alternate
+        if (Random() % 3 == 0)
             songNum = MUS_C_COMM_CENTER;
     }
     sCurrentMapMusic = songNum;
@@ -158,11 +159,6 @@ void FadeOutAndPlayNewMapMusic(u16 songNum, u8 speed)
 {
     FadeOutMapMusic(speed);
     sCurrentMapMusic = 0;
-    if (songNum == MUS_POKE_CENTER) 
-    {
-        if (Random() % 5 == 0)
-            songNum = MUS_C_COMM_CENTER;
-    }
     sNextMapMusic = songNum;
     sMapMusicState = 6;
 }

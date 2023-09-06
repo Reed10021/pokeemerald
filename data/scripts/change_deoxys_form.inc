@@ -53,7 +53,6 @@ ChangeDeoxysForm_Success:
 	playmoncry SPECIES_DEOXYS, 0
 	msgbox ChangeDeoxysForm_Text_Success, MSGBOX_DEFAULT
 	waitmoncry
-	waitbuttonpress
 	goto ChangeDeoxysForm_End
 
 ChangeDeoxysForm_End:
@@ -83,7 +82,8 @@ ChangeDeoxysForm_Text_Select:
 	.string "Please select DEOXYS.$"
 
 ChangeDeoxysForm_Text_Success:
-	.string "Your DEOXYS has transformed!$"
+	.string "Exposure to the strange rock\n"
+	.string "has transformed DEOXYS!$"
 
 ChangeDeoxysForm_Text_Failure:
 	.string "Hmm... Nothing happened.$"

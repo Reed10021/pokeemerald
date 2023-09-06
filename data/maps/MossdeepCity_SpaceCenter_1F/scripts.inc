@@ -79,7 +79,53 @@ MossdeepCity_SpaceCenter_1F_EventScript_NoLaunchesYet:: @ 8223012
 
 MossdeepCity_SpaceCenter_1F_EventScript_ShowLaunchNumber:: @ 822301B
 	msgbox MossdeepCity_SpaceCenter_1F_Text_SuccessfulLaunchNumber, MSGBOX_DEFAULT
+	compare VAR_RESULT, 10
+	goto_if_lt noJirachi
+	call_if_unset FLAG_JIRACHI_BATTLE, MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle
+noJirachi:
 	return
+
+MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle::
+	closemessage
+	msgbox MossdeepCity_SpaceCenter_1F_Text_JirachiFound, MSGBOX_YESNO
+	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	compare VAR_RESULT, NO
+	goto_if_eq jirachiReturn
+	special ShakeCamera
+	delay 30
+	delay 50
+	waitse
+	playmoncry SPECIES_JIRACHI, 2
+	waitmoncry
+	delay 20
+	setvar VAR_0x8004, SPECIES_JIRACHI
+	setvar VAR_0x8005, 70  @ level
+	setvar VAR_0x8006, ITEM_STAR_PIECE
+	special CreateObedientEnemyMon
+	special BattleSetup_StartLegendaryBattle
+	waitstate
+	specialvar VAR_RESULT, GetBattleOutcome
+	compare VAR_RESULT, B_OUTCOME_WON
+	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_DefeatedJirachi
+	compare VAR_RESULT, B_OUTCOME_RAN
+	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi
+	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
+	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi
+	setflag FLAG_JIRACHI_BATTLE
+jirachiReturn:
+	return
+
+MossdeepCity_SpaceCenter_1F_EventScript_DefeatedJirachi::
+	setvar VAR_0x8004, SPECIES_JIRACHI
+	goto Common_EventScript_LegendaryFlewAway
+	end
+
+MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi::
+	setvar VAR_0x8004, SPECIES_JIRACHI
+	goto Common_EventScript_LegendaryFlewAway
+	end
 
 MossdeepCity_SpaceCenter_1F_EventScript_RocketLaunchCounterMagma:: @ 8223024
 	dotimebasedevents
@@ -302,6 +348,10 @@ MossdeepCity_SpaceCenter_1F_Text_RocketLaunchImminent: @ 82232A7
 MossdeepCity_SpaceCenter_1F_Text_SuccessfulLaunchNumber: @ 82232C8
 	.string "The rocket launched safely!\n"
 	.string "That's successful launch no. {STR_VAR_1}!$"
+
+MossdeepCity_SpaceCenter_1F_Text_JirachiFound:
+	.string "Wow! A strange POKéMON has come from space!\n"
+	.string "TRAINER! Can you investigate this POKéMON?$"
 
 MossdeepCity_SpaceCenter_1F_Text_HaywireButRocketLaunchImminent: @ 8223305
 	.string "I know that things are a little\n"
