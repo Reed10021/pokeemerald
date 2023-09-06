@@ -166,6 +166,11 @@ void FadeOutAndFadeInNewMapMusic(u16 songNum, u8 fadeOutSpeed, u8 fadeInSpeed)
 {
     FadeOutMapMusic(fadeOutSpeed);
     sCurrentMapMusic = 0;
+    if (songNum == MUS_POKE_CENTER)
+    {
+        if (Random() % 10 == 0)
+            songNum = MUS_C_COMM_CENTER;
+    }
     sNextMapMusic = songNum;
     sMapMusicState = 7;
     sMapMusicFadeInSpeed = fadeInSpeed;
@@ -174,6 +179,11 @@ void FadeOutAndFadeInNewMapMusic(u16 songNum, u8 fadeOutSpeed, u8 fadeInSpeed)
 void FadeInNewMapMusic(u16 songNum, u8 speed)
 {
     FadeInNewBGM(songNum, speed);
+    if (songNum == MUS_POKE_CENTER)
+    {
+        if (Random() % 10 == 0)
+            songNum = MUS_C_COMM_CENTER;
+    }
     sCurrentMapMusic = songNum;
     sNextMapMusic = 0;
     sMapMusicState = 2;
