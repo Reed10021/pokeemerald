@@ -6876,7 +6876,7 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(TM45_ATTRACT)
                                         | TMHM(TM46_THIEF)
                                         | TMHM(HM03_SURF)
-                                        | TMHM(HM05_FLASH))
+                                        | TMHM(HM05_FLASH)
                                         | TMHM(HM07_WATERFALL)
                                         | TMHM(HM08_DIVE)),
 
@@ -6903,7 +6903,7 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(TM46_THIEF)
                                         | TMHM(HM02_FLY)
                                         | TMHM(HM03_SURF)
-                                        | TMHM(HM05_FLASH))
+                                        | TMHM(HM05_FLASH)
                                         | TMHM(HM07_WATERFALL)
                                         | TMHM(HM08_DIVE)),
 
