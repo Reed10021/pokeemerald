@@ -88,18 +88,15 @@ noJirachi:
 MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle::
 	closemessage
 	msgbox MossdeepCity_SpaceCenter_1F_Text_JirachiFound, MSGBOX_YESNO
-	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
-	waitmovement 0
-	release
+	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq jirachiReturn
-	playse SE_THUNDERSTORM_STOP
-	special ShakeCamera
-	delay 30
-	waitse
 	playmoncry SPECIES_JIRACHI, 2
 	waitmoncry
 	delay 20
+	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
 	setvar VAR_0x8004, SPECIES_JIRACHI
 	setvar VAR_0x8005, 50  @ level
 	setvar VAR_0x8006, ITEM_STAR_PIECE

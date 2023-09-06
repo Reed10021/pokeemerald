@@ -242,66 +242,73 @@ PetalburgCity_EventScript_Gentleman:: @ 81DC488
 	end
 
 PetalburgCity_EventScript_Gentleman_StarterTwo::
+	closemessage
 	goto_if_set FLAG_STARTER_TWO_EGG, PetalburgCity_EventScript_Gentleman_StarterTwo_Received
 	switch VAR_STARTER_MON
 	case 0, PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko
 	case 1, PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic
 	case 2, PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip
-	release
+PetalburgCity_EventScript_Gentleman_StarterTwo_Received:
 	end
 
 PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko::
 	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
+	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
 	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
+	closemessage
 	setflag FLAG_STARTER_TWO_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_TORCHIC
+	closemessage
 	releaseall
 	end
 
 PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic::
 	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
+	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
 	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
+	closemessage
 	setflag FLAG_STARTER_TWO_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_MUDKIP
+	closemessage
 	releaseall
 	end
 
 PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip::
 	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
+	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq PetalburgCity_EventScript_NoRoomForEgg
 	msgbox PetalburgCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
+	closemessage
 	setflag FLAG_STARTER_TWO_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
 	giveegg SPECIES_TREECKO
+	closemessage
 	releaseall
-	end
-
-PetalburgCity_EventScript_Gentleman_StarterTwo_Received:
 	end
 
 PetalburgCity_EventScript_DeclineEgg::
