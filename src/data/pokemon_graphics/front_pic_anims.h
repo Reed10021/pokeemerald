@@ -4580,6 +4580,64 @@ static const union AnimCmd sAnim_CHIMECHO_1[] =
     ANIMCMD_END,
 };
 
+
+static const union AnimCmd sAnim_DEOXYS_ATTACK_1[] =
+{
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 26),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYS_ATTACK_2[] =
+{
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYS_DEFENSE_1[] =
+{
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 26),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYS_DEFENSE_2[] =
+{
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYS_SPEED_1[] =
+{
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 26),
+    ANIMCMD_FRAME(1, 16),
+    ANIMCMD_FRAME(0, 16),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_DEOXYS_SPEED_2[] =
+{
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_FRAME(0, 20),
+    ANIMCMD_FRAME(2, 20),
+    ANIMCMD_END,
+};
+
 static const union AnimCmd sAnim_EGG_1[] =
 {
     ANIMCMD_FRAME(0, 6),
@@ -4802,63 +4860,6 @@ static const union AnimCmd sAnim_UNOWN_QMARK_1[] =
     ANIMCMD_FRAME(0, 30),
     ANIMCMD_FRAME(1, 30),
     ANIMCMD_FRAME(0, 1),
-    ANIMCMD_END,
-};
-
-static const union AnimCmd sAnim_DEOXYSATTACK_1[] =
-{
-    ANIMCMD_FRAME(0, 16),
-    ANIMCMD_FRAME(1, 16),
-    ANIMCMD_FRAME(0, 26),
-    ANIMCMD_FRAME(1, 16),
-    ANIMCMD_FRAME(0, 16),
-    ANIMCMD_END,
-};
-
-static const union AnimCmd sAnim_DEOXYSATTACK_2[] =
-{
-    ANIMCMD_FRAME(0, 20),
-    ANIMCMD_FRAME(2, 20),
-    ANIMCMD_FRAME(0, 20),
-    ANIMCMD_FRAME(2, 20),
-    ANIMCMD_END,
-};
-
-static const union AnimCmd sAnim_DEOXYSDEFENSE_1[] =
-{
-    ANIMCMD_FRAME(0, 16),
-    ANIMCMD_FRAME(1, 16),
-    ANIMCMD_FRAME(0, 26),
-    ANIMCMD_FRAME(1, 16),
-    ANIMCMD_FRAME(0, 16),
-    ANIMCMD_END,
-};
-
-static const union AnimCmd sAnim_DEOXYSDEFENSE_2[] =
-{
-    ANIMCMD_FRAME(0, 20),
-    ANIMCMD_FRAME(2, 20),
-    ANIMCMD_FRAME(0, 20),
-    ANIMCMD_FRAME(2, 20),
-    ANIMCMD_END,
-};
-
-static const union AnimCmd sAnim_DEOXYSSPEED_1[] =
-{
-    ANIMCMD_FRAME(0, 16),
-    ANIMCMD_FRAME(1, 16),
-    ANIMCMD_FRAME(0, 26),
-    ANIMCMD_FRAME(1, 16),
-    ANIMCMD_FRAME(0, 16),
-    ANIMCMD_END,
-};
-
-static const union AnimCmd sAnim_DEOXYSSPEED_2[] =
-{
-    ANIMCMD_FRAME(0, 20),
-    ANIMCMD_FRAME(2, 20),
-    ANIMCMD_FRAME(0, 20),
-    ANIMCMD_FRAME(2, 20),
     ANIMCMD_END,
 };
 
@@ -6862,6 +6863,24 @@ static const union AnimCmd *const sAnims_CHIMECHO[] ={
     sAnim_CHIMECHO_1,
 };
 
+static const union AnimCmd *const sAnims_DEOXYS_ATTACK[] = {
+    sAnim_GeneralFrame0,
+    sAnim_DEOXYS_ATTACK_1,
+    sAnim_DEOXYS_ATTACK_2,
+};
+
+static const union AnimCmd *const sAnims_DEOXYS_DEFENSE[] = {
+    sAnim_GeneralFrame0,
+    sAnim_DEOXYS_DEFENSE_1,
+    sAnim_DEOXYS_DEFENSE_2,
+};
+
+static const union AnimCmd *const sAnims_DEOXYS_SPEED[] = {
+    sAnim_GeneralFrame0,
+    sAnim_DEOXYS_SPEED_1,
+    sAnim_DEOXYS_SPEED_2,
+};
+
 static const union AnimCmd *const sAnims_EGG[] ={
     sAnim_GeneralFrame0,
     sAnim_EGG_1,
@@ -7000,24 +7019,6 @@ static const union AnimCmd *const sAnims_UNOWN_EMARK[] ={
 static const union AnimCmd *const sAnims_UNOWN_QMARK[] ={
     sAnim_GeneralFrame0,
     sAnim_UNOWN_QMARK_1,
-};
-
-static const union AnimCmd* const sAnims_DEOXYSATTACK[] = {
-    sAnim_GeneralFrame0,
-    sAnim_DEOXYSATTACK_1,
-    sAnim_DEOXYSATTACK_2,
-};
-
-static const union AnimCmd* const sAnims_DEOXYSDEFENSE[] = {
-    sAnim_GeneralFrame0,
-    sAnim_DEOXYSDEFENSE_1,
-    sAnim_DEOXYSDEFENSE_2,
-};
-
-static const union AnimCmd* const sAnims_DEOXYSSPEED[] = {
-    sAnim_GeneralFrame0,
-    sAnim_DEOXYSSPEED_1,
-    sAnim_DEOXYSSPEED_2,
 };
 
 #define ANIM_CMD(name)             [SPECIES_##name] = sAnims_##name
@@ -7465,9 +7466,9 @@ const union AnimCmd *const *const gMonFrontAnimsPtrTable[] =
     ANIM_CMD(UNOWN_Z),
     ANIM_CMD(UNOWN_EMARK),
     ANIM_CMD(UNOWN_QMARK),
-    ANIM_CMD(DEOXYSATTACK),
-    ANIM_CMD(DEOXYSDEFENSE),
-    ANIM_CMD(DEOXYSSPEED),
+    ANIM_CMD(DEOXYS_ATTACK),
+    ANIM_CMD(DEOXYS_DEFENSE),
+    ANIM_CMD(DEOXYS_SPEED),
 };
 
 #undef ANIM_CMD
