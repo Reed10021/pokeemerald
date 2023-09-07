@@ -39,6 +39,8 @@ FortreeCity_EventScript_OldMan_StarterThree_Received:
 	end
 FortreeCity_EventScript_OldMan_StarterThree:
 	goto_if_set FLAG_STARTER_THREE_EGG, FortreeCity_EventScript_OldMan_StarterThree_Received
+	faceplayer
+	lockall
 	switch VAR_STARTER_MON
 	case 0, FortreeCity_EventScript_OldMan_StarterThree_Treecko
 	case 1, FortreeCity_EventScript_OldMan_StarterThree_Torchic
@@ -46,7 +48,6 @@ FortreeCity_EventScript_OldMan_StarterThree:
 	end
 
 FortreeCity_EventScript_OldMan_StarterThree_Treecko::
-	lockall
 	msgbox FortreeCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq FortreeCity_EventScript_DeclineEgg
@@ -64,7 +65,6 @@ FortreeCity_EventScript_OldMan_StarterThree_Treecko::
 	end
 
 FortreeCity_EventScript_OldMan_StarterThree_Torchic::
-	lockall
 	msgbox FortreeCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq FortreeCity_EventScript_DeclineEgg
@@ -82,7 +82,6 @@ FortreeCity_EventScript_OldMan_StarterThree_Torchic::
 	end
 
 FortreeCity_EventScript_OldMan_StarterThree_Mudkip::
-	lockall
 	msgbox FortreeCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq FortreeCity_EventScript_DeclineEgg

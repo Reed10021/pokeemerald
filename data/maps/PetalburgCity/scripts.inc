@@ -243,6 +243,8 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Received:
 	end
 PetalburgCity_EventScript_Gentleman_StarterTwo:
 	goto_if_set FLAG_STARTER_TWO_EGG, PetalburgCity_EventScript_Gentleman_StarterTwo_Received
+	lockall
+	faceplayer
 	switch VAR_STARTER_MON
 	case 0, PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko
 	case 1, PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic
@@ -250,7 +252,6 @@ PetalburgCity_EventScript_Gentleman_StarterTwo:
 	end
 
 PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko::
-	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
@@ -268,7 +269,6 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko::
 	end
 
 PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic::
-	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
@@ -286,7 +286,6 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic::
 	end
 
 PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip::
-	lockall
 	msgbox PetalburgCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq PetalburgCity_EventScript_DeclineEgg
@@ -856,10 +855,10 @@ PetalburgCity_Text_ImLookingForTalentedTrainers: @ 81DCC09
 	.string "I'm sorry to have taken your time.$"
 
 PetalburgCity_Text_HaveEggWillYouTakeIt:
-	.string "Speaking of a full party, I have\n"
-	.string "an EGG here. I personally don't\l"
-	.string "have time to care for it.\p"
-	.string "But I've heard that you beat NORMAN.\n"
+	.string "You're just the TRAINER I'm looking\n"
+	.string "for. I have an EGG here,but I\l"
+	.string "personally don't have time for it.\p"
+	.string "I've heard that you beat NORMAN.\n"
 	.string "A capable TRAINER like yourself would\l"
 	.string "be able to take care of this EGG.\p"
 	.string "Will you take this EGG?$"

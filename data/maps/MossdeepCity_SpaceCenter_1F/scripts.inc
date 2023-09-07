@@ -86,7 +86,6 @@ noJirachi:
 	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle::
-	closemessage
 	msgbox MossdeepCity_SpaceCenter_1F_Text_JirachiFound, MSGBOX_YESNO
 	closemessage
 	compare VAR_RESULT, NO
@@ -105,7 +104,7 @@ MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle::
 	waitstate
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_DefeatedJirachi
+	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
@@ -114,14 +113,11 @@ MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle::
 jirachiReturn:
 	return
 
-MossdeepCity_SpaceCenter_1F_EventScript_DefeatedJirachi::
-	setvar VAR_0x8004, SPECIES_JIRACHI
-	goto Common_EventScript_LegendaryFlewAway
-	end
-
 MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi::
 	setvar VAR_0x8004, SPECIES_JIRACHI
-	goto Common_EventScript_LegendaryFlewAway
+	bufferspeciesname 0, VAR_0x8004
+	msgbox gText_LegendaryFlewAway, MSGBOX_DEFAULT
+	release
 	end
 
 MossdeepCity_SpaceCenter_1F_EventScript_RocketLaunchCounterMagma:: @ 8223024

@@ -60,9 +60,9 @@ MauvilleCity_PokemonCenter_1F_EventScript_SelfTrader_DeclineTrade::
 	end
 
 MauvilleCity_PokemonCenter_1F_Text_IllTradeIfYouWant:
-	.string "Hi! I'm a DEVON employee and I\n"
-	.string "can help you to trade a\l"
-	.string "POKéMON with yourself!\p"
+	.string "Hi! I'm a DEVON employee and I can\n"
+	.string "help you to trade a POKéMON with\l"
+	.string "yourself! Handy for evolutions.\p"
 	.string "Do you want to trade with yourself?$"
 
 MauvilleCity_PokemonCenter_1F_Text_ComeBack:
