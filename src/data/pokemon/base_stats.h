@@ -11066,12 +11066,12 @@ const struct BaseStats gBaseStats[] =
 
     [SPECIES_TROPIUS] =
     {
-        .baseHP        = 99,
-        .baseAttack    = 68,
+        .baseHP        = 101,
+        .baseAttack    = 73,
         .baseDefense   = 100,
         .baseSpeed     = 51,
-        .baseSpAttack  = 87,
-        .baseSpDefense = 95,
+        .baseSpAttack  = 92,
+        .baseSpDefense = 105,
         .type1 = TYPE_GRASS,
         .type2 = TYPE_FLYING,
         .catchRate = 200,
@@ -11579,11 +11579,11 @@ const struct BaseStats gBaseStats[] =
     [SPECIES_CASTFORM] =
     {
         .baseHP        = 100,
-        .baseAttack    = 75,
-        .baseDefense   = 75,
+        .baseAttack    = 80,
+        .baseDefense   = 80,
         .baseSpeed     = 100,
-        .baseSpAttack  = 75,
-        .baseSpDefense = 75,
+        .baseSpAttack  = 80,
+        .baseSpDefense = 80,
         .type1 = TYPE_NORMAL,
         .type2 = TYPE_NORMAL,
         .catchRate = 45,
