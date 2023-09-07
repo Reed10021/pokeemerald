@@ -3261,9 +3261,9 @@ static void BufferTradeSceneStrings(void)
     {
         GetMonData(&gEnemyParty[0], MON_DATA_OT_NAME, gStringVar1);
         GetMonData(&gEnemyParty[0], MON_DATA_NICKNAME, name);
-        StringCopy_Nickname(gStringVar3, name);
+        StringCopy10(gStringVar3, name);
         GetMonData(&gPlayerParty[gSpecialVar_0x8005], MON_DATA_NICKNAME, name);
-        StringCopy_Nickname(gStringVar2, name);
+        StringCopy10(gStringVar2, name);
     }
 }
 
