@@ -164,14 +164,12 @@ RustboroCity_DevonCorp_3F_EventScript_MrStone:: @ 821256C
 
 RustboroCity_DevonCorp_3F_EventScript_MrStoneEeveeEgg::
 	msgbox RustboroCity_DevonCorp_3F_Text_IHaveAnEgg, MSGBOX_YESNO
-	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq RustboroCity_DevonCorp_3F_EventScript_MrStoneDeclineEeveeEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq RustboroCity_DevonCorp_3F_EventScript_MrStoneNoRoomForEeveeEgg
 	msgbox RustboroCity_DevonCorp_3F_EventScript_MrStoneEeveeEggAccepted, MSGBOX_DEFAULT
-	closemessage
 	setflag FLAG_EEVEE_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message RustboroCity_DevonCorp_3F_Text_ReceivedTheEgg

@@ -33,31 +33,27 @@ FortreeCity_EventScript_Girl:: @ 81E25DE
 	end
 
 FortreeCity_EventScript_OldMan:: @ 81E25E7
-	msgbox FortreeCity_Text_EveryoneHealthyAndLively, MSGBOX_NPC
 	goto_if_set FLAG_DEFEATED_FORTREE_GYM, FortreeCity_EventScript_OldMan_StarterThree
+FortreeCity_EventScript_OldMan_StarterThree_Received:
+	msgbox FortreeCity_Text_EveryoneHealthyAndLively, MSGBOX_NPC
 	end
-
-FortreeCity_EventScript_OldMan_StarterThree::
-	closemessage
+FortreeCity_EventScript_OldMan_StarterThree:
 	goto_if_set FLAG_STARTER_THREE_EGG, FortreeCity_EventScript_OldMan_StarterThree_Received
 	switch VAR_STARTER_MON
 	case 0, FortreeCity_EventScript_OldMan_StarterThree_Treecko
 	case 1, FortreeCity_EventScript_OldMan_StarterThree_Torchic
 	case 2, FortreeCity_EventScript_OldMan_StarterThree_Mudkip
-FortreeCity_EventScript_OldMan_StarterThree_Received:
 	end
 
 FortreeCity_EventScript_OldMan_StarterThree_Treecko::
 	lockall
 	msgbox FortreeCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
-	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq FortreeCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq FortreeCity_EventScript_NoRoomForEgg
-	msgbox FortreeCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
-	closemessage
+	msgbox FortreeCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
 	setflag FLAG_STARTER_THREE_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message FortreeCity_Text_ReceivedTheEgg
@@ -70,14 +66,12 @@ FortreeCity_EventScript_OldMan_StarterThree_Treecko::
 FortreeCity_EventScript_OldMan_StarterThree_Torchic::
 	lockall
 	msgbox FortreeCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
-	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq FortreeCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq FortreeCity_EventScript_NoRoomForEgg
-	msgbox FortreeCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
-	closemessage
+	msgbox FortreeCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
 	setflag FLAG_STARTER_THREE_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message FortreeCity_Text_ReceivedTheEgg
@@ -90,14 +84,12 @@ FortreeCity_EventScript_OldMan_StarterThree_Torchic::
 FortreeCity_EventScript_OldMan_StarterThree_Mudkip::
 	lockall
 	msgbox FortreeCity_Text_HaveEggWillYouTakeIt, MSGBOX_YESNO
-	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq FortreeCity_EventScript_DeclineEgg
 	getpartysize
 	compare VAR_RESULT, PARTY_SIZE
 	goto_if_eq FortreeCity_EventScript_NoRoomForEgg
-	msgbox FortreeCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_NPC
-	closemessage
+	msgbox FortreeCity_Text_HopeYoullWalkPlentyWithEgg, MSGBOX_DEFAULT
 	setflag FLAG_STARTER_THREE_EGG
 	playfanfare MUS_OBTAIN_ITEM
 	message FortreeCity_Text_ReceivedTheEgg
@@ -108,12 +100,12 @@ FortreeCity_EventScript_OldMan_StarterThree_Mudkip::
 	end
 
 FortreeCity_EventScript_DeclineEgg::
-	msgbox FortreeCity_Text_AsYouWishThen, MSGBOX_NPC
+	msgbox FortreeCity_Text_AsYouWishThen, MSGBOX_DEFAULT
 	releaseall
 	end
 
 FortreeCity_EventScript_NoRoomForEgg::
-	msgbox FortreeCity_Text_NoRoomForThisEgg, MSGBOX_NPC
+	msgbox FortreeCity_Text_NoRoomForThisEgg, MSGBOX_DEFAULT
 	releaseall
 	end
 

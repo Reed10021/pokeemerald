@@ -35,6 +35,43 @@ MauvilleCity_PokemonCenter_1F_EventScript_Youngster:: @ 8210E98
 	msgbox MauvilleCity_PokemonCenter_1F_Text_RecordCornerSoundsFun, MSGBOX_NPC
 	end
 
+MauvilleCity_PokemonCenter_1F_EventScript_SelfTrader::
+	lock
+	faceplayer
+	msgbox MauvilleCity_PokemonCenter_1F_Text_IllTradeIfYouWant, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq MauvilleCity_PokemonCenter_1F_EventScript_SelfTrader_DeclineTrade
+	special ChoosePartyMon
+	waitstate
+	compare VAR_0x8004, 255
+	goto_if_eq MauvilleCity_PokemonCenter_1F_EventScript_SelfTrader_DeclineTrade
+	copyvar VAR_0x8005, VAR_0x8004
+	setvar VAR_0x8004, 6
+	special CreateInGameTradePokemon
+	special DoInGameTradeScene
+	waitstate
+	msgbox MauvilleCity_PokemonCenter_1F_Text_ComeBack, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_PokemonCenter_1F_EventScript_SelfTrader_DeclineTrade::
+	msgbox MauvilleCity_PokemonCenter_1F_Text_YouDontWantToThatsOkay, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_PokemonCenter_1F_Text_IllTradeIfYouWant:
+	.string "Hi! I'm a DEVON employee and I\n"
+	.string "can help you to trade a\l"
+	.string "POKéMON with yourself!\p"
+	.string "Do you want to trade with yourself?$"
+
+MauvilleCity_PokemonCenter_1F_Text_ComeBack:
+	.string "Come back anytime.$"
+
+MauvilleCity_PokemonCenter_1F_Text_YouDontWantToThatsOkay:
+	.string "You don't want to?\n"
+    .string "Okay, come back anytime.$"
+
 MauvilleCity_PokemonCenter_1F_Text_ManOverThereSaysWeirdThings: @ 8210EA1
 	.string "That man over there, he says weird\n"
 	.string "things!\p"
