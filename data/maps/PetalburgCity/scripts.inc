@@ -856,7 +856,7 @@ PetalburgCity_Text_ImLookingForTalentedTrainers: @ 81DCC09
 
 PetalburgCity_Text_HaveEggWillYouTakeIt:
 	.string "You're just the TRAINER I'm looking\n"
-	.string "for. I have an EGG here,but I\l"
+	.string "for. I have an EGG here, but I\l"
 	.string "personally don't have time for it.\p"
 	.string "I've heard that you beat NORMAN.\n"
 	.string "A capable TRAINER like yourself would\l"
