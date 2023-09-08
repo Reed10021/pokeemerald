@@ -9526,7 +9526,7 @@ static void Cmd_pickup(void)
                 && species != 0
                 && species != SPECIES_EGG
                 && heldItem == ITEM_NONE
-                && (Random() % 10) == 0)
+                && (Random() % 10) <= 4) // == 0
             {
                 heldItem = GetBattlePyramidPickupItemId();
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
@@ -9549,7 +9549,7 @@ static void Cmd_pickup(void)
                 && species != 0
                 && species != SPECIES_EGG
                 && heldItem == ITEM_NONE
-                && (Random() % 10) == 0)
+                && (Random() % 10) <= 4) // == 0
             {
                 s32 j;
                 s32 rand = Random() % 100;
