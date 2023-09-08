@@ -8754,15 +8754,15 @@ static void Cmd_recoverbasedonsunlight(void)
 
 static void Cmd_hiddenpowercalc(void)
 {
-    u8 powerBits;
+//    u8 powerBits;
     u8 typeBits;
 
-    powerBits = ((gBattleMons[gBattlerAttacker].hpIV & 2) >> 1)
+/*    powerBits = ((gBattleMons[gBattlerAttacker].hpIV & 2) >> 1)
               | ((gBattleMons[gBattlerAttacker].attackIV & 2) << 0)
               | ((gBattleMons[gBattlerAttacker].defenseIV & 2) << 1)
               | ((gBattleMons[gBattlerAttacker].speedIV & 2) << 2)
               | ((gBattleMons[gBattlerAttacker].spAttackIV & 2) << 3)
-              | ((gBattleMons[gBattlerAttacker].spDefenseIV & 2) << 4);
+              | ((gBattleMons[gBattlerAttacker].spDefenseIV & 2) << 4);*/
 
     typeBits  = ((gBattleMons[gBattlerAttacker].hpIV & 1) << 0)
               | ((gBattleMons[gBattlerAttacker].attackIV & 1) << 1)
@@ -8771,7 +8771,7 @@ static void Cmd_hiddenpowercalc(void)
               | ((gBattleMons[gBattlerAttacker].spAttackIV & 1) << 4)
               | ((gBattleMons[gBattlerAttacker].spDefenseIV & 1) << 5);
 
-    gDynamicBasePower = (40 * powerBits) / 63 + 30;
+    gDynamicBasePower = 75; //(40 * powerBits) / 63 + 30;
 
     gBattleStruct->dynamicMoveType = (15 * typeBits) / 63 + 1;
     if (gBattleStruct->dynamicMoveType >= TYPE_MYSTERY)
