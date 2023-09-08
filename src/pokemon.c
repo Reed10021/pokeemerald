@@ -2436,6 +2436,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 nature)
 {
     u32 personality;
+    u32 shinyValue;
     u8 CONSTANT_REROLLS = 40;
     u16 trueChainCount = VarGet(VAR_CHAIN);
     u32 adjustedChainCount = trueChainCount + CONSTANT_REROLLS; // Add some constant rerolls to the base chain rate because hard.
@@ -2449,7 +2450,7 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
     {
         personality = Random32();
 
-        u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+        shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
         if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
         {
             u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
@@ -2512,6 +2513,7 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
 void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 gender, u8 nature, u8 unownLetter)
 {
     u32 personality;
+    u32 shinyValue;
     u8 CONSTANT_REROLLS = 40;
     u16 trueChainCount = VarGet(VAR_CHAIN);
     u32 adjustedChainCount = trueChainCount + CONSTANT_REROLLS; // Add some constant rerolls to the base chain rate because hard.
@@ -2528,7 +2530,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
         do
         {
             personality = Random32();
-            u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+            shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
             if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
             {
                 u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
@@ -2593,7 +2595,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
         do
         {
             personality = Random32();
-            u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+            shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
             if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
             {
                 u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
