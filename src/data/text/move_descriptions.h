@@ -946,8 +946,8 @@ static const u8 sMoonlightDescription[] = _(
     "varies with the weather.");
 
 static const u8 sHiddenPowerDescription[] = _(
-    "The effectiveness varies\n"
-    "with the user.");
+    "The type varies with\n"
+    "the user.");
 
 static const u8 sCrossChopDescription[] = _(
     "A double-chopping attack.\n"
