@@ -392,7 +392,7 @@ static bool8 TryGenerateWildMon(const struct WildPokemonInfo *wildMonInfo, u8 ar
     u16 chainCount = VarGet(VAR_CHAIN);
 
     if (chainCount >= 3) //If we're chaining.
-        rerollCount += chainCount / 3;
+        rerollCount += chainCount / 2; // A chain of 24 == 12 rerolls for the species.
 
     do {
         rerollCount--;
@@ -444,7 +444,7 @@ static u16 GenerateFishingWildMon(const struct WildPokemonInfo *wildMonInfo, u8 
     u32 rerollCount = 1;
     u16 chainCount = VarGet(VAR_CHAIN);
     if (chainCount >= 3) //If we're chaining.
-        rerollCount += chainCount / 3;
+        rerollCount += chainCount / 2;
     do {
 		rerollCount--;
 		wildMonIndex = ChooseWildMonIndex_Fishing(rod);

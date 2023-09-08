@@ -12,6 +12,12 @@ Route117_EventScript_DaycareMan:: @ 8291C18
 	compare VAR_RESULT, DAYCARE_TWO_MONS
 	goto_if_eq Route117_EventScript_CheckOnTwoMons
 	msgbox Route117_Text_SeeWifeIfYoudLikeMeToRaiseMon, MSGBOX_DEFAULT
+	compare VAR_CHAIN, 3
+	goto_if_lt NotChain
+	bufferspeciesname 0, VAR_SPECIESCHAINED
+	buffernumberstring 1, VAR_CHAIN
+	msgbox Route117_Text_NormalChainInfo, MSGBOX_DEFAULT
+NotChain:
 	release
 	end
 
@@ -33,6 +39,12 @@ NotShiny:
 	special RejectEggFromDayCare
 	buffernumberstring 0, VAR_EGG_CHAIN
 	msgbox Route117_Text_EggChainInfo, MSGBOX_DEFAULT
+	compare VAR_CHAIN, 3
+	goto_if_lt NotChaining
+	bufferspeciesname 0, VAR_SPECIESCHAINED
+	buffernumberstring 1, VAR_CHAIN
+	msgbox Route117_Text_NormalChainInfo, MSGBOX_DEFAULT
+NotChaining:
 	release
 	end
 
@@ -54,6 +66,11 @@ Route117_EventScript_DaycareReceiveEgg:: @ 8291C9D
 	clearflag FLAG_PENDING_DAYCARE_EGG
 	buffernumberstring 0, VAR_EGG_CHAIN
 	msgbox Route117_Text_EggChainInfo, MSGBOX_DEFAULT
+	goto_if_lt ZeroChaining
+	bufferspeciesname 0, VAR_SPECIESCHAINED
+	buffernumberstring 1, VAR_CHAIN
+	msgbox Route117_Text_NormalChainInfo, MSGBOX_DEFAULT
+ZeroChaining:
 	release
 	end
 
@@ -72,6 +89,12 @@ Route117_EventScript_CheckOnOneMon:: @ 8291CD1
 	msgbox Route117_Text_YourMonIsDoingFine, MSGBOX_DEFAULT
 	setvar VAR_0x8004, 0
 	call Route117_EventScript_CheckMonReceivedMail
+	compare VAR_CHAIN, 3
+	goto_if_lt NoChaining
+	bufferspeciesname 0, VAR_SPECIESCHAINED
+	buffernumberstring 1, VAR_CHAIN
+	msgbox Route117_Text_NormalChainInfo, MSGBOX_DEFAULT
+NoChaining:
 	release
 	end
 
@@ -88,6 +111,12 @@ Route117_EventScript_CheckOnTwoMons:: @ 8291CE8
 	call Route117_EventScript_CheckMonReceivedMail
 	buffernumberstring 0, VAR_EGG_CHAIN
 	msgbox Route117_Text_EggChainInfo, MSGBOX_DEFAULT
+	compare VAR_CHAIN, 3
+	goto_if_lt SkipChaining
+	bufferspeciesname 0, VAR_SPECIESCHAINED
+	buffernumberstring 1, VAR_CHAIN
+	msgbox Route117_Text_NormalChainInfo, MSGBOX_DEFAULT
+SkipChaining:
 	release
 	end
 
@@ -351,6 +380,11 @@ Route117_Text_TakeGoodCareOfIt: @ 82921CF
 Route117_Text_EggChainInfo:
 	.string "By the way, your current Egg\n"
 	.string "Chain count is {STR_VAR_1}.$"
+
+Route117_Text_NormalChainInfo:
+	.string "It also looks like you're chaining\n"
+	.string "wild {STR_VAR_1}. Your Chain Level\p"
+	.string "for {STR_VAR_1} is {STR_VAR_2}.$"
 
 Route117_Text_FriendlyWithOtherTrainersMon: @ 82921E5
 	.string "By the way, about your {STR_VAR_1},\n"
