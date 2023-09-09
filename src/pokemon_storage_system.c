@@ -302,9 +302,9 @@ struct UnkStruct_2039D84
 
 enum
 {
-    BOX_OPTION_MOVE_MONS,
     BOX_OPTION_WITHDRAW,
     BOX_OPTION_DEPOSIT,
+    BOX_OPTION_MOVE_MONS,
     BOX_OPTION_MOVE_ITEMS,
     BOX_OPTION_EXIT,
 };
@@ -718,9 +718,9 @@ static void sub_80D2C1C(struct UnkStruct_2000028 *unkStruct);
 // static const rom data
 static const struct PSS_MenuStringPtrs gUnknown_085716C0[] =
 {
-    {gText_MovePokemon, gText_MoveMonDescription},
     {gText_WithdrawPokemon, gText_WithdrawMonDescription},
     {gText_DepositPokemon, gText_DepositMonDescription},
+    {gText_MovePokemon, gText_MoveMonDescription},
     {gText_MoveItems, gText_MoveItemsDescription},
     {gText_SeeYa, gText_SeeYaDescription}
 };
