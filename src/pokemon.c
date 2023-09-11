@@ -2199,13 +2199,12 @@ void CreateMon(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 hasFix
 
 void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, u8 hasFixedPersonality, u32 fixedPersonality, u8 otIdType, u32 fixedOtId)
 {
-    u8 CONSTANT_REROLLS = 40;
     u8 speciesName[POKEMON_NAME_LENGTH + 1];
     u32 personality;
     u32 value;
     u16 checksum;
     u16 trueChainCount = VarGet(VAR_CHAIN);
-    u32 adjustedChainCount = trueChainCount + CONSTANT_REROLLS; // Add some constant rerolls to the base chain rate because hard.
+    u32 adjustedChainCount = trueChainCount + 40; // Add some constant rerolls to the base chain rate because hard.
     u16 eggChainCount = VarGet(VAR_EGG_CHAIN);
     u8 legendaryCheck = 0;
 
@@ -2269,21 +2268,21 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
                     case SPECIES_DEOXYS_ATTACK:
                     case SPECIES_DEOXYS_DEFENSE:
                     case SPECIES_DEOXYS_SPEED:
-                        adjustedChainCount += 200; // Use the current chain and increment it by 200. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
+                        adjustedChainCount += 150; // Use the current chain and increment it by 150. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
                         // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
                         legendaryCheck = 1;
                 }
                 // Reward long chains that haven't broken
                 if (trueChainCount >= 160)
-                    adjustedChainCount += 480 + (trueChainCount * 3);
-                else if (trueChainCount >= 100)
-                    adjustedChainCount += 320 + (trueChainCount * 2);
-                else if (trueChainCount >= 60)
-                    adjustedChainCount += 160 + trueChainCount;
+                    adjustedChainCount += (trueChainCount * 3);
+                else if (trueChainCount >= 110)
+                    adjustedChainCount += (trueChainCount * 2);
+                else if (trueChainCount >= 70)
+                    adjustedChainCount += 90 + trueChainCount;
                 else if (trueChainCount >= 40)
-                    adjustedChainCount += 80;
-                else if (trueChainCount >= 20)
-                    adjustedChainCount += 20;
+                    adjustedChainCount += 40 + trueChainCount;
+                else if (trueChainCount >= 10)
+                    adjustedChainCount += trueChainCount;
 
                 if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1)
                     rolls = adjustedChainCount / 2; // If this is a pokemon we're not chaining, we get rolls equal to chainCount divided by 2. So a chainCount of 20 = 10 additional rolls for shiny.
@@ -2436,65 +2435,60 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 
 void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 nature)
 {
-    u32 personality;
-    u32 shinyValue;
-    u8 CONSTANT_REROLLS = 40;
-    u16 trueChainCount = VarGet(VAR_CHAIN);
-    u32 adjustedChainCount = trueChainCount + CONSTANT_REROLLS; // Add some constant rerolls to the base chain rate because hard.
+    u32 personality = Random32();
     u32 value = gSaveBlock2Ptr->playerTrainerId[0]
         | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
         | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
         | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
-    u8 legendaryCheck = 0;
+    u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
 
-    do
     {
-        personality = Random32();
-
-        shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+        u16 trueChainCount = VarGet(VAR_CHAIN);
+        u32 adjustedChainCount = trueChainCount + 40; // Add some constant rerolls to the base chain rate because hard.
+        u8 legendaryCheck = 0;
         if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
         {
             u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
             // Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
             switch (species)
             {
-            case SPECIES_ARTICUNO:
-            case SPECIES_ZAPDOS:
-            case SPECIES_MOLTRES:
-            case SPECIES_MEWTWO:
-            case SPECIES_MEW:
-            case SPECIES_RAIKOU:
-            case SPECIES_ENTEI:
-            case SPECIES_SUICUNE:
-            case SPECIES_LUGIA:
-            case SPECIES_HO_OH:
-            case SPECIES_CELEBI:
-            case SPECIES_REGICE:
-            case SPECIES_REGIROCK:
-            case SPECIES_REGISTEEL:
-            case SPECIES_GROUDON:
-            case SPECIES_KYOGRE:
-            case SPECIES_RAYQUAZA:
-            case SPECIES_DEOXYS:
-            case SPECIES_JIRACHI:
-            case SPECIES_DEOXYS_ATTACK:
-            case SPECIES_DEOXYS_DEFENSE:
-            case SPECIES_DEOXYS_SPEED:
-                adjustedChainCount += 200; // Use the current chain and increment it by 200. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
-                // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
-                legendaryCheck = 1;
+                case SPECIES_ARTICUNO:
+                case SPECIES_ZAPDOS:
+                case SPECIES_MOLTRES:
+                case SPECIES_MEWTWO:
+                case SPECIES_MEW:
+                case SPECIES_RAIKOU:
+                case SPECIES_ENTEI:
+                case SPECIES_SUICUNE:
+                case SPECIES_LUGIA:
+                case SPECIES_HO_OH:
+                case SPECIES_CELEBI:
+                case SPECIES_REGICE:
+                case SPECIES_REGIROCK:
+                case SPECIES_REGISTEEL:
+                case SPECIES_GROUDON:
+                case SPECIES_KYOGRE:
+                case SPECIES_RAYQUAZA:
+                case SPECIES_DEOXYS:
+                case SPECIES_JIRACHI:
+                case SPECIES_DEOXYS_ATTACK:
+                case SPECIES_DEOXYS_DEFENSE:
+                case SPECIES_DEOXYS_SPEED:
+                    adjustedChainCount += 150; // Use the current chain and increment it by 150. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
+                    // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
+                    legendaryCheck = 1;
             }
             // Reward long chains that haven't broken
             if (trueChainCount >= 160)
-                adjustedChainCount += 480 + (trueChainCount * 3);
-            else if (trueChainCount >= 100)
-                adjustedChainCount += 320 + (trueChainCount * 2);
-            else if (trueChainCount >= 60)
-                adjustedChainCount += 160 + trueChainCount;
+                adjustedChainCount += (trueChainCount * 3);
+            else if (trueChainCount >= 110)
+                adjustedChainCount += (trueChainCount * 2);
+            else if (trueChainCount >= 70)
+                adjustedChainCount += 90 + trueChainCount;
             else if (trueChainCount >= 40)
-                adjustedChainCount += 80;
-            else if (trueChainCount >= 20)
-                adjustedChainCount += 20;
+                adjustedChainCount += 40 + trueChainCount;
+            else if (trueChainCount >= 10)
+                adjustedChainCount += trueChainCount;
 
             if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1)
                 rolls = adjustedChainCount / 2; // If this is a pokemon we're not chaining, we get rolls equal to chainCount divided by 2. So a chainCount of 20 = 10 additional rolls for shiny.
@@ -2506,153 +2500,109 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
             } while (shinyValue >= SHINY_ODDS && rolls < adjustedChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
         }
     }
-    while (nature != GetNatureFromPersonality(personality));
+    // Do this check after we've rolled chain shininess. Prevents near-infinite loops and in-game slowdowns.
+    // If we rolled a shiny and the nature doesn't match, keep shininess and roll nature.
+    while (nature != GetNatureFromPersonality(personality))
+    {
+        personality = Random32();
+        if (shinyValue < SHINY_ODDS)
+            personality = ((((Random() % SHINY_ODDS) ^ (HIHALF(value) ^ LOHALF(value))) ^ LOHALF(personality)) << 16) | LOHALF(personality);
+    }
 
     CreateMon(mon, species, level, fixedIV, 1, personality, OT_ID_PLAYER_ID, 0);
 }
 
 void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV, u8 gender, u8 nature, u8 unownLetter)
 {
-    u32 personality;
-    u32 shinyValue;
-    u8 CONSTANT_REROLLS = 40;
-    u16 trueChainCount = VarGet(VAR_CHAIN);
-    u32 adjustedChainCount = trueChainCount + CONSTANT_REROLLS; // Add some constant rerolls to the base chain rate because hard.
+    u32 personality = Random32();
     u32 value = gSaveBlock2Ptr->playerTrainerId[0]
         | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
         | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
         | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
-    u8 legendaryCheck = 0;
+    u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+
+    {
+        u16 trueChainCount = VarGet(VAR_CHAIN);
+        u32 adjustedChainCount = trueChainCount + 40; // Add some constant rerolls to the base chain rate because hard.
+        u8 legendaryCheck = 0;
+
+        if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
+        {
+            u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
+            // Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
+            switch (species)
+            {
+                case SPECIES_ARTICUNO:
+                case SPECIES_ZAPDOS:
+                case SPECIES_MOLTRES:
+                case SPECIES_MEWTWO:
+                case SPECIES_MEW:
+                case SPECIES_RAIKOU:
+                case SPECIES_ENTEI:
+                case SPECIES_SUICUNE:
+                case SPECIES_LUGIA:
+                case SPECIES_HO_OH:
+                case SPECIES_CELEBI:
+                case SPECIES_REGICE:
+                case SPECIES_REGIROCK:
+                case SPECIES_REGISTEEL:
+                case SPECIES_GROUDON:
+                case SPECIES_KYOGRE:
+                case SPECIES_RAYQUAZA:
+                case SPECIES_DEOXYS:
+                case SPECIES_JIRACHI:
+                case SPECIES_DEOXYS_ATTACK:
+                case SPECIES_DEOXYS_DEFENSE:
+                case SPECIES_DEOXYS_SPEED:
+                    adjustedChainCount += 150; // Use the current chain and increment it by 150. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
+                    // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
+                    legendaryCheck = 1;
+            }
+            // Reward long chains that haven't broken
+            if (trueChainCount >= 160)
+                adjustedChainCount += (trueChainCount * 3);
+            else if (trueChainCount >= 110)
+                adjustedChainCount += (trueChainCount * 2);
+            else if (trueChainCount >= 70)
+                adjustedChainCount += 90 + trueChainCount;
+            else if (trueChainCount >= 40)
+                adjustedChainCount += 40 + trueChainCount;
+            else if (trueChainCount >= 10)
+                adjustedChainCount += trueChainCount;
+
+            if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1)
+                rolls = adjustedChainCount / 2; // If this is a pokemon we're not chaining, we get rolls equal to chainCount divided by 2. So a chainCount of 20 = 10 additional rolls for shiny.
+            do
+            {
+                personality = Random32();
+                shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
+                rolls++;
+            } while (shinyValue >= SHINY_ODDS && rolls < adjustedChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+        }
+    }
 
     if ((u8)(unownLetter - 1) < 28)
     {
-        u16 actualLetter;
-
-        do
-        {
-            personality = Random32();
-            shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
-            if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
-            {
-                u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
-                // Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
-                switch (species)
-                {
-                case SPECIES_ARTICUNO:
-                case SPECIES_ZAPDOS:
-                case SPECIES_MOLTRES:
-                case SPECIES_MEWTWO:
-                case SPECIES_MEW:
-                case SPECIES_RAIKOU:
-                case SPECIES_ENTEI:
-                case SPECIES_SUICUNE:
-                case SPECIES_LUGIA:
-                case SPECIES_HO_OH:
-                case SPECIES_CELEBI:
-                case SPECIES_REGICE:
-                case SPECIES_REGIROCK:
-                case SPECIES_REGISTEEL:
-                case SPECIES_GROUDON:
-                case SPECIES_KYOGRE:
-                case SPECIES_RAYQUAZA:
-                case SPECIES_DEOXYS:
-                case SPECIES_JIRACHI:
-                case SPECIES_DEOXYS_ATTACK:
-                case SPECIES_DEOXYS_DEFENSE:
-                case SPECIES_DEOXYS_SPEED:
-                    adjustedChainCount += 200; // Use the current chain and increment it by 200. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
-                    // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
-                    legendaryCheck = 1;
-                }
-                // Reward long chains that haven't broken
-                if (trueChainCount >= 160)
-                    adjustedChainCount += 480 + (trueChainCount * 3);
-                else if (trueChainCount >= 100)
-                    adjustedChainCount += 320 + (trueChainCount * 2);
-                else if (trueChainCount >= 60)
-                    adjustedChainCount += 160 + trueChainCount;
-                else if (trueChainCount >= 40)
-                    adjustedChainCount += 80;
-                else if (trueChainCount >= 20)
-                    adjustedChainCount += 20;
-
-                if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1)
-                    rolls = adjustedChainCount / 2; // If this is a pokemon we're not chaining, we get rolls equal to chainCount divided by 2. So a chainCount of 20 = 10 additional rolls for shiny.
-                do
-                {
-                    personality = Random32();
-                    shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
-                    rolls++;
-                } while (shinyValue >= SHINY_ODDS && rolls < adjustedChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
-            }
-            actualLetter = ((((personality & 0x3000000) >> 18) | ((personality & 0x30000) >> 12) | ((personality & 0x300) >> 6) | (personality & 0x3)) % 28);
-        }
+        u16 actualLetter = ((((personality & 0x3000000) >> 18) | ((personality & 0x30000) >> 12) | ((personality & 0x300) >> 6) | (personality & 0x3)) % 28);
         while (nature != GetNatureFromPersonality(personality)
             || gender != GetGenderFromSpeciesAndPersonality(species, personality)
-            || actualLetter != unownLetter - 1);
+            || actualLetter != unownLetter - 1)
+        {
+            personality = Random32();
+            if (shinyValue < SHINY_ODDS)
+                personality = ((((Random() % SHINY_ODDS) ^ (HIHALF(value) ^ LOHALF(value))) ^ LOHALF(personality)) << 16) | LOHALF(personality);
+            actualLetter = ((((personality & 0x3000000) >> 18) | ((personality & 0x30000) >> 12) | ((personality & 0x300) >> 6) | (personality & 0x3)) % 28);
+        }
     }
     else
     {
-        do
+        while (nature != GetNatureFromPersonality(personality)
+            || gender != GetGenderFromSpeciesAndPersonality(species, personality))
         {
             personality = Random32();
-            shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
-            if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
-            {
-                u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
-                // Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
-                switch (species)
-                {
-                case SPECIES_ARTICUNO:
-                case SPECIES_ZAPDOS:
-                case SPECIES_MOLTRES:
-                case SPECIES_MEWTWO:
-                case SPECIES_MEW:
-                case SPECIES_RAIKOU:
-                case SPECIES_ENTEI:
-                case SPECIES_SUICUNE:
-                case SPECIES_LUGIA:
-                case SPECIES_HO_OH:
-                case SPECIES_CELEBI:
-                case SPECIES_REGICE:
-                case SPECIES_REGIROCK:
-                case SPECIES_REGISTEEL:
-                case SPECIES_GROUDON:
-                case SPECIES_KYOGRE:
-                case SPECIES_RAYQUAZA:
-                case SPECIES_DEOXYS:
-                case SPECIES_JIRACHI:
-                case SPECIES_DEOXYS_ATTACK:
-                case SPECIES_DEOXYS_DEFENSE:
-                case SPECIES_DEOXYS_SPEED:
-                    adjustedChainCount += 200; // Use the current chain and increment it by 200. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
-                    // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
-                    legendaryCheck = 1;
-                }
-                // Reward long chains that haven't broken
-                if (trueChainCount >= 160)
-                    adjustedChainCount += 480 + (trueChainCount * 3);
-                else if (trueChainCount >= 100)
-                    adjustedChainCount += 320 + (trueChainCount * 2);
-                else if (trueChainCount >= 60)
-                    adjustedChainCount += 160 + trueChainCount;
-                else if (trueChainCount >= 40)
-                    adjustedChainCount += 80;
-                else if (trueChainCount >= 20)
-                    adjustedChainCount += 20;
-
-                if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1)
-                    rolls = adjustedChainCount / 2; // If this is a pokemon we're not chaining, we get rolls equal to chainCount divided by 2. So a chainCount of 20 = 10 additional rolls for shiny.
-                do
-                {
-                    personality = Random32();
-                    shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
-                    rolls++;
-                } while (shinyValue >= SHINY_ODDS && rolls < adjustedChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
-            }
+            if (shinyValue < SHINY_ODDS)
+                personality = ((((Random() % SHINY_ODDS) ^ (HIHALF(value) ^ LOHALF(value))) ^ LOHALF(personality)) << 16) | LOHALF(personality);
         }
-        while (nature != GetNatureFromPersonality(personality)
-            || gender != GetGenderFromSpeciesAndPersonality(species, personality));
     }
 
     CreateMon(mon, species, level, fixedIV, 1, personality, OT_ID_PLAYER_ID, 0);
