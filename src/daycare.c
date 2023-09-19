@@ -32,7 +32,7 @@ static void DaycarePrintMonInfo(u8 windowId, s32 daycareSlotId, u8 y);
 static bool8 IsEggShiny(struct DayCare* daycare);
 static bool8 IsPersonalityShiny(u32 personality);
 static u32 ForceShiny(u32 personality);
-static u32 RollEggChains(u8 mode);
+static u32 RollEggChains(struct DayCare* daycare, u8 mode);
 
 // RAM buffers used to assist with BuildEggMoveset()
 EWRAM_DATA static u16 sHatchedEggLevelUpMoves[EGG_LVL_UP_MOVES_ARRAY_COUNT] = {0};
@@ -473,7 +473,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
     // don't inherit nature
     if (parent < 0)
     {
-        personality = RollEggChains(1);
+        personality = RollEggChains(daycare, 1);
     }
     // inherit nature
     else
@@ -481,7 +481,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
         s32 natureTries = 0;
         u8 isShiny = 0;
         u8 wantedNature = GetNatureFromPersonality(GetBoxMonData(&daycare->mons[parent].mon, MON_DATA_PERSONALITY, NULL));
-        personality = RollEggChains(2);
+        personality = RollEggChains(daycare, 2);
         // If we got a shiny from the chain, then set the isShiny flag to true.
         if (IsPersonalityShiny(personality))
             isShiny = 1;
@@ -503,7 +503,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
     FlagSet(FLAG_PENDING_DAYCARE_EGG);
 }
 
-static u32 RollEggChains(u8 mode)
+static u32 RollEggChains(struct DayCare* daycare, u8 mode)
 {
     u32 personality;
     u32 eggChainCount = VarGet(VAR_EGG_CHAIN);
