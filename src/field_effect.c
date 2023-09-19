@@ -20,6 +20,7 @@
 #include "party_menu.h"
 #include "pokemon.h"
 #include "pokemon_storage_system.h"
+#include "random.h"
 #include "script.h"
 #include "sound.h"
 #include "sprite.h"
