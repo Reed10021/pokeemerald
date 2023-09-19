@@ -725,7 +725,7 @@ u8 GetMostSuitableMonToSwitchInto(void)
                     break;
             }
 
-            if (i != MAX_MON_MOVES || (checkedAllMonForSEMoves && bestDmg <= TYPE_MUL_NOT_EFFECTIVE))
+            if (i != MAX_MON_MOVES /* || (checkedAllMonForSEMoves && bestDmg <= TYPE_MUL_NOT_EFFECTIVE)*/)
                 return bestMonId; // Has both the typing and at least one super effective move.
 
             invalidMons |= gBitTable[bestMonId]; // Sorry buddy, we want something better.
