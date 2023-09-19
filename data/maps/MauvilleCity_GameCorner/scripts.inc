@@ -309,6 +309,9 @@ MauvilleCity_GameCorner_EventScript_BuyTM32:: @ 820FFDD
 	checkitemspace ITEM_TM32, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
+	checkitem ITEM_TM32, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM32_COINS
 	additem ITEM_TM32
 	updatecoinsbox 1, 1
@@ -324,6 +327,9 @@ MauvilleCity_GameCorner_EventScript_BuyTM29:: @ 8210017
 	checkitemspace ITEM_TM29, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
+	checkitemspace ITEM_TM29, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM29_COINS
 	additem ITEM_TM29
 	updatecoinsbox 1, 1
@@ -339,6 +345,9 @@ MauvilleCity_GameCorner_EventScript_BuyTM35:: @ 8210051
 	checkitemspace ITEM_TM35, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
+	checkitemspace ITEM_TM35, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM35_COINS
 	additem ITEM_TM35
 	updatecoinsbox 1, 1
@@ -354,6 +363,9 @@ MauvilleCity_GameCorner_EventScript_BuyTM24:: @ 821008B
 	checkitemspace ITEM_TM24, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
+	checkitemspace ITEM_TM24, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM24_COINS
 	additem ITEM_TM24
 	updatecoinsbox 1, 1
@@ -369,6 +381,9 @@ MauvilleCity_GameCorner_EventScript_BuyTM13:: @ 82100C5
 	checkitemspace ITEM_TM13, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
+	checkitemspace ITEM_TM13, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM13_COINS
 	additem ITEM_TM13
 	updatecoinsbox 1, 1
@@ -384,6 +399,11 @@ MauvilleCity_GameCorner_EventScript_NotEnoughCoinsForTM:: @ 82100FF
 
 MauvilleCity_GameCorner_EventScript_NoRoomForTM:: @ 821010D
 	call Common_EventScript_BagIsFull
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseTMPrize
+	end
+
+MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis:: @ 821010D
+	msgbox MauvilleCity_GameCorner_Text_YouAlreadyHaveThis, MSGBOX_DEFAULT
 	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseTMPrize
 	end
 
@@ -819,3 +839,5 @@ MauvilleCity_GameCorner_Text_CantPlayWithNoCoinCase: @ 8210C2E
 	.string "You can't play if you don't have\n"
 	.string "a COIN CASE.$"
 
+MauvilleCity_GameCorner_Text_YouAlreadyHaveThis:
+	.string "You already have this item.$"

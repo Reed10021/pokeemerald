@@ -2260,8 +2260,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             case SPECIES_DEOXYS_ATTACK:
             case SPECIES_DEOXYS_DEFENSE:
             case SPECIES_DEOXYS_SPEED:
-                adjustedChainCount += 150; // Use the current chain and increment it by 150. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
-                // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
+                adjustedChainCount += 250; // Use the current chain and increment it by 250. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
                 legendaryCheck = 1;
         }
         // Reward long chains that haven't broken
@@ -2474,8 +2473,7 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
                 case SPECIES_DEOXYS_ATTACK:
                 case SPECIES_DEOXYS_DEFENSE:
                 case SPECIES_DEOXYS_SPEED:
-                    adjustedChainCount += 150; // Use the current chain and increment it by 150. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
-                    // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
+                    adjustedChainCount += 250; // Use the current chain and increment it by 250. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
                     legendaryCheck = 1;
             }
             // Reward long chains that haven't broken
@@ -2507,6 +2505,17 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
         personality = Random32();
         if (shinyValue < SHINY_ODDS)
             personality = ((((Random() % SHINY_ODDS) ^ (HIHALF(value) ^ LOHALF(value))) ^ LOHALF(personality)) << 16) | LOHALF(personality);
+        // Mathematical explaination of the above
+        // Personality is formatted like so: 00000000 00000000 00000000 00000000
+        // Seperating it out into high and low halfs, we end up with the following: High(00000000 00000000) Low(00000000 00000000)
+        // shinyValue is calculated by doing Trainer ID XOR Secret ID XOR High XOR Low
+        // If this shinyValue is < SHINY_ODDS, then the pokemon is shiny.
+        // For any generated personality value, we can perform (Trainer ID XOR Secret ID) XOR Low, then perform a shift (<<) by 16 bits
+        // to get a High value that, when XOR'd with the Low value again, will result in a shiny value of 0. To get the Low value
+        // in the personality value we just OR it with the High value we generated and shifted.
+        // But because we can technically have any shiny value from 0 to SHINY_ODDS minus 1, if we perform
+        // (Random() % SHINY_ODDS XOR (Trainer ID XOR Secret ID) XOR Low << 16) | Low, when we generate our shinyValue
+        // it will be equal to the Random() % SHINY_ODDS value.
     }
 
     CreateMon(mon, species, level, fixedIV, 1, personality, OT_ID_PLAYER_ID, 0);
@@ -2554,8 +2563,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
                 case SPECIES_DEOXYS_ATTACK:
                 case SPECIES_DEOXYS_DEFENSE:
                 case SPECIES_DEOXYS_SPEED:
-                    adjustedChainCount += 150; // Use the current chain and increment it by 150. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
-                    // Yes this is a bit cheeky. As this is written, you can chain any mon and then encounter a legendary to have (chainCount + 100) shiny rerolls.
+                    adjustedChainCount += 250; // Use the current chain and increment it by 150. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
                     legendaryCheck = 1;
             }
             // Reward long chains that haven't broken
@@ -6618,6 +6626,8 @@ u16 GetBattleBGM(void)
                 return MUS_VS_CHAMPION;
             return MUS_VS_RIVAL;
         case TRAINER_CLASS_ELITE_FOUR:
+            if(FlagGet(FLAG_IS_CHAMPION))
+                return (Random() % 2) == 0 ? MUS_VS_ELITE_FOUR : MUS_RG_VS_GYM_LEADER;
             return MUS_VS_ELITE_FOUR;
         case TRAINER_CLASS_SALON_MAIDEN:
         case TRAINER_CLASS_DOME_ACE:
@@ -6628,7 +6638,10 @@ u16 GetBattleBGM(void)
         case TRAINER_CLASS_PYRAMID_KING:
             return MUS_VS_FRONTIER_BRAIN;
         default:
-            return MUS_VS_TRAINER;
+            if (FlagGet(FLAG_DEFEATED_SOOTOPOLIS_GYM))
+                if ((Random % 5) == 0)
+                    return (Random() % 2) == 0 ? MUS_VS_RIVAL : MUS_VS_AQUA_MAGMA;
+            return (Random() % 2) == 0 ? MUS_VS_TRAINER : MUS_RG_VS_TRAINER;
         }
     }
     else
@@ -6662,7 +6675,7 @@ u16 GetBattleBGM(void)
 		case SPECIES_CELEBI:
 			return MUS_VS_MEW;
 		}
-        return MUS_VS_WILD;
+        return (Random() % 2) == 0 ? MUS_VS_WILD : MUS_RG_VS_WILD;
 	}
 }
 

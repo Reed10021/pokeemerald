@@ -41,7 +41,7 @@ RustboroCity_CuttersHouse_Text_ExplainCut: @ 8215D33
 	.string "Any POKéMON that's learned CUT can\n"
 	.string "chop down thin trees if the TRAINER\l"
 	.string "has earned the STONE BADGE.\p"
-	.string "And, unlike a TM, an HM can be used\n"
+	.string "And, like TMs, an HM can be used\n"
 	.string "more than once.$"
 
 RustboroCity_CuttersHouse_Text_DadHelpedClearLandOfTrees: @ 8215E39

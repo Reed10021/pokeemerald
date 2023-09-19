@@ -343,9 +343,11 @@ MossdeepCity_SpaceCenter_1F_Text_SuccessfulLaunchNumber: @ 82232C8
 	.string "That's successful launch no. {STR_VAR_1}!$"
 
 MossdeepCity_SpaceCenter_1F_Text_JirachiFound:
-	.string "Wow! A strange POKéMON has come\n"
-	.string "from space!\l"
-	.string "Can you investigate this POKéMON?$"
+	.string "Oh wow! It looks like a strange POKéMON\n"
+	.string "has come from space!\l"
+	.string "Maybe it followed our rockets?\p"
+	.string "I'm not a TRAINER, so would you mind\l"
+	.string "investigating this POKéMON for us?$"
 
 MossdeepCity_SpaceCenter_1F_Text_HaywireButRocketLaunchImminent: @ 8223305
 	.string "I know that things are a little\n"

@@ -776,14 +776,14 @@ const struct BaseStats gBaseStats[] =
 
     [SPECIES_ARBOK] =
     {
-        .baseHP        = 60,
+        .baseHP        = 70,
         .baseAttack    = 95,
-        .baseDefense   = 69,
-        .baseSpeed     = 80,
+        .baseDefense   = 95,
+        .baseSpeed     = 70,
         .baseSpAttack  = 65,
-        .baseSpDefense = 79,
+        .baseSpDefense = 95,
         .type1 = TYPE_POISON,
-        .type2 = TYPE_POISON,
+        .type2 = TYPE_DARK,
         .catchRate = 90,
         .expYield = 147,
         .evYield_HP        = 0,
@@ -3046,14 +3046,16 @@ const struct BaseStats gBaseStats[] =
         .noFlip = FALSE,
     },
 
+    //BST = 510, STEELIX BST = 550
+    //STEELIX has strong defensive orientation, ONIX has strong sweeper orientation (a la Scyther/Scizor)
     [SPECIES_ONIX] =
     {
-        .baseHP        = 35,
-        .baseAttack    = 45,
-        .baseDefense   = 160,
-        .baseSpeed     = 70,
+        .baseHP        = 60,
+        .baseAttack    = 120,
+        .baseDefense   = 100,
+        .baseSpeed     = 120,
         .baseSpAttack  = 30,
-        .baseSpDefense = 45,
+        .baseSpDefense = 80,
         .type1 = TYPE_ROCK,
         .type2 = TYPE_GROUND,
         .catchRate = 45,
@@ -3072,7 +3074,7 @@ const struct BaseStats gBaseStats[] =
         .growthRate = GROWTH_MEDIUM_FAST,
         .eggGroup1 = EGG_GROUP_MINERAL,
         .eggGroup2 = EGG_GROUP_MINERAL,
-        .abilities = {ABILITY_ROCK_HEAD, ABILITY_STURDY},
+        .abilities = {ABILITY_ROCK_HEAD, ABILITY_SAND_STREAM},
         .safariZoneFleeRate = 0,
         .bodyColor = BODY_COLOR_GRAY,
         .noFlip = FALSE,
@@ -3817,11 +3819,11 @@ const struct BaseStats gBaseStats[] =
     [SPECIES_SEAKING] =
     {
         .baseHP        = 80,
-        .baseAttack    = 92,
-        .baseDefense   = 65,
+        .baseAttack    = 105,
+        .baseDefense   = 80,
         .baseSpeed     = 68,
-        .baseSpAttack  = 65,
-        .baseSpDefense = 80,
+        .baseSpAttack  = 67,
+        .baseSpDefense = 95,
         .type1 = TYPE_WATER,
         .type2 = TYPE_WATER,
         .catchRate = 60,
@@ -6664,12 +6666,12 @@ const struct BaseStats gBaseStats[] =
 
     [SPECIES_STEELIX] =
     {
-        .baseHP        = 75,
+        .baseHP        = 80,
         .baseAttack    = 85,
         .baseDefense   = 200,
-        .baseSpeed     = 30,
+        .baseSpeed     = 20,
         .baseSpAttack  = 55,
-        .baseSpDefense = 65,
+        .baseSpDefense = 110,
         .type1 = TYPE_STEEL,
         .type2 = TYPE_GROUND,
         .catchRate = 25,
@@ -12378,7 +12380,7 @@ const struct BaseStats gBaseStats[] =
 
     [SPECIES_DEOXYS] =
     {
-        .baseHP        = 60,
+        .baseHP        = 80,
         .baseAttack    = 150,
         .baseDefense   = 50,
         .baseSpeed     = 150,
@@ -12443,7 +12445,7 @@ const struct BaseStats gBaseStats[] =
 
     [SPECIES_DEOXYS_ATTACK] =
     {
-        .baseHP        = 60,
+        .baseHP        = 80,
         .baseAttack    = 180,
         .baseDefense   = 20,
         .baseSpeed     = 150,
@@ -12475,7 +12477,7 @@ const struct BaseStats gBaseStats[] =
 
     [SPECIES_DEOXYS_DEFENSE] =
     {
-        .baseHP        = 60,
+        .baseHP        = 80,
         .baseAttack    = 70,
         .baseDefense   = 160,
         .baseSpeed     = 90,
@@ -12507,7 +12509,7 @@ const struct BaseStats gBaseStats[] =
 
     [SPECIES_DEOXYS_SPEED] =
     {
-        .baseHP        = 60,
+        .baseHP        = 80,
         .baseAttack    = 95,
         .baseDefense   = 90,
         .baseSpeed     = 180,

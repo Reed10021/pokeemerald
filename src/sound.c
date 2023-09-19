@@ -130,9 +130,22 @@ void PlayNewMapMusic(u16 songNum)
 {
     if (songNum == MUS_POKE_CENTER)
     {
-        // Alternate
-        if (Random() % 3 == 0)
-            songNum = MUS_C_COMM_CENTER;
+        if (sCurrentMapMusic == MUS_C_COMM_CENTER || 
+            sCurrentMapMusic == MUS_RG_POKE_CENTER || 
+            sCurrentMapMusic == MUS_RG_NET_CENTER)
+        {
+            songNum = sCurrentMapMusic;
+        }
+        else
+        {
+            // Alternate
+            if (Random() % 5 == 0)
+                songNum = MUS_C_COMM_CENTER;
+            else if (Random() % 5 == 0)
+                songNum = MUS_RG_POKE_CENTER;
+            else if (Random() % 5 == 0)
+                songNum = MUS_RG_NET_CENTER;
+        }
     }
     sCurrentMapMusic = songNum;
     sNextMapMusic = 0;

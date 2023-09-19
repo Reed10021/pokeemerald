@@ -1848,11 +1848,11 @@ static bool8 Fishing_ShowDots(struct Task *task)
 
 static bool8 Fishing_CheckForBite(struct Task *task)
 {
-    bool8 bite;
+//    bool8 bite;
 
     AlignFishingAnimationFrames();
     task->tStep++;
-    bite = FALSE;
+//    bite = TRUE;
 
     if (!DoesCurrentMapHaveFishingMons())
     {
@@ -1860,6 +1860,7 @@ static bool8 Fishing_CheckForBite(struct Task *task)
     }
     else
     {
+        /*
         if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG))
         {
             u8 ability = GetMonAbility(&gPlayerParty[0]);
@@ -1877,8 +1878,8 @@ static bool8 Fishing_CheckForBite(struct Task *task)
             else
                 bite = TRUE;
         }
-
-        if (bite == TRUE)
+        
+        if (bite == TRUE)*/
             StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingBiteDirectionAnimNum(GetPlayerFacingDirection()));
     }
     return TRUE;
@@ -1987,11 +1988,11 @@ static bool8 Fishing_StartEncounter(struct Task *task)
 static bool8 Fishing_NotEvenNibble(struct Task *task)
 {
     AlignFishingAnimationFrames();
-    //StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingNoCatchDirectionAnimNum(GetPlayerFacingDirection()));
-    //FillWindowPixelBuffer(0, PIXEL_FILL(1));
-    //AddTextPrinterParameterized2(0, 1, gText_NotEvenANibble, 1, 0, 2, 1, 3);
-    //task->tStep = FISHING_SHOW_RESULT;
-	task->tStep = FISHING_START_ROUND;
+    StartSpriteAnim(&gSprites[gPlayerAvatar.spriteId], GetFishingNoCatchDirectionAnimNum(GetPlayerFacingDirection()));
+    FillWindowPixelBuffer(0, PIXEL_FILL(1));
+    AddTextPrinterParameterized2(0, 1, gText_NotEvenANibble, 1, 0, 2, 1, 3);
+    task->tStep = FISHING_SHOW_RESULT;
+	//task->tStep = FISHING_START_ROUND;
     return FALSE;
 }
 

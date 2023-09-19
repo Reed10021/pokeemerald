@@ -347,7 +347,7 @@ static u16 GetRandomAlternateMove(u8 monId)
     bool32 needTMs = FALSE;
     u16 moveId = MOVE_NONE;
     bool32 shouldUseMove;
-    u8 level;
+    u8 level = 100;
 
     if (monId < MULTI_PARTY_SIZE)
     {
@@ -362,11 +362,11 @@ static u16 GetRandomAlternateMove(u8 monId)
     learnset = gLevelUpLearnsets[species];
     j = 0;
 
-    // Despite being open level, level up moves are only read up to level 60
+    // (Fixed) Despite being open level, level up moves are only read up to level 60
     if (PLAYER_APPRENTICE.lvlMode == APPRENTICE_LVL_MODE_50)
         level = 50;
-    else // == APPRENTICE_LVL_MODE_OPEN
-        level = 60;
+    //else // == APPRENTICE_LVL_MODE_OPEN
+    //    level = 60;
 
     for (j = 0; learnset[j] != LEVEL_UP_END; j++)
     {
@@ -482,7 +482,7 @@ static void GetLatestLearnedMoves(u16 species, u16 *moves)
     if (PLAYER_APPRENTICE.lvlMode == APPRENTICE_LVL_MODE_50)
         level = 50;
     else // == APPRENTICE_LVL_MODE_OPEN
-        level = 60;
+        level = 100; //60;
 
     learnset = gLevelUpLearnsets[species];
     for (i = 0; learnset[i] != LEVEL_UP_END; i++)
