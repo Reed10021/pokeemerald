@@ -6639,7 +6639,7 @@ u16 GetBattleBGM(void)
             return MUS_VS_FRONTIER_BRAIN;
         default:
             if (FlagGet(FLAG_DEFEATED_SOOTOPOLIS_GYM))
-                if ((Random % 5) == 0)
+                if ((Random() % 5) == 0)
                     return (Random() % 2) == 0 ? MUS_VS_RIVAL : MUS_VS_AQUA_MAGMA;
             return (Random() % 2) == 0 ? MUS_VS_TRAINER : MUS_RG_VS_TRAINER;
         }
