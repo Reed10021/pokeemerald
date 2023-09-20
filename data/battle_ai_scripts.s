@@ -54,8 +54,8 @@ AI_CheckBadMove:
 
 AI_CBM_CheckIfNegatesType: @ 82DBF92
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
-	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus10
-	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus20
+	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus5
+	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus30
 	get_ability AI_TARGET
 	if_equal ABILITY_VOLT_ABSORB, CheckIfVoltAbsorbCancelsElectric
 	if_equal ABILITY_WATER_ABSORB, CheckIfWaterAbsorbCancelsWater
@@ -71,12 +71,12 @@ CheckIfVoltAbsorbCancelsElectric: @ 82DBFBD
 
 CheckIfWaterAbsorbCancelsWater: @ 82DBFCA
 	get_curr_move_type
-	if_equal_ TYPE_WATER, Score_Minus20
+	if_equal_ TYPE_WATER, Score_Minus12
 	goto AI_CheckBadMove_CheckSoundproof_
 
 CheckIfFlashFireCancelsFire: @ 82DBFD7
 	get_curr_move_type
-	if_equal_ TYPE_FIRE, Score_Minus20
+	if_equal_ TYPE_FIRE, Score_Minus12
 	goto AI_CheckBadMove_CheckSoundproof_
 
 CheckIfWonderGuardCancelsMove: @ 82DBFE4
@@ -85,7 +85,7 @@ CheckIfWonderGuardCancelsMove: @ 82DBFE4
 
 CheckIfLevitateCancelsGroundMove: @ 82DBFEF
 	get_curr_move_type
-	if_equal_ TYPE_GROUND, Score_Minus20
+	if_equal_ TYPE_GROUND, Score_Minus12
 
 AI_CheckBadMove_CheckSoundproof_: @ 82DBFF7
 	get_how_powerful_move_is
@@ -94,15 +94,15 @@ AI_CheckBadMove_CheckSoundproof_: @ 82DBFF7
 AI_CheckBadMove_CheckSoundproof: @ 82DBFFE
 	get_ability AI_TARGET
 	if_not_equal ABILITY_SOUNDPROOF, AI_CheckBadMove_CheckEffect
-	if_move MOVE_GROWL, Score_Minus20
-	if_move MOVE_ROAR, Score_Minus20
-	if_move MOVE_SING, Score_Minus20
-	if_move MOVE_SUPERSONIC, Score_Minus20
-	if_move MOVE_SCREECH, Score_Minus20
-	if_move MOVE_SNORE, Score_Minus20
-	if_move MOVE_UPROAR, Score_Minus20
-	if_move MOVE_METAL_SOUND, Score_Minus20
-	if_move MOVE_GRASS_WHISTLE, Score_Minus20
+	if_move MOVE_GROWL, Score_Minus10
+	if_move MOVE_ROAR, Score_Minus10
+	if_move MOVE_SING, Score_Minus10
+	if_move MOVE_SUPERSONIC, Score_Minus10
+	if_move MOVE_SCREECH, Score_Minus10
+	if_move MOVE_SNORE, Score_Minus10
+	if_move MOVE_UPROAR, Score_Minus10
+	if_move MOVE_METAL_SOUND, Score_Minus10
+	if_move MOVE_GRASS_WHISTLE, Score_Minus10
 
 AI_CheckBadMove_CheckEffect: @ 82DC045
 	if_effect EFFECT_SLEEP, AI_CBM_Sleep
@@ -226,8 +226,6 @@ AI_CBM_Sleep: @ 82DC2D4
 
 AI_CBM_Explosion: @ 82DC2F7
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
-	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus10
-	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus20
 	get_ability AI_TARGET
 	if_equal ABILITY_DAMP, Score_Minus10
 	count_usable_party_mons AI_USER
@@ -246,8 +244,7 @@ AI_CBM_Nightmare: @ 82DC31B
 
 AI_CBM_DreamEater: @ 82DC330
 	if_not_status AI_TARGET, STATUS1_SLEEP, Score_Minus8
-	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
-	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus20
+	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	end
 
 AI_CBM_BellyDrum: @ 82DC341
@@ -364,9 +361,9 @@ AI_CBM_LightScreen: @ 82DC4C5
 	end
 
 AI_CBM_OneHitKO: @ 82DC4D0
-	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
+	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	get_ability AI_TARGET
-	if_equal ABILITY_STURDY, Score_Minus30
+	if_equal ABILITY_STURDY, Score_Minus10
 	if_level_cond 1, Score_Minus10
 	end
 
@@ -375,9 +372,7 @@ AI_CBM_Magnitude: @ 82DC4E5
 	if_equal ABILITY_LEVITATE, Score_Minus10
 
 AI_CBM_HighRiskForDamage: @ 82DC4ED
-	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
-	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus5
-	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus20
+	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	get_ability AI_TARGET
 	if_not_equal ABILITY_WONDER_GUARD, AI_CBM_HighRiskForDamage_End
 	if_type_effectiveness AI_EFFECTIVENESS_x2, AI_CBM_HighRiskForDamage_End
@@ -406,7 +401,7 @@ AI_CBM_Reflect: @ 82DC53A
 	end
 
 AI_CBM_Paralyze: @ 82DC545
-	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
+	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	get_ability AI_TARGET
 	if_equal ABILITY_LIMBER, Score_Minus10
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
@@ -526,7 +521,7 @@ AI_CBM_Stockpile: @ 82DC689
 	end
 
 AI_CBM_SpitUpAndSwallow: @ 82DC692
-	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
+	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	get_stockpile_count AI_USER
 	if_equal 0, Score_Minus10
 	end
@@ -544,9 +539,9 @@ AI_CBM_WillOWisp: @ 82DC6B4
 	get_ability AI_TARGET
 	if_equal ABILITY_WATER_VEIL, Score_Minus10
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
-	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
+	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus10
-	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus20
+	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus10
 	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10
 	end
 
@@ -635,10 +630,6 @@ Score_Minus10:
 
 Score_Minus12:
 	score -12
-	end
-
-Score_Minus20:
-	score -20
 	end
 
 Score_Minus30:
