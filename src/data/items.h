@@ -675,7 +675,7 @@ const struct Item gItems[] =
     {
         .name = _("RED SHARD"),
         .itemId = ITEM_RED_SHARD,
-        .price = 200,
+        .price = 1500,
         .description = sRedShardDesc,
         .pocket = POCKET_ITEMS,
         .type = 4,
@@ -687,7 +687,7 @@ const struct Item gItems[] =
     {
         .name = _("BLUE SHARD"),
         .itemId = ITEM_BLUE_SHARD,
-        .price = 200,
+        .price = 1500,
         .description = sBlueShardDesc,
         .pocket = POCKET_ITEMS,
         .type = 4,
@@ -699,7 +699,7 @@ const struct Item gItems[] =
     {
         .name = _("YELLOW SHARD"),
         .itemId = ITEM_YELLOW_SHARD,
-        .price = 200,
+        .price = 1500,
         .description = sYellowShardDesc,
         .pocket = POCKET_ITEMS,
         .type = 4,
@@ -711,7 +711,7 @@ const struct Item gItems[] =
     {
         .name = _("GREEN SHARD"),
         .itemId = ITEM_GREEN_SHARD,
-        .price = 200,
+        .price = 1500,
         .description = sGreenShardDesc,
         .pocket = POCKET_ITEMS,
         .type = 4,
