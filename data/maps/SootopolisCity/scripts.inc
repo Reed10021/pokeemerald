@@ -154,7 +154,7 @@ SootopolisCity_EventScript_SetExitCaveOfOriginObjPos:: @ 81E585B
 	end
 
 SootopolisCity_EventScript_SetOutsideGymObjPos:: @ 81E5871
-	setobjectxyperm LOCALID_EXPERT, 31, 18
+	setobjectxyperm LOCALID_EXPERT, 30, 18
 	setobjectxyperm LOCALID_STEVEN, 29, 33
 	setobjectxyperm LOCALID_MAXIE, 33, 35
 	setobjectxyperm LOCALID_ARCHIE, 34, 35
@@ -182,7 +182,7 @@ SootopolisCity_EventScript_SetWallaceLeft:: @ 81E58C7
 	return
 
 SootopolisCity_EventScript_SetExpertBlockCaveEntrance:: @ 81E58D3
-	setobjectxyperm LOCALID_EXPERT, 31, 18
+	setobjectxyperm LOCALID_EXPERT, 30, 18
 	return
 
 SootopolisCity_OnWarp: @ 81E58DB
