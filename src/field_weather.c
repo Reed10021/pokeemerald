@@ -16,6 +16,7 @@
 #include "task.h"
 #include "trig.h"
 #include "gpu_regs.h"
+#include "field_camera.h"
 
 #define DROUGHT_COLOR_INDEX(color) ((((color) >> 1) & 0xF) | (((color) >> 2) & 0xF0) | (((color) >> 3) & 0xF00))
 
@@ -201,6 +202,13 @@ void SetNextWeather(u8 weather)
     gWeatherPtr->weatherChangeComplete = FALSE;
     gWeatherPtr->nextWeather = weather;
     gWeatherPtr->finishStep = 0;
+    if (gWeatherPtr->nextWeather != gWeatherPtr->currWeather)
+    {
+        if (gWeatherPtr->nextWeather == WEATHER_FOG_HORIZONTAL)
+            BlendPalettesGradually(0x3FF0000, 12, 3, 8, RGB_WHITEALPHA, 0, 0);  //blend first 10 sprite palette slots
+        else if (gWeatherPtr->nextWeather != gWeatherPtr->currWeather && gWeatherPtr->currWeather == WEATHER_FOG_HORIZONTAL)
+            BlendPalettesGradually(0x3FF0000, 12, 8, 0, RGB_WHITEALPHA, 0, 0);  //undo fog pal blend
+    }
 }
 
 void SetCurrentAndNextWeather(u8 weather)
@@ -225,6 +233,7 @@ static void Task_WeatherInit(u8 taskId)
     // When the screen fades in, this is set to TRUE.
     if (gWeatherPtr->readyForInit)
     {
+        UpdateCameraPanning();
         sWeatherFuncs[gWeatherPtr->currWeather].initAll();
         gTasks[taskId].func = Task_WeatherMain;
     }
@@ -707,6 +716,8 @@ static bool8 LightenSpritePaletteInFog(u8 paletteIndex)
         if (gWeatherPtr->lightenedFogSpritePals[i] == paletteIndex)
             return TRUE;
     }
+    if (IsObjectEventPaletteIndex(paletteIndex))
+        return TRUE;
 
     return FALSE;
 }

@@ -11,6 +11,7 @@
 #include "field_effect.h"
 #include "field_effect_helpers.h"
 #include "field_player_avatar.h"
+#include "field_weather.h"
 #include "fieldmap.h"
 #include "mauville_old_man.h"
 #include "metatile_behavior.h"
@@ -1407,7 +1408,8 @@ static u8 TrySetupObjectEventSprite(struct ObjectEventTemplate *objectEventTempl
         StartSpriteAnim(sprite, GetFaceDirectionAnimNum(objectEvent->facingDirection));
 
     SetObjectSubpriorityByZCoord(objectEvent->previousElevation, sprite, 1);
-    UpdateObjectEventVisibility(objectEvent, sprite);
+    UpdateObjectEventVisibility(objectEvent, sprite);`
+    UpdateSpritePaletteWithWeather(IndexOfSpritePaletteTag(graphicsInfo->paletteTag));
     return objectEventId;
 }
 
@@ -1775,6 +1777,7 @@ void ObjectEventSetGraphicsId(struct ObjectEvent *objectEvent, u8 graphicsId)
     if (paletteSlot == 0)
     {
         PatchObjectPalette(graphicsInfo->paletteTag1, graphicsInfo->paletteSlot);
+        UpdateSpritePaletteWithWeather(graphicsInfo->paletteSlot);
     }
     else if (paletteSlot == 10)
     {
@@ -2028,6 +2031,16 @@ static u8 FindObjectEventPaletteIndexByTag(u16 tag)
         }
     }
     return 0xFF;
+}
+
+bool8 IsObjectEventPaletteIndex(u8 paletteIndex)
+{
+    if ((paletteIndex - 16) > 10)
+        return FALSE;   //don't mess with the weather pal itself
+    else if (FindObjectEventPaletteIndexByTag(GetSpritePaletteTagByPaletteNum(paletteIndex)) != 0xFF)
+        return TRUE;
+
+    return FALSE;
 }
 
 void LoadPlayerObjectReflectionPalette(u16 tag, u8 slot)
