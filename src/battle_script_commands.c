@@ -3324,29 +3324,29 @@ static void Cmd_getexp(void)
                 if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP))
                 {
                     if (gBattleStruct->sentInPokes & 1)
-                    {
-                        u32 levelDiffTop;
-                        u32 levelDiffBottom;
                         gBattleMoveDamage = *exp;
-                        levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 10;
-                        levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 1);
-                        gBattleMoveDamage = gBattleMoveDamage * (((levelDiffTop * levelDiffTop) / (levelDiffBottom * levelDiffBottom)) * (Sqrt(levelDiffTop) / Sqrt(levelDiffBottom))); // exponent: 2.5
-                    }
                     else
                         gBattleMoveDamage = 0;
 
                     if (holdEffect == HOLD_EFFECT_EXP_SHARE)
                         gBattleMoveDamage += gExpShareExp;
+                    {
+                        u32 levelDiffTop;
+                        u32 levelDiffBottom;
+                        levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 10;
+                        levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 1);
+                        gBattleMoveDamage = gBattleMoveDamage * (((levelDiffTop * levelDiffTop) / (levelDiffBottom * levelDiffBottom)) * (Sqrt(levelDiffTop) / Sqrt(levelDiffBottom))); // exponent: 2.5
+                    }
                     if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
                     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
                     // The winning Pokémon is at or past the level where it would be able to evolve, but it has not.
                     if(GetEvolutionTargetSpecies(&gPlayerParty[gBattleStruct->expGetterMonId], 0, 0) != 0)
-                        gBattleMoveDamage = (gBattleMoveDamage * 120) / 100;
+                        gBattleMoveDamage = (gBattleMoveDamage * 119) / 100;
                     // 220 or higher friendship
                     if(GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_FRIENDSHIP) > 219)
-                        gBattleMoveDamage = (gBattleMoveDamage * 120) / 100;
+                        gBattleMoveDamage = (gBattleMoveDamage * 119) / 100;
 
                     if (IsTradedMon(&gPlayerParty[gBattleStruct->expGetterMonId]))
                     {
