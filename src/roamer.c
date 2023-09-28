@@ -172,6 +172,7 @@ void CreateRoamerMonInstance(void)
 {
     struct Pokemon *mon;
     struct Roamer *roamer;
+    u8 soulDew = ITEM_SOUL_DEW;
 
     mon = &gEnemyParty[0];
     ZeroEnemyPartyMons();
@@ -184,7 +185,7 @@ void CreateRoamerMonInstance(void)
     SetMonData(mon, MON_DATA_CUTE, &gSaveBlock1Ptr->roamer.cute);
     SetMonData(mon, MON_DATA_SMART, &gSaveBlock1Ptr->roamer.smart);
     SetMonData(mon, MON_DATA_TOUGH, &gSaveBlock1Ptr->roamer.tough);
-    SetMonData(mon, MON_DATA_HELD_ITEM, ITEM_SOUL_DEW);
+    SetMonData(mon, MON_DATA_HELD_ITEM, &soulDew);
 }
 
 bool8 TryStartRoamerEncounter(void)
