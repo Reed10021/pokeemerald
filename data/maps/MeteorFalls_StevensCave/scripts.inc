@@ -57,9 +57,9 @@ MeteorFalls_StevensCave_Text_StevenDefeat: @ 823B32D
 MeteorFalls_StevensCave_Text_LetMeGiveYouSomething:
 	.string "STEVEN: Phew…that was a great\n"
 	.string "battle, {PLAYER}{KUN}.\l"
-	.string "You and your POKéMON performed\p"
-	.string "admirably. To celebrate your victory,\n"
-	.string "you can have this ticket.$"
+	.string "You and your POKéMON\p"
+	.string "performed admirably. To celebrate your\l"
+	.string "victory, you can have this ticket.$"
 
 MeteorFalls_StevensCave_Text_MyPredictionCameTrue: @ 823B358
 	.string "STEVEN: Come to think of it, ever since\n"

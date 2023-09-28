@@ -3249,8 +3249,6 @@ static void Cmd_getexp(void)
         {
             u16 calculatedExp;
             s32 viaSentIn;
-            u32 levelDiffTop;
-            u32 levelDiffBottom;
 
             for (viaSentIn = 0, i = 0; i < PARTY_SIZE; i++)
             {
@@ -3270,14 +3268,11 @@ static void Cmd_getexp(void)
                     viaExpShare++;
             }
 
-            calculatedExp = gBaseStats[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level / 5; // original: divide by 7
-            levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 10;
-            levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 10);
-            calculatedExp = calculatedExp * (((levelDiffTop*levelDiffTop) / (levelDiffBottom*levelDiffBottom)) * (Sqrt(levelDiffTop)/Sqrt(levelDiffBottom))); // exponent: 2.5
+            calculatedExp = (gBaseStats[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level) / 5; // original: divide by 7
 
             if (viaExpShare) // at least one mon is getting exp via exp share
             {
-                *exp = calculatedExp / 2; // / viaSentIn;
+                *exp = calculatedExp / viaSentIn; /// / 2 / viaSentIn;
 
                 gExpShareExp = calculatedExp / 2; // / viaExpShare;
                 gExpShareExp = gExpShareExp + 1;
@@ -3329,7 +3324,14 @@ static void Cmd_getexp(void)
                 if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP))
                 {
                     if (gBattleStruct->sentInPokes & 1)
+                    {
+                        u32 levelDiffTop;
+                        u32 levelDiffBottom;
                         gBattleMoveDamage = *exp;
+                        levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 10;
+                        levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 1);
+                        gBattleMoveDamage = gBattleMoveDamage * (((levelDiffTop * levelDiffTop) / (levelDiffBottom * levelDiffBottom)) * (Sqrt(levelDiffTop) / Sqrt(levelDiffBottom))); // exponent: 2.5
+                    }
                     else
                         gBattleMoveDamage = 0;
 

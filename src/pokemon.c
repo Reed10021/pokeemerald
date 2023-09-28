@@ -2249,12 +2249,14 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             case SPECIES_LUGIA:
             case SPECIES_HO_OH:
             case SPECIES_CELEBI:
-            case SPECIES_REGICE:
             case SPECIES_REGIROCK:
+            case SPECIES_REGICE:
             case SPECIES_REGISTEEL:
             case SPECIES_GROUDON:
             case SPECIES_KYOGRE:
             case SPECIES_RAYQUAZA:
+            case SPECIES_LATIAS:
+            case SPECIES_LATIOS:
             case SPECIES_DEOXYS:
             case SPECIES_JIRACHI:
             case SPECIES_DEOXYS_ATTACK:
@@ -2462,12 +2464,14 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
                 case SPECIES_LUGIA:
                 case SPECIES_HO_OH:
                 case SPECIES_CELEBI:
-                case SPECIES_REGICE:
                 case SPECIES_REGIROCK:
+                case SPECIES_REGICE:
                 case SPECIES_REGISTEEL:
                 case SPECIES_GROUDON:
                 case SPECIES_KYOGRE:
                 case SPECIES_RAYQUAZA:
+                case SPECIES_LATIAS:
+                case SPECIES_LATIOS:
                 case SPECIES_DEOXYS:
                 case SPECIES_JIRACHI:
                 case SPECIES_DEOXYS_ATTACK:
@@ -2552,12 +2556,14 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
                 case SPECIES_LUGIA:
                 case SPECIES_HO_OH:
                 case SPECIES_CELEBI:
-                case SPECIES_REGICE:
                 case SPECIES_REGIROCK:
+                case SPECIES_REGICE:
                 case SPECIES_REGISTEEL:
                 case SPECIES_GROUDON:
                 case SPECIES_KYOGRE:
                 case SPECIES_RAYQUAZA:
+                case SPECIES_LATIAS:
+                case SPECIES_LATIOS:
                 case SPECIES_DEOXYS:
                 case SPECIES_JIRACHI:
                 case SPECIES_DEOXYS_ATTACK:
