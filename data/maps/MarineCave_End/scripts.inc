@@ -87,5 +87,5 @@ MarineCave_End_Movement_KyogreApproach: @ 823B09D
 	step_end
 
 MarineCave_End_Text_DefeatedKyogre_SomethingOnTheGround:
-	.string "…\n"
-	.string "Huh? Something is on the ground…$"
+	.string "... \n"
+	.string "Huh? Something is on the ground!$"

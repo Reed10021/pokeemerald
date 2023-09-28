@@ -87,5 +87,5 @@ TerraCave_End_Movement_GroudonApproach: @ 823B16E
 	step_end
 
 TerraCave_End_Text_DefeatedGroudon_SomethingOnTheGround:
-	.string "…\n"
-	.string "Huh? Something is on the ground…$"
+	.string "... \n"
+	.string "Huh? Something is on the ground!$"

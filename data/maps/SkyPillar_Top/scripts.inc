@@ -191,5 +191,5 @@ SkyPillar_Top_Text_RayquazaFlewOff: @ 8239860
 	.string "The awakened RAYQUAZA flew off…$"
 
 SkyPillar_Top_Text_DefeatedRayquaza_SomethingOnTheGround:
-	.string "…\n"
-	.string "Huh? Something is on the ground…$"
+	.string "... \n"
+	.string "Huh? Something is on the ground!$"
