@@ -81,6 +81,9 @@ SkyPillar_Top_EventScript_DefeatedRayquaza2:: @ 823977C
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject VAR_LAST_TALKED
 	fadescreenswapbuffers FADE_FROM_BLACK
+	msgbox SkyPillar_Top_Text_DefeatedRayquaza_SomethingOnTheGround, MSGBOX_DEFAULT
+	giveitem ITEM_AURORA_TICKET
+	setflag FLAG_ENABLE_SHIP_BIRTH_ISLAND
 	releaseall
 	end
 
@@ -187,3 +190,6 @@ SkyPillar_Top_Movement_CameraPanDown: @ 823985C
 SkyPillar_Top_Text_RayquazaFlewOff: @ 8239860
 	.string "The awakened RAYQUAZA flew off…$"
 
+SkyPillar_Top_Text_DefeatedRayquaza_SomethingOnTheGround:
+	.string "…\n"
+	.string "Huh? Something is on the ground…$"

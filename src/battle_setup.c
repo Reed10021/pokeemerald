@@ -892,7 +892,7 @@ static u8 GetTrainerBattleTransition(void)
     if (gTrainerBattleOpponent_A == TRAINER_SECRET_BASE)
         return B_TRANSITION_CHAMPION;
 
-    if(gTrainerBattleOpponent_A == TRAINER_STEVEN)
+    if(gTrainerBattleOpponent_A == TRAINER_STEVEN || gTrainerBattleOpponent_A == TRAINER_STEVEN_2)
         return B_TRANSITION_CHAMPION;
 
     if (gTrainers[gTrainerBattleOpponent_A].trainerClass == TRAINER_CLASS_ELITE_FOUR)

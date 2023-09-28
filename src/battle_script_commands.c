@@ -3249,6 +3249,7 @@ static void Cmd_getexp(void)
         {
             u16 calculatedExp;
             s32 viaSentIn;
+            u32 leveldiff;
 
             for (viaSentIn = 0, i = 0; i < PARTY_SIZE; i++)
             {
@@ -3268,25 +3269,24 @@ static void Cmd_getexp(void)
                     viaExpShare++;
             }
 
-            calculatedExp = gBaseStats[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level / 7;
+            calculatedExp = gBaseStats[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level / 5; // original: divide by 7
+            leveldiff = ((2 * gBattleMons[gBattlerFainted].level) + 10) / (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 10);
+            leveldiff = (leveldiff * leveldiff) * Sqrt(leveldiff); // exponent: 2.5
+            calculatedExp = calculatedExp * leveldiff;
 
             if (viaExpShare) // at least one mon is getting exp via exp share
             {
-                *exp = calculatedExp / 2 / viaSentIn;
-                if (*exp == 0)
-                    *exp = 1;
+                *exp = calculatedExp / 2; // / viaSentIn;
 
-                gExpShareExp = calculatedExp / 2 / viaExpShare;
-                if (gExpShareExp == 0)
-                    gExpShareExp = 1;
+                gExpShareExp = calculatedExp / 2; // / viaExpShare;
+                gExpShareExp = gExpShareExp + 1;
             }
             else
             {
                 *exp = calculatedExp / viaSentIn;
-                if (*exp == 0)
-                    *exp = 1;
                 gExpShareExp = 0;
             }
+            *exp = *exp + 1;
 
             gBattleScripting.getexpState++;
             gBattleStruct->expGetterMonId = 0;
@@ -3338,6 +3338,12 @@ static void Cmd_getexp(void)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
                     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
+                    // The winning Pokémon is at or past the level where it would be able to evolve, but it has not.
+                    if(GetEvolutionTargetSpecies(&gPlayerParty[gBattleStruct->expGetterMonId], 0, 0) != 0)
+                        gBattleMoveDamage = (gBattleMoveDamage * 120) / 100;
+                    // 220 or higher friendship
+                    if(GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_FRIENDSHIP) > 219)
+                        gBattleMoveDamage = (gBattleMoveDamage * 120) / 100;
 
                     if (IsTradedMon(&gPlayerParty[gBattleStruct->expGetterMonId]))
                     {
@@ -3378,7 +3384,7 @@ static void Cmd_getexp(void)
                     PREPARE_MON_NICK_WITH_PREFIX_BUFFER(gBattleTextBuff1, gBattleStruct->expGetterBattlerId, gBattleStruct->expGetterMonId);
                     // buffer 'gained' or 'gained a boosted'
                     PREPARE_STRING_BUFFER(gBattleTextBuff2, i);
-                    PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff3, 5, gBattleMoveDamage);
+                    PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff3, 6, gBattleMoveDamage);
 
                     PrepareStringBattle(STRINGID_PKMNGAINEDEXP, gBattleStruct->expGetterBattlerId);
                     MonGainEVs(&gPlayerParty[gBattleStruct->expGetterMonId], gBattleMons[gBattlerFainted].species);
@@ -5599,7 +5605,7 @@ static void Cmd_getmoneyreward(void)
         moneyReward += GetTrainerMoneyToGive(gTrainerBattleOpponent_B);
 
     AddMoney(&gSaveBlock1Ptr->money, moneyReward);
-    PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 5, moneyReward);
+    PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 6, moneyReward);
 
     gBattlescriptCurrInstr++;
 }

@@ -2527,6 +2527,41 @@ void ResumePausedWeather(void)
     SetCurrentAndNextWeather(weather);
 }
 
+static const u8 sWeatherCycleRoute109[] =
+{
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_DROUGHT,
+    WEATHER_DROUGHT,
+    WEATHER_SUNNY_CLOUDS,
+};
+static const u8 sWeatherCycleRoute103_110[] =
+{
+    WEATHER_SUNNY,
+    WEATHER_RAIN,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_DROUGHT,
+};
+static const u8 sWeatherCycleRoute111_112[] =
+{
+    WEATHER_SANDSTORM,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SANDSTORM,
+};
+static const u8 sWeatherCycleRoute114_115[] =
+{
+    WEATHER_RAIN,
+    WEATHER_RAIN,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SUNNY,
+};
+static const u8 sWeatherCycleRoute116_117[] = // and Verdanturf Town
+{
+    WEATHER_RAIN,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_DROUGHT,
+    WEATHER_SUNNY,
+};
 static const u8 sWeatherCycleRoute119[] =
 {
     WEATHER_SUNNY,
@@ -2534,12 +2569,54 @@ static const u8 sWeatherCycleRoute119[] =
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_RAIN,
 };
-static const u8 sWeatherCycleRoute123[] =
+static const u8 sWeatherCycleRoute120[] =
+{
+    WEATHER_RAIN,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_RAIN_THUNDERSTORM,
+};
+static const u8 sWeatherCycleRoute121_122[] =
+{
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_DOWNPOUR,
+    WEATHER_DROUGHT,
+    WEATHER_SUNNY_CLOUDS,
+};
+static const u8 sWeatherCycleRoute123[] = //and 118
+{
+    WEATHER_DROUGHT,
+    WEATHER_SUNNY,
+    WEATHER_DOWNPOUR,
+    WEATHER_SUNNY,
+};
+static const u8 sWeatherCycleRoute124_125[] =
+{
+    WEATHER_DROUGHT,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_DOWNPOUR,
+    WEATHER_SUNNY_CLOUDS,
+};
+static const u8 sWeatherCycleRoute126_127_128[] =
 {
     WEATHER_SUNNY,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_DROUGHT,
+    WEATHER_DOWNPOUR,
+};
+static const u8 sWeatherCycleRoute129_130_131[] =
+{
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_DOWNPOUR,
     WEATHER_SUNNY,
-    WEATHER_RAIN,
-    WEATHER_SUNNY,
+    WEATHER_DROUGHT,
+};
+static const u8 sWeatherCycleRoute132_133_134[] =
+{
+    WEATHER_DOWNPOUR,
+    WEATHER_DOWNPOUR,
+    WEATHER_SUNNY_CLOUDS,
+    WEATHER_DROUGHT,
 };
 
 static u8 TranslateWeatherNum(u8 weather)
@@ -2562,8 +2639,19 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_DOWNPOUR:           return WEATHER_DOWNPOUR;
     case WEATHER_UNDERWATER_BUBBLES: return WEATHER_UNDERWATER_BUBBLES;
     case WEATHER_ABNORMAL:           return WEATHER_ABNORMAL;
+    case WEATHER_ROUTE109_CYCLE:     return sWeatherCycleRoute109[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE103_110_CYCLE: return sWeatherCycleRoute103_110[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE111_112_CYCLE: return sWeatherCycleRoute111_112[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE114_115_CYCLE: return sWeatherCycleRoute114_115[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE116_117_CYCLE: return sWeatherCycleRoute116_117[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE119_CYCLE:     return sWeatherCycleRoute119[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE120_CYCLE:     return sWeatherCycleRoute120[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE121_122_CYCLE: return sWeatherCycleRoute121_122[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE123_CYCLE:     return sWeatherCycleRoute123[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE124_125_CYCLE: return sWeatherCycleRoute124_125[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE126_127_128_CYCLE: return sWeatherCycleRoute126_127_128[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE129_130_131_CYCLE: return sWeatherCycleRoute129_130_131[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE132_133_134_CYCLE: return sWeatherCycleRoute132_133_134[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;
     }
 }

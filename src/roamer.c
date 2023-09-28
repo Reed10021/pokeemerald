@@ -3,6 +3,7 @@
 #include "pokemon.h"
 #include "random.h"
 #include "roamer.h"
+#include "constants/items.h"
 #include "constants/maps.h"
 #include "constants/species.h"
 
@@ -68,7 +69,7 @@ static void CreateInitialRoamerMon(bool16 createLatios)
         (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIOS;
 
     CreateMon(&gEnemyParty[0], (&gSaveBlock1Ptr->roamer)->species, 40, 0x20, 0, 0, OT_ID_PLAYER_ID, 0);
-    (&gSaveBlock1Ptr->roamer)->level = 40;
+    (&gSaveBlock1Ptr->roamer)->level = 50;
     (&gSaveBlock1Ptr->roamer)->status = 0;
     (&gSaveBlock1Ptr->roamer)->active = TRUE;
     (&gSaveBlock1Ptr->roamer)->ivs = GetMonData(&gEnemyParty[0], MON_DATA_IVS);
@@ -183,6 +184,7 @@ void CreateRoamerMonInstance(void)
     SetMonData(mon, MON_DATA_CUTE, &gSaveBlock1Ptr->roamer.cute);
     SetMonData(mon, MON_DATA_SMART, &gSaveBlock1Ptr->roamer.smart);
     SetMonData(mon, MON_DATA_TOUGH, &gSaveBlock1Ptr->roamer.tough);
+    SetMonData(mon, MON_DATA_HELD_ITEM, ITEM_SOUL_DEW);
 }
 
 bool8 TryStartRoamerEncounter(void)

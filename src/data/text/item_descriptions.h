@@ -213,7 +213,7 @@ static const u8 sWhiteFluteDesc[] = _(
 static const u8 sBerryJuiceDesc[] = _(
     "A 100% pure juice\n"
     "that restores HP\n"
-    "by 20 points.");
+    "by 140 points.");
 
 static const u8 sSacredAshDesc[] = _(
     "Fully revives and\n"
@@ -544,7 +544,7 @@ static const u8 sLumBerryDesc[] = _(
 
 static const u8 sSitrusBerryDesc[] = _(
     "A hold item that\n"
-    "restores 30 HP in\n"
+    "restores 90 HP in\n"
     "battle.");
 
 static const u8 sFigyBerryDesc[] = _(

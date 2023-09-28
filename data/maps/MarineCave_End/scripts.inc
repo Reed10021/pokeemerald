@@ -57,7 +57,17 @@ MarineCave_End_EventScript_Kyogre:: @ 823B01B
 MarineCave_End_EventScript_DefeatedKyogre:: @ 823B084
 	setvar VAR_SHOULD_END_ABNORMAL_WEATHER, 1
 	setflag FLAG_DEFEATED_KYOGRE
-	goto Common_EventScript_RemoveStaticPokemon
+	goto MarineCave_End_EventScript_DefeatedKyogre2
+	end
+
+MarineCave_End_EventScript_DefeatedKyogre2::
+	fadescreenswapbuffers FADE_TO_BLACK
+	removeobject VAR_LAST_TALKED
+	fadescreenswapbuffers FADE_FROM_BLACK
+	msgbox MarineCave_End_Text_DefeatedKyogre_SomethingOnTheGround, MSGBOX_DEFAULT
+	giveitem ITEM_OLD_SEA_MAP
+	setflag FLAG_ENABLE_SHIP_FARAWAY_ISLAND
+	release
 	end
 
 MarineCave_End_EventScript_RanFromKyogre:: @ 823B092
@@ -76,3 +86,6 @@ MarineCave_End_Movement_KyogreApproach: @ 823B09D
 	walk_down_affine
 	step_end
 
+MarineCave_End_Text_DefeatedKyogre_SomethingOnTheGround:
+	.string "…\n"
+	.string "Huh? Something is on the ground…$"

@@ -16,6 +16,9 @@ MeteorFalls_StevensCave_EventScript_Steven:: @ 823B182
 	waitmovement 0
 	msgbox MeteorFalls_StevensCave_Text_ShouldKnowHowGoodIAmExpectWorst, MSGBOX_DEFAULT
 	trainerbattle_no_intro TRAINER_STEVEN, MeteorFalls_StevensCave_Text_StevenDefeat
+	msgbox MeteorFalls_StevensCave_Text_LetMeGiveYouSomething, MSGBOX_DEFAULT
+	giveitem ITEM_EON_TICKET
+	setflag FLAG_ENABLE_SHIP_SOUTHERN_ISLAND
 	msgbox MeteorFalls_StevensCave_Text_MyPredictionCameTrue, MSGBOX_DEFAULT
 	setflag FLAG_DEFEATED_METEOR_FALLS_STEVEN
 	release
@@ -24,6 +27,12 @@ MeteorFalls_StevensCave_EventScript_Steven:: @ 823B182
 MeteorFalls_StevensCave_EventScript_Defeated:: @ 823B1CD
 	applymovement LOCALID_STEVEN, Common_Movement_FacePlayer
 	waitmovement 0
+	msgbox MeteorFalls_StevensCave_Text_WillYouBattleMeAgain, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq MeteorFalls_StevensCave_EventScript_Defeated_NoRebattle
+	trainerbattle_no_intro TRAINER_STEVEN_2, MeteorFalls_StevensCave_Text_StevenDefeat2
+	cleartrainerflag TRAINER_STEVEN_2
+MeteorFalls_StevensCave_EventScript_Defeated_NoRebattle:
 	msgbox MeteorFalls_StevensCave_Text_MyPredictionCameTrue, MSGBOX_DEFAULT
 	release
 	end
@@ -45,6 +54,13 @@ MeteorFalls_StevensCave_Text_StevenDefeat: @ 823B32D
 	.string "You…\n"
 	.string "I had no idea you'd become so strong…$"
 
+MeteorFalls_StevensCave_Text_LetMeGiveYouSomething:
+	.string "STEVEN: Phew…that was a great\n"
+	.string "battle, {PLAYER}{KUN}.\l"
+	.string "You and your POKéMON performed\p"
+	.string "admirably. To celebrate your victory,\n"
+	.string "you can have this ticket.$"
+
 MeteorFalls_StevensCave_Text_MyPredictionCameTrue: @ 823B358
 	.string "STEVEN: Come to think of it, ever since\n"
 	.string "our paths first crossed in GRANITE\l"
@@ -57,3 +73,13 @@ MeteorFalls_StevensCave_Text_MyPredictionCameTrue: @ 823B358
 	.string "… … … … … …\p"
 	.string "Fufufu, even I couldn't tell you that.$"
 
+MeteorFalls_StevensCave_Text_StevenDefeat2:
+	.string "You…\n"
+	.string "You are a truly noble POKéMON CHAMPION!$"
+
+MeteorFalls_StevensCave_Text_WillYouBattleMeAgain:
+	.string "STEVEN: That look in your eyes…\n"
+	.string "it reminds me of when I was the\l"
+	.string "CHAMPION.\p"
+	.string "{PLAYER}{KUN}! Will you battle me\n"
+	.string "again?$"

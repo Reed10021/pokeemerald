@@ -57,7 +57,17 @@ TerraCave_End_EventScript_Groudon:: @ 823B0EC
 TerraCave_End_EventScript_DefeatedGroudon:: @ 823B155
 	setvar VAR_SHOULD_END_ABNORMAL_WEATHER, 1
 	setflag FLAG_DEFEATED_GROUDON
-	goto Common_EventScript_RemoveStaticPokemon
+	goto TerraCave_End_EventScript_DefeatedGroudon2
+	end
+
+TerraCave_End_EventScript_DefeatedGroudon2::
+	fadescreenswapbuffers FADE_TO_BLACK
+	removeobject VAR_LAST_TALKED
+	fadescreenswapbuffers FADE_FROM_BLACK
+	msgbox TerraCave_End_Text_DefeatedGroudon_SomethingOnTheGround, MSGBOX_DEFAULT
+	giveitem ITEM_MYSTIC_TICKET
+	setflag FLAG_ENABLE_SHIP_NAVEL_ROCK
+	release
 	end
 
 TerraCave_End_EventScript_RanFromGroudon:: @ 823B163
@@ -76,3 +86,6 @@ TerraCave_End_Movement_GroudonApproach: @ 823B16E
 	walk_down_affine
 	step_end
 
+TerraCave_End_Text_DefeatedGroudon_SomethingOnTheGround:
+	.string "…\n"
+	.string "Huh? Something is on the ground…$"
