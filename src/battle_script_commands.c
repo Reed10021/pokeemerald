@@ -3333,9 +3333,10 @@ static void Cmd_getexp(void)
                     {
                         u32 levelDiffTop;
                         u32 levelDiffBottom;
-                        levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 10;
-                        levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 1);
+                        levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 20;
+                        levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 5);
                         gBattleMoveDamage = gBattleMoveDamage * (((levelDiffTop * levelDiffTop) / (levelDiffBottom * levelDiffBottom)) * (Sqrt(levelDiffTop) / Sqrt(levelDiffBottom))); // exponent: 2.5
+                        gBattleMoveDamage = gBattleMoveDamage + 1;
                     }
                     if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
