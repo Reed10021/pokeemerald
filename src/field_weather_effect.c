@@ -2529,37 +2529,41 @@ void ResumePausedWeather(void)
 
 static const u8 sWeatherCycleRoute109[] =
 {
-    WEATHER_SUNNY_CLOUDS,
     WEATHER_DROUGHT,
+    WEATHER_SUNNY,
     WEATHER_DROUGHT,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute103_110[] =
 {
-    WEATHER_SUNNY,
+    WEATHER_SHADE,
     WEATHER_RAIN,
-    WEATHER_SUNNY_CLOUDS,
-    WEATHER_DROUGHT,
+    WEATHER_SHADE,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute111_112[] =
 {
     WEATHER_SANDSTORM,
-    WEATHER_SUNNY_CLOUDS,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SHADE,
     WEATHER_SANDSTORM,
+    WEATHER_SANDSTORM,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute114_115[] =
 {
     WEATHER_RAIN,
     WEATHER_RAIN,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SHADE,
+    WEATHER_SUNNY,
     WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute116_117[] = // and Verdanturf Town
 {
     WEATHER_RAIN,
-    WEATHER_SUNNY_CLOUDS,
-    WEATHER_DROUGHT,
+    WEATHER_SHADE,
+    WEATHER_SUNNY,
     WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute119[] =
@@ -2568,20 +2572,23 @@ static const u8 sWeatherCycleRoute119[] =
     WEATHER_RAIN,
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_RAIN,
+    WEATHER_RAIN_THUNDERSTORM,
 };
 static const u8 sWeatherCycleRoute120[] =
 {
     WEATHER_RAIN,
-    WEATHER_SUNNY_CLOUDS,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
     WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute121_122[] =
 {
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SUNNY,
     WEATHER_DOWNPOUR,
     WEATHER_DROUGHT,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute123[] = //and 118
 {
@@ -2589,34 +2596,39 @@ static const u8 sWeatherCycleRoute123[] = //and 118
     WEATHER_SUNNY,
     WEATHER_DOWNPOUR,
     WEATHER_SUNNY,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute124_125[] =
 {
     WEATHER_DROUGHT,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SHADE,
     WEATHER_DOWNPOUR,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute126_127_128[] =
 {
     WEATHER_SUNNY,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SHADE,
     WEATHER_DROUGHT,
     WEATHER_DOWNPOUR,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute129_130_131[] =
 {
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SHADE,
     WEATHER_DOWNPOUR,
     WEATHER_SUNNY,
     WEATHER_DROUGHT,
+    WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute132_133_134[] =
 {
     WEATHER_DOWNPOUR,
     WEATHER_DOWNPOUR,
-    WEATHER_SUNNY_CLOUDS,
+    WEATHER_SHADE,
     WEATHER_DROUGHT,
+    WEATHER_SUNNY,
 };
 
 static u8 TranslateWeatherNum(u8 weather)
@@ -2659,7 +2671,7 @@ static u8 TranslateWeatherNum(u8 weather)
 void UpdateWeatherPerDay(u16 increment)
 {
     u16 weatherStage = gSaveBlock1Ptr->weatherCycleStage + increment;
-    weatherStage %= 4;
+    weatherStage %= 5;
     gSaveBlock1Ptr->weatherCycleStage = weatherStage;
 }
 
