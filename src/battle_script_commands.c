@@ -3249,7 +3249,8 @@ static void Cmd_getexp(void)
         {
             u16 calculatedExp;
             s32 viaSentIn;
-            u32 leveldiff;
+            u32 levelDiffTop;
+            u32 levelDiffBottom;
 
             for (viaSentIn = 0, i = 0; i < PARTY_SIZE; i++)
             {
@@ -3270,9 +3271,9 @@ static void Cmd_getexp(void)
             }
 
             calculatedExp = gBaseStats[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level / 5; // original: divide by 7
-            leveldiff = ((2 * gBattleMons[gBattlerFainted].level) + 10) / (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 10);
-            leveldiff = (leveldiff * leveldiff) * Sqrt(leveldiff); // exponent: 2.5
-            calculatedExp = calculatedExp * leveldiff;
+            levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 10;
+            levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 10);
+            calculatedExp = calculatedExp * (((levelDiffTop*levelDiffTop) / (levelDiffBottom*levelDiffBottom)) * (Sqrt(levelDiffTop)/Sqrt(levelDiffBottom))); // exponent: 2.5
 
             if (viaExpShare) // at least one mon is getting exp via exp share
             {
