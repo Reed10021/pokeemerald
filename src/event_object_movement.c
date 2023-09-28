@@ -1408,7 +1408,7 @@ static u8 TrySetupObjectEventSprite(struct ObjectEventTemplate *objectEventTempl
         StartSpriteAnim(sprite, GetFaceDirectionAnimNum(objectEvent->facingDirection));
 
     SetObjectSubpriorityByZCoord(objectEvent->previousElevation, sprite, 1);
-    UpdateObjectEventVisibility(objectEvent, sprite);`
+    UpdateObjectEventVisibility(objectEvent, sprite);
     UpdateSpritePaletteWithWeather(IndexOfSpritePaletteTag(graphicsInfo->paletteTag));
     return objectEventId;
 }
