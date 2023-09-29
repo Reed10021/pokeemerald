@@ -72,6 +72,7 @@ static void SpriteCB_Ball_FadeOut(struct Sprite *);
 static void DestroySpriteAfterOneFrame(struct Sprite *);
 static void LoadBallParticleGfx(u8);
 static void SpriteCB_CaptureStar_Flicker(struct Sprite *);
+static void SpriteCB_CaptureStar_NoFlicker(struct Sprite*);
 static void SpriteCB_Ball_Release_Wait(struct Sprite *);
 static void SpriteCB_Ball_Block_Step(struct Sprite *);
 static void PokeBallOpenParticleAnimation_Step1(struct Sprite *);
