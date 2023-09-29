@@ -534,7 +534,19 @@ void AddBagItemIconSprite(u16 itemId, u8 id)
 
 void RemoveBagItemIconSprite(u8 id)
 {
-    RemoveBagSprite(id + 2);
+    // (fixed) BUG: For one frame, the item you scroll to in the Bag menu
+    // will have an incorrect palette and may be seen as a flicker.
+    u8* spriteId = &gBagMenu->spriteIds[2]; //ITEMMENUSPRITE_ITEM
+
+    if (spriteId[id ^ 1] != 0xFF)
+        gSprites[spriteId[id ^ 1]].invisible = TRUE;
+
+    if (spriteId[id] != 0xFF)
+    {
+        DestroySpriteAndFreeResources(&gSprites[spriteId[id]]);
+        spriteId[id] = 0xFF;
+    }
+    //RemoveBagSprite(id + 2);
 }
 
 void sub_80D4FAC(void)
