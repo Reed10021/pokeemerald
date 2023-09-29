@@ -1447,12 +1447,12 @@ static void MakeCaptureStars(struct Sprite *sprite, u8 mode)
             }
         }
         else if (mode == 1) {
-            u8 spriteId = CreateSprite(&sBallParticleSpriteTemplates[4], sprite->pos1.x, sprite->pos2.y, subpriority);
+            u8 spriteId = CreateSprite(&sBallParticleSpriteTemplates[4], GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X), GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y) - 16, subpriority);
             if (spriteId != MAX_SPRITES)
             {
-                gSprites[spriteId].sDuration = 64;
-                gSprites[spriteId].sTargetX = sprite->pos1.x + sCaptureStars[i].xOffset;
-                gSprites[spriteId].sTargetY = sprite->pos2.y - sCaptureStars[i].yOffset;
+                gSprites[spriteId].sDuration = 24;
+                gSprites[spriteId].sTargetX = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X) + sCaptureStars[i].xOffset;
+                gSprites[spriteId].sTargetY = (GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y) - 16) + sCaptureStars[i].yOffset;
                 gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
                 InitAnimArcTranslation(&gSprites[spriteId]);
                 gSprites[spriteId].callback = SpriteCB_CaptureStar_Flicker;
