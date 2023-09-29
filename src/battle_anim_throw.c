@@ -67,7 +67,7 @@ static void SpriteCB_Ball_Wobble_Step(struct Sprite *);
 static void SpriteCB_Ball_Capture(struct Sprite *);
 static void SpriteCB_Ball_Release_Step(struct Sprite *);
 static void SpriteCB_Ball_Capture_Step(struct Sprite *);
-static void MakeCaptureStars(struct Sprite *);
+static void MakeCaptureStars(struct Sprite *, u8);
 static void SpriteCB_Ball_FadeOut(struct Sprite *);
 static void DestroySpriteAfterOneFrame(struct Sprite *);
 static void LoadBallParticleGfx(u8);
@@ -1005,7 +1005,7 @@ static void SpriteCB_Ball_CriticalCapture_Step(struct Sprite* sprite)
 {
     if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_SUCCESS || gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_FAIL)
     {
-        MakeCaptureStars(sprite);
+        MakeCaptureStars(sprite, 1);
     }
     sprite->callback = SpriteCB_Ball_Bounce_Step;
 }
@@ -1323,7 +1323,7 @@ static void SpriteCB_Ball_Capture_Step(struct Sprite *sprite)
     {
         PlaySE(SE_RG_BALL_CLICK);
         BlendPalettes(0x10000 << sprite->oam.paletteNum, 6, RGB(0, 0, 0));
-        MakeCaptureStars(sprite);
+        MakeCaptureStars(sprite, 0);
     }
     else if (sprite->sTimer == 60)
     {
@@ -1417,7 +1417,7 @@ static void DestroySpriteAfterOneFrame(struct Sprite *sprite)
 #define sTargetY   data[4]
 #define sAmplitude data[5]
 
-static void MakeCaptureStars(struct Sprite *sprite)
+static void MakeCaptureStars(struct Sprite *sprite, u8 mode)
 {
     u32 i;
     u8 subpriority;
@@ -1433,16 +1433,31 @@ static void MakeCaptureStars(struct Sprite *sprite)
     LoadBallParticleGfx(BALL_MASTER);
     for (i = 0; i < ARRAY_COUNT(sCaptureStars); i++)
     {
-        u8 spriteId = CreateSprite(&sBallParticleSpriteTemplates[4], sprite->pos1.x, sprite->pos1.y, subpriority);
-        if (spriteId != MAX_SPRITES)
-        {
-            gSprites[spriteId].sDuration = 24;
-            gSprites[spriteId].sTargetX = sprite->pos1.x + sCaptureStars[i].xOffset;
-            gSprites[spriteId].sTargetY = sprite->pos1.y + sCaptureStars[i].yOffset;
-            gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
-            InitAnimArcTranslation(&gSprites[spriteId]);
-            gSprites[spriteId].callback = SpriteCB_CaptureStar_Flicker;
-            StartSpriteAnim(&gSprites[spriteId], sBallParticleAnimNums[BALL_MASTER]);
+        if (mode == 0) {
+            u8 spriteId = CreateSprite(&sBallParticleSpriteTemplates[4], sprite->pos1.x, sprite->pos1.y, subpriority);
+            if (spriteId != MAX_SPRITES)
+            {
+                gSprites[spriteId].sDuration = 24;
+                gSprites[spriteId].sTargetX = sprite->pos1.x + sCaptureStars[i].xOffset;
+                gSprites[spriteId].sTargetY = sprite->pos1.y + sCaptureStars[i].yOffset;
+                gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
+                InitAnimArcTranslation(&gSprites[spriteId]);
+                gSprites[spriteId].callback = SpriteCB_CaptureStar_Flicker;
+                StartSpriteAnim(&gSprites[spriteId], sBallParticleAnimNums[BALL_MASTER]);
+            }
+        }
+        else if (mode == 1) {
+            u8 spriteId = CreateSprite(&sBallParticleSpriteTemplates[4], sprite->pos2.x, sprite->pos2.y, subpriority);
+            if (spriteId != MAX_SPRITES)
+            {
+                gSprites[spriteId].sDuration = 24;
+                gSprites[spriteId].sTargetX = sprite->pos2.x + sCaptureStars[i].xOffset;
+                gSprites[spriteId].sTargetY = sprite->pos2.y + sCaptureStars[i].yOffset;
+                gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
+                InitAnimArcTranslation(&gSprites[spriteId]);
+                gSprites[spriteId].callback = SpriteCB_CaptureStar_Flicker;
+                StartSpriteAnim(&gSprites[spriteId], sBallParticleAnimNums[BALL_MASTER]);
+            }
         }
     }
 }
