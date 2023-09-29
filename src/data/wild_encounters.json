@@ -853,7 +853,7 @@
               {
                 "min_level": 19,
                 "max_level": 19,
-                "species": "SPECIES_TRAPINCH"
+                "species": "SPECIES_CACNEA"
               },
               {
                 "min_level": 20,
@@ -863,7 +863,7 @@
               {
                 "min_level": 20,
                 "max_level": 20,
-                "species": "SPECIES_CACNEA"
+                "species": "SPECIES_LARVITAR"
               },
               {
                 "min_level": 22,
@@ -873,7 +873,7 @@
               {
                 "min_level": 22,
                 "max_level": 22,
-                "species": "SPECIES_CACNEA"
+                "species": "SPECIES_LARVITAR"
               }
             ]
           },
@@ -1101,7 +1101,7 @@
               {
                 "min_level": 16,
                 "max_level": 16,
-                "species": "SPECIES_SPINDA"
+                "species": "SPECIES_GASTLY"
               },
               {
                 "min_level": 16,
