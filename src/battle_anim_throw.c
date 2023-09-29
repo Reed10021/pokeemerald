@@ -1439,7 +1439,7 @@ static void MakeCaptureStars(struct Sprite *sprite, u8 mode)
             u8 spriteId = CreateSprite(&sBallParticleSpriteTemplates[4], sprite->pos1.x, sprite->pos1.y, subpriority);
             if (spriteId != MAX_SPRITES)
             {
-                gSprites[spriteId].sDuration = 24;
+                gSprites[spriteId].sDuration = 32;
                 gSprites[spriteId].sTargetX = sprite->pos1.x + sCaptureStars[i].xOffset;
                 gSprites[spriteId].sTargetY = sprite->pos1.y + sCaptureStars[i].yOffset;
                 gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
