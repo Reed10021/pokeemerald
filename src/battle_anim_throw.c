@@ -1006,6 +1006,7 @@ static void SpriteCB_Ball_CriticalCapture_Step(struct Sprite* sprite)
     if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_SUCCESS || gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_FAIL)
     {
         MakeCaptureStars(sprite, 1);
+        PlaySE(SE_SHINY);
     }
     sprite->callback = SpriteCB_Ball_Bounce_Step;
 }
@@ -1455,7 +1456,7 @@ static void MakeCaptureStars(struct Sprite *sprite, u8 mode)
                 gSprites[spriteId].sTargetY = (GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y) - 16) + sCaptureStars[i].yOffset;
                 gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
                 InitAnimArcTranslation(&gSprites[spriteId]);
-                gSprites[spriteId].callback = SpriteCB_CaptureStar_Flicker;
+                gSprites[spriteId].callback = SpriteCB_CaptureStar_NoFlicker;
                 StartSpriteAnim(&gSprites[spriteId], sBallParticleAnimNums[BALL_MASTER]);
             }
         }
@@ -1468,6 +1469,13 @@ static void MakeCaptureStars(struct Sprite *sprite, u8 mode)
 #undef sAmplitude
 
 static void SpriteCB_CaptureStar_Flicker(struct Sprite *sprite)
+{
+    sprite->invisible = !sprite->invisible;
+    if (TranslateAnimHorizontalArc(sprite))
+        DestroySprite(sprite);
+}
+
+static void SpriteCB_CaptureStar_NoFlicker(struct Sprite* sprite)
 {
     //sprite->invisible = !sprite->invisible;
     if (TranslateAnimHorizontalArc(sprite))
