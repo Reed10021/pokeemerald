@@ -1450,9 +1450,9 @@ static void MakeCaptureStars(struct Sprite *sprite, u8 mode)
             u8 spriteId = CreateSprite(&sBallParticleSpriteTemplates[4], sprite->pos1.x, sprite->pos2.y, subpriority);
             if (spriteId != MAX_SPRITES)
             {
-                gSprites[spriteId].sDuration = 24;
+                gSprites[spriteId].sDuration = 64;
                 gSprites[spriteId].sTargetX = sprite->pos1.x + sCaptureStars[i].xOffset;
-                gSprites[spriteId].sTargetY = sprite->pos2.y + sCaptureStars[i].yOffset;
+                gSprites[spriteId].sTargetY = sprite->pos2.y - sCaptureStars[i].yOffset;
                 gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
                 InitAnimArcTranslation(&gSprites[spriteId]);
                 gSprites[spriteId].callback = SpriteCB_CaptureStar_Flicker;
