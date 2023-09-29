@@ -58,6 +58,7 @@ static void SpriteCB_Ball_Arc(struct Sprite *);
 static void SpriteCB_Ball_Block(struct Sprite *);
 static void SpriteCB_Ball_MonShrink(struct Sprite *);
 static void SpriteCB_Ball_MonShrink_Step(struct Sprite *);
+static void SpriteCB_Ball_CriticalCapture_Step(struct Sprite*);
 static void SpriteCB_Ball_Bounce(struct Sprite *);
 static void SpriteCB_Ball_Bounce_Step(struct Sprite *);
 static void SpriteCB_Ball_Release(struct Sprite *);
@@ -989,14 +990,24 @@ static void SpriteCB_Ball_Bounce(struct Sprite *sprite)
 
     if (sprite->animEnded)
     {
+
         sprite->sState = 0;
         sprite->sAmplitude = 40;
         sprite->sPhase = 0;
         phase = 0;
         sprite->pos1.y += Cos(phase, 40);
         sprite->pos2.y = -Cos(phase, sprite->sAmplitude);
-        sprite->callback = SpriteCB_Ball_Bounce_Step;
+        sprite->callback = SpriteCB_Ball_CriticalCapture_Step;
     }
+}
+
+static void SpriteCB_Ball_CriticalCapture_Step(struct Sprite* sprite)
+{
+    if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_SUCCESS || gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_FAIL)
+    {
+        MakeCaptureStars(sprite);
+    }
+    sprite->callback = SpriteCB_Ball_Bounce_Step;
 }
 
 #undef sState
@@ -1235,10 +1246,16 @@ static void SpriteCB_Ball_Wobble_Step(struct Sprite *sprite)
         }
         else
         {
-            if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_3_SHAKES_SUCCESS && shakes == 3)
+            if ((gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_3_SHAKES_SUCCESS && shakes == 3) ||
+                (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_SUCCESS && shakes == 1))
             {
                 sprite->callback = SpriteCB_Ball_Capture;
                 sprite->affineAnimPaused = TRUE;
+            }
+            else if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_FAIL && shakes == 1)
+            {
+                sprite->affineAnimPaused = TRUE;
+                sprite->callback = SpriteCB_Ball_Release;
             }
             else
             {
@@ -1249,7 +1266,7 @@ static void SpriteCB_Ball_Wobble_Step(struct Sprite *sprite)
         break;
     case BALL_WAIT_NEXT_SHAKE:
     default:
-        if (++sprite->sTimer == 31)
+        if (++sprite->sTimer == 16) //31
         {
             sprite->sTimer = 0;
             RESET_STATE(sprite->sState);
@@ -1276,7 +1293,7 @@ static void SpriteCB_Ball_Wobble_Step(struct Sprite *sprite)
 
 static void SpriteCB_Ball_Release(struct Sprite *sprite)
 {
-    if (++sprite->sTimer == 31)
+    if (++sprite->sTimer == 16) //31
     {
         sprite->data[5] = 0;
         sprite->callback = SpriteCB_Ball_Release_Step;

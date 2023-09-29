@@ -9888,11 +9888,37 @@ static void Cmd_handleballthrow(void)
         else // mon may be caught, calculate shakes
         {
             u8 shakes;
+            u16 caughtCount = GetNationalPokedexCount(FLAG_GET_CAUGHT);
+            u32 crit = 1000; // Testing
 
+            if (caughtCount > 279) {
+                crit = (odds * 250) / 100; // * 2.5
+            } else if (caughtCount > 204) {
+                crit = (odds * 200) / 100; // * 2.0
+            } else if (caughtCount > 129) {
+                crit = (odds * 150) / 100; // * 1.5
+            } else if (caughtCount > 54) {
+                crit = odds;               // * 1.0
+            } else if (caughtCount > 9) {
+                crit = (odds * 50) / 100;  // * 0.5
+            }                              // else 0
+
+            crit /= 6;
             odds = Sqrt(Sqrt(16711680 / odds));
             odds = 1048560 / odds;
-
-            for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
+            if (Random() % 255 < crit) // is a critical capture
+            {
+                // Make one shake check.
+                if (Random() < odds) {
+                    shakes = BALL_1_SHAKE_SUCCESS;
+                } else {
+                    shakes = BALL_1_SHAKE_FAIL; //use special shake value to communicate critical capture animation
+                }
+            }
+            else //not a critical capture, roll shakes as normal
+            {
+                for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
+            }
 
             if (gLastUsedItem == ITEM_MASTER_BALL)
                 shakes = BALL_3_SHAKES_SUCCESS; // why calculate the shakes before that check?
@@ -9900,7 +9926,7 @@ static void Cmd_handleballthrow(void)
             BtlController_EmitBallThrowAnim(0, shakes);
             MarkBattlerForControllerExec(gActiveBattler);
 
-            if (shakes == BALL_3_SHAKES_SUCCESS) // mon caught, copy of the code above
+            if (shakes == BALL_3_SHAKES_SUCCESS || shakes == BALL_1_SHAKE_SUCCESS) // mon caught, copy of the code above
             {
                 gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
                 SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);
