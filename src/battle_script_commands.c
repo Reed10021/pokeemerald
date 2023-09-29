@@ -9889,7 +9889,7 @@ static void Cmd_handleballthrow(void)
         {
             u8 shakes;
             u16 caughtCount = GetNationalPokedexCount(FLAG_GET_CAUGHT);
-            u32 crit = 1000; // Testing
+            u32 crit = 0;
 
             if (caughtCount > 279) {
                 crit = (odds * 250) / 100; // * 2.5
@@ -9906,13 +9906,13 @@ static void Cmd_handleballthrow(void)
             crit /= 6;
             odds = Sqrt(Sqrt(16711680 / odds));
             odds = 1048560 / odds;
-            if (Random() % 255 < crit) // is a critical capture
+            if (Random() % 255 < crit) // if is a critical capture
             {
-                // Make one shake check.
+                // Make only one shake check.
                 if (Random() < odds) {
                     shakes = BALL_1_SHAKE_SUCCESS;
                 } else {
-                    shakes = BALL_1_SHAKE_FAIL; //use special shake value to communicate critical capture animation
+                    shakes = BALL_1_SHAKE_FAIL; // use special shake value to communicate critical capture animation
                 }
             }
             else //not a critical capture, roll shakes as normal
