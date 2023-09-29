@@ -1265,7 +1265,7 @@ static const u8 sTM29Desc[] = _(
 static const u8 sTM30Desc[] = _(
     "Hurls a dark lump\n"
     "at the foe. It may\n"
-    "lower SP. DEF.");
+    "lower DEFENSE.");
 
 static const u8 sTM31Desc[] = _(
     "Destroys barriers\n"

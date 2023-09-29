@@ -987,7 +987,7 @@ static const u8 sAncientPowerDescription[] = _(
 
 static const u8 sShadowBallDescription[] = _(
     "Hurls a black blob that may\n"
-    "lower the foe's SP. DEF.");
+    "lower the foe's DEFENSE.");
 
 static const u8 sFutureSightDescription[] = _(
     "Heightens inner power to\n"
