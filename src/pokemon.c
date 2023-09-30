@@ -2266,7 +2266,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
                 legendaryCheck = 1;
         }
         // Reward long chains that haven't broken
-        if (trueChainCount >= 160)
+        if (trueChainCount >= 250)
+            adjustedChainCount += (trueChainCount * 4);
+        else if (trueChainCount >= 160)
             adjustedChainCount += (trueChainCount * 3);
         else if (trueChainCount >= 110)
             adjustedChainCount += (trueChainCount * 2);
@@ -2481,7 +2483,9 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
                     legendaryCheck = 1;
             }
             // Reward long chains that haven't broken
-            if (trueChainCount >= 160)
+            if (trueChainCount >= 250)
+                adjustedChainCount += (trueChainCount * 4);
+            else if (trueChainCount >= 160)
                 adjustedChainCount += (trueChainCount * 3);
             else if (trueChainCount >= 110)
                 adjustedChainCount += (trueChainCount * 2);
@@ -2573,7 +2577,9 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
                     legendaryCheck = 1;
             }
             // Reward long chains that haven't broken
-            if (trueChainCount >= 160)
+            if (trueChainCount >= 250)
+                adjustedChainCount += (trueChainCount * 4);
+            else if (trueChainCount >= 160)
                 adjustedChainCount += (trueChainCount * 3);
             else if (trueChainCount >= 110)
                 adjustedChainCount += (trueChainCount * 2);

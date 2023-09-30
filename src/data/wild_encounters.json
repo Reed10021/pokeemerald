@@ -148,7 +148,7 @@
               {
                 "min_level": 3,
                 "max_level": 3,
-                "species": "SPECIES_ZIGZAGOON"
+                "species": "SPECIES_SURSKIT"
               },
               {
                 "min_level": 4,
@@ -163,7 +163,7 @@
               {
                 "min_level": 3,
                 "max_level": 3,
-                "species": "SPECIES_SURSKIT"
+                "species": "SPECIES_SEEDOT"
               },
               {
                 "min_level": 3,
@@ -1143,7 +1143,7 @@
                 "species": "SPECIES_SWABLU"
               },
               {
-                "min_level": 16,
+                "min_level": 15,
                 "max_level": 16,
                 "species": "SPECIES_LOTAD"
               },
@@ -1160,7 +1160,7 @@
               {
                 "min_level": 15,
                 "max_level": 15,
-                "species": "SPECIES_LOTAD"
+                "species": "SPECIES_SURSKIT"
               },
               {
                 "min_level": 16,
@@ -1190,7 +1190,7 @@
               {
                 "min_level": 15,
                 "max_level": 15,
-                "species": "SPECIES_SURSKIT"
+                "species": "SPECIES_NUZLEAF"
               },
               {
                 "min_level": 15,
@@ -1392,7 +1392,7 @@
             "mons": [
               {
                 "min_level": 13,
-                "max_level": 13,
+                "max_level": 14,
                 "species": "SPECIES_POOCHYENA"
               },
               {
@@ -1401,9 +1401,9 @@
                 "species": "SPECIES_ODDISH"
               },
               {
-                "min_level": 14,
-                "max_level": 14,
-                "species": "SPECIES_POOCHYENA"
+                "min_level": 13,
+                "max_level": 13,
+                "species": "SPECIES_SURSKIT"
               },
               {
                 "min_level": 14,
@@ -1443,7 +1443,7 @@
               {
                 "min_level": 13,
                 "max_level": 13,
-                "species": "SPECIES_SURSKIT"
+                "species": "SPECIES_SEEDOT"
               },
               {
                 "min_level": 13,
@@ -3520,11 +3520,6 @@
               {
                 "min_level": 25,
                 "max_level": 25,
-                "species": "SPECIES_POOCHYENA"
-              },
-              {
-                "min_level": 25,
-                "max_level": 25,
                 "species": "SPECIES_MIGHTYENA"
               },
               {
@@ -3571,6 +3566,11 @@
                 "min_level": 25,
                 "max_level": 25,
                 "species": "SPECIES_KECLEON"
+              },
+              {
+                "min_level": 27,
+                "max_level": 27,
+                "species": "SPECIES_TROPIUS"
               },
               {
                 "min_level": 25,
