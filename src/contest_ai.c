@@ -1626,6 +1626,7 @@ static void ContestAICmd_if_not_eq_var(void)
         gAIScriptPtr += 7;
 }
 
+#define UBFIX
 // UB: Should just be comparing to gAIScriptPtr[1] in the functions below
 // The values passed via gAIScriptPtr[1] range from 0-255
 // and vars is an s16[3], so this goes way out of bounds
@@ -1652,6 +1653,7 @@ static void ContestAICmd_if_random_greater_than(void)
     else
         gAIScriptPtr += 6;
 }
+#undef UBFIX
 
 static void ContestAICmd_goto(void)
 {

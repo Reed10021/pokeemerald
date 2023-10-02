@@ -165,13 +165,7 @@ static u8 SaveWriteToFlash(u16 a1, const struct SaveSectionLocation *location)
         }
 
         for (i = 0; i < SECTOR_SAVE_SLOT_LENGTH; i++)
-        {
-            if (gSaveBlock1Ptr->flashLevel != 0) {
-                AnimateSprites();
-                BuildOamBuffer();
-            }
             HandleWriteSector(i, location);
-        }
 
         if (gSaveBlock1Ptr->flashLevel == 0) {
             SetVBlankCallback(prevVblankCB);

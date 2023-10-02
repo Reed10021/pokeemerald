@@ -4508,6 +4508,7 @@ static u8 PrintCryScreenSpeciesName(u8 windowId, u16 num, u8 left, u8 top)
     return i;
 }
 
+#define UBFIX
 static void UnusedPrintMonName(u8 windowId, const u8* name, u8 left, u8 top)
 {
     u8 str[POKEMON_NAME_LENGTH + 1];
@@ -4520,13 +4521,16 @@ static void UnusedPrintMonName(u8 windowId, const u8* name, u8 left, u8 top)
         ;
     for (i = 0; i < nameLength; i++)
         str[ARRAY_COUNT(str) - nameLength + i] = name[i];
+
 #ifdef UBFIX
     str[ARRAY_COUNT(str) - 1] = EOS;
 #else
     str[ARRAY_COUNT(str)] = EOS;
 #endif
+
     PrintInfoSubMenuText(windowId, str, left, top);
 }
+#undef UBFIX
 
 static void UnusedPrintDecimalNum(u8 windowId, u16 b, u8 left, u8 top)
 {
