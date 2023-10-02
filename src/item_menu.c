@@ -1171,7 +1171,7 @@ void PrintItemSoldAmount(int windowId, int numSold, int moneyEarned)
     ConvertIntToDecimalStringN(gStringVar1, numSold, STR_CONV_MODE_LEADING_ZEROS, numDigits);
     StringExpandPlaceholders(gStringVar4, gText_xVar1);
     AddTextPrinterParameterized(windowId, 1, gStringVar4, 0, 1, -1, 0);
-    PrintMoneyAmount(windowId, 36, 1, moneyEarned, 0); // prev x = 38. minus 1 for third digit? minus one for seventh money digit?
+    PrintMoneyAmount(windowId, 34, 1, moneyEarned, 0); // prev x = 38. minus 4 for third item digit.
 }
 
 void Task_BagMenu_HandleInput(u8 taskId)
