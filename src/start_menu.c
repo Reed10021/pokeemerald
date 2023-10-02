@@ -295,11 +295,13 @@ static const struct SpriteTemplate sSpriteTemplate_Throbber =
 
 void ShowThrobber(void)
 {
-    LoadCompressedSpriteSheet(&sSpriteSheet_Throbber[0]);
-    LoadSpritePalettes(sSpritePalettes_Throbber);
+    if (gSaveBlock1Ptr->flashLevel == 0) {
+        LoadCompressedSpriteSheet(&sSpriteSheet_Throbber[0]);
+        LoadSpritePalettes(sSpritePalettes_Throbber);
 
-    // 217 and 123 are the x and y coordinates (in pixels)
-    throbberSpriteId = CreateSprite(&sSpriteTemplate_Throbber, 217, 123, 2);
+        // 217 and 123 are the x and y coordinates (in pixels)
+        throbberSpriteId = CreateSprite(&sSpriteTemplate_Throbber, 217, 123, 2);
+    }
 };
 
 void SetDexPokemonPokenavFlags(void) // unused
@@ -1141,7 +1143,9 @@ static u8 SaveDoSaveCallback(void)
         ShowSaveMessage(gText_PlayerSavedGame, SaveSuccessCallback);
     else
         ShowSaveMessage(gText_SaveError, SaveErrorCallback);
-    DestroySprite(&gSprites[throbberSpriteId]);
+
+    if(gSaveBlock1Ptr->flashLevel == 0)
+        DestroySprite(&gSprites[throbberSpriteId]);
 
     SaveStartTimer();
     return SAVE_IN_PROGRESS;

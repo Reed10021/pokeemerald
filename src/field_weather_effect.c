@@ -2571,9 +2571,9 @@ static const u8 sWeatherCycleRoute123[] = //and 118
 {
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
-    WEATHER_DOWNPOUR,
+    WEATHER_RAIN,
     WEATHER_SUNNY,
-    WEATHER_SUNNY,
+    WEATHER_RAIN_THUNDERSTORM,
 };
 static const u8 sWeatherCycleRoute124_125[] =
 {
@@ -2655,7 +2655,7 @@ void UpdateWeatherPerDay(u16 increment)
 static void UpdateRainCounter(u8 newWeather, u8 oldWeather)
 {
     if (newWeather != oldWeather
-     && (newWeather == WEATHER_RAIN || newWeather == WEATHER_RAIN_THUNDERSTORM))
+     && (newWeather == WEATHER_RAIN || newWeather == WEATHER_RAIN_THUNDERSTORM || newWeather == WEATHER_DOWNPOUR))
         IncrementGameStat(GAME_STAT_GOT_RAINED_ON);
 }
 

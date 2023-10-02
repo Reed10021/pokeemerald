@@ -132,10 +132,12 @@ static bool32 SetDamagedSectorBits(u8 op, u8 bit)
 
 static void VBlankCB_Saving(void)
 {
-    AnimateSprites();
-    BuildOamBuffer();
-    LoadOam();
-    ProcessSpriteCopyRequests();
+    if (gSaveBlock1Ptr->flashLevel == 0) {
+        AnimateSprites();
+        BuildOamBuffer();
+        LoadOam();
+        ProcessSpriteCopyRequests();
+    }
 }
 
 static u8 SaveWriteToFlash(u16 a1, const struct SaveSectionLocation *location)
