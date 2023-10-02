@@ -346,17 +346,17 @@ static u32 HandleCantOpenRibbonsInput(struct Pokenav1Struct *state)
     return POKENAV_MENU_FUNC_NONE;
 }
 
-static u32 HandleCantAccessPCInput(struct Pokenav_Menu *menu)
+static u32 HandleCantAccessPCInput(struct Pokenav1Struct *state)
 {
-    if (UpdateMenuCursorPos(menu))
+    if (UpdateMenuCursorPos(state))
     {
-        menu->callback = GetMainMenuInputHandler();
+        state->callback = GetMainMenuInputHandler();
         return POKENAV_MENU_FUNC_MOVE_CURSOR;
     }
 
     if (JOY_NEW(A_BUTTON | B_BUTTON))
     {
-        menu->callback = GetMainMenuInputHandler();
+        state->callback = GetMainMenuInputHandler();
         return POKENAV_MENU_FUNC_RESHOW_DESCRIPTION;
     }
 
@@ -367,7 +367,7 @@ static void Task_WaitFadeAccessPC(u8 taskId)
 {
     if (WaitForPokenavShutdownFade())
     {
-        ScriptContext_SetupScript(EventScript_PCMainMenu);
+        ScriptContext1_SetupScript(EventScript_PCMainMenu);
         DestroyTask(taskId);
     }
 }
@@ -393,9 +393,9 @@ static u32 HandleConditionMenuInput(struct Pokenav1Struct *state)
                 gSysPcFromPokenav = TRUE;
                 // Reusing from debug menu to gracefully close PC when done.
                 CreateTask(Task_WaitFadeAccessPC, 0);
-                return POKENAV_MENU_FUNC_EXIT; 
+                return -1; //POKENAV_MENU_FUNC_EXIT
             } else {
-                menu->callback = HandleCantAccessPCInput;
+                state->callback = HandleCantAccessPCInput;
                 return POKENAV_MENU_FUNC_CANNOT_ACCESS_PC;
             }
         case POKENAV_MENUITEM_CONDITION_PARTY:

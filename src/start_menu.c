@@ -89,6 +89,7 @@ EWRAM_DATA static u8 (*sSaveDialogCallback)(void) = NULL;
 EWRAM_DATA static u8 sSaveDialogTimer = 0;
 EWRAM_DATA static bool8 sSavingComplete = FALSE;
 EWRAM_DATA static u8 sSaveInfoWindowId = 0;
+EWRAM_DATA static u8 throbberSpriteId = 0;
 
 // Menu action callbacks
 static bool8 StartMenuPokedexCallback(void);
@@ -228,7 +229,7 @@ static void HideStartMenuWindow(void);
 #define TAG_THROBBER 0x1000
 static const u16 sThrobber_Pal[] = INCBIN_U16("graphics/text_window/throbber.gbapal");
 const u32 gThrobber_Gfx[] = INCBIN_U32("graphics/text_window/throbber.4bpp.lz");
-static u8 spriteId;
+
 
 static const struct OamData sOam_Throbber =
 {
@@ -298,7 +299,7 @@ void ShowThrobber(void)
     LoadSpritePalettes(sSpritePalettes_Throbber);
 
     // 217 and 123 are the x and y coordinates (in pixels)
-    spriteId = CreateSprite(&sSpriteTemplate_Throbber, 217, 123, 2);
+    throbberSpriteId = CreateSprite(&sSpriteTemplate_Throbber, 217, 123, 2);
 };
 
 void SetDexPokemonPokenavFlags(void) // unused
@@ -1137,15 +1138,10 @@ static u8 SaveDoSaveCallback(void)
     }
 
     if (saveStatus == SAVE_STATUS_OK)
-    {
         ShowSaveMessage(gText_PlayerSavedGame, SaveSuccessCallback);
-        DestroySprite(&gSprites[spriteId]);
-    }
     else
-    {
         ShowSaveMessage(gText_SaveError, SaveErrorCallback);
-        DestroySprite(&gSprites[spriteId]);
-    }
+    DestroySprite(&gSprites[throbberSpriteId]);
 
     SaveStartTimer();
     return SAVE_IN_PROGRESS;

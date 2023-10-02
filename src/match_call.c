@@ -1052,7 +1052,7 @@ static bool32 SelectMatchCallTrainer(void)
 
     matchCallId = GetTrainerMatchCallId(gMatchCallState.trainerId);
    if (!((TrainerIsEligibleForRematch(matchCallId) && GetRematchTrainerLocation(matchCallId) == gMapHeader.regionMapSectionId)
-   || ShouldTrainerRequestBattle(matchCallId)))
+   || sub_8196D74(matchCallId))) //ShouldTrainerRequestBattle
         return FALSE;
 
     return TRUE;
@@ -1780,7 +1780,7 @@ static bool32 sub_8196D74(int matchCallId)
     int numRematchTrainersFought;
     int var0, var1, var2;
 
-    if (GetNumOwnedBadges() < 5)
+    if (GetNumOwnedBadges() < 2) //5
         return FALSE;
 
     dayCount = RtcGetLocalDayCount();

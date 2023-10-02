@@ -129,7 +129,7 @@ static bool32 SetDamagedSectorBits(u8 op, u8 bit)
 
     return retVal;
 }
-]
+
 static void VBlankCB_Saving(void)
 {
     AnimateSprites();

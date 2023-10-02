@@ -294,7 +294,7 @@ void EvolutionScene(struct Pokemon* mon, u16 speciesToEvolve, bool8 canStopEvo, 
     gTasks[ID].tLearnsFirstMove = TRUE;
     gTasks[ID].tEvoWasStopped = FALSE;
     gTasks[ID].tPartyID = partyID;
-    gTasks[id].tStopLearningMove = FALSE;
+    gTasks[ID].tStopLearningMove = FALSE;
 
     memcpy(&sEvoStructPtr->savedPalette, &gPlttBufferUnfaded[0x20], 0x60);
 
@@ -509,7 +509,7 @@ void TradeEvolutionScene(struct Pokemon* mon, u16 speciesToEvolve, u8 preEvoSpri
     gTasks[ID].tLearnsFirstMove = TRUE;
     gTasks[ID].tEvoWasStopped = FALSE;
     gTasks[ID].tPartyID = partyID;
-    gTasks[id].tStopLearningMove = FALSE;
+    gTasks[ID].tStopLearningMove = FALSE;
 
     gBattle_BG0_X = 0;
     gBattle_BG0_Y = 0;
@@ -831,7 +831,7 @@ static void Task_EvolutionScene(u8 taskID)
                 BufferMoveToLearnIntoBattleTextBuff2();
                 BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_TRYTOLEARNMOVE1 - BATTLESTRINGS_ID_ADDER]);
                 BattlePutTextOnWindow(gDisplayedStringBattle, 0);
-                gTasks[taskId].tStopLearningMove = FALSE;
+                gTasks[taskID].tStopLearningMove = FALSE;
                 gTasks[taskID].tLearnMoveState++;
             }
             break;
@@ -897,12 +897,12 @@ static void Task_EvolutionScene(u8 taskID)
             {
                 HandleBattleWindow(0x18, 8, 0x1D, 0xD, WINDOW_CLEAR);
                 PlaySE(SE_SELECT);
-                if (gTasks[taskId].tStopLearningMove) {
-                    gTasks[taskId].tLearnMoveState = gTasks[taskId].data[7];
-                    if (gTasks[taskId].tLearnMoveState == 6)
+                if (gTasks[taskID].tStopLearningMove) {
+                    gTasks[taskID].tLearnMoveState = gTasks[taskID].data[7];
+                    if (gTasks[taskID].tLearnMoveState == 6)
                         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 0x10, RGB_BLACK);
                 } else{
-                    gTasks[taskId].tLearnMoveState = gTasks[taskId].data[8];
+                    gTasks[taskID].tLearnMoveState = gTasks[taskID].data[8];
                 }
             }
             break;
@@ -968,7 +968,7 @@ static void Task_EvolutionScene(u8 taskID)
         case 10:
             BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_STOPLEARNINGMOVE - BATTLESTRINGS_ID_ADDER]);
             BattlePutTextOnWindow(gDisplayedStringBattle, 0);
-            gTasks[taskId].tStopLearningMove = TRUE;
+            gTasks[taskID].tStopLearningMove = TRUE;
             gTasks[taskID].tData7 = 11;
             gTasks[taskID].tData8 = 0;
             gTasks[taskID].tLearnMoveState = 3;
@@ -976,7 +976,7 @@ static void Task_EvolutionScene(u8 taskID)
         case 11:
             BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_DIDNOTLEARNMOVE - BATTLESTRINGS_ID_ADDER]);
             BattlePutTextOnWindow(gDisplayedStringBattle, 0);
-            gTasks[taskId].tStopLearningMove = FALSE;
+            gTasks[taskID].tStopLearningMove = FALSE;
             gTasks[taskID].tState = 15;
             break;
         case 12:
@@ -1185,7 +1185,7 @@ static void Task_TradeEvolutionScene(u8 taskID)
                 BufferMoveToLearnIntoBattleTextBuff2();
                 BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_TRYTOLEARNMOVE1 - BATTLESTRINGS_ID_ADDER]);
                 DrawTextOnTradeWindow(0, gDisplayedStringBattle, 1);
-                gTasks[taskId].tStopLearningMove = FALSE;
+                gTasks[taskID].tStopLearningMove = FALSE;
                 gTasks[taskID].tLearnMoveState++;
             }
             break;
@@ -1219,7 +1219,7 @@ static void Task_TradeEvolutionScene(u8 taskID)
         case 4:
             var = Menu_ProcessInputNoWrapClearOnChoose();
             if (var == MENU_B_PRESSED){
-                var = !gTasks[taskId].tStopLearningMove;
+                var = !gTasks[taskID].tStopLearningMove;
             }
             switch (var)
             {
@@ -1305,7 +1305,7 @@ static void Task_TradeEvolutionScene(u8 taskID)
         case 9:
             BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_STOPLEARNINGMOVE - BATTLESTRINGS_ID_ADDER]);
             DrawTextOnTradeWindow(0, gDisplayedStringBattle, 1);
-            gTasks[taskId].tStopLearningMove = TRUE;
+            gTasks[taskID].tStopLearningMove = TRUE;
             gTasks[taskID].tData7 = 10;
             gTasks[taskID].tData8 = 0;
             gTasks[taskID].tLearnMoveState = 3;
@@ -1313,7 +1313,7 @@ static void Task_TradeEvolutionScene(u8 taskID)
         case 10:
             BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_DIDNOTLEARNMOVE - BATTLESTRINGS_ID_ADDER]);
             DrawTextOnTradeWindow(0, gDisplayedStringBattle, 1);
-            gTasks[taskId].tStopLearningMove = FALSE;
+            gTasks[taskID].tStopLearningMove = FALSE;
             gTasks[taskID].tState = 13;
             break;
         case 11:

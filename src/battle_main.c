@@ -1917,6 +1917,54 @@ static void sub_8038538(struct Sprite *sprite)
     }
 }
 
+// If the player's average party level is lower than the opponents, generate a random value between -1, 0, and +1 and adjust opponents level.
+// If the player's average party level is higher than the opponents, generate a random value between partyData[i].lvl and avgLevel + 1 and adjust opponents level.
+// If the opponent is a leader, elite 4, champion, or rival and the average party level is higher than the opponents, generate a random value between partyData[i].lvl and avgLevel + 3 and adjust opponent's level
+u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel)
+{
+    u8 max;
+    u8 range;
+    s8 rand;
+    s16 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting it back to u8.
+    if (pokeBaseLevel > avgLevel)
+    {
+        if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival & Steven
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER ||
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
+            rand = 0;
+        else
+            rand = (Random() % 2) - (Random() % 2); // -1, 0, +1
+        // 0 is more common
+    }
+    else // <=
+    {
+        if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival & Steven
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER ||
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
+        {
+            max = avgLevel + 3;
+            range = (max - pokeBaseLevel) + 1;
+            rand = Random() % range;
+        }
+        else
+        {
+            max = avgLevel + 1;
+            range = (max - pokeBaseLevel) + 1;
+            rand = Random() % range;
+        }
+    }
+    scaledLevel = pokeBaseLevel + rand;
+    if (scaledLevel < 0) {
+        scaledLevel = 5;
+    }
+    else if (scaledLevel > 100) {
+        scaledLevel = 100;
+    }
+    return (u8)scaledLevel;
+}
+
 static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 firstTrainer)
 {
     u32 nameHash = 0;
@@ -1924,26 +1972,23 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     u8 fixedIV;
     s32 i, j;
     u8 monsCount;
-    u8 scaledLevel = 0;
     u8 avgLevel = 1;
 
     if (trainerNum == TRAINER_SECRET_BASE)
         return 0;
 
-    {
-        if (GetMonData(&gPlayerParty[5], MON_DATA_SPECIES) != SPECIES_NONE)
-            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[4], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[5], MON_DATA_LEVEL)) * 100) / 600;
-        else if ((GetMonData(&gPlayerParty[5], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[4], MON_DATA_SPECIES) != SPECIES_NONE))
-            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[4], MON_DATA_LEVEL)) * 100) / 500;
-        else if ((GetMonData(&gPlayerParty[4], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[3], MON_DATA_SPECIES) != SPECIES_NONE))
-            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL)) * 100) / 400;
-        else if ((GetMonData(&gPlayerParty[3], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[2], MON_DATA_SPECIES) != SPECIES_NONE))
-            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL)) * 100) / 300;
-        else if ((GetMonData(&gPlayerParty[2], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[1], MON_DATA_SPECIES) != SPECIES_NONE))
-            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL)) * 100) / 200;
-        else if ((GetMonData(&gPlayerParty[1], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES) != SPECIES_NONE))
-            avgLevel = GetMonData(&gPlayerParty[0], MON_DATA_LEVEL);
-    }
+    if (GetMonData(&gPlayerParty[5], MON_DATA_SPECIES) != SPECIES_NONE)
+        avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[4], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[5], MON_DATA_LEVEL)) * 100) / 600;
+    else if ((GetMonData(&gPlayerParty[5], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[4], MON_DATA_SPECIES) != SPECIES_NONE))
+        avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[4], MON_DATA_LEVEL)) * 100) / 500;
+    else if ((GetMonData(&gPlayerParty[4], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[3], MON_DATA_SPECIES) != SPECIES_NONE))
+        avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL)) * 100) / 400;
+    else if ((GetMonData(&gPlayerParty[3], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[2], MON_DATA_SPECIES) != SPECIES_NONE))
+        avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL)) * 100) / 300;
+    else if ((GetMonData(&gPlayerParty[2], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[1], MON_DATA_SPECIES) != SPECIES_NONE))
+        avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL)) * 100) / 200;
+    else if ((GetMonData(&gPlayerParty[1], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES) != SPECIES_NONE))
+        avgLevel = GetMonData(&gPlayerParty[0], MON_DATA_LEVEL);
 
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && !(gBattleTypeFlags & (BATTLE_TYPE_FRONTIER
                                                                         | BATTLE_TYPE_EREADER_TRAINER
@@ -1977,118 +2022,72 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
             for (j = 0; gTrainers[trainerNum].trainerName[j] != EOS; j++)
                 nameHash += gTrainers[trainerNum].trainerName[j];
 
-            // If the player's average party level is lower than the opponents, generate a random value between -1, 0, and +1 and adjust opponents level.
-            // If the player's average party level is higher than the opponents, generate a random value between partyData[i].lvl and avgLevel + 1 and adjust opponents level.
-            // If the opponent is a leader, elite 4, champion, or rival and the average party level is higher than the opponents, generate a random value between partyData[i].lvl and avgLevel + 3 and adjust opponent's level
-            {
-                u8 max;
-                u8 range;
-                s8 rand;
-                s16 scaledLevelTemp = 0; // resolve < 0 & > 100 edge cases before storing it back into scaledLevel.
-                if (partyData[i].lvl > avgLevel)
-                {
-                    if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival & Steven
-                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER ||
-                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
-                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
-                        rand = 0;
-                    else
-                        rand = (Random() % 2) - (Random % 2); // -1, 0, +1
-                    // 0 is more common
-                }
-                else // <=
-                {
-                    if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival & Steven
-                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER || 
-                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR || 
-                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
-                    {
-                        max = avgLevel + 3;
-                        range = (max - partyData[i].lvl) + 1;
-                        rand = Random() % range;
-                    }
-                    else
-                    {
-                        max = avgLevel + 1;
-                        range = (max - partyData[i].lvl) + 1;
-                        rand = Random() % range;
-                    }
-                }
-                scaledLevelTemp = partyData[i].lvl + rand;
-                if (scaledLevelTemp < 0) {
-                    scaledLevelTemp = 5;
-                } else if (scaledLevelTemp > 100) {
-                    scaledLevelTemp = 100;
-                }
-                scaledLevel = scaledLevelTemp;
-            }
-
             switch (gTrainers[trainerNum].partyFlags)
             {
-            case 0:
-            {
-                const struct TrainerMonNoItemDefaultMoves *partyData = gTrainers[trainerNum].party.NoItemDefaultMoves;
-
-                for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
-                    nameHash += gSpeciesNames[partyData[i].species][j];
-
-                personalityValue += nameHash << 8;
-                fixedIV = partyData[i].iv * 31 / 255;
-                CreateMon(&party[i], partyData[i].species, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
-                break;
-            }
-            case F_TRAINER_PARTY_CUSTOM_MOVESET:
-            {
-                const struct TrainerMonNoItemCustomMoves *partyData = gTrainers[trainerNum].party.NoItemCustomMoves;
-
-                for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
-                    nameHash += gSpeciesNames[partyData[i].species][j];
-
-                personalityValue += nameHash << 8;
-                fixedIV = partyData[i].iv * 31 / 255;
-                CreateMon(&party[i], partyData[i].species, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
-
-                for (j = 0; j < MAX_MON_MOVES; j++)
+                case 0:
                 {
-                    SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
-                    SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
+                    const struct TrainerMonNoItemDefaultMoves *partyData = gTrainers[trainerNum].party.NoItemDefaultMoves;
+
+                    for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
+                        nameHash += gSpeciesNames[partyData[i].species][j];
+
+                    personalityValue += nameHash << 8;
+                    fixedIV = partyData[i].iv * 31 / 255;
+                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                    break;
                 }
-                break;
-            }
-            case F_TRAINER_PARTY_HELD_ITEM:
-            {
-                const struct TrainerMonItemDefaultMoves *partyData = gTrainers[trainerNum].party.ItemDefaultMoves;
-
-                for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
-                    nameHash += gSpeciesNames[partyData[i].species][j];
-
-                personalityValue += nameHash << 8;
-                fixedIV = partyData[i].iv * 31 / 255;
-                CreateMon(&party[i], partyData[i].species, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
-
-                SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
-                break;
-            }
-            case F_TRAINER_PARTY_CUSTOM_MOVESET | F_TRAINER_PARTY_HELD_ITEM:
-            {
-                const struct TrainerMonItemCustomMoves *partyData = gTrainers[trainerNum].party.ItemCustomMoves;
-
-                for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
-                    nameHash += gSpeciesNames[partyData[i].species][j];
-
-                personalityValue += nameHash << 8;
-                fixedIV = partyData[i].iv * 31 / 255;
-                CreateMon(&party[i], partyData[i].species, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
-
-                SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
-
-                for (j = 0; j < MAX_MON_MOVES; j++)
+                case F_TRAINER_PARTY_CUSTOM_MOVESET:
                 {
-                    SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
-                    SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
+                    const struct TrainerMonNoItemCustomMoves *partyData = gTrainers[trainerNum].party.NoItemCustomMoves;
+
+                    for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
+                        nameHash += gSpeciesNames[partyData[i].species][j];
+
+                    personalityValue += nameHash << 8;
+                    fixedIV = partyData[i].iv * 31 / 255;
+                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+
+                    for (j = 0; j < MAX_MON_MOVES; j++)
+                    {
+                        SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
+                        SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
+                    }
+                    break;
                 }
-                break;
-            }
+                case F_TRAINER_PARTY_HELD_ITEM:
+                {
+                    const struct TrainerMonItemDefaultMoves *partyData = gTrainers[trainerNum].party.ItemDefaultMoves;
+
+                    for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
+                        nameHash += gSpeciesNames[partyData[i].species][j];
+
+                    personalityValue += nameHash << 8;
+                    fixedIV = partyData[i].iv * 31 / 255;
+                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+
+                    SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
+                    break;
+                }
+                case F_TRAINER_PARTY_CUSTOM_MOVESET | F_TRAINER_PARTY_HELD_ITEM:
+                {
+                    const struct TrainerMonItemCustomMoves *partyData = gTrainers[trainerNum].party.ItemCustomMoves;
+
+                    for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
+                        nameHash += gSpeciesNames[partyData[i].species][j];
+
+                    personalityValue += nameHash << 8;
+                    fixedIV = partyData[i].iv * 31 / 255;
+                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+
+                    SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
+
+                    for (j = 0; j < MAX_MON_MOVES; j++)
+                    {
+                        SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
+                        SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
+                    }
+                    break;
+                }
             }
         }
 
