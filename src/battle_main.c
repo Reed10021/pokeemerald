@@ -1924,9 +1924,26 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     u8 fixedIV;
     s32 i, j;
     u8 monsCount;
+    u8 scaledLevel = 0;
+    u8 avgLevel = 1;
 
     if (trainerNum == TRAINER_SECRET_BASE)
         return 0;
+
+    {
+        if (GetMonData(&gPlayerParty[5], MON_DATA_SPECIES) != SPECIES_NONE)
+            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[4], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[5], MON_DATA_LEVEL)) * 100) / 600;
+        else if ((GetMonData(&gPlayerParty[5], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[4], MON_DATA_SPECIES) != SPECIES_NONE))
+            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[4], MON_DATA_LEVEL)) * 100) / 500;
+        else if ((GetMonData(&gPlayerParty[4], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[3], MON_DATA_SPECIES) != SPECIES_NONE))
+            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[3], MON_DATA_LEVEL)) * 100) / 400;
+        else if ((GetMonData(&gPlayerParty[3], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[2], MON_DATA_SPECIES) != SPECIES_NONE))
+            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[2], MON_DATA_LEVEL)) * 100) / 300;
+        else if ((GetMonData(&gPlayerParty[2], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[1], MON_DATA_SPECIES) != SPECIES_NONE))
+            avgLevel = ((GetMonData(&gPlayerParty[0], MON_DATA_LEVEL) + GetMonData(&gPlayerParty[1], MON_DATA_LEVEL)) * 100) / 200;
+        else if ((GetMonData(&gPlayerParty[1], MON_DATA_SPECIES) == SPECIES_NONE) && (GetMonData(&gPlayerParty[0], MON_DATA_SPECIES) != SPECIES_NONE))
+            avgLevel = GetMonData(&gPlayerParty[0], MON_DATA_LEVEL);
+    }
 
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && !(gBattleTypeFlags & (BATTLE_TYPE_FRONTIER
                                                                         | BATTLE_TYPE_EREADER_TRAINER
@@ -1952,13 +1969,59 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
             if (gTrainers[trainerNum].doubleBattle == TRUE)
                 personalityValue = 0x80;
-            else if (gTrainers[trainerNum].encounterMusic_gender & 0x80)
+            else if (gTrainers[trainerNum].encounterMusic_gender & 0x80) // is female
                 personalityValue = 0x78;
             else
                 personalityValue = 0x88;
 
             for (j = 0; gTrainers[trainerNum].trainerName[j] != EOS; j++)
                 nameHash += gTrainers[trainerNum].trainerName[j];
+
+            // If the player's average party level is lower than the opponents, generate a random value between -1, 0, and +1 and adjust opponents level.
+            // If the player's average party level is higher than the opponents, generate a random value between partyData[i].lvl and avgLevel + 1 and adjust opponents level.
+            // If the opponent is a leader, elite 4, champion, or rival and the average party level is higher than the opponents, generate a random value between partyData[i].lvl and avgLevel + 3 and adjust opponent's level
+            {
+                u8 max;
+                u8 range;
+                s8 rand;
+                s16 scaledLevelTemp = 0; // resolve < 0 & > 100 edge cases before storing it back into scaledLevel.
+                if (partyData[i].lvl > avgLevel)
+                {
+                    if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival & Steven
+                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER ||
+                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
+                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
+                        rand = 0;
+                    else
+                        rand = (Random() % 2) - (Random % 2); // -1, 0, +1
+                    // 0 is more common
+                }
+                else // <=
+                {
+                    if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival & Steven
+                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER || 
+                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR || 
+                        gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
+                    {
+                        max = avgLevel + 3;
+                        range = (max - partyData[i].lvl) + 1;
+                        rand = Random() % range;
+                    }
+                    else
+                    {
+                        max = avgLevel + 1;
+                        range = (max - partyData[i].lvl) + 1;
+                        rand = Random() % range;
+                    }
+                }
+                scaledLevelTemp = partyData[i].lvl + rand;
+                if (scaledLevelTemp < 0) {
+                    scaledLevelTemp = 5;
+                } else if (scaledLevelTemp > 100) {
+                    scaledLevelTemp = 100;
+                }
+                scaledLevel = scaledLevelTemp;
+            }
 
             switch (gTrainers[trainerNum].partyFlags)
             {
@@ -1971,7 +2034,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 personalityValue += nameHash << 8;
                 fixedIV = partyData[i].iv * 31 / 255;
-                CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                CreateMon(&party[i], partyData[i].species, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
                 break;
             }
             case F_TRAINER_PARTY_CUSTOM_MOVESET:
@@ -1983,7 +2046,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 personalityValue += nameHash << 8;
                 fixedIV = partyData[i].iv * 31 / 255;
-                CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                CreateMon(&party[i], partyData[i].species, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
 
                 for (j = 0; j < MAX_MON_MOVES; j++)
                 {
@@ -2001,7 +2064,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 personalityValue += nameHash << 8;
                 fixedIV = partyData[i].iv * 31 / 255;
-                CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                CreateMon(&party[i], partyData[i].species, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
 
                 SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
                 break;
@@ -2015,7 +2078,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                 personalityValue += nameHash << 8;
                 fixedIV = partyData[i].iv * 31 / 255;
-                CreateMon(&party[i], partyData[i].species, partyData[i].lvl, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                CreateMon(&party[i], partyData[i].species, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
 
                 SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
 

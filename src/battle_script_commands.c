@@ -3323,6 +3323,7 @@ static void Cmd_getexp(void)
 
                 if (GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_HP))
                 {
+                    u16 chainCount = VarGet(VAR_CHAIN);
                     if (gBattleStruct->sentInPokes & 1)
                         gBattleMoveDamage = *exp;
                     else
@@ -3346,6 +3347,16 @@ static void Cmd_getexp(void)
                         }
                         gBattleMoveDamage = gBattleMoveDamage + 1;
                     }
+                    // In general, if you have a high chain count, reward additional exp no matter who the battle was against.
+                    if (chainCount > 249)
+                        gBattleMoveDamage = (gBattleMoveDamage * 300) / 100; // x3 EXP
+                    else if (chainCount > 109)
+                        gBattleMoveDamage = (gBattleMoveDamage * 200) / 100; // x2 EXP
+                    else if (chainCount > 39)
+                        gBattleMoveDamage += (gBattleMoveDamage * 50) / 100; // + 50% EXP
+                    else if (chainCount > 9)
+                        gBattleMoveDamage += (gBattleMoveDamage * 25) / 100; // + 25% EXP
+
                     if (holdEffect == HOLD_EFFECT_LUCKY_EGG)
                         gBattleMoveDamage = (gBattleMoveDamage * 150) / 100;
                     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER)
@@ -5526,7 +5537,8 @@ static void Cmd_yesnoboxstoplearningmove(void)
         else if (JOY_NEW(B_BUTTON))
         {
             PlaySE(SE_SELECT);
-            gBattlescriptCurrInstr = T1_READ_PTR(gBattlescriptCurrInstr + 1);
+            //gBattlescriptCurrInstr = T1_READ_PTR(gBattlescriptCurrInstr + 1);
+            gBattlescriptCurrInstr += 5;
             HandleBattleWindow(0x18, 0x8, 0x1D, 0xD, WINDOW_CLEAR);
         }
         break;
@@ -9891,17 +9903,17 @@ static void Cmd_handleballthrow(void)
             u16 caughtCount = GetNationalPokedexCount(FLAG_GET_CAUGHT);
             u32 crit = 0;
 
-            if (caughtCount > 279) {
-                crit = (odds * 250) / 100; // * 2.5
-            } else if (caughtCount > 204) {
-                crit = (odds * 200) / 100; // * 2.0
-            } else if (caughtCount > 129) {
-                crit = (odds * 150) / 100; // * 1.5
-            } else if (caughtCount > 54) {
-                crit = odds;               // * 1.0
-            } else if (caughtCount > 9) {
-                crit = (odds * 50) / 100;  // * 0.5
-            }                              // else 0
+            if (caughtCount > 179) {        // 180+
+                crit = (odds * 250) / 100;  // * 2.5
+            } else if (caughtCount > 104) { // 105+
+                crit = (odds * 200) / 100;  // * 2.0
+            } else if (caughtCount > 29) {  // 30+
+                crit = (odds * 150) / 100;  // * 1.5
+            } else if (caughtCount > 9) {   // 10+
+                crit = odds;                // * 1.0
+            } else {                        // 0-9
+                crit = (odds * 50) / 100;   // else * 0.5
+            }
 
             crit /= 6;
             odds = Sqrt(Sqrt(16711680 / odds));

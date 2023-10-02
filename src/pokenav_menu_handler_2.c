@@ -41,6 +41,7 @@ static u32 LoopedTask_ReturnToMainMenu(s32 state);
 static u32 LoopedTask_OpenConditionSearchMenu(s32 state);
 static u32 LoopedTask_ReturnToConditionMenu(s32 state);
 static u32 LoopedTask_SelectRibbonsNoWinners(s32 state);
+static u32 LoopedTask_CannotAccessPC(s32);
 static u32 LoopedTask_ReShowDescription(s32 state);
 static u32 LoopedTask_OpenPokenavFeature(s32 state);
 static void sub_81C9FC4(void);
@@ -65,6 +66,7 @@ static void sub_81CA698(void);
 static void AddOptionDescriptionWindow(void);
 static void PrintCurrentOptionDescription(void);
 static void PrintNoRibbonWinners(void);
+static void PrintCannotAccessPC(void);
 static bool32 sub_81CA7C4(void);
 static void sub_81CA7D4(void);
 static void sub_81CA7F4(void);
@@ -127,14 +129,15 @@ static const LoopedTask sMenuHandlerLoopTaskFuncs[] = {
     [POKENAV_MENU_FUNC_RETURN_TO_CONDITION]   = LoopedTask_ReturnToConditionMenu,
     [POKENAV_MENU_FUNC_NO_RIBBON_WINNERS]     = LoopedTask_SelectRibbonsNoWinners,
     [POKENAV_MENU_FUNC_RESHOW_DESCRIPTION]    = LoopedTask_ReShowDescription,
-    [POKENAV_MENU_FUNC_OPEN_FEATURE]          = LoopedTask_OpenPokenavFeature
+    [POKENAV_MENU_FUNC_OPEN_FEATURE]          = LoopedTask_OpenPokenavFeature,
+    [POKENAV_MENU_FUNC_CANNOT_ACCESS_PC]      = LoopedTask_CannotAccessPC
 };
 
 static const struct CompressedSpriteSheet gUnknown_086201C4[] =
 {
     {
         .data = gPokenavOptions_Gfx,
-        .size = 0x3400,
+        .size = 0x3800,
         .tag = 0x0003
     },
     {
@@ -160,14 +163,17 @@ static const u16 gUnknown_08620210[] = {0x20, 1};
 static const u16 gUnknown_08620214[] = {0x40, 4};
 static const u16 gUnknown_08620218[] = {0x60, 2};
 static const u16 gUnknown_0862021C[] = {0x80, 3};
-static const u16 gUnknown_08620220[] = {0xA0, 1};
-static const u16 gUnknown_08620224[] = {0xC0, 1};
-static const u16 gUnknown_08620228[] = {0xE0, 4};
-static const u16 gUnknown_0862022C[] = {0x100, 1};
-static const u16 gUnknown_08620230[] = {0x120, 2};
-static const u16 gUnknown_08620234[] = {0x140, 0};
-static const u16 gUnknown_08620238[] = {0x160, 0};
-static const u16 gUnknown_0862023C[] = {0x180, 3};
+static const u16 sOptionsLabelGfx_AccessPC[] = {0xA0, 1};
+static const u16 gUnknown_08620220[] = {0xC0, 1};
+static const u16 gUnknown_08620224[] = {0xE0, 1};
+static const u16 gUnknown_08620228[] = {0x100, 4};
+static const u16 gUnknown_0862022C[] = {0x120, 1};
+static const u16 gUnknown_08620230[] = {0x140, 2};
+static const u16 gUnknown_08620234[] = {0x160, 0};
+static const u16 gUnknown_08620238[] = {0x180, 0};
+static const u16 gUnknown_0862023C[] = {0x1A0, 3};
+
+
 
 struct UnkStruct_08620240
 {
@@ -199,9 +205,9 @@ static const struct UnkStruct_08620240 gUnknown_08620240[POKENAV_MENU_TYPE_COUNT
     },
     [POKENAV_MENU_TYPE_CONDITION] = 
     {
-        0x38,
+        0x31,
         0x14,
-        {gUnknown_08620220, gUnknown_08620224, gUnknown_0862023C}
+        {sOptionsLabelGfx_AccessPC, gUnknown_08620220, gUnknown_08620224, gUnknown_0862023C}
     },
     [POKENAV_MENU_TYPE_CONDITION_SEARCH] = 
     {
@@ -229,6 +235,7 @@ static const u8 *const sPageDescriptions[] =
     [POKENAV_MENUITEM_MATCH_CALL]              = gText_CallRegisteredTrainer,
     [POKENAV_MENUITEM_RIBBONS]                 = gText_CheckObtainedRibbons,
     [POKENAV_MENUITEM_SWITCH_OFF]              = gText_PutAwayPokenav,
+    [POKENAV_MENUITEM_CONDITION_ACCESS_PC]     = gText_PokenavAccessPC,
     [POKENAV_MENUITEM_CONDITION_PARTY]         = gText_CheckPartyPokemonInDetail,
     [POKENAV_MENUITEM_CONDITION_SEARCH]        = gText_CheckAllPokemonInDetail,
     [POKENAV_MENUITEM_CONDITION_CANCEL]        = gText_ReturnToPokenavMenu,
@@ -670,6 +677,22 @@ static u32 LoopedTask_ReturnToConditionMenu(s32 state)
     return LT_FINISH;
 }
 
+static u32 LoopedTask_CannotAccessPC(s32 state)
+{
+    switch (state)
+    {
+    case 0:
+        PlaySE(SE_FAILURE);
+        PrintCannotAccessPC();
+        return LT_INC_AND_PAUSE;
+    case 1:
+        if (IsDma3ManagerBusyWithBgCopy())
+            return LT_PAUSE;
+        break;
+    }
+    return LT_FINISH;
+}
+
 static u32 LoopedTask_SelectRibbonsNoWinners(s32 state)
 {
     switch (state)
@@ -744,6 +767,15 @@ static u32 LoopedTask_OpenPokenavFeature(s32 state)
         break;
     }
     return LT_FINISH;
+}
+
+static void PrintCannotAccessPC(void)
+{
+    struct Pokenav2Struct* gfx = GetSubstructPtr(2);
+    const u8 * s = gText_PokenavCannotAccessPC;
+    u32 width = GetStringWidth(1, s, -1);
+    FillWindowPixelBuffer(gfx->optionDescWindowId, PIXEL_FILL(6));
+    AddTextPrinterParameterized3(gfx->optionDescWindowId, 1, (192 - width) / 2, 1, sOptionDescTextColors2, 0, s);
 }
 
 static void sub_81C9FC4(void)

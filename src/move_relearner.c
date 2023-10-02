@@ -609,11 +609,11 @@ static void DoMoveRelearnerMain(void)
         {
             s8 var = Menu_ProcessInputNoWrapClearOnChoose();
 
-            if (var == 0)
+            if (var == MENU_B_PRESSED || var == 0)
             {
                 sMoveRelearnerStruct->state = MENU_STATE_CHOOSE_SETUP_STATE;
             }
-            else if (var == MENU_B_PRESSED || var == 1)
+            else if (var == 1)
             {
                 // What's the point? It gets set to MENU_STATE_PRINT_TRYING_TO_LEARN_PROMPT, anyway.
                 if (sMoveRelearnerMenuSate.showContestInfo == FALSE)
