@@ -350,13 +350,13 @@ static u32 HandleCantAccessPCInput(struct Pokenav1Struct *state)
 {
     if (UpdateMenuCursorPos(state))
     {
-        state->callback = GetMainMenuInputHandler();
+        state->callback = HandleConditionMenuInput;
         return POKENAV_MENU_FUNC_MOVE_CURSOR;
     }
 
     if (JOY_NEW(A_BUTTON | B_BUTTON))
     {
-        state->callback = GetMainMenuInputHandler();
+        state->callback = HandleConditionMenuInput;
         return POKENAV_MENU_FUNC_RESHOW_DESCRIPTION;
     }
 
