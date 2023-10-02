@@ -1917,9 +1917,9 @@ static void sub_8038538(struct Sprite *sprite)
     }
 }
 
-// If the player's average party level is lower than the opponents, generate a random value between -1, 0, and +1 and adjust opponents level.
-// If the player's average party level is higher than the opponents, generate a random value between partyData[i].lvl and avgLevel + 1 and adjust opponents level.
-// If the opponent is a leader, elite 4, champion, or rival and the average party level is higher than the opponents, generate a random value between partyData[i].lvl and avgLevel + 3 and adjust opponent's level
+// If the player's average party level is lower than the opponents, don't do anything (+-0).
+// If the player's average party level is higher than the opponents, randomly scale the level between partyData[i].lvl and avgLevel + 3 and return it.
+// If the opponent is a leader, elite 4, champion, or rival and the average party level is higher than the opponents, increase by the difference plus 1.
 u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel)
 {
     u8 max;
@@ -1928,14 +1928,7 @@ u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel)
     s16 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting it back to u8.
     if (pokeBaseLevel > avgLevel)
     {
-        if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival & Steven
-            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER ||
-            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
-            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
-            rand = 0;
-        else
-            rand = (Random() % 2) - (Random() % 2); // -1, 0, +1
-        // 0 is more common
+        rand = 0;
     }
     else // <=
     {
@@ -1944,13 +1937,11 @@ u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel)
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
         {
-            max = avgLevel + 3;
-            range = (max - pokeBaseLevel) + 1;
-            rand = Random() % range;
+            rand = (avgLevel - pokeBaseLevel) + 1;
         }
         else
         {
-            max = avgLevel + 1;
+            max = avgLevel + 3;
             range = (max - pokeBaseLevel) + 1;
             rand = Random() % range;
         }
