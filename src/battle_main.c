@@ -1920,8 +1920,9 @@ static void sub_8038538(struct Sprite *sprite)
 // If the player's average party level is lower than the opponents, don't do anything (+-0).
 // If the player's average party level is higher than the opponents, randomly scale the level between partyData[i].lvl and avgLevel + 3 and return it.
 // If the opponent is a leader, elite 4, champion, or rival and the average party level is higher than the opponents, increase by the difference plus 1.
-u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel)
+u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 totalMons)
 {
+    s8 temp;
     u8 max;
     u8 range;
     s8 rand;
@@ -1941,9 +1942,14 @@ u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel)
         }
         else
         {
-            max = avgLevel + 3;
+            temp = (currentMon - totalMons) + currentMon; // try and make pokemon in the back of the party stronger than the first ones.
+            if (temp < 1)
+                temp = 1;
+            max = avgLevel + temp;
             range = (max - pokeBaseLevel) + 1;
             rand = Random() % range;
+            if(currentMon == totalMons) // if last pokemon, try one more attempt to make it the strongest.
+                rand += 1;
         }
     }
     scaledLevel = pokeBaseLevel + rand;
@@ -2024,7 +2030,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
                     break;
                 }
                 case F_TRAINER_PARTY_CUSTOM_MOVESET:
@@ -2036,7 +2042,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
 
                     for (j = 0; j < MAX_MON_MOVES; j++)
                     {
@@ -2054,7 +2060,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
 
                     SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
                     break;
@@ -2068,7 +2074,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                    CreateMon(&party[i], partyData[i].species, scaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount), fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
 
                     SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
 

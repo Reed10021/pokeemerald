@@ -55,11 +55,11 @@ MeteorFalls_StevensCave_Text_StevenDefeat: @ 823B32D
 	.string "I had no idea you'd become so strong…$"
 
 MeteorFalls_StevensCave_Text_LetMeGiveYouSomething:
-	.string "STEVEN: Phew…that was a great\n"
-	.string "battle, {PLAYER}{KUN}.\p"
-	.string "You and your POKéMON\l"
-	.string "performed admirably. To celebrate your\l"
-	.string "victory, you can have this ticket.$"
+	.string "STEVEN: Phew…that was a great battle,\n"
+	.string "{PLAYER}{KUN}.\p"
+	.string "You and your POKéMON performed\l"
+	.string "admirably. To celebrate your victory,\l"
+	.string "you can have this ticket.$"
 
 MeteorFalls_StevensCave_Text_MyPredictionCameTrue: @ 823B358
 	.string "STEVEN: Come to think of it, ever since\n"
@@ -78,8 +78,7 @@ MeteorFalls_StevensCave_Text_StevenDefeat2:
 	.string "You are a truly noble POKéMON CHAMPION!$"
 
 MeteorFalls_StevensCave_Text_WillYouBattleMeAgain:
-	.string "STEVEN: That look in your eyes…\n"
-	.string "it reminds me of when I was the\l"
-	.string "CHAMPION.\p"
-	.string "{PLAYER}{KUN}! Will you battle me\n"
+	.string "STEVEN: That look in your eyes…it\n"
+	.string "reminds me of when I was the CHAMPION.\l"
+	.string "{PLAYER}{KUN}! Will you battle me\p"
 	.string "again?$"

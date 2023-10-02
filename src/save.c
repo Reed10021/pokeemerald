@@ -132,12 +132,10 @@ static bool32 SetDamagedSectorBits(u8 op, u8 bit)
 
 static void VBlankCB_Saving(void)
 {
-    if (gSaveBlock1Ptr->flashLevel == 0) {
-        AnimateSprites();
-        BuildOamBuffer();
-        LoadOam();
-        ProcessSpriteCopyRequests();
-    }
+    AnimateSprites();
+    BuildOamBuffer();
+    LoadOam();
+    ProcessSpriteCopyRequests();
 }
 
 static u8 SaveWriteToFlash(u16 a1, const struct SaveSectionLocation *location)
@@ -161,11 +159,23 @@ static u8 SaveWriteToFlash(u16 a1, const struct SaveSectionLocation *location)
         gSaveCounter++;
         status = SAVE_STATUS_OK;
 
-        prevVblankCB = gMain.vblankCallback;
-        SetVBlankCallback(VBlankCB_Saving);
+        if (gSaveBlock1Ptr->flashLevel == 0) {
+            prevVblankCB = gMain.vblankCallback;
+            SetVBlankCallback(VBlankCB_Saving);
+        }
+
         for (i = 0; i < SECTOR_SAVE_SLOT_LENGTH; i++)
+        {
+            if (gSaveBlock1Ptr->flashLevel != 0) {
+                AnimateSprites();
+                BuildOamBuffer();
+            }
             HandleWriteSector(i, location);
-        SetVBlankCallback(prevVblankCB);
+        }
+
+        if (gSaveBlock1Ptr->flashLevel == 0) {
+            SetVBlankCallback(prevVblankCB);
+        }
 
         if (gDamagedSaveSectors != 0) // skip the damaged sector.
         {
