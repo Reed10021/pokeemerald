@@ -39,6 +39,12 @@ Std_10: @ 8271347
 	waitmessage
 	return
 
+Std_MsgboxAnyButtonPress:
+	message 0x0
+	waitmessage
+	waitanybuttonpress
+	return
+
 EventScript_UnusedReturn: @ 827134E
 	return
 

@@ -3915,8 +3915,7 @@ static void SetMoveTypeIcons(void)
                 u8 type = (15 * typeBits) / 63 + 1;
                 if (type >= TYPE_MYSTERY)
                     type++;
-                type |= 0xC0;
-                SetTypeSpritePosAndPal(type & 0x3F, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
+                SetTypeSpritePosAndPal(type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
             } else
                 SetTypeSpritePosAndPal(gBattleMoves[summary->moves[i]].type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
         }
@@ -3962,8 +3961,7 @@ static void SetNewMoveTypeIcon(void)
                 u8 type = (15 * typeBits) / 63 + 1;
                 if (type >= TYPE_MYSTERY)
                     type++;
-                type |= 0xC0;
-                SetTypeSpritePosAndPal(type & 0x3F, 85, 96, SPRITE_ARR_ID_TYPE + 4);
+                SetTypeSpritePosAndPal(type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
             }
             else
                 SetTypeSpritePosAndPal(gBattleMoves[sMonSummaryScreen->newMove].type, 85, 96, SPRITE_ARR_ID_TYPE + 4);

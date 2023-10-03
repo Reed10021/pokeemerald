@@ -1604,7 +1604,6 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
         moveType = (15 * typeBits) / 63 + 1;
         if (moveType >= TYPE_MYSTERY)
             moveType++;
-        moveType |= 0xC0;
     } else {
         moveType = gBattleMoves[move].type;
     }

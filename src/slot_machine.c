@@ -1402,10 +1402,10 @@ static bool8 SlotAction_CheckMatches(struct Task *task)
             {
                 sSlotMachine->reelTimeSpinsLeft = 0;
                 sSlotMachine->reelTimeSpinsUsed = 0;
-                sSlotMachine->luckyGame = FALSE;
-                if (sSlotMachine->matchedSymbols & (1 << MATCHED_777_BLUE))
+                sSlotMachine->luckyGame = TRUE;
+                /*if (sSlotMachine->matchedSymbols & (1 << MATCHED_777_BLUE))
                     // this may be an error, but if you get blue 777, the game becomes lucky
-                    sSlotMachine->luckyGame = TRUE;
+                    sSlotMachine->luckyGame = TRUE;*/
             }
         }
         if (sSlotMachine->matchedSymbols & (1 << MATCHED_POWER) && sSlotMachine->pikaPower < 16)
@@ -1778,9 +1778,9 @@ static bool8 ShouldReelTimeMachineExplode(u16 i)
 
 static u16 SlowReelSpeed(void)
 {
-    u8 i = 0;
+    u8 i = 4;
     u8 rval, value;
-    if (sSlotMachine->netCoinLoss >= 300)
+/*    if (sSlotMachine->netCoinLoss >= 300)
         i = 4;
     else if (sSlotMachine->netCoinLoss >= 250)
         i = 3;
@@ -1788,6 +1788,7 @@ static u16 SlowReelSpeed(void)
         i = 2;
     else if (sSlotMachine->netCoinLoss >= 150)
         i = 1;
+*/
     rval = Random() % 100;
     value = sReelIncrementTable[i][0];
     if (rval < value)
@@ -4807,10 +4808,10 @@ static const s16 sInitialReelPositions[NUM_REELS][2] = {
 static const u8 sLuckyRoundProbabilities[][3] = {
     {1, 1, 12},
     {1, 1, 14},
-    {2, 2, 14},
-    {2, 2, 14},
-    {2, 3, 16},
-    {3, 3, 16}
+    {2, 2, 16},
+    {2, 2, 16},
+    {2, 3, 20},
+    {3, 3, 20}
 };
 
 static const u8 sLuckyFlagProbabilities_Top3[][6] = {
@@ -4850,11 +4851,11 @@ static const u16 sReelTimeExplodeProbability[] = {
 };
 
 static const u16 sReelIncrementTable[][2] = {
-    {10,  5},
     {10, 10},
     {10, 15},
     {10, 25},
-    {10, 35}
+    {10, 35},
+    {10, 50}
 };
 
 static const u16 sReelTimeBonusIncrementTable[] = {

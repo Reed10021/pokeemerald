@@ -7,7 +7,8 @@ NoIncrement:
 	compare VAR_CHAIN, 3
 	goto_if_lt NoText
 	buffernumberstring 0, VAR_CHAIN
-	msgbox Text_ActiveChain, MSGBOX_AUTOCLOSE
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox Text_ActiveChain, MSGBOX_ANYBUTTONPRESS
 NoText:
 	releaseall
 	end
@@ -17,6 +18,7 @@ Text_ActiveChain::
 	
 DeleteChain::
 	lockall
+	playfanfare MUS_TOO_BAD
 	msgbox Text_DeleteChain, MSGBOX_DEFAULT
 	releaseall
 	end

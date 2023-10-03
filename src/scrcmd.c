@@ -1347,6 +1347,31 @@ bool8 ScrCmd_waitbuttonpress(struct ScriptContext *ctx)
     return TRUE;
 }
 
+static bool8 WaitForAnyPress(void)
+{
+    if (JOY_NEW(A_BUTTON))
+        return TRUE;
+    if (JOY_NEW(B_BUTTON))
+        return TRUE;
+    if (JOY_NEW(DPAD_ANY))
+        return TRUE;
+    if (JOY_NEW(START_BUTTON))
+        return TRUE;
+    if (JOY_NEW(SELECT_BUTTON))
+        return TRUE;
+    if (JOY_NEW(L_BUTTON))
+        return TRUE;
+    if (JOY_NEW(R_BUTTON))
+        return TRUE;
+    return FALSE;
+}
+
+bool8 ScrCmd_waitanybuttonpress(struct ScriptContext* ctx)
+{
+    SetupNativeScript(ctx, WaitForAnyPress);
+    return TRUE;
+}
+
 bool8 ScrCmd_yesnobox(struct ScriptContext *ctx)
 {
     u8 left = ScriptReadByte(ctx);

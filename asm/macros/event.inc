@@ -832,7 +832,7 @@
 	.byte 0x6c
 	.endm
 
-	@ Blocks script execution until the player presses any key.
+	@ Blocks script execution until the player presses either A or B.
 	.macro waitbuttonpress
 	.byte 0x6d
 	.endm
@@ -1615,6 +1615,11 @@
 	.2byte \quantity
 	.endm
 
+	@ Blocks script execution until the player presses any button.
+	.macro waitanybuttonpress
+	.byte 0xe4
+	.endm
+
 @ Supplementary
 
 	.macro goto_if_unset flag:req, dest:req
@@ -1739,6 +1744,7 @@
 	MSGBOX_YESNO = 5
 	MSGBOX_AUTOCLOSE = 6
 	MSGBOX_GETPOINTS = 9
+	MSGBOX_ANYBUTTONPRESS = 11
 
 	YES = 1
 	NO  = 0

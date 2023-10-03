@@ -1567,12 +1567,10 @@ static void MoveSelectionDisplayPpNumber(void)
 
 u8 TypeEffectiveness(u8 targetId)
 {
-    u8 moveFlags;
-    u16 move;
-    struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct *)(&gBattleBufferA[gActiveBattler][4]);
-    move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
-    move = gBattleMons[gActiveBattler].moves[gMoveSelectionCursor[gActiveBattler]];
-    moveFlags = AI_TypeCalc(move, gBattleMons[targetId].species, gBattleMons[targetId].ability);
+    struct ChooseMoveStruct* moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
+    u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
+    u8 moveFlags = AI_TypeCalc(move, gBattleMons[targetId].species, gBattleMons[targetId].ability);
+
     if (moveFlags & MOVE_RESULT_NO_EFFECT) {
         return 26;
     }
@@ -1610,8 +1608,7 @@ static void MoveSelectionDisplayMoveTypeDoubles(u8 targetId)
         u8 type = (15 * typeBits) / 63 + 1;
         if (type >= TYPE_MYSTERY)
             type++;
-        type |= 0xC0;
-        StringCopy(txtPtr, gTypeNames[type & 0x3F]);
+        StringCopy(txtPtr, gTypeNames[type]);
     } else {
         StringCopy(txtPtr, gTypeNames[gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type]);
     }
@@ -1641,8 +1638,7 @@ static void MoveSelectionDisplayMoveType(void)
         u8 type = (15 * typeBits) / 63 + 1;
         if (type >= TYPE_MYSTERY)
             type++;
-        type |= 0xC0;
-        StringCopy(txtPtr, gTypeNames[type & 0x3F]);
+        StringCopy(txtPtr, gTypeNames[type]);
     } else {
         StringCopy(txtPtr, gTypeNames[gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type]);
     }
