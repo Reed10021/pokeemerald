@@ -1301,9 +1301,9 @@ static bool8 SlotAction_StartSpin(struct Task *task)
         CreateDigitalDisplayScene(DIG_DISPLAY_STOP_REEL);
         sSlotMachine->state = SLOT_ACTION_SET_LUCKY_SPINS;
     }
-    sSlotMachine->reelIncrement = 8;
-    if (sSlotMachine->reelTimeSpinsLeft)
-        sSlotMachine->reelIncrement = SlowReelSpeed();
+    sSlotMachine->reelIncrement = SlowReelSpeed();
+//    if (sSlotMachine->reelTimeSpinsLeft)
+//        sSlotMachine->reelIncrement = SlowReelSpeed();
     return FALSE;
 }
 
@@ -1397,11 +1397,11 @@ static bool8 SlotAction_CheckMatches(struct Task *task)
         // if you matched 777...
         if (sSlotMachine->matchedSymbols & ((1 << MATCHED_777_MIXED) | (1 << MATCHED_777_BLUE) | (1 << MATCHED_777_RED)))
         {
-            sSlotMachine->luckyFlags &= ~(LUCKY_BIAS_777 | LUCKY_BIAS_MIXED_777);
+            //sSlotMachine->luckyFlags &= ~(LUCKY_BIAS_777 | LUCKY_BIAS_MIXED_777);
             if (sSlotMachine->matchedSymbols & ((1 << MATCHED_777_BLUE) | (1 << MATCHED_777_RED)))
             {
-                sSlotMachine->reelTimeSpinsLeft = 0;
-                sSlotMachine->reelTimeSpinsUsed = 0;
+                //sSlotMachine->reelTimeSpinsLeft = 0;
+                //sSlotMachine->reelTimeSpinsUsed = 0;
                 sSlotMachine->luckyGame = TRUE;
                 /*if (sSlotMachine->matchedSymbols & (1 << MATCHED_777_BLUE))
                     // this may be an error, but if you get blue 777, the game becomes lucky
@@ -1796,7 +1796,7 @@ static u16 SlowReelSpeed(void)
     rval = Random() % 100;
     value = sReelIncrementTable[i][1] + sReelTimeBonusIncrementTable[sSlotMachine->reelTimeSpinsUsed];
     if (rval < value)
-        return 2;
+        return 1;
     return 8;
 }
 
