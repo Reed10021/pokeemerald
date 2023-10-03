@@ -519,10 +519,24 @@ static u32 RollEggChains(struct DayCare* daycare, u8 mode)
             {
                 eggChainCount++;
                 VarSet(VAR_EGG_CHAIN, eggChainCount);
-                // Add 40 to the base shiny rate because this game is unforgivable. And slow.
-                // Compared to modern standards anyways.
-                eggChainCount += 40; // eggChainCount is u32, so we don't have to worry about overflow.
             }
+            // Add 40 to the base shiny rate because this game is unforgivable. And slow.
+            // Compared to modern standards anyways.
+            eggChainCount += 40; // eggChainCount is u32, so we don't have to worry about overflow.
+
+            // Reward long chains that haven't broken
+            if (eggChainCount >= 250)
+                eggChainCount += (eggChainCount * 4);
+            else if (eggChainCount >= 160)
+                eggChainCount += (eggChainCount * 3);
+            else if (eggChainCount >= 110)
+                eggChainCount += (eggChainCount * 2);
+            else if (eggChainCount >= 70)
+                eggChainCount += 90 + eggChainCount;
+            else if (eggChainCount >= 40)
+                eggChainCount += 40 + eggChainCount;
+            else if (eggChainCount >= 10)
+                eggChainCount += eggChainCount;
         }
         else {
             // Parents don't match species-wise, so reset the chain starting with this egg (0+1) and store the parents
