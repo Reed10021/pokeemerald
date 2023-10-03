@@ -422,41 +422,21 @@ static u16 GetEggSpecies(u16 species)
 
 static s32 GetParentToInheritNature(struct DayCare *daycare)
 {
-    u32 species[DAYCARE_MON_COUNT];
-    s32 i;
-    s32 dittoCount;
+    u32 monItemOne = GetBoxMonData(&daycare->mons[0].mon, MON_DATA_HELD_ITEM);
+    u32 monItemTwo = GetBoxMonData(&daycare->mons[1].mon, MON_DATA_HELD_ITEM);
     s32 parent = -1;
 
-    // search for female gender
-    for (i = 0; i < DAYCARE_MON_COUNT; i++)
-    {
-        if (GetBoxMonGender(&daycare->mons[i].mon) == MON_FEMALE)
-            parent = i;
-    }
-
-    // search for ditto
-    for (dittoCount = 0, i = 0; i < DAYCARE_MON_COUNT; i++)
-    {
-        species[i] = GetBoxMonData(&daycare->mons[i].mon, MON_DATA_SPECIES);
-        if (species[i] == SPECIES_DITTO)
-            dittoCount++, parent = i;
-    }
-
-    // coin flip on ...two Dittos
-    if (dittoCount == DAYCARE_MON_COUNT)
-    {
-        if (Random() >= USHRT_MAX / 2)
+    // If any of the parents hold everstones, make that the nature.
+    // If both parents hold everstones, coin flip.
+    if (monItemOne == ITEM_EVERSTONE || monItemTwo == ITEM_EVERSTONE) {
+        if (monItemOne == ITEM_EVERSTONE && monItemTwo != ITEM_EVERSTONE)
             parent = 0;
-        else
+        else if (monItemOne != ITEM_EVERSTONE && monItemTwo == ITEM_EVERSTONE)
             parent = 1;
+        else //Both hold everstones
+            parent = Random() % 2;
     }
-
     // Don't inherit nature if not holding Everstone
-    if (GetBoxMonData(&daycare->mons[parent].mon, MON_DATA_HELD_ITEM) != ITEM_EVERSTONE
-        || Random() >= USHRT_MAX / 2)
-    {
-        return -1;
-    }
 
     return parent;
 }
