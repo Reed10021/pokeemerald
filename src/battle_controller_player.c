@@ -1489,10 +1489,22 @@ static void MoveSelectionDisplayMoveDescription(void)
     u8 pri_start[] = _("{CLEAR_TO 0x6D}");
     LoadMessageBoxAndBorderGfx();
     DrawStdWindowFrame(27, FALSE);
-    if (pwr < 2)
-        StringCopy(pwr_num, gText_BattleSwitchWhich5);
-    else
+    if (move == MOVE_HIDDEN_POWER) {
+        pwr = 75;
         ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
+    } else if (move == MOVE_RETURN) {
+        pwr = (10 * GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP)) / 25;
+        ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
+    } else if (move == MOVE_FRUSTRATION) {
+        pwr = (10 * (MAX_FRIENDSHIP - GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP))) / 25;
+        ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
+    } else {
+        if (pwr < 2)
+            StringCopy(pwr_num, gText_BattleSwitchWhich5);
+        else
+            ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
+    }
+
     if (acc < 2)
         StringCopy(acc_num, gText_BattleSwitchWhich5);
     else
@@ -1587,7 +1599,22 @@ static void MoveSelectionDisplayMoveTypeDoubles(u8 targetId)
 	txtPtr[0] = 1;
 	txtPtr++;
 
-	StringCopy(txtPtr, gTypeNames[gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type]);
+    if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_HIDDEN_POWER) {
+        u8 typeBits = ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_HP_IV) & 1) << 0)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_ATK_IV) & 1) << 1)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_DEF_IV) & 1) << 2)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPEED_IV) & 1) << 3)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPATK_IV) & 1) << 4)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPDEF_IV) & 1) << 5);
+
+        u8 type = (15 * typeBits) / 63 + 1;
+        if (type >= TYPE_MYSTERY)
+            type++;
+        type |= 0xC0;
+        StringCopy(txtPtr, gTypeNames[type & 0x3F]);
+    } else {
+        StringCopy(txtPtr, gTypeNames[gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type]);
+    }
 	BattlePutTextOnWindow(gDisplayedStringBattle, TypeEffectiveness(targetId));
 }
 
@@ -1616,12 +1643,9 @@ static void MoveSelectionDisplayMoveType(void)
             type++;
         type |= 0xC0;
         StringCopy(txtPtr, gTypeNames[type & 0x3F]);
-    }
-    else {
+    } else {
         StringCopy(txtPtr, gTypeNames[gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type]);
     }
-
-    //StringCopy(txtPtr, gTypeNames[gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type]);
     BattlePutTextOnWindow(gDisplayedStringBattle, typeColor);
 }
 

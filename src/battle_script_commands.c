@@ -1594,7 +1594,20 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
     if (move == MOVE_STRUGGLE)
         return 0;
 
-    moveType = gBattleMoves[move].type;
+    if (move == MOVE_HIDDEN_POWER) {
+        u8 typeBits = ((gBattleMons[gBattlerAttacker].hpIV & 1) << 0)
+            | ((gBattleMons[gBattlerAttacker].attackIV & 1) << 1)
+            | ((gBattleMons[gBattlerAttacker].defenseIV & 1) << 2)
+            | ((gBattleMons[gBattlerAttacker].speedIV & 1) << 3)
+            | ((gBattleMons[gBattlerAttacker].spAttackIV & 1) << 4)
+            | ((gBattleMons[gBattlerAttacker].spDefenseIV & 1) << 5);
+        moveType = (15 * typeBits) / 63 + 1;
+        if (moveType >= TYPE_MYSTERY)
+            moveType++;
+        moveType |= 0xC0;
+    } else {
+        moveType = gBattleMoves[move].type;
+    }
 
     if (targetAbility == ABILITY_LEVITATE && moveType == TYPE_GROUND)
     {
@@ -8782,6 +8795,7 @@ static void Cmd_recoverbasedonsunlight(void)
     }
 }
 
+//MOVE_HIDDEN_POWER
 static void Cmd_hiddenpowercalc(void)
 {
 //    u8 powerBits;

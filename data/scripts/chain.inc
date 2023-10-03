@@ -1,15 +1,15 @@
 ChainNumber::
+	lockall
 	compare VAR_CHAIN, 65535
 	goto_if_eq NoIncrement
 	addvar VAR_CHAIN, 1
 NoIncrement:
 	compare VAR_CHAIN, 3
 	goto_if_lt NoText
-	lockall
 	buffernumberstring 0, VAR_CHAIN
-	msgbox Text_ActiveChain, MSGBOX_DEFAULT
-	releaseall
+	msgbox Text_ActiveChain, MSGBOX_AUTOCLOSE
 NoText:
+	releaseall
 	end
 	
 Text_ActiveChain::
