@@ -2,12 +2,14 @@ MauvilleCity_GameCorner_MapScripts:: @ 820FBB8
 	.byte 0
 
     @ Game Corner prices
-	.set TM32_COINS,  1500
-	.set TM29_COINS,  3500
-	.set TM35_COINS,  4000
-	.set TM24_COINS,  4000
-	.set TM13_COINS,  4000
-	.set DOLL_COINS,  1000
+	.set TM32_COINS,	1500
+	.set TM29_COINS,	3500
+	.set TM35_COINS,	4000
+	.set TM24_COINS,	4000
+	.set TM13_COINS,	4000
+	.set DOLL_COINS,	1000
+	.set DRATINI_COINS, 3000
+	.set PORYGON_COINS, 6500
 
 	.set COINS_PRICE_50,  1000
 	.set COINS_PRICE_500, 10000
@@ -129,25 +131,37 @@ MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize:: @ 820FD20
 MauvilleCity_GameCorner_EventScript_ChooseDollPrize:: @ 820FD2B
 	multichoice 12, 0, MULTI_GAME_CORNER_DOLLS, 0
 	switch VAR_RESULT
-	case 0, MauvilleCity_GameCorner_EventScript_TreeckoDoll
-	case 1, MauvilleCity_GameCorner_EventScript_TorchicDoll
-	case 2, MauvilleCity_GameCorner_EventScript_MudkipDoll
-	case 3, MauvilleCity_GameCorner_EventScript_CancelDollSelect
+	case 0, MauvilleCity_GameCorner_EventScript_DratiniPoke
+	case 1, MauvilleCity_GameCorner_EventScript_PorygonPoke
+	case 2, MauvilleCity_GameCorner_EventScript_TreeckoDoll
+	case 3, MauvilleCity_GameCorner_EventScript_TorchicDoll
+	case 4, MauvilleCity_GameCorner_EventScript_MudkipDoll
+	case 5, MauvilleCity_GameCorner_EventScript_CancelDollSelect
 	goto MauvilleCity_GameCorner_EventScript_CancelDollSelect
 	end
 
-MauvilleCity_GameCorner_EventScript_TreeckoDoll:: @ 820FD67
+MauvilleCity_GameCorner_EventScript_DratiniPoke::
 	setvar VAR_TEMP_1, 1
+	bufferspeciesname 0, SPECIES_DRATINI
+	goto MauvilleCity_GameCorner_EventScript_ConfirmDollPrize
+
+MauvilleCity_GameCorner_EventScript_PorygonPoke::
+	setvar VAR_TEMP_1, 2
+	bufferspeciesname 0, SPECIES_PORYGON
+	goto MauvilleCity_GameCorner_EventScript_ConfirmDollPrize
+
+MauvilleCity_GameCorner_EventScript_TreeckoDoll:: @ 820FD67
+	setvar VAR_TEMP_1, 3
 	bufferdecorationname 0, DECOR_TREECKO_DOLL
 	goto MauvilleCity_GameCorner_EventScript_ConfirmDollPrize
 
 MauvilleCity_GameCorner_EventScript_TorchicDoll:: @ 820FD75
-	setvar VAR_TEMP_1, 2
+	setvar VAR_TEMP_1, 4
 	bufferdecorationname 0, DECOR_TORCHIC_DOLL
 	goto MauvilleCity_GameCorner_EventScript_ConfirmDollPrize
 
 MauvilleCity_GameCorner_EventScript_MudkipDoll:: @ 820FD83
-	setvar VAR_TEMP_1, 3
+	setvar VAR_TEMP_1, 5
 	bufferdecorationname 0, DECOR_MUDKIP_DOLL
 	goto MauvilleCity_GameCorner_EventScript_ConfirmDollPrize
 
@@ -156,10 +170,108 @@ MauvilleCity_GameCorner_EventScript_ConfirmDollPrize:: @ 820FD91
 	compare VAR_RESULT, NO
 	goto_if_eq MauvilleCity_GameCorner_EventScript_CancelDollSelect
 	switch VAR_TEMP_1
-	case 1, MauvilleCity_GameCorner_EventScript_BuyTreeckoDoll
-	case 2, MauvilleCity_GameCorner_EventScript_BuyTorchicDoll
-	case 3, MauvilleCity_GameCorner_EventScript_BuyMudkipDoll
+	case 1, MauvilleCity_GameCorner_EventScript_BuyDratiniPoke
+	case 2, MauvilleCity_GameCorner_EventScript_BuyPorygonPoke
+	case 3, MauvilleCity_GameCorner_EventScript_BuyTreeckoDoll
+	case 4, MauvilleCity_GameCorner_EventScript_BuyTorchicDoll
+	case 5, MauvilleCity_GameCorner_EventScript_BuyMudkipDoll
 	end
+
+MauvilleCity_GameCorner_EventScript_BuyDratiniPoke::
+	checkcoins VAR_TEMP_2
+	compare VAR_TEMP_2, DRATINI_COINS
+	goto_if_lt MauvilleCity_GameCorner_EventScript_NotEnoughCoinsForDoll
+	setvar VAR_TEMP_1, SPECIES_DRATINI
+	givemon SPECIES_DRATINI, 15, ITEM_DRAGON_FANG
+	compare VAR_RESULT, 0
+	goto_if_eq MauvilleCity_GameCorner_EventScript_ReceiveDratiniParty
+	compare VAR_RESULT, 1
+	goto_if_eq MauvilleCity_GameCorner_EventScript_ReceiveDratiniPC
+	goto MauvilleCity_GameCorner_EventScript_NoMoreRoomForPokemon
+	end
+
+MauvilleCity_GameCorner_EventScript_ReceiveDratiniParty::
+	call MauvilleCity_GameCorner_EventScript_ReceivedDratiniFanfare
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	call Common_EventScript_GetGiftMonPartySlot
+	call Common_EventScript_NameReceivedPartyMon
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	end
+
+MauvilleCity_GameCorner_EventScript_ReceiveDratiniPC::
+	call MauvilleCity_GameCorner_EventScript_ReceivedDratiniFanfare
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq MauvilleCity_GameCorner_EventScript_SendDratiniToPC
+	call Common_EventScript_NameReceivedBoxMon
+	goto MauvilleCity_GameCorner_EventScript_SendDratiniToPC
+	end
+
+MauvilleCity_GameCorner_EventScript_SendDratiniToPC::
+	call Common_EventScript_TransferredToPC
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	end
+
+MauvilleCity_GameCorner_EventScript_ReceivedDratiniFanfare::
+	playfanfare MUS_OBTAIN_ITEM
+	message MauvilleCity_GameCorner_Text_PlayerReceivedDratini
+	waitmessage
+	waitfanfare
+	removecoins DRATINI_COINS
+	updatecoinsbox 1, 1
+	playse SE_SHOP
+	bufferspeciesname 0, SPECIES_DRATINI
+	return
+
+MauvilleCity_GameCorner_EventScript_BuyPorygonPoke::
+	checkcoins VAR_TEMP_2
+	compare VAR_TEMP_2, PORYGON_COINS
+	goto_if_lt MauvilleCity_GameCorner_EventScript_NotEnoughCoinsForDoll
+	setvar VAR_TEMP_1, SPECIES_PORYGON
+	givemon SPECIES_PORYGON, 15, ITEM_LUCKY_EGG
+	compare VAR_RESULT, 0
+	goto_if_eq MauvilleCity_GameCorner_EventScript_ReceivePorygonParty
+	compare VAR_RESULT, 1
+	goto_if_eq MauvilleCity_GameCorner_EventScript_ReceivePorygonPC
+	goto MauvilleCity_GameCorner_EventScript_NoMoreRoomForPokemon
+	end
+
+MauvilleCity_GameCorner_EventScript_ReceivePorygonParty::
+	call MauvilleCity_GameCorner_EventScript_ReceivedPorygonFanfare
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	call Common_EventScript_GetGiftMonPartySlot
+	call Common_EventScript_NameReceivedPartyMon
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	end
+
+MauvilleCity_GameCorner_EventScript_ReceivePorygonPC::
+	call MauvilleCity_GameCorner_EventScript_ReceivedPorygonFanfare
+	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq MauvilleCity_GameCorner_EventScript_SendPorygonToPC
+	call Common_EventScript_NameReceivedBoxMon
+	goto MauvilleCity_GameCorner_EventScript_SendPorygonToPC
+	end
+
+MauvilleCity_GameCorner_EventScript_SendPorygonToPC::
+	call Common_EventScript_TransferredToPC
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	end
+
+MauvilleCity_GameCorner_EventScript_ReceivedPorygonFanfare::
+	playfanfare MUS_OBTAIN_ITEM
+	message MauvilleCity_GameCorner_Text_PlayerReceivedPorygon
+	waitmessage
+	waitfanfare
+	removecoins PORYGON_COINS
+	updatecoinsbox 1, 1
+	playse SE_SHOP
+	bufferspeciesname 0, SPECIES_PORYGON
+	return
 
 MauvilleCity_GameCorner_EventScript_BuyTreeckoDoll:: @ 820FDCB
 	checkcoins VAR_TEMP_2
@@ -216,6 +328,11 @@ MauvilleCity_GameCorner_EventScript_NotEnoughCoinsForDoll:: @ 820FE79
 
 MauvilleCity_GameCorner_EventScript_NoRoomForDoll:: @ 820FE87
 	call Common_EventScript_NoRoomForDecor
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	end
+
+MauvilleCity_GameCorner_EventScript_NoMoreRoomForPokemon:: @ 8273811
+	msgbox gText_NoMoreRoomForPokemon, MSGBOX_DEFAULT
 	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
 	end
 
@@ -327,7 +444,7 @@ MauvilleCity_GameCorner_EventScript_BuyTM29:: @ 8210017
 	checkitemspace ITEM_TM29, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
-	checkitemspace ITEM_TM29, 1
+	checkitem ITEM_TM29, 1
 	compare VAR_RESULT, TRUE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM29_COINS
@@ -345,7 +462,7 @@ MauvilleCity_GameCorner_EventScript_BuyTM35:: @ 8210051
 	checkitemspace ITEM_TM35, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
-	checkitemspace ITEM_TM35, 1
+	checkitem ITEM_TM35, 1
 	compare VAR_RESULT, TRUE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM35_COINS
@@ -363,7 +480,7 @@ MauvilleCity_GameCorner_EventScript_BuyTM24:: @ 821008B
 	checkitemspace ITEM_TM24, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
-	checkitemspace ITEM_TM24, 1
+	checkitem ITEM_TM24, 1
 	compare VAR_RESULT, TRUE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM24_COINS
@@ -381,7 +498,7 @@ MauvilleCity_GameCorner_EventScript_BuyTM13:: @ 82100C5
 	checkitemspace ITEM_TM13, 1
 	compare VAR_RESULT, FALSE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_NoRoomForTM
-	checkitemspace ITEM_TM13, 1
+	checkitem ITEM_TM13, 1
 	compare VAR_RESULT, TRUE
 	goto_if_eq MauvilleCity_GameCorner_EventScript_YouAlreadyHaveThis
 	removecoins TM13_COINS
@@ -838,6 +955,12 @@ MauvilleCity_GameCorner_Text_HeresSomeSlotsInfo: @ 8210B04
 MauvilleCity_GameCorner_Text_CantPlayWithNoCoinCase: @ 8210C2E
 	.string "You can't play if you don't have\n"
 	.string "a COIN CASE.$"
+
+MauvilleCity_GameCorner_Text_PlayerReceivedDratini:
+	.string "{PLAYER} received DRATINI!$"
+
+MauvilleCity_GameCorner_Text_PlayerReceivedPorygon:
+	.string "{PLAYER} received PORYGON!$"
 
 MauvilleCity_GameCorner_Text_YouAlreadyHaveThis:
 	.string "You already have this item.$"
