@@ -1595,12 +1595,12 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
         return 0;
 
     if (move == MOVE_HIDDEN_POWER) {
-        u8 typeBits = ((gBattleMons[gBattlerAttacker].hpIV & 1) << 0)
-            | ((gBattleMons[gBattlerAttacker].attackIV & 1) << 1)
-            | ((gBattleMons[gBattlerAttacker].defenseIV & 1) << 2)
-            | ((gBattleMons[gBattlerAttacker].speedIV & 1) << 3)
-            | ((gBattleMons[gBattlerAttacker].spAttackIV & 1) << 4)
-            | ((gBattleMons[gBattlerAttacker].spDefenseIV & 1) << 5);
+        u8 typeBits = ((gBattleMons[gActiveBattler].hpIV & 1) << 0)
+            | ((gBattleMons[gActiveBattler].attackIV & 1) << 1)
+            | ((gBattleMons[gActiveBattler].defenseIV & 1) << 2)
+            | ((gBattleMons[gActiveBattler].speedIV & 1) << 3)
+            | ((gBattleMons[gActiveBattler].spAttackIV & 1) << 4)
+            | ((gBattleMons[gActiveBattler].spDefenseIV & 1) << 5);
         moveType = (15 * typeBits) / 63 + 1;
         if (moveType >= TYPE_MYSTERY)
             moveType++;
@@ -9900,7 +9900,7 @@ static void Cmd_handleballthrow(void)
 
         if (odds > 254) // mon caught
         {
-            BtlController_EmitBallThrowAnim(0, BALL_3_SHAKES_SUCCESS);
+            BtlController_EmitBallThrowAnim(0, BALL_0_SHAKES_SUCCESS);
             MarkBattlerForControllerExec(gActiveBattler);
             gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
             SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);

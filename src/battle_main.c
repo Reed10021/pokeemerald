@@ -1927,13 +1927,15 @@ u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 t
     u8 range;
     s8 rand;
     s16 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting it back to u8.
-    if (pokeBaseLevel > avgLevel)
+    currentMon += 1; // starts at zero, so increment to 1 for proper calcs
+
+    if (pokeBaseLevel >= avgLevel)
     {
         rand = 0;
     }
-    else // <=
+    else // <
     {
-        if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival & Steven
+        if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rivals & Steven
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER ||
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
@@ -1942,15 +1944,25 @@ u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 t
         }
         else
         {
-            temp = (currentMon - totalMons) + currentMon; // try and make pokemon in the back of the party stronger than the first ones.
-            if (temp < 1)
-                temp = 1;
-            max = avgLevel + temp;
-            range = (max - pokeBaseLevel) + 1;
-            rand = Random() % range;
-            if(currentMon == totalMons) // if last pokemon, try one more attempt to make it the strongest.
-                rand += 1;
+            temp = avgLevel - pokeBaseLevel;
+            if (temp < 4) {
+                rand = 2;
+            }
+            else if (temp < 8) {
+                rand = 5;
+            }
+            else if (temp < 16) {
+                rand = 12;
+            }
+            else {
+                max = avgLevel + 2;
+                range = (max - pokeBaseLevel) + 1;
+                rand = Random() % range;
+            }
         }
+        rand += currentMon / 2; // try and make pokemon in the back of the party stronger than the first ones.
+        if (currentMon == totalMons) // if last pokemon, try one more attempt to make it the strongest.
+            rand += 1;
     }
     scaledLevel = pokeBaseLevel + rand;
     if (scaledLevel < 0) {

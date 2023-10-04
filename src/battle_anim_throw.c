@@ -1004,7 +1004,9 @@ static void SpriteCB_Ball_Bounce(struct Sprite *sprite)
 
 static void SpriteCB_Ball_CriticalCapture_Step(struct Sprite* sprite)
 {
-    if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_SUCCESS || gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_FAIL)
+    if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_SUCCESS || 
+        gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_FAIL || 
+        gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_0_SHAKES_SUCCESS)
     {
         MakeCaptureStars(sprite, 1);
         PlaySE(SE_SHINY);
@@ -1092,6 +1094,12 @@ static void SpriteCB_Ball_Bounce_Step(struct Sprite *sprite)
         {
             sprite->sTimer = 0;
             sprite->callback = SpriteCB_Ball_Release;
+        }
+        else if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_0_SHAKES_SUCCESS)
+        {
+            sprite->sTimer = 0;
+            sprite->affineAnimPaused = TRUE;
+            sprite->callback = SpriteCB_Ball_Capture;
         }
         else
         {
@@ -1252,18 +1260,16 @@ static void SpriteCB_Ball_Wobble_Step(struct Sprite *sprite)
                 (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_SUCCESS && shakes == 1))
             {
                 sprite->callback = SpriteCB_Ball_Capture;
-                sprite->affineAnimPaused = TRUE;
             }
             else if (gBattleSpritesDataPtr->animationData->ballThrowCaseId == BALL_1_SHAKE_FAIL && shakes == 1)
             {
-                sprite->affineAnimPaused = TRUE;
                 sprite->callback = SpriteCB_Ball_Release;
             }
             else
             {
                 sprite->sState++; // BALL_WAIT_NEXT_SHAKE
-                sprite->affineAnimPaused = TRUE;
             }
+            sprite->affineAnimPaused = TRUE;
         }
         break;
     case BALL_WAIT_NEXT_SHAKE:
