@@ -1778,26 +1778,26 @@ static bool8 ShouldReelTimeMachineExplode(u16 i)
 
 static u16 SlowReelSpeed(void)
 {
-    u8 i = 4;
+    u8 i = 2 + (Random() % 3);
     u8 rval, value;
-/*    if (sSlotMachine->netCoinLoss >= 300)
-        i = 4;
-    else if (sSlotMachine->netCoinLoss >= 250)
-        i = 3;
-    else if (sSlotMachine->netCoinLoss >= 200)
-        i = 2;
-    else if (sSlotMachine->netCoinLoss >= 150)
-        i = 1;
-*/
+    //if (sSlotMachine->netCoinLoss >= 300)
+    //    i = 4;
+    //else if (sSlotMachine->netCoinLoss >= 250)
+    //    i = 3;
+    //else if (sSlotMachine->netCoinLoss >= 200)
+    //    i = 2;
+    //else if (sSlotMachine->netCoinLoss >= 150)
+    //    i = 1;
+
     rval = Random() % 100;
     value = sReelIncrementTable[i][0];
     if (rval < value)
-        return 4;
+        return 3;
     rval = Random() % 100;
     value = sReelIncrementTable[i][1] + sReelTimeBonusIncrementTable[sSlotMachine->reelTimeSpinsUsed];
     if (rval < value)
-        return 1;
-    return 8;
+        return 2;
+    return 4;
 }
 
 static void CheckMatch(void)
@@ -1942,9 +1942,9 @@ static bool8 AwardPayoutAction_GivePayoutToPlayer(struct Task *task)
         sSlotMachine->payout--;
         if (sSlotMachine->coins < MAX_COINS)
             sSlotMachine->coins++;
-        task->data[1] = 8;
+        task->data[1] = 4;
         if (JOY_HELD(A_BUTTON))
-            task->data[1] = 4;
+            task->data[1] = 1;
     }
     if (IsFanfareTaskInactive() && JOY_NEW(START_BUTTON))
     {
@@ -4851,10 +4851,10 @@ static const u16 sReelTimeExplodeProbability[] = {
 };
 
 static const u16 sReelIncrementTable[][2] = {
-    {10, 10},
-    {10, 15},
-    {10, 25},
-    {10, 35},
+    {25, 10},
+    {20, 15},
+    {20, 25},
+    {15, 35},
     {10, 50}
 };
 
