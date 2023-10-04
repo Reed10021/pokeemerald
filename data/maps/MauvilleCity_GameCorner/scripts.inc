@@ -128,6 +128,12 @@ MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize:: @ 820FD20
 	waitmessage
 	goto MauvilleCity_GameCorner_EventScript_ChooseDollPrize
 
+MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrizeAfterMon::
+	showcoinsbox 1, 1
+	message MauvilleCity_GameCorner_Text_WhichPrize
+	waitmessage
+	goto MauvilleCity_GameCorner_EventScript_ChooseDollPrize
+
 MauvilleCity_GameCorner_EventScript_ChooseDollPrize:: @ 820FD2B
 	multichoice 12, 0, MULTI_GAME_CORNER_DOLLS, 0
 	switch VAR_RESULT
@@ -194,10 +200,10 @@ MauvilleCity_GameCorner_EventScript_ReceiveDratiniParty::
 	call MauvilleCity_GameCorner_EventScript_ReceivedDratiniFanfare
 	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
 	compare VAR_RESULT, NO
-	goto_if_eq MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	goto_if_eq MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrizeAfterMon
 	call Common_EventScript_GetGiftMonPartySlot
 	call Common_EventScript_NameReceivedPartyMon
-	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrizeAfterMon
 	end
 
 MauvilleCity_GameCorner_EventScript_ReceiveDratiniPC::
@@ -211,7 +217,7 @@ MauvilleCity_GameCorner_EventScript_ReceiveDratiniPC::
 
 MauvilleCity_GameCorner_EventScript_SendDratiniToPC::
 	call Common_EventScript_TransferredToPC
-	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrizeAfterMon
 	end
 
 MauvilleCity_GameCorner_EventScript_ReceivedDratiniFanfare::
@@ -242,10 +248,10 @@ MauvilleCity_GameCorner_EventScript_ReceivePorygonParty::
 	call MauvilleCity_GameCorner_EventScript_ReceivedPorygonFanfare
 	msgbox gText_NicknameThisPokemon, MSGBOX_YESNO
 	compare VAR_RESULT, NO
-	goto_if_eq MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	goto_if_eq MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrizeAfterMon
 	call Common_EventScript_GetGiftMonPartySlot
 	call Common_EventScript_NameReceivedPartyMon
-	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrizeAfterMon
 	end
 
 MauvilleCity_GameCorner_EventScript_ReceivePorygonPC::
@@ -259,7 +265,7 @@ MauvilleCity_GameCorner_EventScript_ReceivePorygonPC::
 
 MauvilleCity_GameCorner_EventScript_SendPorygonToPC::
 	call Common_EventScript_TransferredToPC
-	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrize
+	goto MauvilleCity_GameCorner_EventScript_ReturnToChooseDollPrizeAfterMon
 	end
 
 MauvilleCity_GameCorner_EventScript_ReceivedPorygonFanfare::
