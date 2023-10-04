@@ -963,10 +963,10 @@ MauvilleCity_GameCorner_Text_CantPlayWithNoCoinCase: @ 8210C2E
 	.string "a COIN CASE.$"
 
 MauvilleCity_GameCorner_Text_PlayerReceivedDratini:
-	.string "{PLAYER} received DRATINI!$"
+	.string "{PLAYER} received Dratini!$"
 
 MauvilleCity_GameCorner_Text_PlayerReceivedPorygon:
-	.string "{PLAYER} received PORYGON!$"
+	.string "{PLAYER} received Porygon!$"
 
 MauvilleCity_GameCorner_Text_YouAlreadyHaveThis:
 	.string "You already have this item.$"
