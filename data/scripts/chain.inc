@@ -6,7 +6,7 @@ ChainNumber::
 NoIncrement:
 	compare VAR_CHAIN, 3
 	goto_if_lt NoText
-	playfanfare MUS_OBTAIN_ITEM
+	playse SE_ITEMFINDER
 	buffernumberstring 0, VAR_CHAIN
 	msgbox Text_ActiveChain, MSGBOX_ANYBUTTONPRESS
 NoText:
