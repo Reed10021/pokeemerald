@@ -1366,6 +1366,7 @@ static bool8 SlotAction_CheckMatches(struct Task *task)
     CheckMatch();
     if (sSlotMachine->reelTimeSpinsLeft)
     {
+        sSlotMachine->payout *= 2; // Double payout for reel time.
         sSlotMachine->reelTimeSpinsLeft--;
         sSlotMachine->reelTimeSpinsUsed++;
     }
@@ -1946,7 +1947,7 @@ static bool8 AwardPayoutAction_GivePayoutToPlayer(struct Task *task)
         if (JOY_HELD(A_BUTTON))
             task->data[1] = 1;
     }
-    if (IsFanfareTaskInactive() && JOY_NEW(START_BUTTON))
+    if (IsFanfareTaskInactive() && JOY_NEW(START_BUTTON | B_BUTTON | DPAD_ANY))
     {
         PlaySE(SE_PIN);
         sSlotMachine->coins += sSlotMachine->payout;
