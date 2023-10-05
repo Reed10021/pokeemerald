@@ -773,7 +773,7 @@ void Snow_InitVars(void)
     gWeatherPtr->weatherGfxLoaded = FALSE;
     gWeatherPtr->gammaTargetIndex = 3;
     gWeatherPtr->gammaStepDelay = 20;
-    gWeatherPtr->targetSnowflakeSpriteCount = 19;
+    gWeatherPtr->targetSnowflakeSpriteCount = 24;
     gWeatherPtr->snowflakeVisibleCounter = 0;
 }
 
@@ -2510,36 +2510,41 @@ static const u8 sWeatherCycleRoute109[] =
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
+    WEATHER_RAIN_THUNDERSTORM,
 };
 static const u8 sWeatherCycleRoute103_110[] =
 {
-    WEATHER_DROUGHT,
+    WEATHER_SUNNY,
     WEATHER_RAIN,
     WEATHER_FOG_HORIZONTAL,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
+    WEATHER_RAIN,
 };
 static const u8 sWeatherCycleRoute111_112[] =
 {
-    WEATHER_SANDSTORM,
-    WEATHER_FOG_HORIZONTAL,
-    WEATHER_SANDSTORM,
     WEATHER_VOLCANIC_ASH,
+    WEATHER_SANDSTORM,
+    WEATHER_SNOW,
+    WEATHER_SANDSTORM,
     WEATHER_SUNNY,
+    WEATHER_VOLCANIC_ASH,
 };
 static const u8 sWeatherCycleRoute114_115[] =
 {
     WEATHER_VOLCANIC_ASH,
-    WEATHER_SUNNY,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_RAIN,
+    WEATHER_VOLCANIC_ASH,
     WEATHER_SNOW,
     WEATHER_SUNNY,
+    WEATHER_SNOW,
 };
 static const u8 sWeatherCycleRoute116_117[] = // and Verdanturf Town
 {
-    WEATHER_SNOW,
+    WEATHER_SUNNY,
     WEATHER_RAIN,
     WEATHER_FOG_HORIZONTAL,
+    WEATHER_RAIN,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
 };
@@ -2549,62 +2554,80 @@ static const u8 sWeatherCycleRoute119[] =
     WEATHER_RAIN,
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_RAIN,
+    WEATHER_RAIN,
     WEATHER_DOWNPOUR,
 };
 static const u8 sWeatherCycleRoute120[] =
 {
-    WEATHER_DOWNPOUR,
-    WEATHER_SUNNY,
-    WEATHER_SUNNY,
     WEATHER_RAIN,
-    WEATHER_SUNNY,
+    WEATHER_RAIN,
+    WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_RAIN,
+    WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_DOWNPOUR,
 };
 static const u8 sWeatherCycleRoute121_122[] =
 {
-    WEATHER_SUNNY,
-    WEATHER_DOWNPOUR,
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
+    WEATHER_FOG_HORIZONTAL,
     WEATHER_SUNNY,
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_RAIN_THUNDERSTORM,
 };
 static const u8 sWeatherCycleRoute123[] = //and 118
 {
-    WEATHER_DROUGHT,
+    WEATHER_FOG_HORIZONTAL,
     WEATHER_SUNNY,
     WEATHER_RAIN,
     WEATHER_SUNNY,
+    WEATHER_FOG_HORIZONTAL,
     WEATHER_RAIN_THUNDERSTORM,
 };
 static const u8 sWeatherCycleRoute124_125[] =
 {
+    // Literally the only place where you can get ice types in Hoenn. Let it snow.
+    WEATHER_SNOW,
     WEATHER_SNOW,
     WEATHER_FOG_HORIZONTAL,
-    WEATHER_DOWNPOUR,
     WEATHER_SUNNY,
-    WEATHER_SUNNY,
+    WEATHER_SNOW,
+    WEATHER_SNOW,
 };
 static const u8 sWeatherCycleRoute126_127_128[] =
 {
     WEATHER_SUNNY,
     WEATHER_FOG_HORIZONTAL,
-    WEATHER_DOWNPOUR,
-    WEATHER_DROUGHT,
+    WEATHER_RAIN_THUNDERSTORM,
     WEATHER_SUNNY,
+    WEATHER_SUNNY,
+    WEATHER_DROUGHT,
 };
 static const u8 sWeatherCycleRoute129_130_131[] =
 {
     WEATHER_FOG_HORIZONTAL,
     WEATHER_DOWNPOUR,
-    WEATHER_SUNNY,
+    WEATHER_FOG_HORIZONTAL,
     WEATHER_DROUGHT,
+    WEATHER_SUNNY,
     WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleRoute132_133_134[] =
 {
     WEATHER_SUNNY,
     WEATHER_DOWNPOUR,
+    WEATHER_SUNNY,
     WEATHER_DROUGHT,
     WEATHER_FOG_HORIZONTAL,
+    WEATHER_RAIN,
+};
+static const u8 sWeatherCycleLilycove[] =
+{
+    WEATHER_SUNNY,
+    WEATHER_SNOW,
+    WEATHER_RAIN,
+    WEATHER_SUNNY,
+    WEATHER_SNOW,
     WEATHER_SUNNY,
 };
 
@@ -2641,6 +2664,7 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_ROUTE126_127_128_CYCLE: return sWeatherCycleRoute126_127_128[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE129_130_131_CYCLE: return sWeatherCycleRoute129_130_131[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE132_133_134_CYCLE: return sWeatherCycleRoute132_133_134[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_LILYCOVE_CYCLE:     return sWeatherCycleLilycove[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;
     }
 }
@@ -2648,7 +2672,7 @@ static u8 TranslateWeatherNum(u8 weather)
 void UpdateWeatherPerDay(u16 increment)
 {
     u16 weatherStage = gSaveBlock1Ptr->weatherCycleStage + increment;
-    weatherStage %= 5;
+    weatherStage %= 6; // Weather cycle shifts by 1 per week. i.e Monday's weather will be Sunday's weather next week.
     gSaveBlock1Ptr->weatherCycleStage = weatherStage;
 }
 

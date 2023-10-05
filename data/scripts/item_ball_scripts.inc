@@ -395,7 +395,7 @@ MeteorFalls_1F_1R_EventScript_ItemPPUP:: @ 82911D2
 	end
 
 MeteorFalls_B1F_2R_EventScript_ItemTM02:: @ 82911DF
-	finditem ITEM_TM02
+	finditem ITEM_SACRED_ASH
 	end
 
 NewMauville_Inside_EventScript_ItemUltraBall:: @ 82911EC
@@ -431,7 +431,7 @@ AbandonedShip_Rooms2_B1F_EventScript_ItemDiveBall:: @ 8291247
 	end
 
 AbandonedShip_Room_B1F_EventScript_ItemTM13:: @ 8291254
-	finditem ITEM_TM13
+	finditem ITEM_PP_MAX
 	end
 
 AbandonedShip_Rooms2_1F_EventScript_ItemRevive:: @ 8291261
@@ -611,7 +611,7 @@ VictoryRoad_1F_EventScript_ItemPPUp:: @ 8291490
 	end
 
 VictoryRoad_B1F_EventScript_ItemTM29:: @ 829149D
-	finditem ITEM_TM29
+	finditem ITEM_PP_MAX
 	end
 
 VictoryRoad_B1F_EventScript_ItemFullRestore:: @ 82914AA

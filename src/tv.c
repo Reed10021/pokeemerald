@@ -116,7 +116,7 @@ void SetTvShowInactive(u8 showIdx);
 static void sub_80F0B24(u16 species, u8 showIdx);
 static void sub_80F0D60(PokeNews *player1, PokeNews *player2, PokeNews *player3, PokeNews *player4);
 static void sub_80F0EEC(void);
-static void sub_80F0F24(void);
+//static void sub_80F0F24(void);
 static s8 sub_80F0ECC(PokeNews *pokeNews, u8 idx);
 static void sub_80F0E58(PokeNews *dest[], PokeNews *src[]);
 static bool8 sub_80F0E84(PokeNews *dest, PokeNews *src, s8 slot);
@@ -1739,7 +1739,7 @@ static void sub_80ED718(void)
     u16 outbreakIdx;
     TVShow *show;
 
-    if (FlagGet(FLAG_SYS_GAME_CLEAR))
+//    if (FlagGet(FLAG_SYS_GAME_CLEAR))
     {
         for (i = 0; i < LAST_TVSHOW_IDX; i ++)
         {
@@ -2655,7 +2655,7 @@ static void sub_80EED88(void)
 {
     u8 newsKind;
 
-    if (FlagGet(FLAG_SYS_GAME_CLEAR))
+    //if (FlagGet(FLAG_SYS_GAME_CLEAR))
     {
         sCurTVShowSlot = sub_80EEE30(gSaveBlock1Ptr->pokeNews);
         if (sCurTVShowSlot != -1 && rbernoulli(1, 100) != TRUE)
@@ -2846,7 +2846,7 @@ static void sub_80EF120(u16 days)
             }
             else
             {
-                if (gSaveBlock1Ptr->pokeNews[i].state == 0 && FlagGet(FLAG_SYS_GAME_CLEAR) == TRUE)
+                if (gSaveBlock1Ptr->pokeNews[i].state == 0 /* && FlagGet(FLAG_SYS_GAME_CLEAR) == TRUE*/)
                 {
                     gSaveBlock1Ptr->pokeNews[i].state = 1;
                 }
@@ -3974,10 +3974,10 @@ static void sub_80F0B64(void)
             {
                 gSaveBlock1Ptr->tvShows[i].common.active = FALSE;
             }
-            else if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
-            {
-                gSaveBlock1Ptr->tvShows[i].common.active = FALSE;
-            }
+            //else if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
+            //{
+            //    gSaveBlock1Ptr->tvShows[i].common.active = FALSE;
+            //}
         }
     }
 }
@@ -4044,7 +4044,7 @@ void ReceivePokeNewsData(void *src, u32 size, u8 masterIdx)
                 break;
         }
         sub_80F0EEC();
-        sub_80F0F24();
+//        sub_80F0F24();
         free(rmBuffer2);
     }
 }
@@ -4137,18 +4137,18 @@ static void sub_80F0EEC(void)
     sub_80EEEB8();
 }
 
-static void sub_80F0F24(void)
-{
-    u8 i;
-
-    if (FlagGet(FLAG_SYS_GAME_CLEAR) != TRUE)
-    {
-        for (i = 0; i < POKE_NEWS_COUNT; i ++)
-        {
-            gSaveBlock1Ptr->pokeNews[i].state = 0;
-        }
-    }
-}
+//static void sub_80F0F24(void)
+//{
+//    u8 i;
+//
+//    if (FlagGet(FLAG_SYS_GAME_CLEAR) != TRUE)
+//    {
+//        for (i = 0; i < POKE_NEWS_COUNT; i ++)
+//        {
+//            gSaveBlock1Ptr->pokeNews[i].state = 0;
+//        }
+//    }
+//}
 
 #define tvlangfix(strptr, langptr, langfix) \
 if (IsStringJapanese(strptr)) \

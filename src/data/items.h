@@ -3789,7 +3789,7 @@ const struct Item gItems[] =
     {
         .name = _("TM02"),
         .itemId = ITEM_TM02_DRAGON_CLAW,
-        .price = 3000,
+        .price = 6000,
         .description = sTM02Desc,
         .importance = 1,
         .pocket = POCKET_TM_HM,

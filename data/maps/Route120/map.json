@@ -5,7 +5,7 @@
   "music": "MUS_ROUTE120",
   "region_map_section": "MAPSEC_ROUTE_120",
   "requires_flash": false,
-  "weather": "WEATHER_ROUTE120_CYCLE",
+  "weather": "WEATHER_SUNNY",
   "map_type": "MAP_TYPE_ROUTE",
   "allow_cycling": true,
   "allow_escaping": false,
@@ -617,31 +617,52 @@
   "coord_events": [
     {
       "type": "weather",
-      "x": 7,
-      "y": 15,
+      "x": 6,
+      "y": 5,
       "elevation": 0,
-      "weather": "COORD_EVENT_WEATHER_RAIN"
+      "weather": "COORD_EVENT_WEATHER_SUNNY"
     },
     {
       "type": "weather",
-      "x": 7,
+      "x": 6,
+      "y": 6,
+      "elevation": 0,
+      "weather": "COORD_EVENT_WEATHER_SUNNY"
+    },
+    {
+      "type": "weather",
+      "x": 6,
+      "y": 7,
+      "elevation": 0,
+      "weather": "COORD_EVENT_WEATHER_SUNNY"
+    },
+    {
+      "type": "weather",
+      "x": 27,
+      "y": 15,
+      "elevation": 0,
+      "weather": "COORD_EVENT_WEATHER_ROUTE120_CYCLE"
+    },
+    {
+      "type": "weather",
+      "x": 27,
       "y": 16,
       "elevation": 0,
-      "weather": "COORD_EVENT_WEATHER_RAIN"
+      "weather": "COORD_EVENT_WEATHER_ROUTE120_CYCLE"
     },
     {
       "type": "weather",
       "x": 22,
       "y": 61,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_RAIN"
+      "weather": "COORD_EVENT_WEATHER_ROUTE120_CYCLE"
     },
     {
       "type": "weather",
       "x": 12,
       "y": 64,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_RAIN"
+      "weather": "COORD_EVENT_WEATHER_ROUTE120_CYCLE"
     },
     {
       "type": "weather",
@@ -677,27 +698,6 @@
       "y": 88,
       "elevation": 5,
       "weather": "COORD_EVENT_WEATHER_SUNNY_CLOUDS"
-    },
-    {
-      "type": "weather",
-      "x": 28,
-      "y": 15,
-      "elevation": 0,
-      "weather": "COORD_EVENT_WEATHER_SUNNY"
-    },
-    {
-      "type": "weather",
-      "x": 28,
-      "y": 16,
-      "elevation": 0,
-      "weather": "COORD_EVENT_WEATHER_SUNNY"
-    },
-    {
-      "type": "weather",
-      "x": 28,
-      "y": 17,
-      "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_SUNNY"
     },
     {
       "type": "weather",

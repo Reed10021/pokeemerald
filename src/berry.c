@@ -1254,10 +1254,10 @@ static u8 GetBerryCountByBerryTreeId(u8 id)
     u16 currentMap = gMapHeader.regionMapSectionId;
     u8 currentWeather = gSaveBlock1Ptr->weather;
 
-    if (currentWeather == WEATHER_RAIN || currentMap == MAPSEC_ROUTE_123) // Berry Master on route 123 tends to the berries.
-        return berry->maxYield;
-    else if(currentWeather == WEATHER_RAIN_THUNDERSTORM || currentWeather == WEATHER_DOWNPOUR || currentWeather == WEATHER_ABNORMAL) // Rare weathers offer more berries.
+    if(currentWeather == WEATHER_RAIN_THUNDERSTORM || currentWeather == WEATHER_DOWNPOUR || currentWeather == WEATHER_ABNORMAL) // Rare weathers offer more berries.
         return berry->maxYield * 2;
+    else if (currentWeather == WEATHER_RAIN || currentMap == MAPSEC_ROUTE_123) // Berry Master on route 123 tends to the berries.
+        return berry->maxYield;
     else
         return gSaveBlock1Ptr->berryTrees[id].berryYield;
 }

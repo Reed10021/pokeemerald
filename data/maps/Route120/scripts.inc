@@ -96,7 +96,7 @@ Route120_EventScript_TrySetRainyWeather:: @ 81F5507
 	end
 
 Route120_EventScript_SetRainyWeather:: @ 81F5523
-	setweather WEATHER_RAIN
+	setweather WEATHER_ROUTE120_CYCLE
 	return
 
 Route120_EventScript_BerryBeauty:: @ 81F5527

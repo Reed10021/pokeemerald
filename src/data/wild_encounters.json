@@ -816,8 +816,8 @@
             "encounter_rate": 10,
             "mons": [
               {
-                "min_level": 20,
-                "max_level": 20,
+                "min_level": 19,
+                "max_level": 21,
                 "species": "SPECIES_SANDSHREW"
               },
               {
@@ -826,9 +826,9 @@
                 "species": "SPECIES_TRAPINCH"
               },
               {
-                "min_level": 21,
-                "max_level": 21,
-                "species": "SPECIES_SANDSHREW"
+                "min_level": 22,
+                "max_level": 22,
+                "species": "SPECIES_ONIX"
               },
               {
                 "min_level": 21,
@@ -837,18 +837,18 @@
               },
               {
                 "min_level": 19,
-                "max_level": 19,
+                "max_level": 20,
                 "species": "SPECIES_BALTOY"
               },
               {
-                "min_level": 21,
+                "min_level": 20,
                 "max_level": 21,
                 "species": "SPECIES_BALTOY"
               },
               {
                 "min_level": 19,
                 "max_level": 19,
-                "species": "SPECIES_SANDSHREW"
+                "species": "SPECIES_NOSEPASS"
               },
               {
                 "min_level": 19,
@@ -856,9 +856,9 @@
                 "species": "SPECIES_CACNEA"
               },
               {
-                "min_level": 20,
-                "max_level": 20,
-                "species": "SPECIES_BALTOY"
+                "min_level": 21,
+                "max_level": 21,
+                "species": "SPECIES_LARVITAR"
               },
               {
                 "min_level": 20,
@@ -912,7 +912,7 @@
             "mons": [
               {
                 "min_level": 5,
-                "max_level": 15,
+                "max_level": 25,
                 "species": "SPECIES_GEODUDE"
               },
               {
@@ -923,12 +923,12 @@
               {
                 "min_level": 15,
                 "max_level": 25,
-                "species": "SPECIES_GEODUDE"
+                "species": "SPECIES_LARVITAR"
               },
               {
                 "min_level": 15,
                 "max_level": 30,
-                "species": "SPECIES_GEODUDE"
+                "species": "SPECIES_GRAVELER"
               },
               {
                 "min_level": 10,

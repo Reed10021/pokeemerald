@@ -41,7 +41,7 @@ PacifidlogTown_House2_EventScript_ClearReceivedFanClubTM:: @ 8203812
 
 PacifidlogTown_House2_EventScript_GiveReturn:: @ 8203816
 	msgbox PacifidlogTown_House2_Text_AdoringPokemonTakeThis, MSGBOX_DEFAULT
-	giveitem ITEM_TM27
+	giveitem ITEM_RARE_CANDY
 	compare VAR_RESULT, FALSE
 	goto_if_eq Common_EventScript_ShowBagIsFull
 	setflag FLAG_RECEIVED_FANCLUB_TM_THIS_WEEK
@@ -110,7 +110,7 @@ PacifidlogTown_House2_Text_AhYourPokemon: @ 820395B
 PacifidlogTown_House2_Text_AdoringPokemonTakeThis: @ 820396D
 	.string "It clearly likes you very much.\p"
 	.string "A POKéMON that adoring and adorable\n"
-	.string "deserves a TM like this, no?$"
+	.string "deserves an item like this, no?$"
 
 PacifidlogTown_House2_Text_PutInSomeMoreEffort: @ 82039CE
 	.string "Hmm…\n"

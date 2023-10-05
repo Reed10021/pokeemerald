@@ -31,6 +31,7 @@
 #define WEATHER_ROUTE126_127_128_CYCLE	30
 #define WEATHER_ROUTE129_130_131_CYCLE  31
 #define WEATHER_ROUTE132_133_134_CYCLE  32
+#define WEATHER_LILYCOVE_CYCLE			33
 
 // These are used in maps' coord_weather_event entries.
 // They are not a one-to-one mapping with the engine's
@@ -48,6 +49,8 @@
 #define COORD_EVENT_WEATHER_DROUGHT             11
 #define COORD_EVENT_WEATHER_ROUTE119_CYCLE      20
 #define COORD_EVENT_WEATHER_ROUTE123_CYCLE      21
+
+#define COORD_EVENT_WEATHER_ROUTE120_CYCLE      27
 
 // These are the "abnormal weather events" that are used
 // to find Kyogre and Groudon.

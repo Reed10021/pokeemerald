@@ -643,6 +643,13 @@
     },
     {
       "type": "weather",
+      "x": 27,
+      "y": 7,
+      "elevation": 3,
+      "weather": "COORD_EVENT_WEATHER_ROUTE119_CYCLE"
+    },
+    {
+      "type": "weather",
       "x": 32,
       "y": 13,
       "elevation": 3,
@@ -728,37 +735,58 @@
     {
       "type": "weather",
       "x": 16,
-      "y": 137,
+      "y": 138,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_SUNNY"
+      "weather": "COORD_EVENT_WEATHER_ROUTE123_CYCLE"
     },
     {
       "type": "weather",
       "x": 17,
-      "y": 137,
+      "y": 138,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_SUNNY"
+      "weather": "COORD_EVENT_WEATHER_ROUTE123_CYCLE"
     },
     {
       "type": "weather",
       "x": 18,
-      "y": 137,
+      "y": 138,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_SUNNY"
+      "weather": "COORD_EVENT_WEATHER_ROUTE123_CYCLE"
     },
     {
       "type": "weather",
       "x": 19,
-      "y": 137,
+      "y": 138,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_SUNNY"
+      "weather": "COORD_EVENT_WEATHER_ROUTE123_CYCLE"
     },
     {
       "type": "weather",
       "x": 20,
-      "y": 137,
+      "y": 138,
       "elevation": 3,
-      "weather": "COORD_EVENT_WEATHER_SUNNY"
+      "weather": "COORD_EVENT_WEATHER_ROUTE123_CYCLE"
+    },
+    {
+      "type": "weather",
+      "x": 17,
+      "y": 139,
+      "elevation": 3,
+      "weather": "COORD_EVENT_WEATHER_ROUTE123_CYCLE"
+    },
+    {
+      "type": "weather",
+      "x": 18,
+      "y": 139,
+      "elevation": 3,
+      "weather": "COORD_EVENT_WEATHER_ROUTE123_CYCLE"
+    },
+    {
+      "type": "weather",
+      "x": 19,
+      "y": 139,
+      "elevation": 3,
+      "weather": "COORD_EVENT_WEATHER_ROUTE123_CYCLE"
     },
     {
       "type": "weather",
