@@ -1860,7 +1860,7 @@ static bool32 HasAtLeastFiveBadges(void)
     {
         if (FlagGet(sBadgeFlags[i]) == TRUE)
         {
-            if (++count >= 5)
+            if (++count >= 3) //5
                 return TRUE;
         }
     }

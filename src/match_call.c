@@ -1780,7 +1780,7 @@ static bool32 sub_8196D74(int matchCallId)
     int numRematchTrainersFought;
     int var0, var1, var2;
 
-    if (GetNumOwnedBadges() < 2) //5
+    if (GetNumOwnedBadges() < 3) //5
         return FALSE;
 
     dayCount = RtcGetLocalDayCount();
