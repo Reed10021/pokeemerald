@@ -1922,49 +1922,60 @@ static void sub_8038538(struct Sprite *sprite)
 // If the opponent is a leader, elite 4, champion, or rival and the average party level is higher than the opponents, increase by the difference plus 1.
 u8 scaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 totalMons)
 {
-    s8 temp;
-    u8 max;
-    u8 range;
-    s8 rand;
+    s8 difference;
+    s8 scale;
     s16 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting it back to u8.
     currentMon += 1; // starts at zero, so increment to 1 for proper calcs
 
     if (pokeBaseLevel >= avgLevel)
     {
-        rand = 0;
+        scale = 0;
     }
     else // <
     {
         if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rivals & Steven
-            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER ||
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_MAGMA_ADMIN || // Magma
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_MAGMA_LEADER ||
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_AQUA_ADMIN || // Aqua
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_AQUA_LEADER ||
+            gTrainers[trainerNum].trainerClass == TRAINER_CLASS_LEADER || // Gyms
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
         {
-            rand = (avgLevel - pokeBaseLevel) + 1;
+            scale = (avgLevel - pokeBaseLevel) + 1;
         }
         else
         {
-            temp = avgLevel - pokeBaseLevel;
-            if (temp < 4) {
-                rand = 2;
+            difference = avgLevel - pokeBaseLevel;
+            if (difference <= 4) { //1-4
+                scale = 2;
             }
-            else if (temp < 8) {
-                rand = 5;
+            else if (difference <= 8) { //5-8
+                scale = 5;
             }
-            else if (temp < 16) {
-                rand = 12;
+            else if (difference <= 12) { //9-12
+                scale = 8;
+            }
+            else if (difference <= 16) { //13-16
+                scale = 11;
             }
             else {
-                max = avgLevel + 2;
-                range = (max - pokeBaseLevel) + 1;
-                rand = Random() % range;
+                // If the game is beaten, continue scaling.
+                if (FlagGet(FLAG_SYS_GAME_CLEAR)) {
+                    scale = difference - (Random() % 17); //hypothetical range of 84-100 (at avgLevel = 100).
+                }
+                else {
+                    // Otherwise, if the game is not beaten, cap scaling at 14.
+                    scale = 14;
+                }
+
             }
         }
-        rand += currentMon / 2; // try and make pokemon in the back of the party stronger than the first ones.
-        if (currentMon == totalMons) // if last pokemon, try one more attempt to make it the strongest.
-            rand += 1;
+        scale += currentMon / 2; // make pokemon in the back of the party stronger than the first ones.
+        if (currentMon == totalMons) // if last pokemon, make it the strongest.
+            scale += 1;
     }
-    scaledLevel = pokeBaseLevel + rand;
+    scaledLevel = pokeBaseLevel + scale;
     if (scaledLevel < 0) {
         scaledLevel = 5;
     }
