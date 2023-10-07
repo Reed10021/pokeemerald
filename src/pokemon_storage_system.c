@@ -8409,8 +8409,8 @@ static void sub_80D08CC(void)
         for (j = sMoveMonsPtr->minRow; j < rowCount; j++)
         {
             struct BoxPokemon *boxMon = GetBoxedMonPtr(boxId, boxPosition);
-
-            sMoveMonsPtr->boxMons[monArrayId] = *boxMon;
+            if (boxMon != NULL)
+                sMoveMonsPtr->boxMons[monArrayId] = *boxMon;
             monArrayId++;
             boxPosition++;
         }

@@ -881,6 +881,10 @@ void ResetAllSprites(void)
 // UB: template pointer may point to freed temporary storage
 void FreeSpriteTiles(struct Sprite *sprite)
 {
+    // Fixed
+    if (!sprite || !sprite->template)
+        return;
+
     if (sprite->template->tileTag != 0xFFFF)
         FreeSpriteTilesByTag(sprite->template->tileTag);
 }
@@ -888,6 +892,10 @@ void FreeSpriteTiles(struct Sprite *sprite)
 // UB: template pointer may point to freed temporary storage
 void FreeSpritePalette(struct Sprite *sprite)
 {
+    // Fixed
+    if (!sprite || !sprite->template)
+        return;
+
     FreeSpritePaletteByTag(sprite->template->paletteTag);
 }
 
