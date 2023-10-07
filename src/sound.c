@@ -130,6 +130,11 @@ void PlayNewMapMusic(u16 songNum)
 {
     if (songNum == MUS_POKE_CENTER)
     {
+        if (sCurrentMapMusic == MUS_C_COMM_CENTER ||
+            sCurrentMapMusic == MUS_RG_POKE_CENTER ||
+            sCurrentMapMusic == MUS_RG_NET_CENTER) {
+            return;
+        }
         // Alternate
         if (Random() % 4 == 0)
         {
@@ -170,13 +175,6 @@ void FadeOutMapMusic(u8 speed)
 
 void FadeOutAndPlayNewMapMusic(u16 songNum, u8 speed)
 {
-    if (songNum == MUS_POKE_CENTER) {
-        if (sCurrentMapMusic == MUS_C_COMM_CENTER ||
-            sCurrentMapMusic == MUS_RG_POKE_CENTER ||
-            sCurrentMapMusic == MUS_RG_NET_CENTER) {
-            return;
-        }
-    }
     FadeOutMapMusic(speed);
     sCurrentMapMusic = 0;
     sNextMapMusic = songNum;
@@ -185,13 +183,6 @@ void FadeOutAndPlayNewMapMusic(u16 songNum, u8 speed)
 
 void FadeOutAndFadeInNewMapMusic(u16 songNum, u8 fadeOutSpeed, u8 fadeInSpeed)
 {
-    if (songNum == MUS_POKE_CENTER) {
-        if (sCurrentMapMusic == MUS_C_COMM_CENTER ||
-            sCurrentMapMusic == MUS_RG_POKE_CENTER ||
-            sCurrentMapMusic == MUS_RG_NET_CENTER) {
-            return;
-        }
-    }
     FadeOutMapMusic(fadeOutSpeed);
     sCurrentMapMusic = 0;
     sNextMapMusic = songNum;
@@ -201,13 +192,6 @@ void FadeOutAndFadeInNewMapMusic(u16 songNum, u8 fadeOutSpeed, u8 fadeInSpeed)
 
 void FadeInNewMapMusic(u16 songNum, u8 speed)
 {
-    if (songNum == MUS_POKE_CENTER) {
-        if (sCurrentMapMusic == MUS_C_COMM_CENTER ||
-            sCurrentMapMusic == MUS_RG_POKE_CENTER ||
-            sCurrentMapMusic == MUS_RG_NET_CENTER) {
-            return;
-        }
-    }
     FadeInNewBGM(songNum, speed);
     sCurrentMapMusic = songNum;
     sNextMapMusic = 0;
