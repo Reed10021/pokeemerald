@@ -3347,7 +3347,7 @@ static void Cmd_getexp(void)
                         u32 levelDiffTop;
                         u32 levelDiffBottom;
                         levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 10;
-                        levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 5);
+                        levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 10);
                         gBattleMoveDamage = gBattleMoveDamage * (((levelDiffTop * levelDiffTop) / (levelDiffBottom * levelDiffBottom)) * (Sqrt(levelDiffTop) / Sqrt(levelDiffBottom))); // exponent: 2.5
                         if (gBattleMoveDamage < *exp) {
                             if (gBattleStruct->sentInPokes & 1)
