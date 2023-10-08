@@ -3979,19 +3979,20 @@ static void Task_SwitchScreensFromAreaScreen(u8 taskId)
         {
         case 1:
             DestroyTask(taskId);
-            PlaySE(SE_PC_OFF);
             break;
         case 2:
         default:
             gTasks[taskId].func = Task_LoadInfoScreen;
-            PlaySE(SE_DEX_PAGE);
             break;
         case 3:
             if (!sPokedexListItem->owned)
+            {
+                FreeAllWindowBuffers();
+                InitWindows(sInfoScreen_WindowTemplates);
                 gTasks[taskId].func = Task_LoadEvolutionScreen;
+            }
             else
                 gTasks[taskId].func = Task_LoadStatsScreen;
-            PlaySE(SE_DEX_PAGE);
             break;
         }
     }
@@ -6823,6 +6824,8 @@ static void Task_SwitchScreensFromEvolutionScreen(u8 taskId)
                 break;
         #endif
         case 4:
+            FreeAllWindowBuffers();
+            InitWindows(sInfoScreen_WindowTemplates);
             gTasks[taskId].func = Task_LoadAreaScreen;
             break;
         default:
