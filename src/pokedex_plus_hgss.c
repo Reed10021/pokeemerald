@@ -3978,6 +3978,8 @@ static void Task_SwitchScreensFromAreaScreen(u8 taskId)
         switch (sPokedexView->screenSwitchState)
         {
         case 1:
+            FreeInfoScreenWindowAndBgBuffers();
+            FreeAllWindowBuffers();
             DestroyTask(taskId);
             break;
         case 2:
