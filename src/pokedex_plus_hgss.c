@@ -409,10 +409,12 @@ static void Task_SwitchScreensFromAreaScreen(u8);
 static void Task_LoadCryScreen(u8);
 static void Task_HandleCryScreenInput(u8);
 static void Task_SwitchScreensFromCryScreen(u8);
+static void Task_ExitCryScreen(u8);
 static void LoadPlayArrowPalette(bool8);
 static void Task_LoadSizeScreen(u8);
 static void Task_HandleSizeScreenInput(u8);
 static void Task_SwitchScreensFromSizeScreen(u8);
+static void Task_ExitSizeScreen(u8);
 static void LoadScreenSelectBarMain(u16);
 static void LoadScreenSelectBarSubmenu(u16);
 static void HighlightScreenSelectBarItem(u8, u16);
@@ -2122,7 +2124,7 @@ static void Task_HandlePokedexInput(u8 taskId)
     }
     else
     {
-        if (JOY_NEW(A_BUTTON) && sPokedexView->pokedexList[sPokedexView->selectedPokemon].seen)
+        if (JOY_NEW(A_BUTTON) /*&& sPokedexView->pokedexList[sPokedexView->selectedPokemon].seen*/)
         {
             TryDestroyStatBars(); //HGSS_Ui
             UpdateSelectedMonSpriteId();
@@ -2131,7 +2133,7 @@ static void Task_HandlePokedexInput(u8 taskId)
             gTasks[taskId].func = Task_OpenInfoScreenAfterMonMovement;
             PlaySE(SE_PIN);
             FreeWindowAndBgBuffers();
-        }
+        } 
         else if (JOY_NEW(START_BUTTON))
         {
             TryDestroyStatBars(); //HGSS_Ui
@@ -3673,6 +3675,7 @@ static u8 StartInfoScreenScroll(struct PokedexListItem *item, u8 taskId)
 {
     sPokedexListItem = item;
     gTasks[taskId].tScrolling = TRUE;
+    gTasks[taskId].tShinyFlag = 0;
     gTasks[taskId].tMonSpriteDone = FALSE;
     gTasks[taskId].tBgLoaded = FALSE;
     gTasks[taskId].tSkipCry = FALSE;
@@ -3846,16 +3849,23 @@ static void Task_HandleInfoScreenInput(u8 taskId)
         BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
         sPokedexView->screenSwitchState = 1;
         gTasks[taskId].func = Task_SwitchScreensFromInfoScreen;
-        PlaySE(SE_PIN);
+        PlaySE(SE_DEX_PAGE);
     }
 
     if ((JOY_NEW(DPAD_LEFT) || (JOY_NEW(L_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)))
     {
-        sPokedexView->selectedScreen = SIZE_SCREEN;
-        BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
-        sPokedexView->screenSwitchState = 3;
-        gTasks[taskId].func = Task_SwitchScreensFromInfoScreen;
-        PlaySE(SE_PIN);
+        if (!sPokedexListItem->owned)
+        {
+            PlaySE(SE_FAILURE);
+        }
+        else
+        {
+            sPokedexView->selectedScreen = SIZE_SCREEN;
+            BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
+            sPokedexView->screenSwitchState = 3;
+            gTasks[taskId].func = Task_SwitchScreensFromInfoScreen;
+            PlaySE(SE_DEX_PAGE);
+        }
     }
 
 }
@@ -5139,11 +5149,11 @@ static void Task_HandleStatsScreenInput(u8 taskId)
     //Switch screens
     if ((JOY_NEW(DPAD_LEFT) || (JOY_NEW(L_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)))
     {
-        sPokedexView->selectedScreen = INFO_SCREEN;
+        sPokedexView->selectedScreen = AREA_SCREEN;
         BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
         sPokedexView->screenSwitchState = 1;
         gTasks[taskId].func = Task_SwitchScreensFromStatsScreen;
-        PlaySE(SE_PIN);
+        PlaySE(SE_DEX_PAGE); //SE_PIN
     }
     if ((JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)))
     {
@@ -5155,7 +5165,7 @@ static void Task_HandleStatsScreenInput(u8 taskId)
             BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
             sPokedexView->screenSwitchState = 3;
             gTasks[taskId].func = Task_SwitchScreensFromStatsScreen;
-            PlaySE(SE_PIN);
+            PlaySE(SE_DEX_PAGE); //SE_PIN
         }
     }
 }
@@ -6239,7 +6249,7 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
         BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
         sPokedexView->screenSwitchState = 3;
         gTasks[taskId].func = Task_SwitchScreensFromEvolutionScreen;
-        PlaySE(SE_PIN);
+        PlaySE(SE_DEX_PAGE); //SE_PIN
     }
     #endif
 
@@ -6290,7 +6300,7 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
             #endif
 
             sPokedexView->sEvoScreenData.fromEvoPage = TRUE;
-            PlaySE(SE_PIN);
+            PlaySE(SE_DEX_PAGE); //SE_PIN
             BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
             gTasks[taskId].func = Task_LoadInfoScreenWaitForFade;
         }
@@ -6312,7 +6322,7 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
         BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
         sPokedexView->screenSwitchState = 1;
         gTasks[taskId].func = Task_SwitchScreensFromEvolutionScreen;
-        PlaySE(SE_PIN);
+        PlaySE(SE_DEX_PAGE); //SE_PIN
     }
     if ((JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)))
     {
@@ -6324,7 +6334,7 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
             BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
             sPokedexView->screenSwitchState = 2;
             gTasks[taskId].func = Task_SwitchScreensFromEvolutionScreen;
-            PlaySE(SE_PIN);
+            PlaySE(SE_DEX_PAGE); //SE_PIN
         }
     }
 }
@@ -6936,7 +6946,7 @@ static void Task_HandleFormsScreenInput(u8 taskId)
             BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
             sPokedexView->screenSwitchState = 1;
             gTasks[taskId].func = Task_SwitchScreensFromFormsScreen;
-            PlaySE(SE_PIN);
+            PlaySE(SE_DEX_PAGE); //SE_PIN
         }
 
         //Exit to overview
@@ -6992,7 +7002,7 @@ static void Task_HandleFormsScreenInput(u8 taskId)
 
             sPokedexView->sEvoScreenData.fromEvoPage = TRUE;
             sPokedexView->sFormScreenData.inSubmenu = FALSE;
-            PlaySE(SE_PIN);
+            PlaySE(SE_DEX_PAGE); //SE_PIN
             BeginNormalPaletteFade(PALETTES_ALL, 0, 0, 16, RGB_BLACK);
             gTasks[taskId].func = Task_LoadInfoScreenWaitForFade;
         }
@@ -7245,10 +7255,9 @@ static void Task_HandleCryScreenInput(u8 taskId)
     {
         if (JOY_NEW(B_BUTTON))
         {
-            BeginNormalPaletteFade(PALETTES_ALL & ~(0x14), 0, 0, 0x10, RGB_BLACK);
+            BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
             m4aMPlayContinue(&gMPlayInfo_BGM);
-            sPokedexView->screenSwitchState = 1;
-            gTasks[taskId].func = Task_SwitchScreensFromCryScreen;
+            gTasks[taskId].func = Task_ExitCryScreen;
             PlaySE(SE_PC_OFF);
             return;
         }
@@ -7301,6 +7310,16 @@ static void Task_SwitchScreensFromCryScreen(u8 taskId)
             gTasks[taskId].func = Task_LoadSizeScreen;
             break;
         }
+    }
+}
+
+static void Task_ExitCryScreen(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        FreeCryScreen();
+        FreeAndDestroyMonPicSprite(gTasks[taskId].tMonSpriteId);
+        DestroyTask(taskId);
     }
 }
 
@@ -7418,12 +7437,20 @@ static void LoadPlayArrowPalette(bool8 cryPlaying)
 
 static void Task_HandleSizeScreenInput(u8 taskId)
 {
-    if (JOY_NEW(B_BUTTON) || JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
+    if (JOY_NEW(B_BUTTON))
+    {
+        BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
+        m4aMPlayContinue(&gMPlayInfo_BGM);
+        gTasks[taskId].func = Task_ExitSizeScreen;
+        PlaySE(SE_PC_OFF);
+        return;
+    }
+    else if (JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
     {
         BeginNormalPaletteFade(PALETTES_ALL & ~(0x14), 0, 0, 0x10, RGB_BLACK);
         sPokedexView->screenSwitchState = 1;
         gTasks[taskId].func = Task_SwitchScreensFromSizeScreen;
-        PlaySE(SE_PC_OFF);
+        PlaySE(SE_DEX_PAGE);
     }
     else if (JOY_NEW(DPAD_LEFT)
      || (JOY_NEW(L_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
@@ -7451,6 +7478,16 @@ static void Task_SwitchScreensFromSizeScreen(u8 taskId)
             gTasks[taskId].func = Task_LoadCryScreen;
             break;
         }
+    }
+}
+
+static void Task_ExitSizeScreen(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        FreeAndDestroyMonPicSprite(gTasks[taskId].tMonSpriteId);
+        FreeAndDestroyTrainerPicSprite(gTasks[taskId].tTrainerSpriteId);
+        DestroyTask(taskId);
     }
 }
 
