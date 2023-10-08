@@ -3836,7 +3836,7 @@ static void Task_HandleInfoScreenInput(u8 taskId)
         else {
             gTasks[taskId].tMonSpriteId = (u16)CreateMonSpriteFromNationalDexNumber(sPokedexListItem->dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
             gSprites[gTasks[taskId].tMonSpriteId].oam.priority = 0;
-            gTasks[taskId].tShinyFlag = 0
+            gTasks[taskId].tShinyFlag = 0;
         }
     }
 
@@ -3901,6 +3901,7 @@ static void Task_ExitInfoScreen(u8 taskId)
 }
 
 #undef tMonSpriteId
+#undef tShinyFlag
 
 //************************************
 //*                                  *
