@@ -423,7 +423,7 @@ static void Task_DisplayCaughtMonDexPage(u8);
 static void Task_HandleCaughtMonPageInput(u8);
 static void Task_ExitCaughtMonPage(u8);
 static void SpriteCB_SlideCaughtMonToCenter(struct Sprite *sprite);
-static void PrintMonInfo(u32 num, u32, u32 owned, u32 newEntry);
+static void PrintMonInfo(u32 num, u32, u32 seen, u32 owned, u32 newEntry);
 static void PrintMonHeight(u16 height, u8 left, u8 top);
 static void PrintMonWeight(u16 weight, u8 left, u8 top);
 static void ResetOtherVideoRegisters(u16);
@@ -3536,7 +3536,7 @@ static void CreateStatBars(struct PokedexListItem *dexMon)
     sPokedexView->justScrolled = FALSE;
 
 
-    if (dexMon->owned) // Show filed bars
+    if (dexMon->owned || dexMon->seen) // Show filed bars
     {
         u8 i;
         u32 width, statValue;
@@ -3548,40 +3548,12 @@ static void CreateStatBars(struct PokedexListItem *dexMon)
         memcpy(gfx, sStatBarsGfx, sizeof(sStatBarsGfx));
         for (i = 0; i < NUM_STATS; i++)
         {
-            statValue = *((u8*)(&gBaseStats[species]) + sBaseStatOffsets[i]);
-            if (statValue <= 100)
-            {
-                width = statValue / 3;
-                if (width >= 33)
-                    width -= 1;
-            }
-            else
-                width = (100 / 3) + ((statValue - 100) / 14);
-
-            if (width > 39) // Max pixels
-                width = 39;
-            if (width < 3)
-                width = 3;
-
-            CreateStatBar(gfx, sBarsYOffset[i], width);
-        }
-
-        LoadSpriteSheet(&sheet);
-        Free(gfx);
-    }
-    else if (dexMon->seen) // Just HP/DEF/SPDEF
-    {
-        u8 i;
-        u32 width, statValue;
-        u8* gfx = Alloc(64 * 64);
-        static const u8 sBarsYOffset[] = { 3, 13, 23, 33, 43, 53 };
-        struct SpriteSheet sheet = {sStatBarsGfx, 64 * 64, TAG_STAT_BAR};
-        u32 species = NationalPokedexNumToSpecies(dexMon->dexNum);
-        memcpy(gfx, sStatBarsGfx, sizeof(sStatBarsGfx));
-        for (i = 0; i < NUM_STATS; i++)
-        {
-            if (i == 1 || i == 3 || i == 5)
-                continue;
+            if (!dexMon->owned)
+                if (i == 1 || i == 3 || i == 5) // Don't show ATK/SPATK/SPD if not 
+                {
+                    CreateStatBar(gfx, sBarsYOffset[i], 0);
+                    continue;
+                }
             statValue = *((u8*)(&gBaseStats[species]) + sBaseStatOffsets[i]);
             if (statValue <= 100)
             {
@@ -3756,7 +3728,8 @@ static void Task_LoadInfoScreen(u8 taskId)
         gMain.state++;
         break;
     case 4:
-        PrintMonInfo(sPokedexListItem->dexNum, sPokedexView->dexMode == DEX_MODE_HOENN ? FALSE : TRUE, sPokedexListItem->owned, 0);
+        PrintMonInfo(sPokedexListItem->dexNum, sPokedexView->dexMode == DEX_MODE_HOENN ? FALSE : TRUE, 
+            sPokedexListItem->seen, sPokedexListItem->owned, 0);
         if (!sPokedexListItem->owned)
             LoadPalette(gPlttBufferUnfaded + 1, BG_PLTT_ID(3) + 1, PLTT_SIZEOF(16 - 1));
         CopyWindowToVram(WIN_INFO, COPYWIN_FULL);
@@ -4152,7 +4125,7 @@ static void Task_DisplayCaughtMonDexPage(u8 taskId)
         gTasks[taskId].tState++;
         break;
     case 3:
-        PrintMonInfo(dexNum, IsNationalPokedexEnabled(), 1, 1);
+        PrintMonInfo(dexNum, IsNationalPokedexEnabled(), 1, 1, 1);
         CopyWindowToVram(WIN_INFO, COPYWIN_FULL);
         CopyBgTilemapBufferToVram(2);
         CopyBgTilemapBufferToVram(3);
@@ -4433,7 +4406,7 @@ static void CreateTypeIconSprites(void)
 }
 
 // u32 value is re-used, but passed as a bool that's TRUE if national dex is enabled
-static void PrintMonInfo(u32 num, u32 value, u32 owned, u32 newEntry)
+static void PrintMonInfo(u32 num, u32 value, u32 seen, u32 owned, u32 newEntry)
 {
     u8 str[16];
     u8 str2[32];
@@ -4451,7 +4424,7 @@ static void PrintMonInfo(u32 num, u32 value, u32 owned, u32 newEntry)
     ConvertIntToDecimalStringN(StringCopy(str, gText_NumberClear01), value, STR_CONV_MODE_LEADING_ZEROS, 3);
     PrintInfoScreenTextWhite(str, 123, 17); //HGSS_Ui
     species = NationalPokedexNumToSpeciesHGSS(num);
-    if (species)
+    if (species && seen)
         name = gSpeciesNames[species];
     else
         name = sText_TenDashes2;
