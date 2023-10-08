@@ -6369,7 +6369,13 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
     if ((JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)))
     {
         if (!sPokedexListItem->owned)
-            PlaySE(SE_FAILURE);
+        {
+            sPokedexView->selectedScreen = INFO_SCREEN;
+            BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
+            sPokedexView->screenSwitchState = 5;
+            gTasks[taskId].func = Task_SwitchScreensFromEvolutionScreen;
+            PlaySE(SE_DEX_PAGE); //SE_PIN
+        }
         else
         {
             sPokedexView->selectedScreen = CRY_SCREEN;
@@ -6846,6 +6852,7 @@ static void Task_SwitchScreensFromEvolutionScreen(u8 taskId)
             gTasks[taskId].func = Task_LoadAreaScreen;
             break;
         default:
+        case 5:
             gTasks[taskId].func = Task_LoadInfoScreen;
             break;
         }
