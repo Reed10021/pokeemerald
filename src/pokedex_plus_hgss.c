@@ -3549,9 +3549,12 @@ static void CreateStatBars(struct PokedexListItem *dexMon)
         {
             if (!dexMon->owned)
             {
-                if (i == 1 || i == 3 || i == 5) // Don't show ATK/SPATK/SPD if not 
+                if (i == 1 || i == 3) // Don't show ATK/SPATK/SPD if not 
                 {
                     i++;
+                }
+                else if (i == 5) {
+                    break;
                 }
             }
 
