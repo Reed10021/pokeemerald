@@ -3821,7 +3821,7 @@ static void PrintMoveDetails(u16 move)
     if (move != MOVE_NONE)
     {
         if (sMonSummaryScreen->currPageIndex == PSS_MODE_BOX)
-        
+        {
             if (move == MOVE_HIDDEN_POWER)
             {
                 u8 typeBits = ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_IV) & 1) << 0)
