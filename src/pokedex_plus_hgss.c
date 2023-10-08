@@ -3535,7 +3535,6 @@ static void CreateStatBars(struct PokedexListItem *dexMon)
 
     sPokedexView->justScrolled = FALSE;
 
-
     if (dexMon->owned || dexMon->seen) // Show filed bars
     {
         u8 i;
@@ -3549,11 +3548,13 @@ static void CreateStatBars(struct PokedexListItem *dexMon)
         for (i = 0; i < NUM_STATS; i++)
         {
             if (!dexMon->owned)
+            {
                 if (i == 1 || i == 3 || i == 5) // Don't show ATK/SPATK/SPD if not 
                 {
-                    CreateStatBar(gfx, sBarsYOffset[i], 0);
-                    continue;
+                    i++;
                 }
+            }
+
             statValue = *((u8*)(&gBaseStats[species]) + sBaseStatOffsets[i]);
             if (statValue <= 100)
             {
