@@ -3870,7 +3870,11 @@ static void Task_HandleInfoScreenInput(u8 taskId)
     {
         if (!sPokedexListItem->owned)
         {
-            PlaySE(SE_FAILURE);
+            sPokedexView->selectedScreen = EVO_SCREEN;
+            BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
+            sPokedexView->screenSwitchState = 4;
+            gTasks[taskId].func = Task_SwitchScreensFromInfoScreen;
+            PlaySE(SE_DEX_PAGE);
         }
         else
         {
@@ -3900,6 +3904,9 @@ static void Task_SwitchScreensFromInfoScreen(u8 taskId)
             break;
         case 3:
             gTasks[taskId].func = Task_LoadSizeScreen;
+            break;
+        case 4:
+            gTasks[taskId].func = Task_LoadEvolutionScreen;
             break;
         }
     }
