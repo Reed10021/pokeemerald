@@ -3978,14 +3978,20 @@ static void Task_SwitchScreensFromAreaScreen(u8 taskId)
         switch (sPokedexView->screenSwitchState)
         {
         case 1:
-        default:
-            gTasks[taskId].func = Task_LoadInfoScreen;
+            DestroyTask(taskId);
+            PlaySE(SE_PC_OFF);
             break;
         case 2:
+        default:
+            gTasks[taskId].func = Task_LoadInfoScreen;
+            PlaySE(SE_DEX_PAGE);
+            break;
+        case 3:
             if (!sPokedexListItem->owned)
-                PlaySE(SE_FAILURE);
+                gTasks[taskId].func = Task_LoadEvolutionScreen;
             else
                 gTasks[taskId].func = Task_LoadStatsScreen;
+            PlaySE(SE_DEX_PAGE);
             break;
         }
     }
@@ -6332,9 +6338,17 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
     //Switch screens
     if ((JOY_NEW(DPAD_LEFT) || (JOY_NEW(L_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)))
     {
-        sPokedexView->selectedScreen = STATS_SCREEN;
+        if (!sPokedexListItem->owned)
+        {
+            sPokedexView->selectedScreen = AREA_SCREEN;
+            sPokedexView->screenSwitchState = 4;
+        }
+        else
+        {
+            sPokedexView->selectedScreen = STATS_SCREEN;
+            sPokedexView->screenSwitchState = 1;
+        }
         BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
-        sPokedexView->screenSwitchState = 1;
         gTasks[taskId].func = Task_SwitchScreensFromEvolutionScreen;
         PlaySE(SE_DEX_PAGE); //SE_PIN
     }
@@ -6409,9 +6423,12 @@ static void CreateCaughtBallEvolutionScreen(u16 targetSpecies, u8 x, u8 y, u16 u
 
 static void HandlePreEvolutionSpeciesPrint(u8 taskId, u16 preSpecies, u16 species, u8 base_x, u8 base_y, u8 base_y_offset, u8 base_i)
 {
-    bool8 seen = GetSetPokedexFlag(SpeciesToNationalPokedexNum(preSpecies), FLAG_GET_SEEN);
+    bool8 seen = GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN);
 
-    StringCopy(gStringVar1, gSpeciesNames[species]); //evolution mon name
+    if(seen)
+        StringCopy(gStringVar1, gSpeciesNames[species]); //evolution mon name
+    else
+        StringCopy(gStringVar1, gText_ThreeQuestionMarks); //show questionmarks instead of name
 
     #ifdef POKEMON_EXPANSION
     if (sPokedexView->sEvoScreenData.isMega)
@@ -6419,7 +6436,7 @@ static void HandlePreEvolutionSpeciesPrint(u8 taskId, u16 preSpecies, u16 specie
     else
     {
     #endif
-
+        seen = GetSetPokedexFlag(SpeciesToNationalPokedexNum(preSpecies), FLAG_GET_SEEN)
         if (seen || !HGSS_HIDE_UNSEEN_EVOLUTION_NAMES)
             StringCopy(gStringVar2, gSpeciesNames[preSpecies]); //evolution mon name
         else
@@ -6805,6 +6822,9 @@ static void Task_SwitchScreensFromEvolutionScreen(u8 taskId)
                 gTasks[taskId].func = Task_LoadFormsScreen;
                 break;
         #endif
+        case 4:
+            gTasks[taskId].func = Task_LoadAreaScreen;
+            break;
         default:
             gTasks[taskId].func = Task_LoadInfoScreen;
             break;

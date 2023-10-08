@@ -728,22 +728,22 @@ static void Task_HandlePokedexAreaScreenInput(u8 taskId)
         if (JOY_NEW(B_BUTTON))
         {
             gTasks[taskId].data[1] = 1;
-            PlaySE(SE_DEX_PAGE);
+            //PlaySE(SE_DEX_PAGE);
         }
         else if (JOY_NEW(DPAD_LEFT) || (JOY_NEW(L_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
         {
-            gTasks[taskId].data[1] = 1;
-            PlaySE(SE_DEX_PAGE);
+            gTasks[taskId].data[1] = 2;
+            //PlaySE(SE_DEX_PAGE);
         }
         else if (JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
         {
-            if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(sPokedexAreaScreen->species), FLAG_GET_CAUGHT))
-            {
-                PlaySE(SE_FAILURE);
-                return;
-            }
-            gTasks[taskId].data[1] = 2;
-            PlaySE(SE_DEX_PAGE);
+            //if (!GetSetPokedexFlag(SpeciesToNationalPokedexNum(sPokedexAreaScreen->species), FLAG_GET_CAUGHT))
+            //{
+            //    PlaySE(SE_FAILURE);
+            //    return;
+            //}
+            gTasks[taskId].data[1] = 3;
+            //PlaySE(SE_DEX_PAGE);
         }
         else
             return;
