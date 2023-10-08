@@ -4112,9 +4112,10 @@ u8 DisplayCaughtMonDexPage(u16 species, u32 otId, u32 personality)
 
 static void Task_DisplayCaughtMonDexPage(u8 taskId)
 {
-    u8 spriteId;
+    u16 spriteId;
     u16 species = gTasks[taskId].tSpecies;
     u16 dexNum = SpeciesToNationalPokedexNum(species);
+    u32 shinyValue;
 
     switch (gTasks[taskId].tState)
     {
@@ -4170,7 +4171,11 @@ static void Task_DisplayCaughtMonDexPage(u8 taskId)
         break;
     case 4:
         #ifndef POKEMON_EXPANSION
-        spriteId = CreateMonSpriteFromNationalDexNumber(dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
+        shinyValue = gTasks[taskId].tOtIdHi ^ gTasks[taskId].tOtIdLo ^ gTasks[taskId].tPersonalityHi ^ gTasks[taskId].tPersonalityLo;
+        if (shinyValue < SHINY_ODDS)
+            spriteId = CreateShinyMonSpriteFromNationalDexNumber(dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
+        else
+            spriteId = CreateMonSpriteFromNationalDexNumber(dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
         #else
         spriteId = CreateMonPicSprite(species, 0, ((u16)gTasks[taskId].tPersonalityHi << 16) | (u16)gTasks[taskId].tPersonalityLo, TRUE, MON_PAGE_X, MON_PAGE_Y, 0, TAG_NONE);
         #endif
