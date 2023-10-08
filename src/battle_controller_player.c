@@ -1661,7 +1661,7 @@ static void MoveSelectionDisplaySplitIcon(void) {
             | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPATK_IV) & 1) << 4)
             | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPDEF_IV) & 1) << 5);
 
-        type = (15 * typeBits) / 63 + 1;
+        u8 type = (15 * typeBits) / 63 + 1;
         if (type >= TYPE_MYSTERY)
             type++;
         moveCategory = type > TYPE_MYSTERY;
