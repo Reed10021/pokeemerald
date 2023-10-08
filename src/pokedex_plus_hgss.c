@@ -3989,6 +3989,7 @@ static void Task_SwitchScreensFromAreaScreen(u8 taskId)
         case 3:
             if (!sPokedexListItem->owned)
             {
+                FreeInfoScreenWindowAndBgBuffers();
                 FreeAllWindowBuffers();
                 InitWindows(sInfoScreen_WindowTemplates);
                 gTasks[taskId].func = Task_LoadEvolutionScreen;
@@ -6343,7 +6344,7 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
     {
         if (!sPokedexListItem->owned)
         {
-            sPokedexView->selectedScreen = INFO_SCREEN;
+            sPokedexView->selectedScreen = AREA_SCREEN;
             sPokedexView->screenSwitchState = 4;
         }
         else
@@ -6830,6 +6831,11 @@ static void Task_SwitchScreensFromEvolutionScreen(u8 taskId)
                 break;
         #endif
         case 4:
+            FreeInfoScreenWindowAndBgBuffers();
+            FreeAllWindowBuffers();
+            InitWindows(sInfoScreen_WindowTemplates);
+            gTasks[taskId].func = Task_LoadAreaScreen;
+            break;
         default:
             FreeAllWindowBuffers();
             InitWindows(sInfoScreen_WindowTemplates);
