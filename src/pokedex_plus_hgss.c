@@ -3635,6 +3635,7 @@ static void SpriteCB_StatBarsBg(struct Sprite *sprite)
 #define tSkipCry         data[3]
 #define tMonSpriteId     data[4]
 #define tTrainerSpriteId data[5]
+#define tShinyFlag       data[6]
 
 static u8 LoadInfoScreen(struct PokedexListItem *item, u8 monSpriteId)
 {
@@ -3823,11 +3824,36 @@ static void Task_HandleInfoScreenInput(u8 taskId)
         return;
     }
 
+    if (JOY_NEW(A_BUTTON))
+    {
+        FreeAndDestroyMonPicSprite(gTasks[taskId].tMonSpriteId);
+        if (gTasks[taskId].tShinyFlag == 0)
+        {
+            gTasks[taskId].tMonSpriteId = (u16)CreateShinyMonSpriteFromNationalDexNumber(sPokedexListItem->dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
+            gSprites[gTasks[taskId].tMonSpriteId].oam.priority = 0;
+            gTasks[taskId].tShinyFlag = 1;
+        }
+        else {
+            gTasks[taskId].tMonSpriteId = (u16)CreateMonSpriteFromNationalDexNumber(sPokedexListItem->dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
+            gSprites[gTasks[taskId].tMonSpriteId].oam.priority = 0;
+            gTasks[taskId].tShinyFlag = 0
+        }
+    }
+
     if ((JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)))
     {
         sPokedexView->selectedScreen = AREA_SCREEN;
         BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
         sPokedexView->screenSwitchState = 1;
+        gTasks[taskId].func = Task_SwitchScreensFromInfoScreen;
+        PlaySE(SE_PIN);
+    }
+
+    if ((JOY_NEW(DPAD_LEFT) || (JOY_NEW(L_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR)))
+    {
+        sPokedexView->selectedScreen = SIZE_SCREEN;
+        BeginNormalPaletteFade(0xFFFFFFEB, 0, 0, 0x10, RGB_BLACK);
+        sPokedexView->screenSwitchState = 3;
         gTasks[taskId].func = Task_SwitchScreensFromInfoScreen;
         PlaySE(SE_PIN);
     }
@@ -7391,7 +7417,7 @@ static void LoadPlayArrowPalette(bool8 cryPlaying)
 
 static void Task_HandleSizeScreenInput(u8 taskId)
 {
-    if (JOY_NEW(B_BUTTON))
+    if (JOY_NEW(B_BUTTON) || JOY_NEW(DPAD_RIGHT) || (JOY_NEW(R_BUTTON) && gSaveBlock2Ptr->optionsButtonMode == OPTIONS_BUTTON_MODE_LR))
     {
         BeginNormalPaletteFade(PALETTES_ALL & ~(0x14), 0, 0, 0x10, RGB_BLACK);
         sPokedexView->screenSwitchState = 1;
