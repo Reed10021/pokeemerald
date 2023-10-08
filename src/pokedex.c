@@ -3922,18 +3922,18 @@ static void HighlightSubmenuScreenSelectBarItem(u8 a, u16 b)
 #define tPersonalityLo data[14]
 #define tPersonalityHi data[15]
 
-u8 DisplayCaughtMonDexPage(u16 species, u32 otId, u32 personality)
-{
-    u8 taskId = CreateTask(Task_DisplayCaughtMonDexPage, 0);
-
-    gTasks[taskId].tState = 0;
-    gTasks[taskId].tDexNum = species;
-    gTasks[taskId].tOtIdLo = otId;
-    gTasks[taskId].tOtIdHi = otId >> 16;
-    gTasks[taskId].tPersonalityLo = personality;
-    gTasks[taskId].tPersonalityHi = personality >> 16;
-    return taskId;
-}
+//u8 DisplayCaughtMonDexPage(u16 species, u32 otId, u32 personality)
+//{
+//    u8 taskId = CreateTask(Task_DisplayCaughtMonDexPage, 0);
+//
+//    gTasks[taskId].tState = 0;
+//    gTasks[taskId].tDexNum = species;
+//    gTasks[taskId].tOtIdLo = otId;
+//    gTasks[taskId].tOtIdHi = otId >> 16;
+//    gTasks[taskId].tPersonalityLo = personality;
+//    gTasks[taskId].tPersonalityHi = personality >> 16;
+//    return taskId;
+//}
 
 static void Task_DisplayCaughtMonDexPage(u8 taskId)
 {

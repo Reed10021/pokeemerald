@@ -24,6 +24,7 @@
 #include "text.h"
 #include "sound.h"
 #include "pokedex.h"
+#include "pokedex_plus_hgss.h"
 #include "recorded_battle.h"
 #include "window.h"
 #include "reshow_battle_screen.h"
