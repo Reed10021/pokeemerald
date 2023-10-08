@@ -128,7 +128,7 @@ static const u8 sText_TenDashes2[] = _("----------");
 #define SCROLLING_MON_X 146
 #define HGSS_DECAPPED 1 //0 false, 1 true
 #define HGSS_DARK_MODE 0 //0 false, 1 true
-#define HGSS_HIDE_UNSEEN_EVOLUTION_NAMES 0 //0 false, 1 true
+#define HGSS_HIDE_UNSEEN_EVOLUTION_NAMES 1 //0 false, 1 true
 
 // For scrolling search parameter
 #define MAX_SEARCH_PARAM_ON_SCREEN   6
@@ -3569,11 +3569,39 @@ static void CreateStatBars(struct PokedexListItem *dexMon)
         LoadSpriteSheet(&sheet);
         Free(gfx);
     }
-    else if (dexMon->seen) // Just HP/ATK/DEF
+    else if (dexMon->seen) // Just HP/DEF/SPDEF
     {
-        static const struct SpriteSheet sheet = {sStatBarsGfx, 64 * 64, TAG_STAT_BAR};
+        u8 i;
+        u32 width, statValue;
+        u8* gfx = Alloc(64 * 64);
+        static const u8 sBarsYOffset[] = { 3, 13, 23, 33, 43, 53 };
+        struct SpriteSheet sheet = {sStatBarsGfx, 64 * 64, TAG_STAT_BAR};
+        u32 species = NationalPokedexNumToSpecies(dexMon->dexNum);
+        memcpy(gfx, sStatBarsGfx, sizeof(sStatBarsGfx));
+        for (i = 0; i < NUM_STATS; i++)
+        {
+            if (i == 1 || i == 3 || i == 5)
+                continue;
+            statValue = *((u8*)(&gBaseStats[species]) + sBaseStatOffsets[i]);
+            if (statValue <= 100)
+            {
+                width = statValue / 3;
+                if (width >= 33)
+                    width -= 1;
+            }
+            else
+                width = (100 / 3) + ((statValue - 100) / 14);
+
+            if (width > 39) // Max pixels
+                width = 39;
+            if (width < 3)
+                width = 3;
+
+            CreateStatBar(gfx, sBarsYOffset[i], width);
+        }
 
         LoadSpriteSheet(&sheet);
+        Free(gfx);
     }
     else // neither seen nor owned
     {
@@ -3740,7 +3768,10 @@ static void Task_LoadInfoScreen(u8 taskId)
     case 5:
         if (!gTasks[taskId].tMonSpriteDone)
         {
-            gTasks[taskId].tMonSpriteId = (u16)CreateMonSpriteFromNationalDexNumber(sPokedexListItem->dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
+            if (sPokedexView->pokedexList[sPokedexView->selectedPokemon].seen)
+                gTasks[taskId].tMonSpriteId = (u16)CreateMonSpriteFromNationalDexNumber(sPokedexListItem->dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
+            else
+                gTasks[taskId].tMonSpriteId = (u16)CreateMonSpriteFromNationalDexNumber(0, MON_PAGE_X, MON_PAGE_Y, 0);
             gSprites[gTasks[taskId].tMonSpriteId].oam.priority = 0;
         }
         gMain.state++;
@@ -3829,17 +3860,23 @@ static void Task_HandleInfoScreenInput(u8 taskId)
 
     if (JOY_NEW(A_BUTTON))
     {
-        FreeAndDestroyMonPicSprite(gTasks[taskId].tMonSpriteId);
         if (gTasks[taskId].tShinyFlag == 0)
         {
-            gTasks[taskId].tMonSpriteId = (u16)CreateShinyMonSpriteFromNationalDexNumber(sPokedexListItem->dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
-            gSprites[gTasks[taskId].tMonSpriteId].oam.priority = 0;
-            gTasks[taskId].tShinyFlag = 1;
+            if (sPokedexView->pokedexList[sPokedexView->selectedPokemon].seen)
+            {
+                FreeAndDestroyMonPicSprite(gTasks[taskId].tMonSpriteId);
+                gTasks[taskId].tMonSpriteId = (u16)CreateShinyMonSpriteFromNationalDexNumber(sPokedexListItem->dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
+                gSprites[gTasks[taskId].tMonSpriteId].oam.priority = 0;
+                gTasks[taskId].tShinyFlag = 1;
+                PlaySE(SE_DEX_PAGE);
+            }
         }
         else {
+            FreeAndDestroyMonPicSprite(gTasks[taskId].tMonSpriteId);
             gTasks[taskId].tMonSpriteId = (u16)CreateMonSpriteFromNationalDexNumber(sPokedexListItem->dexNum, MON_PAGE_X, MON_PAGE_Y, 0);
             gSprites[gTasks[taskId].tMonSpriteId].oam.priority = 0;
             gTasks[taskId].tShinyFlag = 0;
+            PlaySE(SE_DEX_PAGE);
         }
     }
 
@@ -7558,7 +7595,7 @@ static void Task_HandleSearchResultsInput(u8 taskId)
     }
     else
     {
-        if (JOY_NEW(A_BUTTON) && sPokedexView->pokedexList[sPokedexView->selectedPokemon].seen)
+        if (JOY_NEW(A_BUTTON) /*&& sPokedexView->pokedexList[sPokedexView->selectedPokemon].seen*/)
         {
             u32 a;
 
