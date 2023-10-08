@@ -7366,6 +7366,7 @@ static void Task_ExitCryScreen(u8 taskId)
     {
         FreeCryScreen();
         FreeAndDestroyMonPicSprite(gTasks[taskId].tMonSpriteId);
+        FreeInfoScreenWindowAndBgBuffers();
         DestroyTask(taskId);
     }
 }
