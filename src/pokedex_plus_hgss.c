@@ -6436,7 +6436,7 @@ static void HandlePreEvolutionSpeciesPrint(u8 taskId, u16 preSpecies, u16 specie
     else
     {
     #endif
-        seen = GetSetPokedexFlag(SpeciesToNationalPokedexNum(preSpecies), FLAG_GET_SEEN)
+        seen = GetSetPokedexFlag(SpeciesToNationalPokedexNum(preSpecies), FLAG_GET_SEEN);
         if (seen || !HGSS_HIDE_UNSEEN_EVOLUTION_NAMES)
             StringCopy(gStringVar2, gSpeciesNames[preSpecies]); //evolution mon name
         else
