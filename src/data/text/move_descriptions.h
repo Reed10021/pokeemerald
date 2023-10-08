@@ -1395,7 +1395,7 @@ static const u8 sLeafBladeDescription[] = _(
 
 static const u8 sDragonDanceDescription[] = _(
     "A mystical dance that ups\n"
-    "ATTACK and SPEED.");
+    "ATTACK, SP. ATK and SPEED.");
 
 static const u8 sRockBlastDescription[] = _(
     "Hurls boulders at the foe\n"

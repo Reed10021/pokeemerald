@@ -129,7 +129,7 @@ static const struct SpriteFrameImage sSpriteImageTable_85104B4[] =
     obj_frame_tiles(sResetRtcScreen_RightArrowGfx)
 };
 
-static const struct SpritePalette sSpritePalette_Arrow =
+/*static*/ const struct SpritePalette sSpritePalette_Arrow =
 {
     sResetRtcScreen_ArrowPal, 0x1000
 };
@@ -159,7 +159,7 @@ static const union AnimCmd *const sSpriteAnimTable_85104E4[] =
     sSpriteAnim_85104DC,
 };
 
-static const struct SpriteTemplate sSpriteTemplate_85104F0 =
+/*static*/ const struct SpriteTemplate sSpriteTemplate_Arrow =
 {
     .tileTag = 0xFFFF,
     .paletteTag = 0x1000,
@@ -273,12 +273,12 @@ static void CreateCursor(u8 taskId)
 
     LoadSpritePalette(&sSpritePalette_Arrow);
 
-    spriteId = CreateSpriteAtEnd(&sSpriteTemplate_85104F0, 53, 68, 0);
+    spriteId = CreateSpriteAtEnd(&sSpriteTemplate_Arrow, 53, 68, 0);
     gSprites[spriteId].callback = SpriteCB_ResetRtcCursor0;
     gSprites[spriteId].data[0] = taskId;
     gSprites[spriteId].data[1] = -1;
 
-    spriteId = CreateSpriteAtEnd(&sSpriteTemplate_85104F0, 53, 68, 0);
+    spriteId = CreateSpriteAtEnd(&sSpriteTemplate_Arrow, 53, 68, 0);
     gSprites[spriteId].callback = SpriteCB_ResetRtcCursor1;
     gSprites[spriteId].data[0] = taskId;
     gSprites[spriteId].data[1] = -1;

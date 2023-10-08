@@ -62,7 +62,6 @@ static void sub_806E6CC(u8 taskId);
 static bool8 ShouldGetStatBadgeBoost(u16 flagId, u8 battlerId);
 static u16 GiveMoveToBoxMon(struct BoxPokemon *boxMon, u16 move);
 static bool8 ShouldSkipFriendshipChange(void);
-static u16 GetPreEvolution(u16 species);
 
 // EWRAM vars
 EWRAM_DATA static u8 sLearningMoveTableID = 0;
@@ -6440,7 +6439,7 @@ u32 CanSpeciesLearnTMHM(u16 species, u8 tm)
     }
 }
 
-static u16 GetPreEvolution(u16 species) {
+u16 GetPreEvolution(u16 species) {
     int i, j;
     for (i = 1; i < NUM_SPECIES; i++)
     {

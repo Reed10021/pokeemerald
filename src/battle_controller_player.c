@@ -126,6 +126,7 @@ static void DoSwitchOutAnimation(void);
 static void PlayerDoMoveAnimation(void);
 static void task05_08033660(u8 taskId);
 static void sub_805CE38(void);
+static void MoveSelectionDisplaySplitIcon(void);
 
 static void (*const sPlayerBufferCommands[CONTROLLER_CMDS_COUNT])(void) =
 {
@@ -194,6 +195,8 @@ static const u8 sTargetIdentities[] = {B_POSITION_PLAYER_LEFT, B_POSITION_PLAYER
 
 // unknown unused data
 static const u8 sUnknown_0831C5FC[] = {0x48, 0x48, 0x20, 0x5a, 0x50, 0x50, 0x50, 0x58};
+static const u16 sSplitIcons_Pal[] = INCBIN_U16("graphics/battle_interface/split_icons_battle.gbapal");
+static const u8 sSplitIcons_Gfx[] = INCBIN_U8("graphics/battle_interface/split_icons_battle.4bpp");
 
 void nullsub_21(void)
 {
@@ -1587,7 +1590,7 @@ u8 TypeEffectiveness(u8 targetId)
 static void MoveSelectionDisplayMoveTypeDoubles(u8 targetId)
 {
 	u8 *txtPtr;
-	struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
+	struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
     u8 type = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type;
 
 	txtPtr = StringCopy(gDisplayedStringBattle, gText_MoveInterfaceType);
@@ -1619,7 +1622,7 @@ static void MoveSelectionDisplayMoveType(void)
 {
     u8 *txtPtr;
     u8 typeColor = IsDoubleBattle() ? 10 : TypeEffectiveness(GetBattlerAtPosition(BATTLE_OPPOSITE(GetBattlerPosition(gActiveBattler))));
-    struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
+    struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
     u8 type = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type;
 
     txtPtr = StringCopy(gDisplayedStringBattle, gText_MoveInterfaceType);
@@ -1641,6 +1644,19 @@ static void MoveSelectionDisplayMoveType(void)
     }
     StringCopy(txtPtr, gTypeNames[type]);
     BattlePutTextOnWindow(gDisplayedStringBattle, typeColor);
+    MoveSelectionDisplaySplitIcon();
+}
+
+static void MoveSelectionDisplaySplitIcon(void) {
+    struct ChooseMoveStruct* moveInfo;
+    u32 moveCategory;
+
+    moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
+    moveCategory = GetBattleMoveSplit(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]);
+    LoadPalette(sSplitIcons_Pal, 10 * 0x10, 0x20);
+    BlitBitmapToWindow(8, sSplitIcons_Gfx + 0x80 * moveCategory, 0, 0, 16, 16);
+    PutWindowTilemap(8);
+    CopyWindowToVram(8, 3);
 }
 
 static void MoveSelectionCreateCursorAt(u8 cursorPosition, u8 arg1)

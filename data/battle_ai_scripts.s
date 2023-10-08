@@ -600,8 +600,9 @@ AI_CBM_CalmMind: @ 82DC767
 	end
 
 AI_CBM_DragonDance: @ 82DC778
-	if_stat_level_equal AI_USER, STAT_ATK, MAX_STAT_STAGE, Score_Minus10
-	if_stat_level_equal AI_USER, STAT_SPEED, MAX_STAT_STAGE, Score_Minus8
+	if_stat_level_equal AI_USER, STAT_ATK, MAX_STAT_STAGE, Score_Minus8
+	if_stat_level_equal AI_USER, STAT_SPATK, MAX_STAT_STAGE, Score_Minus8
+	if_stat_level_equal AI_USER, STAT_SPEED, MAX_STAT_STAGE, Score_Minus3
 	end
 
 Score_Minus1:

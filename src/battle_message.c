@@ -1499,7 +1499,7 @@ static const struct BattleWindowText sTextOnWindowsInfo_Normal[] =
         .bgColor = 14,
         .shadowColor = 11,
     },
-    { // 8
+    { // 8 Dummy?
         .fillValue = PIXEL_FILL(0xE),
         .fontId = 1,
         .x = 0,

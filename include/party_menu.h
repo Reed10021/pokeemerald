@@ -91,4 +91,6 @@ void GetNumMovesSelectedMonHas(void);
 void MoveDeleterChooseMoveToForget(void);
 void CB2_ReturnToPartyMenuFromSummaryScreen(void);
 
+bool8 CanLearnTutorMove(u16, u8);
+
 #endif // GUARD_PARTY_MENU_H

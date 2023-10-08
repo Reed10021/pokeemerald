@@ -50,6 +50,7 @@
 #define COORD_EVENT_WEATHER_ROUTE119_CYCLE      20
 #define COORD_EVENT_WEATHER_ROUTE123_CYCLE      21
 
+#define COORD_EVENT_WEATHER_ROUTE111_112_CYCLE  24
 #define COORD_EVENT_WEATHER_ROUTE120_CYCLE      27
 
 // These are the "abnormal weather events" that are used

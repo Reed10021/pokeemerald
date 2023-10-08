@@ -10030,9 +10030,9 @@ static void Cmd_displaydexinfo(void)
         if (!gPaletteFade.active)
         {
             FreeAllWindowBuffers();
-            gBattleCommunication[TASK_ID] = DisplayCaughtMonDexPage(SpeciesToNationalPokedexNum(species),
-                                                                        gBattleMons[gBattlerTarget].otId,
-                                                                        gBattleMons[gBattlerTarget].personality);
+            gBattleCommunication[TASK_ID] = DisplayCaughtMonDexPage(species,
+                                            gBattleMons[gBattlerTarget].otId,
+                                            gBattleMons[gBattlerTarget].personality);
             gBattleCommunication[0]++;
         }
         break;
