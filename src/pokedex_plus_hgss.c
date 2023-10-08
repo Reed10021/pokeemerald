@@ -3940,17 +3940,11 @@ static void Task_LoadAreaScreen(u8 taskId)
     default:
         if (!gPaletteFade.active)
         {
-            u16 r2;
             sPokedexView->currentPage = PAGE_AREA;
+            sPokedexView->selectedScreen = AREA_SCREEN;
             gPokedexVBlankCB = gMain.vblankCallback;
             SetVBlankCallback(NULL);
-            r2 = 0;
-            if (gTasks[taskId].data[1] != 0)
-                r2 += DISPCNT_OBJ_ON;
-            if (gTasks[taskId].data[2] != 0)
-                r2 |= DISPCNT_BG1_ON;
-            ResetOtherVideoRegisters(r2);
-            sPokedexView->selectedScreen = AREA_SCREEN;
+            ResetOtherVideoRegisters(DISPCNT_BG1_ON);
             gMain.state = 1;
         }
         break;
@@ -6347,7 +6341,7 @@ static void Task_HandleEvolutionScreenInput(u8 taskId)
     {
         if (!sPokedexListItem->owned)
         {
-            sPokedexView->selectedScreen = AREA_SCREEN;
+            sPokedexView->selectedScreen = INFO_SCREEN;
             sPokedexView->screenSwitchState = 4;
         }
         else
@@ -6610,7 +6604,7 @@ static u8 PrintEvolutionTargetSpeciesAndMethod(u8 taskId, u16 species, u8 depth,
     if(seen)
         StringCopy(gStringVar1, gSpeciesNames[species]);
     else
-        StringCopy(gStringVar1, gText_ThreeDashes);
+        StringCopy(gStringVar1, gText_ThreeQuestionMarks);
 
     if (species == SPECIES_EEVEE)
         isEevee = TRUE;
@@ -6834,9 +6828,9 @@ static void Task_SwitchScreensFromEvolutionScreen(u8 taskId)
                 break;
         #endif
         case 4:
-            gTasks[taskId].func = Task_LoadAreaScreen;
-            break;
         default:
+            FreeAllWindowBuffers();
+            InitWindows(sInfoScreen_WindowTemplates);
             gTasks[taskId].func = Task_LoadInfoScreen;
             break;
         }
