@@ -3821,8 +3821,23 @@ static void PrintMoveDetails(u16 move)
     if (move != MOVE_NONE)
     {
         if (sMonSummaryScreen->currPageIndex == PSS_MODE_BOX)
-        {
-            ShowSplitIcon(GetBattleMoveSplit(move));
+        
+            if (move == MOVE_HIDDEN_POWER)
+            {
+                u8 typeBits = ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_IV) & 1) << 0)
+                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_IV) & 1) << 1)
+                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF_IV) & 1) << 2)
+                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_IV) & 1) << 3)
+                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK_IV) & 1) << 4)
+                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_IV) & 1) << 5);
+
+                u8 type = (15 * typeBits) / 63 + 1;
+                if (type >= TYPE_MYSTERY)
+                    type++;
+                ShowSplitIcon(type > TYPE_MYSTERY);
+            }
+            else
+                ShowSplitIcon(GetBattleMoveSplit(move));
             PrintMovePowerAndAccuracy(move);
             PrintTextOnWindow(windowId, gMoveDescriptionPointers[move - 1], 6, 1, 0, 0);
         }
