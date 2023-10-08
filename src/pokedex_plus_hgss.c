@@ -3940,15 +3940,21 @@ static void Task_LoadAreaScreen(u8 taskId)
     default:
         if (!gPaletteFade.active)
         {
+            u16 r2 = 0;
+
             sPokedexView->currentPage = PAGE_AREA;
-            sPokedexView->selectedScreen = AREA_SCREEN;
             gPokedexVBlankCB = gMain.vblankCallback;
             SetVBlankCallback(NULL);
-            ResetOtherVideoRegisters(DISPCNT_BG1_ON);
+            if (gTasks[taskId].data[1] != 0)
+                r2 += DISPCNT_OBJ_ON;
+            if (gTasks[taskId].data[2] != 0)
+                r2 |= DISPCNT_BG1_ON;
+            ResetOtherVideoRegisters(r2);
             gMain.state = 1;
         }
         break;
     case 1:
+        sPokedexView->selectedScreen = AREA_SCREEN;
         LoadScreenSelectBarSubmenu(0xD); //HGSS_Ui
         LoadPokedexBgPalette(sPokedexView->isSearchResults);
         SetGpuReg(REG_OFFSET_BG1CNT, BGCNT_PRIORITY(0) | BGCNT_CHARBASE(0) | BGCNT_SCREENBASE(13) | BGCNT_16COLOR | BGCNT_TXT256x256);
@@ -3989,9 +3995,6 @@ static void Task_SwitchScreensFromAreaScreen(u8 taskId)
         case 3:
             if (!sPokedexListItem->owned)
             {
-                FreeInfoScreenWindowAndBgBuffers();
-                FreeAllWindowBuffers();
-                InitWindows(sInfoScreen_WindowTemplates);
                 gTasks[taskId].func = Task_LoadEvolutionScreen;
             }
             else
@@ -6831,14 +6834,11 @@ static void Task_SwitchScreensFromEvolutionScreen(u8 taskId)
                 break;
         #endif
         case 4:
-            FreeInfoScreenWindowAndBgBuffers();
-            FreeAllWindowBuffers();
+            FreeStatsScreenWindowAndBgBuffers();
             InitWindows(sInfoScreen_WindowTemplates);
             gTasks[taskId].func = Task_LoadAreaScreen;
             break;
         default:
-            FreeAllWindowBuffers();
-            InitWindows(sInfoScreen_WindowTemplates);
             gTasks[taskId].func = Task_LoadInfoScreen;
             break;
         }
