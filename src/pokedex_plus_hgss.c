@@ -3950,11 +3950,12 @@ static void Task_LoadAreaScreen(u8 taskId)
             if (gTasks[taskId].data[2] != 0)
                 r2 |= DISPCNT_BG1_ON;
             ResetOtherVideoRegisters(r2);
+            sPokedexView->selectedScreen = AREA_SCREEN;
             gMain.state = 1;
         }
         break;
     case 1:
-        sPokedexView->selectedScreen = AREA_SCREEN;
+        LoadTilesetTilemapHGSS(INFO_SCREEN);
         LoadScreenSelectBarSubmenu(0xD); //HGSS_Ui
         LoadPokedexBgPalette(sPokedexView->isSearchResults);
         SetGpuReg(REG_OFFSET_BG1CNT, BGCNT_PRIORITY(0) | BGCNT_CHARBASE(0) | BGCNT_SCREENBASE(13) | BGCNT_16COLOR | BGCNT_TXT256x256);
@@ -3985,7 +3986,6 @@ static void Task_SwitchScreensFromAreaScreen(u8 taskId)
         {
         case 1:
             FreeInfoScreenWindowAndBgBuffers();
-            FreeAllWindowBuffers();
             DestroyTask(taskId);
             break;
         case 2:
@@ -6796,7 +6796,7 @@ static u8 PrintEvolutionTargetSpeciesAndMethod(u8 taskId, u16 species, u8 depth,
                 break;
         #endif
         default:
-            StringExpandPlaceholders(gStringVar4, gText_EVO_UNKNOWN );
+            StringExpandPlaceholders(gStringVar4, gText_EVO_UNKNOWN);
             break;
         }//Switch end
         PrintInfoScreenTextSmall(gStringVar4, base_x + depth_x*depth+base_x_offset, base_y + base_y_offset*base_i); //Print actual instructions
@@ -6834,7 +6834,7 @@ static void Task_SwitchScreensFromEvolutionScreen(u8 taskId)
                 break;
         #endif
         case 4:
-            FreeStatsScreenWindowAndBgBuffers();
+            FreeAllWindowBuffers();
             InitWindows(sInfoScreen_WindowTemplates);
             gTasks[taskId].func = Task_LoadAreaScreen;
             break;
