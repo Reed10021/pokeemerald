@@ -7535,6 +7535,7 @@ static void Task_ExitSizeScreen(u8 taskId)
     {
         FreeAndDestroyMonPicSprite(gTasks[taskId].tMonSpriteId);
         FreeAndDestroyTrainerPicSprite(gTasks[taskId].tTrainerSpriteId);
+        FreeInfoScreenWindowAndBgBuffers();
         DestroyTask(taskId);
     }
 }
