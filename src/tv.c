@@ -221,6 +221,162 @@ static const struct {
         .moves = {MOVE_GROWL, MOVE_TACKLE, MOVE_TAIL_WHIP, MOVE_ATTRACT},
         .level = 8, 
         .location = MAP_NUM(ROUTE116),
+    },
+    {
+        .species = SPECIES_TOGEPI,
+        .moves = {MOVE_ANCIENT_POWER, MOVE_TRI_ATTACK, MOVE_FOLLOW_ME, MOVE_HELPING_HAND},
+        .level = 9,
+        .location = MAP_NUM(ROUTE101),
+    },
+    {
+        .species = SPECIES_TOGETIC,
+        .moves = {MOVE_ICE_BEAM, MOVE_TRI_ATTACK, MOVE_TAIL_GLOW, MOVE_THUNDER},
+        .level = 23,
+        .location = MAP_NUM(ROUTE110),
+    },
+    {
+        .species = SPECIES_PICHU,
+        .moves = {MOVE_VOLT_TACKLE, MOVE_THUNDERBOLT, MOVE_SURF, MOVE_TAIL_GLOW},
+        .level = 12,
+        .location = MAP_NUM(ROUTE103)
+    },
+    {
+        .species = SPECIES_UNOWN,
+        .moves = {MOVE_HIDDEN_POWER, MOVE_PSYCHIC},
+        .level = 30,
+        .location = MAP_NUM(ROUTE123)
+    },
+    {
+        .species = SPECIES_STEELIX,
+        .moves = {MOVE_THRASH, MOVE_IRON_TAIL, MOVE_EARTHQUAKE, MOVE_ROCK_BLAST},
+        .level = 35,
+        .location = MAP_NUM(ROUTE111)
+    },
+    {
+        .species = SPECIES_SLOWPOKE,
+        .moves = {MOVE_PSYCHIC, MOVE_TAIL_GLOW, MOVE_AMNESIA, MOVE_FUTURE_SIGHT},
+        .level = 20,
+        .location = MAP_NUM(ROUTE112)
+    },
+    {
+        .species = SPECIES_SHELLDER,
+        .moves = {MOVE_CLAMP, MOVE_TAIL_GLOW, MOVE_AMNESIA, MOVE_BARRIER},
+        .level = 22,
+        .location = MAP_NUM(ROUTE105)
+    },
+    {
+        .species = SPECIES_CASTFORM,
+        .moves = {MOVE_WEATHER_BALL, MOVE_TAIL_GLOW, MOVE_HAIL, MOVE_PSYCHIC},
+        .level = 30,
+        .location = MAP_NUM(ROUTE119)
+    },
+    {
+        .species = SPECIES_BELLSPROUT,
+        .moves = {MOVE_GIGA_DRAIN, MOVE_TAIL_GLOW, MOVE_SWORDS_DANCE, MOVE_SLUDGE_BOMB},
+        .level = 25,
+        .location = MAP_NUM(ROUTE119)
+    },
+    {
+        .species = SPECIES_PINSIR,
+        .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_FALSE_SWIPE, MOVE_CROSS_CHOP},
+        .level = 16,
+        .location = MAP_NUM(ROUTE116)
+    },
+    {
+        .species = SPECIES_DITTO,
+        .moves = {MOVE_TRANSFORM},
+        .level = 24,
+        .location = MAP_NUM(ROUTE110)
+    },
+    {
+        .species = SPECIES_AIPOM,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_FALSE_SWIPE, MOVE_YAWN, MOVE_THRASH},
+        .level = 24,
+        .location = MAP_NUM(ROUTE113)
+    },
+    {
+        .species = SPECIES_SCYTHER,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_YAWN, MOVE_CROSS_CHOP, MOVE_DRILL_PECK},
+        .level = 20,
+        .location = MAP_NUM(ROUTE115)
+    },
+    {
+        .species = SPECIES_HOUNDOUR,
+        .moves = {MOVE_TAIL_GLOW, MOVE_YAWN, MOVE_HEAT_WAVE, MOVE_DRAGON_BREATH},
+        .level = 14,
+        .location = MAP_NUM(ROUTE112)
+    },
+    {
+        .species = SPECIES_BLISSEY,
+        .moves = {MOVE_AMNESIA, MOVE_SWEET_KISS, MOVE_WISH, MOVE_HYDRO_PUMP},
+        .level = 50,
+        .location = MAP_NUM(ROUTE121)
+    },
+    {
+        .species = SPECIES_MILTANK,
+        .moves = {MOVE_CURSE, MOVE_ROLLOUT, MOVE_THRASH, MOVE_SHADOW_BALL},
+        .level = 50,
+        .location = MAP_NUM(ROUTE123)
+    },
+    {
+        .species = SPECIES_MAGBY,
+        .moves = {MOVE_THUNDER_PUNCH, MOVE_ICE_PUNCH, MOVE_HEAT_WAVE, MOVE_TAIL_GLOW},
+        .level = 19,
+        .location = MAP_NUM(ROUTE118)
+    },
+    {
+        .species = SPECIES_ELEKID,
+        .moves = {MOVE_ICE_PUNCH, MOVE_FIRE_PUNCH, MOVE_VOLT_TACKLE, MOVE_TAIL_GLOW},
+        .level = 21,
+        .location = MAP_NUM(ROUTE110)
+    },
+    {
+        .species = SPECIES_BELDUM,
+        .moves = {MOVE_ICE_PUNCH, MOVE_THUNDER_PUNCH, MOVE_IRON_DEFENSE, MOVE_DRAGON_DANCE},
+        .level = 21,
+        .location = MAP_NUM(ROUTE110)
+    },
+    {
+        .species = SPECIES_TREECKO,
+        .moves = {MOVE_DRAGON_BREATH, MOVE_DRAGON_BREATH, MOVE_DRAGON_BREATH, MOVE_DRAGON_BREATH},
+        .level = 17,
+        .location = MAP_NUM(ROUTE119)
+    },
+    {
+        .species = SPECIES_LAPRAS,
+        .moves = {MOVE_HAIL, MOVE_ICE_BEAM, MOVE_TAIL_GLOW, MOVE_YAWN},
+        .level = 30,
+        .location = MAP_NUM(ROUTE109)
+    },
+    {
+        .species = SPECIES_LAPRAS,
+        .moves = {MOVE_RAIN_DANCE, MOVE_HYDRO_CANNON, MOVE_TAIL_GLOW, MOVE_YAWN},
+        .level = 30,
+        .location = MAP_NUM(ROUTE108)
+    },
+    {
+        .species = SPECIES_GYARADOS,
+        .moves = {MOVE_RAIN_DANCE, MOVE_DRAGON_DANCE, MOVE_DRILL_PECK, MOVE_THRASH},
+        .level = 35,
+        .location = MAP_NUM(ROUTE107)
+    },
+    {
+        .species = SPECIES_GYARADOS,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_FURY_CUTTER, MOVE_DRILL_PECK, MOVE_THRASH},
+        .level = 38,
+        .location = MAP_NUM(ROUTE124)
+    },
+    {
+        .species = SPECIES_SNORLAX,
+        .moves = {MOVE_BELLY_DRUM, MOVE_REST, MOVE_THRASH, MOVE_EARTHQUAKE},
+        .level = 35,
+        .location = MAP_NUM(ROUTE121)
+    },
+    {
+        .species = SPECIES_SNORLAX,
+        .moves = {MOVE_BELLY_DRUM, MOVE_BOUNCE, MOVE_THRASH, MOVE_EARTHQUAKE},
+        .level = 37,
+        .location = MAP_NUM(ROUTE123)
     }
 };
 
@@ -1741,13 +1897,13 @@ static void sub_80ED718(void)
 
 //    if (FlagGet(FLAG_SYS_GAME_CLEAR))
     {
-        for (i = 0; i < LAST_TVSHOW_IDX; i ++)
-        {
-            if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
-            {
-                return;
-            }
-        }
+        //for (i = 0; i < LAST_TVSHOW_IDX; i ++)
+        //{
+        //    if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
+        //    {
+        //        return;
+        //    }
+        //}
         if (!rbernoulli(1, 200))
         {
             sCurTVShowSlot = FindEmptyTVSlotWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
@@ -1760,12 +1916,44 @@ static void sub_80ED718(void)
                 show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
                 show->massOutbreak.var02 = 0;
                 show->massOutbreak.var03 = 0;
-                show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
+                // Use treecko as starter flag; only create mass outbreak for the starter the player picked.
+                if (sPokeOutbreakSpeciesList[outbreakIdx].species == SPECIES_TREECKO)
+                {
+                    switch (VarGet(VAR_STARTER_MON))
+                    {
+                        case 0:
+                        default:
+                            show->massOutbreak.species = SPECIES_TREECKO;
+                            show->massOutbreak.moves[0] = MOVE_TAIL_GLOW;
+                            show->massOutbreak.moves[1] = MOVE_ICE_PUNCH;
+                            show->massOutbreak.moves[2] = MOVE_YAWN;
+                            show->massOutbreak.moves[3] = MOVE_GIGA_DRAIN;
+                            break;
+                        case 1:
+                            show->massOutbreak.species = SPECIES_TORCHIC;
+                            show->massOutbreak.moves[0] = MOVE_DRAGON_DANCE;
+                            show->massOutbreak.moves[1] = MOVE_THUNDER_PUNCH;
+                            show->massOutbreak.moves[2] = MOVE_CROSS_CHOP;
+                            show->massOutbreak.moves[3] = MOVE_HEAT_WAVE;
+                            break;
+                        case 2:
+                            show->massOutbreak.species = SPECIES_MUDKIP;
+                            show->massOutbreak.moves[0] = MOVE_SWORDS_DANCE;
+                            show->massOutbreak.moves[1] = MOVE_FURY_CUTTER;
+                            show->massOutbreak.moves[2] = MOVE_SLUDGE_BOMB;
+                            show->massOutbreak.moves[3] = MOVE_EARTHQUAKE;
+                            break;
+                    }
+                }
+                else
+                {
+                    show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
+                    show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
+                    show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
+                    show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
+                    show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
+                }
                 show->massOutbreak.var0E = 0;
-                show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
-                show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
-                show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
-                show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
                 show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
                 show->massOutbreak.locationMapGroup = 0;
                 show->massOutbreak.var12 = 0;
