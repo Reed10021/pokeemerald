@@ -1308,6 +1308,12 @@ const u32 gPokedexPlusHGSS_ScreenSize_Tilemap[] = INCBIN_U32("graphics/pokedex/h
 const u32 gPokedexPlusHGSS_ScreenSearchHoenn_Tilemap[] = INCBIN_U32("graphics/pokedex/hgss/HGSS_tilemap_search_screen_hoenn.bin.lz");
 const u32 gPokedexPlusHGSS_ScreenSearchNational_Tilemap[] = INCBIN_U32("graphics/pokedex/hgss/HGSS_tilemap_search_screen_national.bin.lz");
 
+const u16 sSplitIcons_Pal[] = INCBIN_U16("graphics/interface/split_icons.gbapal");
+const u32 sSplitIcons_Gfx[] = INCBIN_U32("graphics/interface/split_icons.4bpp.lz");
+
+const u16 sSplitIcons_Battle_Pal[] = INCBIN_U16("graphics/battle_interface/split_icons_battle.gbapal");
+const u8 sSplitIcons_Battle_Gfx[] = INCBIN_U8("graphics/battle_interface/split_icons_battle.4bpp");
+
 const u16 gSummaryScreenPowAcc_Tilemap[] = INCBIN_U16("graphics/interface/powacc_tilemap.bin");
 const u16 gSummaryScreenAppealJam_Tilemap[] = INCBIN_U16("graphics/interface/appealjam_tilemap.bin");
 const u16 gSummaryScreenWindow_Tilemap[] = INCBIN_U16("graphics/interface/summary.bin");

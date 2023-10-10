@@ -3358,6 +3358,12 @@ extern const u32 gPokedexPlusHGSS_ScreenSize_Tilemap[];
 extern const u32 gPokedexPlusHGSS_ScreenSearchHoenn_Tilemap[];
 extern const u32 gPokedexPlusHGSS_ScreenSearchNational_Tilemap[];
 
+extern const u16 sSplitIcons_Pal[];
+extern const u32 sSplitIcons_Gfx[];
+
+extern const u16 sSplitIcons_Battle_Pal[];
+extern const u8 sSplitIcons_Battle_Gfx[];
+
 // berry tag screen
 extern const u32 gBerryCheck_Gfx[];
 extern const u32 gBerryCheck_Pal[];

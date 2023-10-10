@@ -106,8 +106,9 @@ static bool8 CheckFeebas(void)
         if (y >= gRoute119WaterTileData[3 * 2 + 0] && y <= gRoute119WaterTileData[3 * 2 + 1])
             route119Section = 2;
 
-        if (Random() % 100 > 49) // 50% chance of encountering Feebas
-            return FALSE;
+        //if (Random() % 100 > 49) // 50% chance of encountering Feebas
+        //    return FALSE;
+        // If you are on a Feebas tile, 100% for feebas.
 
         FeebasSeedRng(gSaveBlock1Ptr->easyChatPairs[0].unk2);
         for (i = 0; i != NUM_FEEBAS_SPOTS;)

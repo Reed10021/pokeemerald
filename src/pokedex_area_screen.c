@@ -661,49 +661,35 @@ static void Task_ShowPokedexAreaScreen(u8 taskId)
             HideBg(3);
             HideBg(2);
             HideBg(0);
-            break;
-        case 1:
             SetBgAttribute(3, BG_ATTR_CHARBASEINDEX, 3);
             LoadPokedexAreaMapGfx(&sPokedexAreaMapTemplate);
             StringFill(sPokedexAreaScreen->charBuffer, CHAR_SPACE, 16);
             break;
-        case 2:
+        case 1:
             if (sub_81C4E90() == TRUE)
                 return;
             PokedexAreaMapChangeBgY(-8);
-            break;
-        case 3:
             ResetDrawAreaGlowState();
             break;
-        case 4:
+        case 2:
             if (DrawAreaGlow())
                 return;
             break;
-        case 5:
+        case 3:
             ShowRegionMapForPokedexAreaScreen(&sPokedexAreaScreen->regionMap);
             CreateRegionMapPlayerIcon(1, 1);
             PokedexAreaScreen_UpdateRegionMapVariablesAndVideoRegs(0, -8);
-            break;
-        case 6:
             CreateAreaMarkerSprites();
-            break;
-        case 7:
             LoadAreaUnknownGraphics();
-            break;
-        case 8:
             CreateAreaUnknownSprites();
+            BeginNormalPaletteFade(0xFFFFFFF6, 0, 16, 0, RGB(0, 0, 0));
             break;
-        case 9:
-            BeginNormalPaletteFade(0xFFFFFFEB, 0, 16, 0, RGB(0, 0, 0));
-            break;
-        case 10:
+        case 4:
             SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT1_BG0 | BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_BG0 | BLDCNT_TGT2_ALL);
             StartAreaGlow();
             ShowBg(2);
             ShowBg(3);
             SetGpuRegBits(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON);
-            break;
-        case 11:
             gTasks[taskId].func = Task_HandlePokedexAreaScreenInput;
             gTasks[taskId].tState = 0;
             return;

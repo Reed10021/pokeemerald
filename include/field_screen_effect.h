@@ -33,6 +33,7 @@ void DoMossdeepGymWarp(void);
 void DoPortholeWarp(void);
 void DoCableClubWarp(void);
 void DoContestHallWarp(void);
+void SetFlashScanlineEffectWindowBoundaries(u16* dest, s32 centerX, s32 centerY, s32 radius);
 void AnimateFlash(u8 flashLevel);
 void WriteBattlePyramidViewScanlineEffectBuffer(void);
 void sub_80B0244(void);

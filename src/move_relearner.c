@@ -4,6 +4,7 @@
 #include "bg.h"
 #include "contest_effect.h"
 #include "data.h"
+#include "decompress.h"
 #include "event_data.h"
 #include "field_screen_effect.h"
 #include "gpu_regs.h"
@@ -167,6 +168,7 @@ static EWRAM_DATA struct
     u8 moveListScrollArrowTask;                          /*0x113*/
     u8 moveDisplayArrowTask;                             /*0x114*/
     u16 scrollOffset;                                    /*0x116*/
+    u8 splitIconSpriteId;                                //HGSS_Ui Physical/Special type
 } *sMoveRelearnerStruct = {0};
 
 static EWRAM_DATA struct {
@@ -403,6 +405,8 @@ static void CB2_InitLearnMove(void)
 
     LoadSpriteSheet(&sMoveRelearnerSpriteSheet);
     LoadSpritePalette(&sMoveRelearnerPalette);
+    LoadCompressedSpriteSheet(&sSpriteSheet_SplitIcons);
+    LoadSpritePalette(&sSpritePal_SplitIcons);
     CreateUISprites();
 
     sMoveRelearnerStruct->moveListMenuTask = ListMenuInit(&gMultiuseListMenuTemplate, sMoveRelearnerMenuSate.listOffset, sMoveRelearnerMenuSate.listRow);
@@ -428,6 +432,8 @@ static void CB2_InitLearnMoveReturnFromSelectMove(void)
 
     LoadSpriteSheet(&sMoveRelearnerSpriteSheet);
     LoadSpritePalette(&sMoveRelearnerPalette);
+    LoadCompressedSpriteSheet(&sSpriteSheet_SplitIcons);
+    LoadSpritePalette(&sSpritePal_SplitIcons);
     CreateUISprites();
 
     sMoveRelearnerStruct->moveListMenuTask = ListMenuInit(&gMultiuseListMenuTemplate, sMoveRelearnerMenuSate.listOffset, sMoveRelearnerMenuSate.listRow);
@@ -770,6 +776,7 @@ static void HideHeartSpritesAndShowTeachMoveText(bool8 onlyHideSprites)
     {
         gSprites[sMoveRelearnerStruct->heartSpriteIds[i]].invisible = TRUE;
     }
+    gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = FALSE;
 
     if (!onlyHideSprites)
     {
@@ -863,6 +870,9 @@ static void CreateUISprites(void)
         sMoveRelearnerStruct->heartSpriteIds[i] = CreateSprite(&sConstestMoveHeartSprite, (i - (i / 4) * 4) * 8 + 104, (i / 4) * 8 + 36, 0);
     }
 
+    sMoveRelearnerStruct->splitIconSpriteId = CreateSprite(&sSpriteTemplate_SplitIcons, 13, 56, 0);
+    gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = FALSE;
+
     // These are the jam harts.
     // The animation is used to toggle between full/empty heart sprites.
     for (i = 0; i < 8; i++)
@@ -939,9 +949,20 @@ void MoveRelearnerShowHideHearts(s32 moveId)
         {
             gSprites[sMoveRelearnerStruct->heartSpriteIds[i]].invisible = TRUE;
         }
+
+        if (moveId != LIST_CANCEL)
+        {
+            gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = FALSE;
+            StartSpriteAnim(&gSprites[sMoveRelearnerStruct->splitIconSpriteId], GetBattleMoveSplit(moveId));
+        }
+        else 
+        {
+            gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = TRUE;
+        }
     }
     else
     {
+        gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = TRUE;
         numHearts = (u8)(gContestEffects[gContestMoves[moveId].effect].appeal / 10);
 
         if (numHearts == 0xFF)

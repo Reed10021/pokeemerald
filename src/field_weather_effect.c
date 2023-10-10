@@ -997,7 +997,7 @@ void Thunderstorm_InitVars(void)
     gWeatherPtr->targetRainSpriteCount = 16;
     gWeatherPtr->gammaTargetIndex = 3;
     gWeatherPtr->gammaStepDelay = 20;
-    gWeatherPtr->weatherGfxLoaded = FALSE;  // duplicate assignment
+    //gWeatherPtr->weatherGfxLoaded = FALSE;  // duplicate assignment
     gWeatherPtr->thunderTriggered = 0;
     SetRainStrengthFromSoundEffect(SE_THUNDERSTORM);
 }
@@ -1026,7 +1026,7 @@ void Downpour_InitVars(void)
     gWeatherPtr->targetRainSpriteCount = 24;
     gWeatherPtr->gammaTargetIndex = 3;
     gWeatherPtr->gammaStepDelay = 20;
-    gWeatherPtr->weatherGfxLoaded = FALSE;  // duplicate assignment
+    //gWeatherPtr->weatherGfxLoaded = FALSE;  // duplicate assignment
     SetRainStrengthFromSoundEffect(SE_DOWNPOUR);
 }
 
@@ -2503,6 +2503,15 @@ void ResumePausedWeather(void)
     SetCurrentAndNextWeather(weather);
 }
 
+static const u8 sWeatherCycleRoute102_104[] = //and Petalburg City
+{
+    WEATHER_SUNNY,
+    WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
+    WEATHER_RAIN,
+};
 static const u8 sWeatherCycleRoute109[] =
 {
     WEATHER_DROUGHT,
@@ -2630,6 +2639,15 @@ static const u8 sWeatherCycleLilycove[] =
     WEATHER_SNOW,
     WEATHER_SUNNY,
 };
+static const u8 sWeatherCyclePetalburgWoods[] =
+{
+    WEATHER_SHADE,
+    WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_SHADE,
+    WEATHER_SHADE,
+    WEATHER_SHADE,
+    WEATHER_RAIN,
+};
 
 static u8 TranslateWeatherNum(u8 weather)
 {
@@ -2651,6 +2669,7 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_DOWNPOUR:           return WEATHER_DOWNPOUR;
     case WEATHER_UNDERWATER_BUBBLES: return WEATHER_UNDERWATER_BUBBLES;
     case WEATHER_ABNORMAL:           return WEATHER_ABNORMAL;
+    case WEATHER_ROUTE102_104_CYCLE: return sWeatherCycleRoute102_104[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE109_CYCLE:     return sWeatherCycleRoute109[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE103_110_CYCLE: return sWeatherCycleRoute103_110[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE111_112_CYCLE: return sWeatherCycleRoute111_112[gSaveBlock1Ptr->weatherCycleStage];
@@ -2664,7 +2683,8 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_ROUTE126_127_128_CYCLE: return sWeatherCycleRoute126_127_128[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE129_130_131_CYCLE: return sWeatherCycleRoute129_130_131[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE132_133_134_CYCLE: return sWeatherCycleRoute132_133_134[gSaveBlock1Ptr->weatherCycleStage];
-    case WEATHER_LILYCOVE_CYCLE:     return sWeatherCycleLilycove[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_LILYCOVE_CYCLE:         return sWeatherCycleLilycove[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_PETALBURGWOODS_CYCLE:   return sWeatherCyclePetalburgWoods[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;
     }
 }

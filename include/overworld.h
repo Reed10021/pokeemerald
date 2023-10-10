@@ -146,6 +146,7 @@ void CB2_ReturnToFieldContinueScript(void);
 void CB2_ReturnToFieldContinueScriptPlayMapMusic(void);
 void sub_80861E8(void);
 void CB2_ContinueSavedGame(void);
+void InitCurrentFlashLevelScanlineEffect(void);
 void ResetAllMultiplayerState(void);
 u32 sub_8087214(void);
 bool32 sub_808727C(void);

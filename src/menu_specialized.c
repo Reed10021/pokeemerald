@@ -743,7 +743,7 @@ static void MoveRelearnerLoadBattleMoveDescription(u32 chosenMove)
     AddTextPrinterParameterized(0, 1, str, x, 1, TEXT_SPEED_FF, NULL);
 
     str = gText_MoveRelearnerPP;
-    AddTextPrinterParameterized(0, 1, str, 4, 0x29, TEXT_SPEED_FF, NULL);
+    AddTextPrinterParameterized(0, 1, str, 13, 0x29, TEXT_SPEED_FF, NULL);
 
     str = gText_MoveRelearnerPower;
     x = GetStringRightAlignXOffset(1, str, 0x6A);
@@ -761,7 +761,7 @@ static void MoveRelearnerLoadBattleMoveDescription(u32 chosenMove)
     str = gTypeNames[move->type];
     AddTextPrinterParameterized(0, 1, str, 4, 0x19, TEXT_SPEED_FF, NULL);
 
-    x = 4 + GetStringWidth(1, gText_MoveRelearnerPP, 0);
+    x = 13 + GetStringWidth(1, gText_MoveRelearnerPP, 0);
     ConvertIntToDecimalStringN(buffer, move->pp, STR_CONV_MODE_LEFT_ALIGN, 2);
     AddTextPrinterParameterized(0, 1, buffer, x, 0x29, TEXT_SPEED_FF, NULL);
 

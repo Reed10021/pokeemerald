@@ -10,6 +10,7 @@
 #include "battle_tv.h"
 #include "bg.h"
 #include "data.h"
+#include "graphics.h"
 #include "item.h"
 #include "item_menu.h"
 #include "link.h"
@@ -195,8 +196,6 @@ static const u8 sTargetIdentities[] = {B_POSITION_PLAYER_LEFT, B_POSITION_PLAYER
 
 // unknown unused data
 static const u8 sUnknown_0831C5FC[] = {0x48, 0x48, 0x20, 0x5a, 0x50, 0x50, 0x50, 0x58};
-static const u16 sSplitIcons_Pal[] = INCBIN_U16("graphics/battle_interface/split_icons_battle.gbapal");
-static const u8 sSplitIcons_Gfx[] = INCBIN_U8("graphics/battle_interface/split_icons_battle.4bpp");
 
 void nullsub_21(void)
 {
@@ -1668,8 +1667,8 @@ static void MoveSelectionDisplaySplitIcon(void) {
     }
     else
         moveCategory = GetBattleMoveSplit(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]);
-    LoadPalette(sSplitIcons_Pal, 10 * 0x10, 0x20);
-    BlitBitmapToWindow(8, sSplitIcons_Gfx + 0x80 * moveCategory, 0, 0, 16, 16);
+    LoadPalette(sSplitIcons_Battle_Pal, 10 * 0x10, 0x20);
+    BlitBitmapToWindow(8, sSplitIcons_Battle_Gfx + 0x80 * moveCategory, 0, 0, 16, 16);
     PutWindowTilemap(8);
     CopyWindowToVram(8, 3);
 }

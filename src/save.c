@@ -4,13 +4,20 @@
 #include "fieldmap.h"
 #include "save.h"
 #include "task.h"
-#include "decompress.h"
 #include "load_save.h"
 #include "overworld.h"
 #include "pokemon_storage_system.h"
 #include "main.h"
 #include "trainer_hill.h"
 #include "link.h"
+#include "decompress.h"
+#include "palette.h"
+#include "palette.h"
+#include "scanline_effect.h"
+#include "tileset_anims.h"
+#include "field_camera.h"
+#include "field_screen_effect.h"
+#include "battle_pyramid.h"
 #include "constants/game_stat.h"
 
 static u16 CalculateChecksum(const void *data, u16 size);
@@ -20,6 +27,81 @@ static u8 sub_8152E10(u16 a1, const struct SaveSectionLocation *location);
 static u8 ClearSaveData_2(u16 a1, const struct SaveSectionLocation *location);
 static u8 TryWriteSector(u8 sector, u8 *data);
 static u8 HandleWriteSector(u16 a1, const struct SaveSectionLocation *location);
+
+#define TAG_THROBBER 0x1000
+static const u16 sThrobber_Pal[] = INCBIN_U16("graphics/text_window/throbber.gbapal");
+const u32 gThrobber_Gfx[] = INCBIN_U32("graphics/text_window/throbber.4bpp.lz");
+
+static const struct OamData sOam_Throbber =
+{
+    .y = DISPLAY_HEIGHT,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x64),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x64),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const union AnimCmd sAnim_Throbber[] =
+{
+    ANIMCMD_FRAME(0, 4),
+    ANIMCMD_FRAME(32, 4),
+    ANIMCMD_FRAME(64, 4),
+    ANIMCMD_FRAME(96, 4),
+    ANIMCMD_FRAME(128, 4),
+    ANIMCMD_FRAME(160, 4),
+    ANIMCMD_FRAME(192, 4),
+    ANIMCMD_FRAME(224, 4),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd* const sAnims_Throbber[] = { sAnim_Throbber, };
+
+static const struct CompressedSpriteSheet sSpriteSheet_Throbber[] =
+{
+    {
+        .data = gThrobber_Gfx,
+        .size = 0x3200,
+        .tag = TAG_THROBBER
+    },
+    {}
+};
+
+static const struct SpritePalette sSpritePalettes_Throbber[] =
+{
+    {
+        .data = sThrobber_Pal,
+        .tag = TAG_THROBBER
+    },
+    {},
+};
+
+static const struct SpriteTemplate sSpriteTemplate_Throbber =
+{
+    .tileTag = TAG_THROBBER,
+    .paletteTag = TAG_THROBBER,
+    .oam = &sOam_Throbber,
+    .anims = sAnims_Throbber,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+
+u8 ShowThrobber(void)
+{
+    LoadCompressedSpriteSheet(&sSpriteSheet_Throbber[0]);
+    LoadSpritePalettes(sSpritePalettes_Throbber);
+
+    // 217 and 123 are the x and y coordinates (in pixels)
+    return CreateSprite(&sSpriteTemplate_Throbber, 217, 123, 2);
+};
 
 // Divide save blocks into individual chunks to be written to flash sectors
 
@@ -136,11 +218,14 @@ static void VBlankCB_Saving(void)
     BuildOamBuffer();
     LoadOam();
     ProcessSpriteCopyRequests();
+    //ScanlineEffect_InitHBlankDmaTransfer();
+    FieldUpdateBgTilemapScroll();
+    TransferPlttBuffer();
+    TransferTilesetAnimsBuffer();
 }
 
 static u8 SaveWriteToFlash(u16 a1, const struct SaveSectionLocation *location)
 {
-    IntrCallback prevVblankCB;
     u32 status;
     u16 i;
 
@@ -159,17 +244,8 @@ static u8 SaveWriteToFlash(u16 a1, const struct SaveSectionLocation *location)
         gSaveCounter++;
         status = SAVE_STATUS_OK;
 
-        if (gSaveBlock1Ptr->flashLevel == 0) {
-            prevVblankCB = gMain.vblankCallback;
-            SetVBlankCallback(VBlankCB_Saving);
-        }
-
         for (i = 0; i < SECTOR_SAVE_SLOT_LENGTH; i++)
             HandleWriteSector(i, location);
-
-        if (gSaveBlock1Ptr->flashLevel == 0) {
-            SetVBlankCallback(prevVblankCB);
-        }
 
         if (gDamagedSaveSectors != 0) // skip the damaged sector.
         {
@@ -675,11 +751,15 @@ static void UpdateSaveAddresses(void)
 
 u8 HandleSavingData(u8 saveType)
 {
+    IntrCallback prevVblankCB;
     u8 i;
-    u32 *backupVar = gTrainerHillVBlankCounter;
+    u32 *backupVar = gTrainerHillVBlankCounter = NULL;
     u8 *tempAddr;
 
-    gTrainerHillVBlankCounter = NULL;
+    // Save Throbber
+    prevVblankCB = gMain.vblankCallback;
+    SetVBlankCallback(VBlankCB_Saving);
+
     UpdateSaveAddresses();
     switch (saveType)
     {
@@ -723,18 +803,51 @@ u8 HandleSavingData(u8 saveType)
         break;
     }
     gTrainerHillVBlankCounter = backupVar;
+    // Save Throbber - reset callback
+    SetVBlankCallback(prevVblankCB);
     return 0;
 }
 
 u8 TrySavingData(u8 saveType)
 {
+    u16 sFlashLevelPixelRadii[] = { 200, 72, 64, 56, 48, 40, 32, 24, 0 };
+    u8 flashLevel = Overworld_GetFlashLevel();
+    u8 pyramidLightRadius = gSaveBlock2Ptr->frontier.pyramidLightRadius;
+    u8 throbberSpriteId = 0;
     if (gFlashMemoryPresent != TRUE)
     {
         gSaveAttemptStatus = SAVE_STATUS_ERROR;
         return SAVE_STATUS_ERROR;
     }
 
+    // If in a cave, handle flash.
+    if (flashLevel != 0 || InBattlePyramid_())
+    {
+        // Set the first buffer to be not dark
+        SetFlashScanlineEffectWindowBoundaries(&gScanlineEffectRegBuffers[0][0], DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, 200);
+        // Copy the first buffer to the second buffer, that way we don't end up with a flickering effect.
+        CpuFastSet(&gScanlineEffectRegBuffers[0], &gScanlineEffectRegBuffers[1], 480);
+        ScanlineEffect_Stop();
+        ScanlineEffect_Clear();
+    }
+    throbberSpriteId = ShowThrobber();
     HandleSavingData(saveType);
+    DestroySpriteAndFreeResources(&gSprites[throbberSpriteId]);
+    // If in a cave, restore flash level.
+    if (flashLevel != 0 || InBattlePyramid_())
+    {
+        // Set the first buffer back
+        InitCurrentFlashLevelScanlineEffect();
+        if (flashLevel != 0)
+        {
+            WriteFlashScanlineEffectBuffer(flashLevel);
+        }
+        else
+        {
+            WriteBattlePyramidViewScanlineEffectBuffer();
+        }
+    }
+
     if (!gDamagedSaveSectors)
     {
         gSaveAttemptStatus = SAVE_STATUS_OK;

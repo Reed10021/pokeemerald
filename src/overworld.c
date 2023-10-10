@@ -1772,7 +1772,7 @@ static void VBlankCB_Field(void)
     TransferTilesetAnimsBuffer();
 }
 
-static void InitCurrentFlashLevelScanlineEffect(void)
+void InitCurrentFlashLevelScanlineEffect(void)
 {
     u8 flashLevel;
 
