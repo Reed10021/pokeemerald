@@ -92,6 +92,7 @@ bool8 HasMixableShowAlreadyBeenSpawnedWithPlayerID(u8 kind, bool8 flag);
 void tv_store_id_3x(TVShow *show);
 void DeleteTVShowInArrayByIdx(TVShow *shows, u8 idx);
 s8 FindEmptyTVSlotWithinFirstFiveShowsOfArray(TVShow *shows);
+s8 FindExistingOutbreakWithinFirstFiveShowsOfArray(TVShow* shows);
 void FindActiveBroadcastByShowType_SetScriptResult(u8 kind);
 static void InterviewBefore_BravoTrainerPkmnProfile(void);
 static void InterviewBefore_NameRater(void);
@@ -1921,6 +1922,7 @@ static void InterviewAfter_DummyShow4(void)
 
 static void sub_80ED718(void)
 {
+    s8 existingOutbreak;
     u8 i;
     u16 outbreakIdx;
     TVShow *show;
@@ -1934,32 +1936,37 @@ static void sub_80ED718(void)
         //        return;
         //    }
         //}
-        if (!rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
+        // Don't overwrite existing outbreak. Probably what the above code was meant to do, but they botched it.
+        existingOutbreak = FindExistingOutbreakWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
+        if (existingOutbreak == -1)
         {
-            sCurTVShowSlot = FindEmptyTVSlotWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
-            if (sCurTVShowSlot != -1)
+            if (!rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
             {
-                outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesList);
-                show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
-                show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
-                show->massOutbreak.active = TRUE;
-                show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
-                show->massOutbreak.var02 = 0;
-                show->massOutbreak.var03 = 0;
-                show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
-                show->massOutbreak.var0E = 0;
-                show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
-                show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
-                show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
-                show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
-                show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
-                show->massOutbreak.locationMapGroup = 0;
-                show->massOutbreak.var12 = 0;
-                show->massOutbreak.probability = 50;
-                show->massOutbreak.var15 = 0;
-                show->massOutbreak.daysLeft = 0; // How many days to delay before showing on tv.
-                tv_store_id_2x(show);
-                show->massOutbreak.language = gGameLanguage;
+                sCurTVShowSlot = FindEmptyTVSlotWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
+                if (sCurTVShowSlot != -1)
+                {
+                    outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesList);
+                    show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
+                    show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
+                    show->massOutbreak.active = TRUE;
+                    show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
+                    show->massOutbreak.var02 = 0;
+                    show->massOutbreak.var03 = 0;
+                    show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
+                    show->massOutbreak.var0E = 0;
+                    show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
+                    show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
+                    show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
+                    show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
+                    show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
+                    show->massOutbreak.locationMapGroup = 0;
+                    show->massOutbreak.var12 = 0;
+                    show->massOutbreak.probability = 50;
+                    show->massOutbreak.var15 = 0;
+                    show->massOutbreak.daysLeft = 0; // How many days to delay before showing on tv.
+                    tv_store_id_2x(show);
+                    show->massOutbreak.language = gGameLanguage;
+                }
             }
         }
     }
@@ -2850,7 +2857,7 @@ static void sub_80EED88(void)
             if (sub_80EF0E4(newsKind) != TRUE)
             {
                 gSaveBlock1Ptr->pokeNews[sCurTVShowSlot].kind = newsKind;
-                gSaveBlock1Ptr->pokeNews[sCurTVShowSlot].days = 4;
+                gSaveBlock1Ptr->pokeNews[sCurTVShowSlot].days = 2; // Days until event happens.
                 gSaveBlock1Ptr->pokeNews[sCurTVShowSlot].state = TRUE;
             }
         }
@@ -3448,6 +3455,20 @@ s8 FindEmptyTVSlotWithinFirstFiveShowsOfArray(TVShow *shows)
     for (i = 0; i < 5; i ++)
     {
         if (shows[i].common.kind == TVSHOW_OFF_AIR)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+s8 FindExistingOutbreakWithinFirstFiveShowsOfArray(TVShow* shows)
+{
+    u8 i;
+
+    for (i = 0; i < 5; i++)
+    {
+        if (shows[i].common.kind == TVSHOW_MASS_OUTBREAK)
         {
             return i;
         }

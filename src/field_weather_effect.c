@@ -2512,14 +2512,32 @@ static const u8 sWeatherCycleRoute102_104[] = //and Petalburg City
     WEATHER_SUNNY,
     WEATHER_RAIN,
 };
-static const u8 sWeatherCycleRoute109[] =
+static const u8 sWeatherCycleRoute105[] =
+{
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_RAIN,
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SUNNY,
+    WEATHER_RAIN,
+};
+static const u8 sWeatherCycleRoute106_107[] = // and Dewford town
+{
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SUNNY,
+    WEATHER_RAIN,
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
+};
+static const u8 sWeatherCycleRoute108_109[] =
 {
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
+    WEATHER_RAIN_THUNDERSTORM,
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
-    WEATHER_RAIN_THUNDERSTORM,
 };
 static const u8 sWeatherCycleRoute103_110[] =
 {
@@ -2630,6 +2648,24 @@ static const u8 sWeatherCycleRoute132_133_134[] =
     WEATHER_FOG_HORIZONTAL,
     WEATHER_RAIN,
 };
+static const u8 sWeatherCycleSlateport[] =
+{
+    WEATHER_SUNNY,
+    WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_SUNNY,
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SUNNY,
+};
+static const u8 sWeatherCyclePacifidlog[] =
+{
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_DOWNPOUR,
+    WEATHER_SUNNY,
+    WEATHER_DROUGHT,
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SUNNY,
+};
 static const u8 sWeatherCycleLilycove[] =
 {
     WEATHER_SUNNY,
@@ -2670,7 +2706,9 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_UNDERWATER_BUBBLES: return WEATHER_UNDERWATER_BUBBLES;
     case WEATHER_ABNORMAL:           return WEATHER_ABNORMAL;
     case WEATHER_ROUTE102_104_CYCLE: return sWeatherCycleRoute102_104[gSaveBlock1Ptr->weatherCycleStage];
-    case WEATHER_ROUTE109_CYCLE:     return sWeatherCycleRoute109[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE105_CYCLE:     return sWeatherCycleRoute105[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE106_107_CYCLE: return sWeatherCycleRoute106_107[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE108_109_CYCLE: return sWeatherCycleRoute108_109[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE103_110_CYCLE: return sWeatherCycleRoute103_110[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE111_112_CYCLE: return sWeatherCycleRoute111_112[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE114_115_CYCLE: return sWeatherCycleRoute114_115[gSaveBlock1Ptr->weatherCycleStage];
@@ -2683,6 +2721,8 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_ROUTE126_127_128_CYCLE: return sWeatherCycleRoute126_127_128[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE129_130_131_CYCLE: return sWeatherCycleRoute129_130_131[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE132_133_134_CYCLE: return sWeatherCycleRoute132_133_134[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_SLATEPORT_CYCLE:        return sWeatherCycleSlateport[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_PACIFIDLOG_CYCLE:       return sWeatherCyclePacifidlog[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_LILYCOVE_CYCLE:         return sWeatherCycleLilycove[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_PETALBURGWOODS_CYCLE:   return sWeatherCyclePetalburgWoods[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;

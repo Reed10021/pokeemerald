@@ -464,7 +464,13 @@ static bool8 SetUpMassOutbreakEncounter(u8 flags)
     u16 i;
 
     if (flags & WILD_CHECK_REPEL && !IsWildLevelAllowedByRepel(gSaveBlock1Ptr->outbreakPokemonLevel))
-        return FALSE;
+    {
+        if (VarGet(VAR_CHAIN) >= 3 && gSaveBlock1Ptr->outbreakPokemonSpecies == VarGet(VAR_SPECIESCHAINED)) {
+            // Do nothing if we are chaining and the species we picked is our chained species.
+        }
+        else
+            return FALSE;
+    }
 
     CreateWildMon(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakPokemonLevel);
     for (i = 0; i < 4; i++)
@@ -475,12 +481,27 @@ static bool8 SetUpMassOutbreakEncounter(u8 flags)
 
 static bool8 DoMassOutbreakEncounterTest(void)
 {
+    u32 encounterRate = 1;
+    u32 rerollCount = 1;
+    u16 chainCount = VarGet(VAR_CHAIN);
+
+    ApplyCleanseTagEncounterRateMod(&encounterRate);
+    if (encounterRate == 0)
+        return FALSE;
+
+    if (chainCount >= 3) //If we're chaining.
+        rerollCount += chainCount / 2;
+
+
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != 0
      && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
      && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup)
     {
-        if (Random() % 100 < gSaveBlock1Ptr->outbreakPokemonProbability)
-            return TRUE;
+        do {
+            rerollCount--;
+            if (Random() % 100 < gSaveBlock1Ptr->outbreakPokemonProbability)
+                return TRUE;
+        } while (rerollCount > 0);
     }
     return FALSE;
 }
