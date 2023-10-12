@@ -2363,7 +2363,7 @@ u8 CastformDataTypeChange(u8 battler)
         SET_BATTLER_TYPE(battler, TYPE_ICE);
         formChange = CASTFORM_TO_ICE;
     }
-    // Castform doesn't have a specific form for Rock type, but still change his type to Rock so it gets weather ball bonuses.
+    // Castform doesn't have a specific form for Rock type, but still change his type to Rock so it gets weather ball STAB.
     if (gBattleWeather & WEATHER_SANDSTORM_ANY && !IS_BATTLER_OF_TYPE(battler, TYPE_ROCK))
     {
         SET_BATTLER_TYPE(battler, TYPE_ROCK);

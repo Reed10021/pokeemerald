@@ -1605,8 +1605,26 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
         moveType = (15 * typeBits) / 63 + 1;
         if (moveType >= TYPE_MYSTERY)
             moveType++;
+    } else if (move == MOVE_WEATHER_BALL) {
+        moveType = gBattleMoves[move].type; // Normal
+        if (WEATHER_HAS_EFFECT)
+        {
+            if (gBattleWeather & WEATHER_RAIN_ANY)
+                moveType = TYPE_WATER;
+            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                moveType = TYPE_ROCK;
+            else if (gBattleWeather & WEATHER_SUN_ANY)
+                moveType = TYPE_FIRE;
+            else if (gBattleWeather & WEATHER_HAIL_ANY)
+                moveType = TYPE_ICE;
+        }
     } else {
         moveType = gBattleMoves[move].type;
+    }
+
+    if (gBattleMons[gBattlerTarget].species == targetSpecies) {
+        type1 = gBattleMons[gBattlerTarget].type1;
+        type2 = gBattleMons[gBattlerTarget].type2;
     }
 
     if (targetAbility == ABILITY_LEVITATE && moveType == TYPE_GROUND)

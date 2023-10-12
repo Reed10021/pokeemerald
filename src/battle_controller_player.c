@@ -31,6 +31,7 @@
 #include "text.h"
 #include "util.h"
 #include "window.h"
+#include "constants/abilities.h"
 #include "constants/battle_anim.h"
 #include "constants/items.h"
 #include "constants/moves.h"
@@ -1493,19 +1494,27 @@ static void MoveSelectionDisplayMoveDescription(void)
     DrawStdWindowFrame(27, FALSE);
     if (move == MOVE_HIDDEN_POWER) {
         pwr = 75;
-        ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
     } else if (move == MOVE_RETURN) {
         pwr = (10 * GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP)) / 25;
-        ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
     } else if (move == MOVE_FRUSTRATION) {
         pwr = (10 * (MAX_FRIENDSHIP - GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP))) / 25;
-        ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
-    } else {
-        if (pwr < 2)
-            StringCopy(pwr_num, gText_BattleSwitchWhich5);
-        else
-            ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
+    } else if (move == MOVE_WEATHER_BALL) {
+        if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_ANY))
+            pwr *= 2;
     }
+
+    if (move == MOVE_THUNDER) {
+        if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_RAIN_ANY))
+            acc = 100;
+    } else if (move == MOVE_BLIZZARD) {
+        if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_HAIL_ANY))
+            acc = 100;
+    }
+
+    if (pwr < 2)
+        StringCopy(pwr_num, gText_BattleSwitchWhich5);
+    else
+        ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
 
     if (acc < 2)
         StringCopy(acc_num, gText_BattleSwitchWhich5);
@@ -1611,6 +1620,18 @@ static void MoveSelectionDisplayMoveTypeDoubles(u8 targetId)
         type = (15 * typeBits) / 63 + 1;
         if (type >= TYPE_MYSTERY)
             type++;
+    } else if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_WEATHER_BALL) {
+        if (WEATHER_HAS_EFFECT)
+        {
+            if (gBattleWeather & WEATHER_RAIN_ANY)
+                type = TYPE_WATER;
+            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                type = TYPE_ROCK;
+            else if (gBattleWeather & WEATHER_SUN_ANY)
+                type = TYPE_FIRE;
+            else if (gBattleWeather & WEATHER_HAIL_ANY)
+                type = TYPE_ICE;
+        }
     }
     StringCopy(txtPtr, gTypeNames[type]);
 	BattlePutTextOnWindow(gDisplayedStringBattle, TypeEffectiveness(targetId));
@@ -1640,6 +1661,18 @@ static void MoveSelectionDisplayMoveType(void)
         type = (15 * typeBits) / 63 + 1;
         if (type >= TYPE_MYSTERY)
             type++;
+    } else if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_WEATHER_BALL) {
+        if (WEATHER_HAS_EFFECT)
+        {
+            if (gBattleWeather & WEATHER_RAIN_ANY)
+                type = TYPE_WATER;
+            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                type = TYPE_ROCK;
+            else if (gBattleWeather & WEATHER_SUN_ANY)
+                type = TYPE_FIRE;
+            else if (gBattleWeather & WEATHER_HAIL_ANY)
+                type = TYPE_ICE;
+        }
     }
     StringCopy(txtPtr, gTypeNames[type]);
     BattlePutTextOnWindow(gDisplayedStringBattle, typeColor);

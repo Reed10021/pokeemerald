@@ -40,6 +40,7 @@
 #include "text.h"
 #include "tv.h"
 #include "window.h"
+#include "constants/abilities.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/party_menu.h"
@@ -1631,11 +1632,25 @@ static void Task_HandleInput(u8 taskId)
         if (JOY_NEW(DPAD_UP))
         {
             data[3] = 0;
+            if (sMonSummaryScreen->currPageIndex == PSS_PAGE_SKILLS)
+            {
+                ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_IVS);
+                ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_EVS);
+                ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_STATS);
+                PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_IVS);
+            }
             ChangeSummaryPokemon(taskId, -1);
         }
         else if (JOY_NEW(DPAD_DOWN))
         {
             data[3] = 0;
+            if (sMonSummaryScreen->currPageIndex == PSS_PAGE_SKILLS)
+            {
+                ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_IVS);
+                ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_EVS);
+                ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_STATS);
+                PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_IVS);
+            }
             ChangeSummaryPokemon(taskId, 1);
         }
         else if (JOY_NEW(DPAD_LEFT) || GetLRKeysPressed() == MENU_L_PRESSED)
@@ -3771,6 +3786,17 @@ static void PrintMovePowerAndAccuracy(u16 moveIndex)
         } else if (moveIndex == MOVE_FRUSTRATION) {
             ConvertIntToDecimalStringN(gStringVar1, (10 * (MAX_FRIENDSHIP - monFriendship) / 25), STR_CONV_MODE_RIGHT_ALIGN, 3);
             text = gStringVar1;
+        } else if (moveIndex == MOVE_WEATHER_BALL) {
+            u8 power = gBattleMoves[moveIndex].power;
+            if (gMain.inBattle)
+            {
+                if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_ANY))
+                {
+                    power *= 2;
+                }
+            }
+            ConvertIntToDecimalStringN(gStringVar1, power, STR_CONV_MODE_RIGHT_ALIGN, 3);
+            text = gStringVar1;
         } else {
             if (gBattleMoves[moveIndex].power < 2)
             {
@@ -3791,7 +3817,20 @@ static void PrintMovePowerAndAccuracy(u16 moveIndex)
         }
         else
         {
-            ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[moveIndex].accuracy, STR_CONV_MODE_RIGHT_ALIGN, 3);
+            u8 accuracy = gBattleMoves[moveIndex].accuracy;
+            if (gMain.inBattle)
+            {
+                if (moveIndex == MOVE_THUNDER)
+                {
+                    if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_RAIN_ANY))
+                        accuracy = 100;
+                }
+                else if (moveIndex == MOVE_BLIZZARD) {
+                    if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_HAIL_ANY))
+                        accuracy = 100;
+                }
+            }
+            ConvertIntToDecimalStringN(gStringVar1, accuracy, STR_CONV_MODE_RIGHT_ALIGN, 3);
             text = gStringVar1;
         }
 
@@ -3867,7 +3906,22 @@ static void PrintContestMoveDescription(u8 moveSlot)
 
 u8 GetBattleMoveSplit(u16 move)
 {
-    if (gBattleMoves[move].power == 0 || gBattleMoves[move].type == TYPE_MYSTERY) {
+    if (move == MOVE_WEATHER_BALL && gMain.inBattle) {
+        u8 type = gBattleMoves[move].type;
+        if (WEATHER_HAS_EFFECT)
+        {
+            if (gBattleWeather & WEATHER_RAIN_ANY)
+                type = TYPE_WATER;
+            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                type = TYPE_ROCK;
+            else if (gBattleWeather & WEATHER_SUN_ANY)
+                type = TYPE_FIRE;
+            else if (gBattleWeather & WEATHER_HAIL_ANY)
+                type = TYPE_ICE;
+        }
+        return type > TYPE_MYSTERY;
+    }
+    else if (gBattleMoves[move].power == 0 || gBattleMoves[move].type == TYPE_MYSTERY) {
         return 2; // status move
     }
     else {
@@ -4058,7 +4112,25 @@ static void SetMonTypeIcons(void)
     }
     else
     {
-        SetTypeSpritePosAndPal(gBaseStats[summary->species].type1, 120, 48, SPRITE_ARR_ID_TYPE);
+        u8 type1 = gBaseStats[summary->species].type1;
+        if (gMain.inBattle)
+        {
+            if (WEATHER_HAS_EFFECT && 
+                summary->species == SPECIES_CASTFORM && 
+                gBaseStats[summary->species].abilities[0] == ABILITY_FORECAST && 
+                summary->abilityNum == 0)
+            {
+                if (gBattleWeather & WEATHER_RAIN_ANY)
+                    type1 = TYPE_WATER;
+                else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                    type1 = TYPE_ROCK;
+                else if (gBattleWeather & WEATHER_SUN_ANY)
+                    type1 = TYPE_FIRE;
+                else if (gBattleWeather & WEATHER_HAIL_ANY)
+                    type1 = TYPE_ICE;
+            }
+        }
+        SetTypeSpritePosAndPal(type1, 120, 48, SPRITE_ARR_ID_TYPE);
         if (gBaseStats[summary->species].type1 != gBaseStats[summary->species].type2)
         {
             SetTypeSpritePosAndPal(gBaseStats[summary->species].type2, 160, 48, SPRITE_ARR_ID_TYPE + 1);
@@ -4091,6 +4163,23 @@ static void SetMoveTypeIcons(void)
                 u8 type = (15 * typeBits) / 63 + 1;
                 if (type >= TYPE_MYSTERY)
                     type++;
+                SetTypeSpritePosAndPal(type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
+            } else if(summary->moves[i] == MOVE_WEATHER_BALL) {
+                u8 type = gBattleMoves[summary->moves[i]].type;
+                if (gMain.inBattle)
+                {
+                    if (WEATHER_HAS_EFFECT)
+                    {
+                        if (gBattleWeather & WEATHER_RAIN_ANY)
+                            type = TYPE_WATER;
+                        else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                            type = TYPE_ROCK;
+                        else if (gBattleWeather & WEATHER_SUN_ANY)
+                            type = TYPE_FIRE;
+                        else if (gBattleWeather & WEATHER_HAIL_ANY)
+                            type = TYPE_ICE;
+                    }
+                }
                 SetTypeSpritePosAndPal(type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
             } else
                 SetTypeSpritePosAndPal(gBattleMoves[summary->moves[i]].type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
@@ -4139,7 +4228,24 @@ static void SetNewMoveTypeIcon(void)
                     type++;
                 SetTypeSpritePosAndPal(type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
             }
-            else
+            else if (sMonSummaryScreen->newMove == MOVE_WEATHER_BALL) {
+                u8 type = gBattleMoves[sMonSummaryScreen->newMove].type;
+                if (gMain.inBattle)
+                {
+                    if (WEATHER_HAS_EFFECT)
+                    {
+                        if (gBattleWeather & WEATHER_RAIN_ANY)
+                            type = TYPE_WATER;
+                        else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                            type = TYPE_ROCK;
+                        else if (gBattleWeather & WEATHER_SUN_ANY)
+                            type = TYPE_FIRE;
+                        else if (gBattleWeather & WEATHER_HAIL_ANY)
+                            type = TYPE_ICE;
+                    }
+                }
+                SetTypeSpritePosAndPal(type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
+            } else
                 SetTypeSpritePosAndPal(gBattleMoves[sMonSummaryScreen->newMove].type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
         }
         else
