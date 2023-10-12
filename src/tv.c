@@ -348,9 +348,21 @@ static const struct {
         .level = 21,
         .location = MAP_NUM(ROUTE110)
     },
-    {
+    {   // Starter outbreaks
         .species = SPECIES_TREECKO,
-        .moves = {MOVE_DRAGON_BREATH, MOVE_DRAGON_BREATH, MOVE_DRAGON_BREATH, MOVE_DRAGON_BREATH},
+        .moves = {MOVE_TAIL_GLOW, MOVE_ICE_PUNCH, MOVE_YAWN, MOVE_GIGA_DRAIN},
+        .level = 17,
+        .location = MAP_NUM(ROUTE119)
+    },
+    {
+        .species = SPECIES_TORCHIC,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_THUNDER_PUNCH, MOVE_CROSS_CHOP, MOVE_HEAT_WAVE},
+        .level = 17,
+        .location = MAP_NUM(ROUTE119)
+    },
+    {
+        .species = SPECIES_MUDKIP,
+        .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_SLUDGE_BOMB, MOVE_EARTHQUAKE},
         .level = 17,
         .location = MAP_NUM(ROUTE119)
     },
@@ -1922,7 +1934,7 @@ static void sub_80ED718(void)
         //        return;
         //    }
         //}
-        if (!rbernoulli(1, 200))
+        if (!rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
         {
             sCurTVShowSlot = FindEmptyTVSlotWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
             if (sCurTVShowSlot != -1)
@@ -1934,50 +1946,18 @@ static void sub_80ED718(void)
                 show->massOutbreak.level = sPokeOutbreakSpeciesList[outbreakIdx].level;
                 show->massOutbreak.var02 = 0;
                 show->massOutbreak.var03 = 0;
-                // Use treecko as starter flag; only create mass outbreak for the starter the player picked.
-                if (sPokeOutbreakSpeciesList[outbreakIdx].species == SPECIES_TREECKO)
-                {
-                    switch (VarGet(VAR_STARTER_MON))
-                    {
-                        case 0:
-                        default:
-                            show->massOutbreak.species = SPECIES_TREECKO;
-                            show->massOutbreak.moves[0] = MOVE_TAIL_GLOW;
-                            show->massOutbreak.moves[1] = MOVE_ICE_PUNCH;
-                            show->massOutbreak.moves[2] = MOVE_YAWN;
-                            show->massOutbreak.moves[3] = MOVE_GIGA_DRAIN;
-                            break;
-                        case 1:
-                            show->massOutbreak.species = SPECIES_TORCHIC;
-                            show->massOutbreak.moves[0] = MOVE_DRAGON_DANCE;
-                            show->massOutbreak.moves[1] = MOVE_THUNDER_PUNCH;
-                            show->massOutbreak.moves[2] = MOVE_CROSS_CHOP;
-                            show->massOutbreak.moves[3] = MOVE_HEAT_WAVE;
-                            break;
-                        case 2:
-                            show->massOutbreak.species = SPECIES_MUDKIP;
-                            show->massOutbreak.moves[0] = MOVE_SWORDS_DANCE;
-                            show->massOutbreak.moves[1] = MOVE_FURY_CUTTER;
-                            show->massOutbreak.moves[2] = MOVE_SLUDGE_BOMB;
-                            show->massOutbreak.moves[3] = MOVE_EARTHQUAKE;
-                            break;
-                    }
-                }
-                else
-                {
-                    show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
-                    show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
-                    show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
-                    show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
-                    show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
-                }
+                show->massOutbreak.species = sPokeOutbreakSpeciesList[outbreakIdx].species;
                 show->massOutbreak.var0E = 0;
+                show->massOutbreak.moves[0] = sPokeOutbreakSpeciesList[outbreakIdx].moves[0];
+                show->massOutbreak.moves[1] = sPokeOutbreakSpeciesList[outbreakIdx].moves[1];
+                show->massOutbreak.moves[2] = sPokeOutbreakSpeciesList[outbreakIdx].moves[2];
+                show->massOutbreak.moves[3] = sPokeOutbreakSpeciesList[outbreakIdx].moves[3];
                 show->massOutbreak.locationMapNum = sPokeOutbreakSpeciesList[outbreakIdx].location;
                 show->massOutbreak.locationMapGroup = 0;
                 show->massOutbreak.var12 = 0;
                 show->massOutbreak.probability = 50;
                 show->massOutbreak.var15 = 0;
-                show->massOutbreak.daysLeft = 1;
+                show->massOutbreak.daysLeft = 0; // How many days to delay before showing on tv.
                 tv_store_id_2x(show);
                 show->massOutbreak.language = gGameLanguage;
             }
