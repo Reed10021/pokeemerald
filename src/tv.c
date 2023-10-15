@@ -1923,7 +1923,7 @@ static void InterviewAfter_DummyShow4(void)
 static void sub_80ED718(void)
 {
     s8 existingOutbreak;
-    u8 i;
+    u32 i;
     u8 nBadges = 0;
     u16 outbreakIdx;
     TVShow *show;
@@ -2898,7 +2898,7 @@ static void sub_80EED88(void)
         sCurTVShowSlot = sub_80EEE30(gSaveBlock1Ptr->pokeNews);
         if (sCurTVShowSlot != -1 /*&& rbernoulli(1, 100) != TRUE*/)
         {
-            u8 i;
+            u32 i;
             u8 nBadges = 0;
             for (i = FLAG_BADGE01_GET, nBadges = 0; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
             {
