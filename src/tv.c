@@ -1924,8 +1924,10 @@ static void sub_80ED718(void)
 {
     s8 existingOutbreak;
     u8 i;
+    u8 nBadges = 0;
     u16 outbreakIdx;
     TVShow *show;
+
 
 //    if (FlagGet(FLAG_SYS_GAME_CLEAR))
     {
@@ -1938,13 +1940,54 @@ static void sub_80ED718(void)
         //}
         // Don't overwrite existing outbreak. Probably what the above code was meant to do, but they botched it.
         existingOutbreak = FindExistingOutbreakWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
-        // If we found an existing outbreak show, and if either the saveblock outbreakSpecies is not SPECIES_NONE (active outbreak) or if the outbreak hasn't started yet (queued outbreak), don't create an outbreak.
-        if (existingOutbreak != -1 && (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE || gSaveBlock1Ptr->tvShows[existingOutbreak].massOutbreak.daysLeft > 0))
+        // If we found an existing outbreak show or if either the saveblock outbreakSpecies is not SPECIES_NONE (active outbreak) don't create an outbreak.
+        if (existingOutbreak != -1 || gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
         {
             return;
         }
 
-        if (!rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
+        for (i = FLAG_BADGE01_GET, nBadges = 0; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
+        {
+            if (FlagGet(i))
+            {
+                nBadges++;
+            }
+        }
+
+        switch (nBadges)
+        {
+            default:
+            case 0:
+            case 1:
+            case 2:
+                if (rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
+                    return;
+                break;
+            case 3:
+            case 4:
+                if (rbernoulli(1, 70))
+                    return;
+                break;
+            case 5:
+            case 6:
+                if (rbernoulli(1, 50))
+                    return;
+                break;
+            case 7:
+                if (rbernoulli(1, 40))
+                    return;
+                break;
+            case 8:
+                if (FlagGet(FLAG_SYS_GAME_CLEAR))
+                {
+                    if (rbernoulli(1, 10))
+                        return;
+                }
+                else if (rbernoulli(1, 30))
+                        return;
+                break;
+        }
+        // We didn't return, so generate news.
         {
             sCurTVShowSlot = FindEmptyTVSlotWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
             if (sCurTVShowSlot != -1)
@@ -2853,10 +2896,55 @@ static void sub_80EED88(void)
     //if (FlagGet(FLAG_SYS_GAME_CLEAR))
     {
         sCurTVShowSlot = sub_80EEE30(gSaveBlock1Ptr->pokeNews);
-        if (sCurTVShowSlot != -1 && rbernoulli(1, 100) != TRUE)
+        if (sCurTVShowSlot != -1 /*&& rbernoulli(1, 100) != TRUE*/)
         {
-            newsKind = (Random() % 4) + POKENEWS_SLATEPORT;
-            if (sub_80EF0E4(newsKind) != TRUE)
+            u8 i;
+            u8 nBadges = 0;
+            for (i = FLAG_BADGE01_GET, nBadges = 0; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
+            {
+                if (FlagGet(i))
+                {
+                    nBadges++;
+                }
+            }
+            switch (nBadges) // FFFF * (firstnum) / (secondnum) >= Random()
+            {
+                default:
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    if (rbernoulli(1, 100))
+                        return;
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                    if (rbernoulli(1, 80))
+                        return;
+                    break;
+                case 7:
+                case 8:
+                    if (FlagGet(FLAG_SYS_GAME_CLEAR))
+                    {
+                        if (rbernoulli(1, 50))
+                            return;
+                    }
+                    else if (rbernoulli(1, 60))
+                            return;
+                    break;
+            }
+            // We didn't return, so generate news.
+            i = 0;
+            do {
+                if (i > 100) // if we can't generate a news that we don't already have happening, return after 100 attempts.
+                    return;
+                newsKind = (Random() % 4) + POKENEWS_SLATEPORT;
+                i++;
+            } while (sub_80EF0E4(newsKind) != TRUE);
+            
+            // IF we get here then we haven't returned and have generated a valid newskind.
+            //if (sub_80EF0E4(newsKind) != TRUE)
             {
                 gSaveBlock1Ptr->pokeNews[sCurTVShowSlot].kind = newsKind;
                 gSaveBlock1Ptr->pokeNews[sCurTVShowSlot].days = 2; // Days until event happens.
@@ -3470,7 +3558,7 @@ s8 FindExistingOutbreakWithinFirstFiveShowsOfArray(TVShow* shows)
 
     for (i = 0; i < 5; i++)
     {
-        if (shows[i].common.kind == TVSHOW_MASS_OUTBREAK)
+        if (shows[i].common.kind == TVSHOW_MASS_OUTBREAK && shows[i].common.active == TRUE)
         {
             return i;
         }
@@ -3985,7 +4073,7 @@ static bool8 sub_80F0668(TVShow *tv1, TVShow *tv2, u8 idx)
     tv2->common.srcTrainerIdHi = linkTrainerId >> 8;
     *tv1 = *tv2;
     tv1->common.active = TRUE;
-    tv1->massOutbreak.daysLeft = 1;
+    tv1->massOutbreak.daysLeft = 0; //time to delay outbreak
     return TRUE;
 }
 
