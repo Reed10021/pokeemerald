@@ -1580,7 +1580,7 @@ u8 TypeEffectiveness(u8 targetId)
 {
     struct ChooseMoveStruct* moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
     u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
-    u8 moveFlags = AI_TypeCalc(move, gBattleMons[targetId].species, gBattleMons[targetId].ability);
+    u8 moveFlags = AI_TypeCalc(move, gBattleMons[targetId].type1, gBattleMons[targetId].type2, gBattleMons[targetId].ability);
 
     if (moveFlags & MOVE_RESULT_NO_EFFECT) {
         return 26;

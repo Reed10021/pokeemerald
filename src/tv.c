@@ -408,6 +408,103 @@ static const struct {
         .moves = {MOVE_BELLY_DRUM, MOVE_BOUNCE, MOVE_THRASH, MOVE_EARTHQUAKE},
         .level = 37,
         .location = MAP_NUM(ROUTE123)
+    },
+    {
+        .species = SPECIES_BLISSEY,
+        .moves = {MOVE_CALM_MIND, MOVE_SWEET_KISS, MOVE_WISH, MOVE_PSYCHO_BOOST},
+        .level = 100,
+        .location = MAP_NUM(ROUTE123)
+    },
+    {
+        .species = SPECIES_MILOTIC,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_HYDRO_PUMP, MOVE_ICE_BEAM, MOVE_THUNDER},
+        .level = 60,
+        .location = MAP_NUM(ROUTE130)
+    },
+    {
+        .species = SPECIES_KINGDRA,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_HYDRO_PUMP, MOVE_OUTRAGE, MOVE_THUNDER},
+        .level = 60,
+        .location = MAP_NUM(ROUTE134)
+    },
+    {
+        .species = SPECIES_MANTINE,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_HYDRO_CANNON, MOVE_BULLET_SEED, MOVE_PSYCHO_BOOST},
+        .level = 60,
+        .location = MAP_NUM(ROUTE133)
+    },
+    {
+        .species = SPECIES_SLOWBRO,
+        .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_CANNON, MOVE_BELLY_DRUM, MOVE_PSYCHO_BOOST},
+        .level = 60,
+        .location = MAP_NUM(ROUTE132)
+    },
+    {
+        .species = SPECIES_SLOWKING,
+        .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_CANNON, MOVE_BELLY_DRUM, MOVE_PSYCHO_BOOST},
+        .level = 60,
+        .location = MAP_NUM(ROUTE131)
+    },
+    {
+        .species = SPECIES_POLIWRATH,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_HYDRO_CANNON, MOVE_BELLY_DRUM, MOVE_CROSS_CHOP},
+        .level = 45,
+        .location = MAP_NUM(ROUTE122)
+    },
+    {
+        .species = SPECIES_POLIWRATH,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_HYDRO_CANNON, MOVE_BELLY_DRUM, MOVE_CROSS_CHOP},
+        .level = 45,
+        .location = MAP_NUM(ROUTE122)
+    },
+    {
+        .species = SPECIES_DEWGONG,
+        .moves = {MOVE_TAIL_GLOW, MOVE_HAIL, MOVE_ICE_BALL, MOVE_HYDRO_PUMP},
+        .level = 50,
+        .location = MAP_NUM(ROUTE126)
+    },
+    {
+        .species = SPECIES_OMASTAR,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_ROCK_SLIDE, MOVE_ICE_BALL, MOVE_HYDRO_CANNON},
+        .level = 50,
+        .location = MAP_NUM(ROUTE127)
+    },
+    {
+        .species = SPECIES_KABUTOPS,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_ROCK_SLIDE, MOVE_EARTHQUAKE, MOVE_HYDRO_CANNON},
+        .level = 50,
+        .location = MAP_NUM(ROUTE128)
+    },
+    {
+        .species = SPECIES_POLITOED,
+        .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_CANNON, MOVE_ICE_BEAM, MOVE_THUNDER_PUNCH},
+        .level = 50,
+        .location = MAP_NUM(ROUTE129)
+    },
+    {
+        // Gen 1 starters
+        .species = SPECIES_SQUIRTLE,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_CURSE, MOVE_CROSS_CHOP, MOVE_HYDRO_CANNON},
+        .level = 15,
+        .location = MAP_NUM(ROUTE103)
+    },
+    {
+        .species = SPECIES_CHARMANDER,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_DRILL_PECK, MOVE_HEAT_WAVE, MOVE_OUTRAGE},
+        .level = 15,
+        .location = MAP_NUM(ROUTE110)
+    },
+    {
+        .species = SPECIES_BULBASAUR,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_PETAL_DANCE, MOVE_SLUDGE_BOMB, MOVE_SPORE},
+        .level = 15,
+        .location = MAP_NUM(ROUTE104)
+    },
+    {
+        .species = SPECIES_PARASECT,
+        .moves = {MOVE_BELLY_DRUM, MOVE_FURY_CUTTER, MOVE_SPORE, MOVE_EXTREME_SPEED},
+        .level = 50,
+        .location = MAP_NUM(ROUTE120)
     }
 };
 
@@ -1940,7 +2037,7 @@ static void sub_80ED718(void)
         //}
         // Don't overwrite existing outbreak. Probably what the above code was meant to do, but they botched it.
         existingOutbreak = FindExistingOutbreakWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
-        // If we found an existing outbreak show or if either the saveblock outbreakSpecies is not SPECIES_NONE (active outbreak) don't create an outbreak.
+        // If we found an existing active outbreak show or if the saveblock outbreakSpecies is not SPECIES_NONE (active outbreak) don't create an outbreak.
         if (existingOutbreak != -1 || gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
         {
             return;
@@ -1958,32 +2055,32 @@ static void sub_80ED718(void)
         {
             default:
             case 0:
+                if (rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
+                    return;
+                break;
             case 1:
             case 2:
-                if (rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
+                if (rbernoulli(2, 20)) // FFFF * (firstnum) / (secondnum) >= Random()
                     return;
                 break;
             case 3:
             case 4:
-                if (rbernoulli(1, 70))
+                if (rbernoulli(3, 20))
                     return;
                 break;
             case 5:
             case 6:
-                if (rbernoulli(1, 50))
-                    return;
-                break;
             case 7:
-                if (rbernoulli(1, 40))
+                if (rbernoulli(4, 10))
                     return;
                 break;
             case 8:
                 if (FlagGet(FLAG_SYS_GAME_CLEAR))
                 {
-                    if (rbernoulli(1, 10))
-                        return;
+                    // If we beat the game, generate an outbreak every day.
+                    break;
                 }
-                else if (rbernoulli(1, 30))
+                else if (rbernoulli(4, 5))
                         return;
                 break;
         }
@@ -2920,17 +3017,17 @@ static void sub_80EED88(void)
                 case 4:
                 case 5:
                 case 6:
-                    if (rbernoulli(1, 80))
+                    if (rbernoulli(2, 50))
                         return;
                     break;
                 case 7:
                 case 8:
                     if (FlagGet(FLAG_SYS_GAME_CLEAR))
                     {
-                        if (rbernoulli(1, 50))
+                        if (rbernoulli(4, 20))
                             return;
                     }
-                    else if (rbernoulli(1, 60))
+                    else if (rbernoulli(3, 25))
                             return;
                     break;
             }

@@ -1585,11 +1585,10 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
     return flags;
 }
 
-u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
+u8 AI_TypeCalc(u16 move, u8 type1, u8 type2, u8 targetAbility)
 {
     s32 i = 0;
     u8 flags = 0;
-    u8 type1 = gBaseStats[targetSpecies].type1, type2 = gBaseStats[targetSpecies].type2;
     u8 moveType;
 
     if (move == MOVE_STRUGGLE)
@@ -1620,11 +1619,6 @@ u8 AI_TypeCalc(u16 move, u16 targetSpecies, u8 targetAbility)
         }
     } else {
         moveType = gBattleMoves[move].type;
-    }
-
-    if (gBattleMons[gBattlerTarget].species == targetSpecies) {
-        type1 = gBattleMons[gBattlerTarget].type1;
-        type2 = gBattleMons[gBattlerTarget].type2;
     }
 
     if (targetAbility == ABILITY_LEVITATE && moveType == TYPE_GROUND)
