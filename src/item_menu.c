@@ -959,7 +959,7 @@ void BagMenu_ItemPrintCallback(u8 windowId, s32 itemIndex, u8 y)
             if (VarGet(VAR_REGISTERED_L_ITEM) && VarGet(VAR_REGISTERED_L_ITEM) == itemId)
                 BlitBitmapToWindow(windowId, sLButtonGfx, 96, y - 1, 24, 16);
 
-            if (VarGet(VAR_REGISTERED_R_ITEM) && VarGet(VAR_REGISTERED_L_ITEM) == itemId)
+            if (VarGet(VAR_REGISTERED_R_ITEM) && VarGet(VAR_REGISTERED_R_ITEM) == itemId)
                 BlitBitmapToWindow(windowId, sRButtonGfx, 96, y - 1, 24, 16);
         }
     }
