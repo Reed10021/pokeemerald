@@ -995,8 +995,8 @@ struct SaveBlock1
     /*0x3D64*/ struct SaveTrainerHill trainerHill;
     /*0x3D70*/ struct WaldaPhrase waldaPhrase;
     // sizeof: 0x3D88
-    /*0x3D88*/ u16 registeredItemL;
-    /*0x3D8A*/ u16 registeredItemR;
+    ///*0x3D88*/ u16 registeredItemL;
+    ///*0x3D8A*/ u16 registeredItemR;
     // sizeof: 0x3D8C
 };
 

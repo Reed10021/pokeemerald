@@ -631,23 +631,23 @@ void SwapRegisteredBike(void)
         break;
     }
 
-    switch (gSaveBlock1Ptr->registeredItemL)
+    switch (VarGet(VAR_REGISTERED_L_ITEM))
     {
     case ITEM_MACH_BIKE:
-        gSaveBlock1Ptr->registeredItemL = ITEM_ACRO_BIKE;
+        VarSet(VAR_REGISTERED_L_ITEM, ITEM_ACRO_BIKE);
         break;
     case ITEM_ACRO_BIKE:
-        gSaveBlock1Ptr->registeredItemL = ITEM_MACH_BIKE;
+        VarSet(VAR_REGISTERED_L_ITEM, ITEM_MACH_BIKE);
         break;
     }
 
-    switch (gSaveBlock1Ptr->registeredItemR)
+    switch (VarGet(VAR_REGISTERED_R_ITEM))
     {
     case ITEM_MACH_BIKE:
-        gSaveBlock1Ptr->registeredItemR = ITEM_ACRO_BIKE;
+        VarSet(VAR_REGISTERED_R_ITEM, ITEM_ACRO_BIKE);
         break;
     case ITEM_ACRO_BIKE:
-        gSaveBlock1Ptr->registeredItemR = ITEM_MACH_BIKE;
+        VarSet(VAR_REGISTERED_R_ITEM, ITEM_MACH_BIKE);
         break;
     }
 }

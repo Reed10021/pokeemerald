@@ -91,13 +91,14 @@ static void InitPlayerTrainerId(void)
     SetTrainerId(trainerId, gSaveBlock2Ptr->playerTrainerId);
 }
 
-// L=A isnt set here for some reason.
+// L=A isnt set here for some reason. (fixed)
 static void SetDefaultOptions(void)
 {
-    gSaveBlock2Ptr->optionsTextSpeed = OPTIONS_TEXT_SPEED_FAST;
+    gSaveBlock2Ptr->optionsTextSpeed = OPTIONS_TEXT_SPEED_MID;
     gSaveBlock2Ptr->optionsWindowFrameType = 0;
     gSaveBlock2Ptr->optionsSound = OPTIONS_SOUND_STEREO;
-    gSaveBlock2Ptr->optionsBattleStyle = OPTIONS_BATTLE_STYLE_SHIFT;
+    gSaveBlock2Ptr->optionsButtonMode = OPTIONS_BUTTON_MODE_LR;
+    gSaveBlock2Ptr->optionsBattleStyle = OPTIONS_BATTLE_STYLE_SET; // OPTIONS_BATTLE_STYLE_SHIFT
     gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
     gSaveBlock2Ptr->regionMapZoom = FALSE;
 }
@@ -185,8 +186,6 @@ void NewGameInitData(void)
     ClearRoamerData();
     ClearRoamerLocationData();
     gSaveBlock1Ptr->registeredItemSelect = 0;
-    gSaveBlock1Ptr->registeredItemL = 0;
-    gSaveBlock1Ptr->registeredItemR = 0;
     ClearBag();
     NewGameInitPCItems();
     ClearPokeblocks();

@@ -956,10 +956,10 @@ void BagMenu_ItemPrintCallback(u8 windowId, s32 itemIndex, u8 y)
             if (gSaveBlock1Ptr->registeredItemSelect && gSaveBlock1Ptr->registeredItemSelect == itemId)
                 BlitBitmapToWindow(windowId, sSelectButtonGfx, 96, y - 1, 24, 16);
 
-            if (gSaveBlock1Ptr->registeredItemL && gSaveBlock1Ptr->registeredItemL == itemId)
+            if (VarGet(VAR_REGISTERED_L_ITEM) && VarGet(VAR_REGISTERED_L_ITEM) == itemId)
                 BlitBitmapToWindow(windowId, sLButtonGfx, 96, y - 1, 24, 16);
 
-            if (gSaveBlock1Ptr->registeredItemR && gSaveBlock1Ptr->registeredItemR == itemId)
+            if (VarGet(VAR_REGISTERED_R_ITEM) && VarGet(VAR_REGISTERED_L_ITEM) == itemId)
                 BlitBitmapToWindow(windowId, sRButtonGfx, 96, y - 1, 24, 16);
         }
     }
@@ -1597,9 +1597,9 @@ void OpenContextMenu(u8 unused)
 
                         if (gSaveBlock1Ptr->registeredItemSelect == gSpecialVar_ItemId)
                             gBagMenu->contextMenuItemsBuffer[1] = ITEMMENUACTION_DESELECT;
-                        else if (gSaveBlock1Ptr->registeredItemL == gSpecialVar_ItemId)
+                        else if (VarGet(VAR_REGISTERED_L_ITEM) == gSpecialVar_ItemId)
                             gBagMenu->contextMenuItemsBuffer[1] = ITEMMENUACTION_DESELECT;
-                        else if (gSaveBlock1Ptr->registeredItemR == gSpecialVar_ItemId)
+                        else if (VarGet(VAR_REGISTERED_R_ITEM) == gSpecialVar_ItemId)
                             gBagMenu->contextMenuItemsBuffer[1] = ITEMMENUACTION_DESELECT;
                         break;
                     case BALLS_POCKET:
@@ -2505,10 +2505,10 @@ static void ResetRegisteredItem(u16 item)
 {
     if (gSaveBlock1Ptr->registeredItemSelect == item)
         gSaveBlock1Ptr->registeredItemSelect = ITEM_NONE;
-    else if (gSaveBlock1Ptr->registeredItemL == item)
-        gSaveBlock1Ptr->registeredItemL = ITEM_NONE;
-    else if (gSaveBlock1Ptr->registeredItemR == item)
-        gSaveBlock1Ptr->registeredItemR = ITEM_NONE;
+    else if (VarGet(VAR_REGISTERED_L_ITEM) == item)
+        VarSet(VAR_REGISTERED_L_ITEM, ITEM_NONE);
+    else if (VarGet(VAR_REGISTERED_R_ITEM) == item)
+        VarSet(VAR_REGISTERED_R_ITEM, ITEM_NONE);
 }
 
 static void ItemMenu_FinishRegister(u8 taskId)
@@ -2546,7 +2546,7 @@ static void ItemMenu_Register(u8 taskId)
 static void ItemMenu_RegisterSelect(u8 taskId)
 {
     if (gSaveBlock1Ptr->registeredItemSelect == gSpecialVar_ItemId)
-        gSaveBlock1Ptr->registeredItemSelect = 0;
+        gSaveBlock1Ptr->registeredItemSelect = ITEM_NONE;
     else
         gSaveBlock1Ptr->registeredItemSelect = gSpecialVar_ItemId;
 
@@ -2555,20 +2555,20 @@ static void ItemMenu_RegisterSelect(u8 taskId)
 
 static void ItemMenu_RegisterL(u8 taskId)
 {
-    if (gSaveBlock1Ptr->registeredItemL == gSpecialVar_ItemId)
-        gSaveBlock1Ptr->registeredItemL = ITEM_NONE;
+    if (VarGet(VAR_REGISTERED_L_ITEM) == gSpecialVar_ItemId)
+        VarSet(VAR_REGISTERED_L_ITEM, ITEM_NONE);
     else
-        gSaveBlock1Ptr->registeredItemL = gSpecialVar_ItemId;
+        VarSet(VAR_REGISTERED_L_ITEM, gSpecialVar_ItemId);
 
     gTasks[taskId].func = ItemMenu_FinishRegister;
 }
 
 static void ItemMenu_RegisterR(u8 taskId)
 {
-    if (gSaveBlock1Ptr->registeredItemR == gSpecialVar_ItemId)
-        gSaveBlock1Ptr->registeredItemR = ITEM_NONE;
+    if (VarGet(VAR_REGISTERED_R_ITEM) == gSpecialVar_ItemId)
+        VarSet(VAR_REGISTERED_R_ITEM, ITEM_NONE);
     else
-        gSaveBlock1Ptr->registeredItemR = gSpecialVar_ItemId;
+        VarSet(VAR_REGISTERED_R_ITEM, gSpecialVar_ItemId);
 
     gTasks[taskId].func = ItemMenu_FinishRegister;
 }
@@ -2602,10 +2602,10 @@ bool8 UseRegisteredKeyItemOnField(u8 button)
         registeredItem = gSaveBlock1Ptr->registeredItemSelect;
         break;
     case 1:
-        registeredItem = gSaveBlock1Ptr->registeredItemL;
+        registeredItem = VarGet(VAR_REGISTERED_L_ITEM);
         break;
     case 2:
-        registeredItem = gSaveBlock1Ptr->registeredItemR;
+        registeredItem = VarGet(VAR_REGISTERED_R_ITEM);
         break;
     default:
         return FALSE;
@@ -2632,10 +2632,10 @@ bool8 UseRegisteredKeyItemOnField(u8 button)
                 gSaveBlock1Ptr->registeredItemSelect = ITEM_NONE;
                 break;
             case 1:
-                gSaveBlock1Ptr->registeredItemL = ITEM_NONE;
+                VarSet(VAR_REGISTERED_L_ITEM, ITEM_NONE);
                 break;
             case 2:
-                gSaveBlock1Ptr->registeredItemR = ITEM_NONE;
+                VarSet(VAR_REGISTERED_R_ITEM, ITEM_NONE);
                 break;
             }
         }

@@ -9959,7 +9959,7 @@ static void Cmd_handleballthrow(void)
             }
 
             if (gLastUsedItem == ITEM_MASTER_BALL)
-                shakes = BALL_3_SHAKES_SUCCESS; // why calculate the shakes before that check?
+                shakes = BALL_0_SHAKES_SUCCESS; // why calculate the shakes before that check?
 
             BtlController_EmitBallThrowAnim(0, shakes);
             MarkBattlerForControllerExec(gActiveBattler);

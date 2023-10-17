@@ -194,16 +194,52 @@ static const struct {
     u8 location;
 } sPokeOutbreakSpeciesList[] = {
     {
+        .species = SPECIES_TOGEPI,
+        .moves = {MOVE_ANCIENT_POWER, MOVE_TRI_ATTACK, MOVE_FOLLOW_ME, MOVE_HELPING_HAND},
+        .level = 9,
+        .location = MAP_NUM(ROUTE101),
+    },
+    {
+        .species = SPECIES_TOGETIC,
+        .moves = {MOVE_ICE_BEAM, MOVE_TRI_ATTACK, MOVE_TAIL_GLOW, MOVE_THUNDER},
+        .level = 23,
+        .location = MAP_NUM(ROUTE110),
+    },
+    {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_BIDE, MOVE_HARDEN, MOVE_LEECH_SEED},
         .level = 3, 
         .location = MAP_NUM(ROUTE102)
     },
     {
+        .species = SPECIES_DITTO,
+        .moves = {MOVE_TRANSFORM},
+        .level = 24,
+        .location = MAP_NUM(ROUTE110)
+    },
+    {
+        .species = SPECIES_AIPOM,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_FALSE_SWIPE, MOVE_YAWN, MOVE_THRASH},
+        .level = 24,
+        .location = MAP_NUM(ROUTE113)
+    },
+    {
         .species = SPECIES_NUZLEAF,
         .moves = {MOVE_HARDEN, MOVE_GROWTH, MOVE_NATURE_POWER, MOVE_LEECH_SEED},
         .level = 15, 
         .location = MAP_NUM(ROUTE114),
+    },
+    {
+        .species = SPECIES_STEELIX,
+        .moves = {MOVE_THRASH, MOVE_IRON_TAIL, MOVE_EARTHQUAKE, MOVE_ROCK_BLAST},
+        .level = 35,
+        .location = MAP_NUM(ROUTE111)
+    },
+    {
+        .species = SPECIES_SLOWPOKE,
+        .moves = {MOVE_PSYCHIC, MOVE_TAIL_GLOW, MOVE_AMNESIA, MOVE_FUTURE_SIGHT},
+        .level = 20,
+        .location = MAP_NUM(ROUTE112)
     },
     {
         .species = SPECIES_SEEDOT,
@@ -230,18 +266,6 @@ static const struct {
         .location = MAP_NUM(ROUTE116),
     },
     {
-        .species = SPECIES_TOGEPI,
-        .moves = {MOVE_ANCIENT_POWER, MOVE_TRI_ATTACK, MOVE_FOLLOW_ME, MOVE_HELPING_HAND},
-        .level = 9,
-        .location = MAP_NUM(ROUTE101),
-    },
-    {
-        .species = SPECIES_TOGETIC,
-        .moves = {MOVE_ICE_BEAM, MOVE_TRI_ATTACK, MOVE_TAIL_GLOW, MOVE_THUNDER},
-        .level = 23,
-        .location = MAP_NUM(ROUTE110),
-    },
-    {
         .species = SPECIES_PICHU,
         .moves = {MOVE_VOLT_TACKLE, MOVE_THUNDERBOLT, MOVE_SURF, MOVE_TAIL_GLOW},
         .level = 12,
@@ -252,18 +276,6 @@ static const struct {
         .moves = {MOVE_HIDDEN_POWER, MOVE_PSYCHIC},
         .level = 30,
         .location = MAP_NUM(ROUTE123)
-    },
-    {
-        .species = SPECIES_STEELIX,
-        .moves = {MOVE_THRASH, MOVE_IRON_TAIL, MOVE_EARTHQUAKE, MOVE_ROCK_BLAST},
-        .level = 35,
-        .location = MAP_NUM(ROUTE111)
-    },
-    {
-        .species = SPECIES_SLOWPOKE,
-        .moves = {MOVE_PSYCHIC, MOVE_TAIL_GLOW, MOVE_AMNESIA, MOVE_FUTURE_SIGHT},
-        .level = 20,
-        .location = MAP_NUM(ROUTE112)
     },
     {
         .species = SPECIES_SHELLDER,
@@ -288,18 +300,6 @@ static const struct {
         .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_FALSE_SWIPE, MOVE_CROSS_CHOP},
         .level = 16,
         .location = MAP_NUM(ROUTE116)
-    },
-    {
-        .species = SPECIES_DITTO,
-        .moves = {MOVE_TRANSFORM},
-        .level = 24,
-        .location = MAP_NUM(ROUTE110)
-    },
-    {
-        .species = SPECIES_AIPOM,
-        .moves = {MOVE_DRAGON_DANCE, MOVE_FALSE_SWIPE, MOVE_YAWN, MOVE_THRASH},
-        .level = 24,
-        .location = MAP_NUM(ROUTE113)
     },
     {
         .species = SPECIES_SCYTHER,
