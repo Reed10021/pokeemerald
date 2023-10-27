@@ -1141,6 +1141,7 @@ int sub_802130C(void)
     case 1:
         if (!IsLinkTaskFinished())
             return 0;
+        break;
         // fall through. The original author forgot to use "break" here
         // because this will call BeginNormalPaletteFade() twice.
     case 2:
@@ -2535,14 +2536,16 @@ void sub_80236B8(struct BerryCrushGame *r5)
     }
     if (r5->unk28 % 15 == 0)
     {
+        // BUG: The wrong field is used twice below
+        // As a result, only a sparkleAmount of 0, 1, or 4 is attainable
         if (r5->unk34 < gUnknown_082F4434[r5->unk9 - 2][0])
             r5->unk25_5 = 0;
         else if (r5->unk34 < gUnknown_082F4434[r5->unk9 - 2][1])
             r5->unk25_5 = 1;
         else if (r5->unk34 < gUnknown_082F4434[r5->unk9 - 2][2])
-            r5->unk34 = 2; // typo since r5->unk34 will be reset? 
+            r5->unk25_5 = 2; // typo since r5->unk34 will be reset? // r5->unk34 -> r5->unk25_5
         else if (r5->unk34 < gUnknown_082F4434[r5->unk9 - 2][3])
-            r5->unk34 = 3; // typo since r5->unk34 will be reset? 
+            r5->unk25_5 = 3; // typo since r5->unk34 will be reset? // r5->unk34 -> r5->unk25_5
         else
             r5->unk25_5 = 4;
         r5->unk34 = 0;

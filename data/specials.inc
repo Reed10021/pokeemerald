@@ -537,3 +537,4 @@ gSpecials:: @ 81DBA64
 	def_special TrySetBattleTowerLinkType
 	def_special IsDeoxysInParty
 	def_special TryChangeDeoxysForm
+	def_special GetOutbreakMon

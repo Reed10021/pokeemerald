@@ -1085,7 +1085,10 @@ void CB2_InitCopyrightScreenAfterTitleScreen(void)
 static void Task_IntroLoadPart1Graphics(u8 taskId)
 {
     SetVBlankCallback(NULL);
-    gIntroCharacterGender = Random() & 1;
+    if(gSaveFileStatus == SAVE_STATUS_OK || gSaveFileStatus == SAVE_STATUS_ERROR) // ERROR still has a save file
+        gIntroCharacterGender = gSaveBlock2Ptr->playerGender;
+    else
+        gIntroCharacterGender = Random() & 1;
     intro_reset_and_hide_bgs();
     SetGpuReg(REG_OFFSET_BG3VOFS, 0);
     SetGpuReg(REG_OFFSET_BG2VOFS, 0x50);
@@ -2007,7 +2010,8 @@ static void CreateKyogreBubbleSprites_1(void)
     {
         spriteId = CreateSprite(&gUnknown_085E4D14, gIntroKyogreBubbleData[i + 6][0], gIntroKyogreBubbleData[i + 6][1], i);
         gSprites[spriteId].invisible = TRUE;
-        gSprites[spriteId].data[6] = gIntroKyogreBubbleData[i][2];
+        gSprites[spriteId].data[6] = gIntroKyogreBubbleData[i + 6][2];
+        //gSprites[spriteId].data[6] = gIntroKyogreBubbleData[i][2];  // Using the wrong set of delays here
         gSprites[spriteId].data[7] = 0x40;
     }
 }

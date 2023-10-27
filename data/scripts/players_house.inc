@@ -310,6 +310,11 @@ PlayersHouse_1F_Movement_MomReturnToSeatFemale: @ 82929C1
 PlayersHouse_1F_EventScript_Mom:: @ 82929C5
 	lock
 	faceplayer
+	special GetOutbreakMon
+	compare VAR_RESULT, FALSE
+	goto_if_eq PlayersHouse_1F_EventScript_Mom_No_Outbreak
+	msgbox PlayersHouse_1F_Text_DidYouKnowAboutThisOutbreak, MSGBOX_DEFAULT
+PlayersHouse_1F_EventScript_Mom_No_Outbreak:
 	compare VAR_LITTLEROOT_HOUSES_STATE_MAY, 4
 	goto_if_eq PlayersHouse_1F_EventScript_DontPushYourselfTooHard
 	compare VAR_LITTLEROOT_HOUSES_STATE_BRENDAN, 4

@@ -24,4 +24,4 @@ DeleteChain::
 	end
 	
 Text_DeleteChain::
-	.string "Chain Level: 0. Chain reset!$"
+	.string "Chain Level: {STR_VAR_1} -> 0.\n{STR_VAR_2} chain reset!$"

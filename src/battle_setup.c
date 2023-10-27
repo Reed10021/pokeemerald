@@ -633,8 +633,13 @@ static void CB2_EndWildBattle(void)
 		// If we had a chain and the species was correct but we died.
 		if (chainCount != 0 && species == VarGet(VAR_SPECIESCHAINED))
 		{
-			if(chainCount >= 3)
-				ScriptContext1_SetupScript(DeleteChain);
+            if (chainCount >= 3)
+            {
+                u8 numDigits = CountDigits(chainCount);
+                ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
+                GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
+                ScriptContext1_SetupScript(DeleteChain);
+            }
 			VarSet(VAR_CHAIN,0);
 			VarSet(VAR_SPECIESCHAINED,0);
 		}
@@ -650,6 +655,9 @@ static void CB2_EndWildBattle(void)
 				// If the chain was 3, show textbox showing you messed up.
 				if(chainCount >= 3)
 				{
+                    u8 numDigits = CountDigits(chainCount);
+                    ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
+                    GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
 					ScriptContext1_SetupScript(DeleteChain);
 					// Cleanup
 					VarSet(VAR_CHAIN, 0);
@@ -679,8 +687,13 @@ static void CB2_EndWildBattle(void)
 			// If we had a chain and the species was correct but we ran from it.
 			if (chainCount != 0 && species == VarGet(VAR_SPECIESCHAINED))
 			{
-				if(chainCount >= 3)
-					ScriptContext1_SetupScript(DeleteChain);
+                if (chainCount >= 3)
+                {
+                    u8 numDigits = CountDigits(chainCount);
+                    ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
+                    GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
+                    ScriptContext1_SetupScript(DeleteChain);
+                }
 				VarSet(VAR_CHAIN,0);
 				VarSet(VAR_SPECIESCHAINED,0);
 			}

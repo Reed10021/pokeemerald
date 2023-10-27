@@ -456,20 +456,28 @@ static u16 GetRegionMapSectionId(u8 mapGroup, u8 mapNum)
 
 static bool8 MapHasMon(const struct WildPokemonHeader *info, u16 species)
 {
-    if (GetRegionMapSectionId(info->mapGroup, info->mapNum) == MAPSEC_ALTERING_CAVE)
-    {
-        sPokedexAreaScreen->unk6E2++;
-        if (sPokedexAreaScreen->unk6E2 != sPokedexAreaScreen->unk6E4 + 1)
-            return FALSE;
-    }
+    // If this is a header for Altering Cave, skip it if it's not the current Altering Cave encounter set
+    //if (GetRegionMapSectionId(info->mapGroup, info->mapNum) == MAPSEC_ALTERING_CAVE)
+    //{
+    //    sPokedexAreaScreen->unk6E2++;
+    //    if (sPokedexAreaScreen->unk6E2 != sPokedexAreaScreen->unk6E4 + 1)
+    //        return FALSE;
+    //}
 
     if (MonListHasMon(info->landMonsInfo, species, 12))
         return TRUE;
     if (MonListHasMon(info->waterMonsInfo, species, 5))
         return TRUE;
-    if (MonListHasMon(info->fishingMonsInfo, species, 12))
+    // When searching the fishing encounters, this incorrectly uses the size of the land encounters.
+    // As a result it's reading out of bounds of the fishing encounters tables.
+    if (MonListHasMon(info->fishingMonsInfo, species, 10))
         return TRUE;
     if (MonListHasMon(info->rockSmashMonsInfo, species, 5))
+        return TRUE;
+    // If active outbreak
+    if (gSaveBlock1Ptr->outbreakLocationMapNum == info->mapNum && 
+        gSaveBlock1Ptr->outbreakLocationMapGroup == info->mapGroup && 
+        gSaveBlock1Ptr->outbreakPokemonSpecies == species)
         return TRUE;
     return FALSE;
 }

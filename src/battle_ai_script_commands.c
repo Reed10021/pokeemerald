@@ -451,7 +451,13 @@ static u8 ChooseMoveOrAction_Doubles(void)
 {
     s32 i;
     s32 j;
-    s32 scriptsToRun;
+    //s32 scriptsToRun;
+    // the value assigned to this is a u32 (aiFlags)
+    // this becomes relevant because aiFlags can have bit 31 set
+    // and scriptsToRun is shifted
+    // this never happens in the vanilla game because bit 31 is
+    // only set when it's the first battle
+    u32 scriptsToRun;
     s16 bestMovePointsForTarget[MAX_BATTLERS_COUNT];
     s8 mostViableTargetsArray[MAX_BATTLERS_COUNT];
     u8 actionOrMoveIndex[MAX_BATTLERS_COUNT];
@@ -1606,7 +1612,7 @@ static void Cmd_if_status_not_in_party(void)
         if (species != SPECIES_NONE && species != SPECIES_EGG && hp != 0 && status == statusToCompareTo)
         {
             gAIScriptPtr += 10; // UB: Still bugged in Emerald. Uncomment the return statement to fix.
-            // return;
+            return;
         }
     }
 
@@ -1752,6 +1758,9 @@ static void Cmd_if_cant_faint(void)
     gBattleMoveDamage = gBattleMoveDamage * AI_THINKING_STRUCT->simulatedRNG[AI_THINKING_STRUCT->movesetIndex] / 100;
 
     // This macro is missing the damage 0 = 1 assumption.
+    // Moves always do at least 1 damage.
+    if (gBattleMoveDamage == 0)
+        gBattleMoveDamage = 1;
 
     if (gBattleMons[gBattlerTarget].hp > gBattleMoveDamage)
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 1);
@@ -1867,8 +1876,10 @@ static void Cmd_if_has_move_with_effect(void)
     case AI_TARGET_PARTNER:
         for (i = 0; i < MAX_MON_MOVES; i++)
         {
-            // UB: checks sBattler_AI instead of gBattlerTarget.
-            if (gBattleMons[sBattler_AI].moves[i] != 0 && gBattleMoves[BATTLE_HISTORY->usedMoves[gBattlerTarget].moves[i]].effect == gAIScriptPtr[2])
+            // BUG: (fixed) checks sBattler_AI instead of gBattlerTarget.
+            //if (gBattleMons[sBattler_AI].moves[i] != 0 && gBattleMoves[BATTLE_HISTORY->usedMoves[gBattlerTarget].moves[i]].effect == gAIScriptPtr[2])
+            //    break;
+            if (gBattleMons[gBattlerTarget].moves[i] != 0 && gBattleMoves[BATTLE_HISTORY->usedMoves[gBattlerTarget].moves[i]].effect == gAIScriptPtr[2])
                 break;
         }
         if (i == MAX_MON_MOVES)
@@ -2015,7 +2026,11 @@ static void Cmd_if_holds_item(void)
     var2 = gAIScriptPtr[2];
     var1 = gAIScriptPtr[3];
 
-    if ((var1 | var2) == item)
+    //if ((var1 | var2) == item)
+    // This bug doesn't affect the vanilla game because this script command
+    // is only used to check ITEM_PERSIM_BERRY, whose high byte happens to
+    // be 0.
+    if (((var2 << 8) | var1) == item)
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 4);
     else
         gAIScriptPtr += 8;
@@ -2080,11 +2095,13 @@ static void Cmd_get_used_held_item(void)
         battlerId = gBattlerTarget;
 
     // This is likely a leftover from Ruby's code and its ugly ewram access.
+    #define NONMATCHING
     #ifdef NONMATCHING
         AI_THINKING_STRUCT->funcResult = gBattleStruct->usedHeldItems[battlerId];
     #else
         AI_THINKING_STRUCT->funcResult = *(u8*)((u8*)(gBattleStruct) + offsetof(struct BattleStruct, usedHeldItems) + (battlerId * 2));
     #endif // NONMATCHING
+    #undef NONMATCHING
 
     gAIScriptPtr += 2;
 }

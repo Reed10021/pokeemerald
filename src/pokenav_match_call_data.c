@@ -7,6 +7,7 @@
 #include "gym_leader_rematch.h"
 #include "match_call.h"
 #include "pokenav.h"
+#include "region_map.h"
 #include "strings.h"
 #include "constants/region_map_sections.h"
 #include "constants/trainers.h"
@@ -950,6 +951,16 @@ void MatchCall_GetMessage(u32 idx, u8 *dest)
 
     if (idx >= ARRAY_COUNT(sMatchCallHeaders))
         return;
+    if (idx == MC_HEADER_MOM)
+    {
+        if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE) {
+            GetMapName(gStringVar1, gSaveBlock1Ptr->outbreakLocationMapNum, 0);
+            StringCopy(gStringVar2, gSpeciesNames[gSaveBlock1Ptr->outbreakPokemonSpecies]);
+            ConvertIntToDecimalStringN(gStringVar3, gSaveBlock1Ptr->outbreakDaysLeft, STR_CONV_MODE_LEFT_ALIGN, 1);
+            StringExpandPlaceholders(dest, MatchCall_Text_Mom_Outbreak);
+            return;
+        }
+    }
     matchCall = sMatchCallHeaders[idx];
     i = MatchCallGetFunctionIndex(matchCall);
     sMatchCall_GetMessageFunctions[i](matchCall, dest);

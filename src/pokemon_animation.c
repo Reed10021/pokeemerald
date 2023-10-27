@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle.h"
+#include "data.h"
 #include "pokemon.h"
 #include "pokemon_animation.h"
 #include "sprite.h"
@@ -875,11 +876,11 @@ u8 GetSpeciesBackAnimSet(u16 species)
 // as 0xFFFFXXXX instead of the desired 0x02YYXXXX.
 // By dumb luck, this is not an issue in vanilla. However,
 // changing the link order revealed this bug.
-#if MODERN
+//#if MODERN
 #define ANIM_SPRITE(taskId)   ((struct Sprite *)((gTasks[taskId].tPtrHi << 16) | ((u16)gTasks[taskId].tPtrLo)))
-#else
-#define ANIM_SPRITE(taskId)   ((struct Sprite *)((gTasks[taskId].tPtrHi << 16) | (gTasks[taskId].tPtrLo)))
-#endif //MODERN
+//#else
+//#define ANIM_SPRITE(taskId)   ((struct Sprite *)((gTasks[taskId].tPtrHi << 16) | (gTasks[taskId].tPtrLo)))
+//#endif //MODERN
 
 static void Task_HandleMonAnimation(u8 taskId)
 {
@@ -1044,6 +1045,12 @@ static void sub_817F77C(struct Sprite *sprite)
         FreeOamMatrix(sprite->oam.matrixNum);
         sprite->oam.matrixNum |= (sprite->hFlip << 3);
         sprite->oam.affineMode = ST_OAM_AFFINE_OFF;
+    }
+    else
+    {
+        // BUG: (fixed) Reset these back to normal after they were changed so Poké Ball catch/release
+        // animations without a screen transition in between don't break
+        sprite->affineAnims = gUnknown_082FF694;
     }
 }
 

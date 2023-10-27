@@ -1961,7 +1961,7 @@ const struct SpriteTemplate gUnknown_08329D98[MAX_BATTLERS_COUNT] =
         .oam = &gOamData_831ACA8,
         .anims = NULL,
         .images = gUnknown_082FF3C8,
-        .affineAnims = gUnknown_082FF694,
+        .affineAnims = gUnknown_082FF694, //gAffineAnims_BattleSpriteOpponentSide
         .callback = SpriteCb_WildMon,
     },
     {   // B_POSITION_PLAYER_RIGHT
@@ -1979,7 +1979,7 @@ const struct SpriteTemplate gUnknown_08329D98[MAX_BATTLERS_COUNT] =
         .oam = &gOamData_831ACA8,
         .anims = NULL,
         .images = gUnknown_082FF408,
-        .affineAnims = gUnknown_082FF694,
+        .affineAnims = gUnknown_082FF694, //gAffineAnims_BattleSpriteOpponentSide
         .callback = SpriteCb_WildMon
     },
 };
@@ -2103,6 +2103,7 @@ static const u16 sHMMoves[] =
     MOVE_ROCK_SMASH, MOVE_WATERFALL, MOVE_DIVE, 0xFFFF
 };
 
+// ALTERING_CAVE
 static const struct SpeciesItem sAlteringCaveWildMonHeldItems[] =
 {
     {SPECIES_NONE,      ITEM_NONE},
@@ -6054,7 +6055,13 @@ u8 GetTrainerEncounterMusicId(u16 trainerOpponentId)
 
 u16 ModifyStatByNature(u8 nature, u16 n, u8 statIndex)
 {
-    u16 retVal;
+    // Because this is a u16 it will be unable to store the
+    // result of the multiplication for any stat > 595 for a
+    // positive nature and > 728 for a negative nature.
+    // Neither occur in the base game, but this can happen if
+    // any Nature-affected base stat is increased to a value
+    // above 248. The closest by default is Shuckle at 230.
+    u32 retVal;
     // Dont modify HP, Accuracy, or Evasion by nature
     if (statIndex <= STAT_HP || statIndex > NUM_NATURE_STATS)
     {
@@ -6619,17 +6626,25 @@ u16 GetBattleBGM(void)
         case TRAINER_CLASS_MAGMA_ADMIN:
             return MUS_VS_AQUA_MAGMA;
         case TRAINER_CLASS_LEADER:
+            if (FlagGet(FLAG_IS_CHAMPION))
+                if ((Random() % 4) == 0)
+                    return MUS_VS_FRONTIER_BRAIN;
+                return (Random() % 2) == 0 ? MUS_VS_GYM_LEADER : MUS_RG_VS_GYM_LEADER;
             return MUS_VS_GYM_LEADER;
         case TRAINER_CLASS_CHAMPION:
+            if (FlagGet(FLAG_IS_CHAMPION))
+                if ((Random() % 4) == 0)
+                    return MUS_VS_FRONTIER_BRAIN;
+                return (Random() % 2) == 0 ? MUS_VS_CHAMPION : MUS_RG_VS_CHAMPION;
             return MUS_VS_CHAMPION;
 		case TRAINER_CLASS_PKMN_TRAINER_1:
 		case TRAINER_CLASS_PKMN_TRAINER_2:
-			return MUS_RG_VS_CHAMPION;
+            return (Random() % 2) == 0 ? MUS_RG_VS_CHAMPION : MUS_VS_FRONTIER_BRAIN;
         case TRAINER_CLASS_PKMN_TRAINER_3:
             if (gBattleTypeFlags & BATTLE_TYPE_FRONTIER)
                 return MUS_VS_RIVAL;
             if (!StringCompare(gTrainers[gTrainerBattleOpponent_A].trainerName, gText_BattleWallyName))
-                return MUS_VS_TRAINER;
+                return MUS_VS_RIVAL;
             if (!StringCompare(gTrainers[gTrainerBattleOpponent_A].trainerName, gText_BattleStevenName))
                 return MUS_VS_CHAMPION;
             return MUS_VS_RIVAL;
@@ -6647,9 +6662,9 @@ u16 GetBattleBGM(void)
             return MUS_VS_FRONTIER_BRAIN;
         default:
             if (FlagGet(FLAG_DEFEATED_SOOTOPOLIS_GYM))
-                if ((Random() % 5) == 0)
+                if ((Random() % 4) == 0)
                     return (Random() % 2) == 0 ? MUS_VS_RIVAL : MUS_VS_AQUA_MAGMA;
-            return (Random() % 2) == 0 ? MUS_VS_TRAINER : MUS_RG_VS_TRAINER;
+            return (Random() % 3) != 0 ? MUS_VS_TRAINER : MUS_RG_VS_TRAINER;
         }
     }
     else
@@ -6683,7 +6698,7 @@ u16 GetBattleBGM(void)
 		case SPECIES_CELEBI:
 			return MUS_VS_MEW;
 		}
-        return (Random() % 2) == 0 ? MUS_VS_WILD : MUS_RG_VS_WILD;
+        return (Random() % 3) != 0 ? MUS_VS_WILD : MUS_RG_VS_WILD;
 	}
 }
 

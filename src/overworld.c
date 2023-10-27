@@ -1166,14 +1166,16 @@ static void TransitionMapMusic(void)
         u16 currentMusic = GetCurrentMapMusic();
         if (newMusic != MUS_ABNORMAL_WEATHER && newMusic != 0xFFFF)
         {
-            if (currentMusic == MUS_UNDERWATER || currentMusic == MUS_SURF || currentMusic == MUS_RG_SURF)
+            if (currentMusic == MUS_UNDERWATER /*|| currentMusic == MUS_SURF || currentMusic == MUS_RG_SURF*/)
                 return;
-            if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-                newMusic = (Random() % 2) == 0 ? MUS_SURF : MUS_RG_SURF;
+            //if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+            //    newMusic = (Random() % 2) == 0 ? MUS_SURF : MUS_RG_SURF;
         }
         if (newMusic != currentMusic)
         {
-            if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE))
+            if (newMusic == MUS_POKE_CENTER && (currentMusic == MUS_RG_NET_CENTER || currentMusic == MUS_C_COMM_CENTER || currentMusic == MUS_RG_POKE_CENTER))
+                return;
+            else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE) || TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
                 FadeOutAndFadeInNewMapMusic(newMusic, 4, 4);
             else
                 FadeOutAndPlayNewMapMusic(newMusic, 8);

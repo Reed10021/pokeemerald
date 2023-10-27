@@ -2038,6 +2038,16 @@ MatchCall_Text_Mom3:: @ 82B23F3
 	.string "Wear those RUNNING SHOES until\n"
 	.string "they fall apart, honey!$"
 
+MatchCall_Text_Mom_Outbreak::
+	.string "MOM: Hi, {PLAYER}!\n"
+	.string "Did you hear about the mass\l"
+	.string "outbreak of POKéMON on the news?\p"
+	.string "Apparently there is a bunch of\n"
+	.string "{STR_VAR_2} near {STR_VAR_1}!\p"
+	.string "The news said the outbreak will\n"
+	.string "remain for this many days: {STR_VAR_3}!\p"
+	.string "Go get 'em honey!$"
+
 MatchCall_Text_Roxanne1:: @ 82B2456
 	.string "ROXANNE: Oh, hello, {PLAYER}!\p"
 	.string "I've been hard at work retraining\n"

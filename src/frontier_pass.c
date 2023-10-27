@@ -982,7 +982,8 @@ static void Task_HandleFrontierPassInput(u8 taskId)
                 PlaySE(SE_PC_OFF);
                 SetMainCallback2(CB2_HideFrontierPass);
                 DestroyTask(taskId);
-                // BUG. The function should return here. Otherwise, it can play the same sound twice and destroy the same task twice.
+                // BUG. (fixed) The function should return here. Otherwise, it can play the same sound twice and destroy the same task twice.
+                return;
             }
         }
 

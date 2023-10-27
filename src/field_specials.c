@@ -4456,3 +4456,16 @@ bool16 TryChangeDeoxysForm(void)
 
     gSpecialVar_Result = FALSE;
 }
+
+void GetOutbreakMon(void)
+{
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE) {
+        GetMapName(gStringVar1, gSaveBlock1Ptr->outbreakLocationMapNum, 0);
+        StringCopy(gStringVar2, gSpeciesNames[gSaveBlock1Ptr->outbreakPokemonSpecies]);
+        ConvertIntToDecimalStringN(gStringVar3, gSaveBlock1Ptr->outbreakDaysLeft, STR_CONV_MODE_LEFT_ALIGN, 1);
+        gSpecialVar_Result = TRUE;
+    }
+    else {
+        gSpecialVar_Result = FALSE;
+    }
+}

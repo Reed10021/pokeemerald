@@ -178,7 +178,13 @@ void CreateRoamerMonInstance(void)
     ZeroEnemyPartyMons();
     roamer = &gSaveBlock1Ptr->roamer;
     CreateMonWithIVsPersonality(mon, roamer->species, roamer->level, roamer->ivs, roamer->personality);
-    SetMonData(mon, MON_DATA_STATUS, &gSaveBlock1Ptr->roamer.status);
+    // The roamer's status field is u8, but SetMonData expects status to be u32, so will set the roamer's status
+    // using the status field and the following 3 bytes (cool, beauty, and cute).
+    //SetMonData(mon, MON_DATA_STATUS, &gSaveBlock1Ptr->roamer.status);
+    {
+        u32 status = gSaveBlock1Ptr->roamer.status;
+        SetMonData(mon, MON_DATA_STATUS, &status);
+    }
     SetMonData(mon, MON_DATA_HP, &gSaveBlock1Ptr->roamer.hp);
     SetMonData(mon, MON_DATA_COOL, &gSaveBlock1Ptr->roamer.cool);
     SetMonData(mon, MON_DATA_BEAUTY, &gSaveBlock1Ptr->roamer.beauty);

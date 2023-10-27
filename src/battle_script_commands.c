@@ -9587,6 +9587,14 @@ static void Cmd_pickup(void)
                 heldItem = GetBattlePyramidPickupItemId();
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
             }
+            else if (species == SPECIES_SHUCKLE
+                && heldItem >= FIRST_BERRY_INDEX
+                && heldItem <= LAST_BERRY_INDEX
+                && !(Random() % 8))
+            {
+                heldItem = ITEM_BERRY_JUICE;
+                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+            }
         }
     }
     else
@@ -9626,6 +9634,14 @@ static void Cmd_pickup(void)
                         break;
                     }
                 }
+            }
+            else if (species == SPECIES_SHUCKLE
+                && heldItem >= FIRST_BERRY_INDEX
+                && heldItem <= LAST_BERRY_INDEX
+                && !(Random() % 8))
+            {
+                heldItem = ITEM_BERRY_JUICE;
+                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
             }
         }
     }
@@ -9877,12 +9893,12 @@ static void Cmd_handleballthrow(void)
                 break;
             case ITEM_PREMIER_BALL:
 				if (IsMonShiny(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]]))
-					ballMultiplier = 60;
+					ballMultiplier = 50;
 				else 
-					ballMultiplier = 10;
+					ballMultiplier = 20;
 				break;
             case ITEM_LUXURY_BALL:
-                ballMultiplier = 10;
+                ballMultiplier = 15;
                 break;
             }
         }
@@ -9944,7 +9960,10 @@ static void Cmd_handleballthrow(void)
             crit /= 6;
             odds = Sqrt(Sqrt(16711680 / odds));
             odds = 1048560 / odds;
-            if (Random() % 255 < crit) // if is a critical capture
+
+            if (gLastUsedItem == ITEM_MASTER_BALL)
+                shakes = BALL_0_SHAKES_SUCCESS; // why calculate the shakes before that check? (fixed)
+            else if (Random() % 255 < crit) // if is a critical capture
             {
                 // Make only one shake check.
                 if (Random() < odds) {
@@ -9958,13 +9977,10 @@ static void Cmd_handleballthrow(void)
                 for (shakes = 0; shakes < BALL_3_SHAKES_SUCCESS && Random() < odds; shakes++);
             }
 
-            if (gLastUsedItem == ITEM_MASTER_BALL)
-                shakes = BALL_0_SHAKES_SUCCESS; // why calculate the shakes before that check?
-
             BtlController_EmitBallThrowAnim(0, shakes);
             MarkBattlerForControllerExec(gActiveBattler);
 
-            if (shakes == BALL_3_SHAKES_SUCCESS || shakes == BALL_1_SHAKE_SUCCESS) // mon caught, copy of the code above
+            if (shakes == BALL_3_SHAKES_SUCCESS || shakes == BALL_1_SHAKE_SUCCESS || shakes == BALL_0_SHAKES_SUCCESS) // mon caught, copy of the code above
             {
                 gBattlescriptCurrInstr = BattleScript_SuccessBallThrow;
                 SetMonData(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]], MON_DATA_POKEBALL, &gLastUsedItem);

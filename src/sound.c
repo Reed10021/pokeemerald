@@ -2,10 +2,12 @@
 #include "gba/m4a_internal.h"
 #include "sound.h"
 #include "battle.h"
+#include "event_data.h"
 #include "m4a.h"
 #include "main.h"
 #include "pokemon.h"
 #include "random.h"
+#include "rtc.h"
 #include "constants/songs.h"
 #include "task.h"
 
@@ -130,25 +132,21 @@ void PlayNewMapMusic(u16 songNum)
 {
     if (songNum == MUS_POKE_CENTER)
     {
-        if (sCurrentMapMusic == MUS_C_COMM_CENTER ||
-            sCurrentMapMusic == MUS_RG_POKE_CENTER ||
-            sCurrentMapMusic == MUS_RG_NET_CENTER) {
-            return;
-        }
-        // Alternate
-        if (Random() % 4 == 0)
+        // Alternate music depending on champion status & time of day
+        if (FlagGet(FLAG_IS_CHAMPION))
         {
-            switch (Random() % 3) {
-                case 0:
-                    songNum = MUS_C_COMM_CENTER;
-                    break;
-                case 1:
-                    songNum = MUS_RG_POKE_CENTER;
-                    break;
-                case 2:
-                default:
-                    songNum = MUS_RG_NET_CENTER;
-                    break;
+            if (gLocalTime.hours >= DAY_START && gLocalTime.hours < NIGHT_START) //Daytime
+            {
+                songNum = (Random() % 2) == 0 ? MUS_POKE_CENTER : MUS_RG_NET_CENTER;
+            }
+            else // Nighttime
+            {
+                songNum = (Random() % 2) == 0 ? MUS_C_COMM_CENTER : MUS_RG_POKE_CENTER;
+            }
+        }
+        else {
+            if (gLocalTime.hours >= NIGHT_START || gLocalTime.hours < DAY_START) {
+                songNum = MUS_C_COMM_CENTER;
             }
         }
     }

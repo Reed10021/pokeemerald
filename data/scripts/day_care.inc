@@ -12,12 +12,17 @@ Route117_EventScript_DaycareMan:: @ 8291C18
 	compare VAR_RESULT, DAYCARE_TWO_MONS
 	goto_if_eq Route117_EventScript_CheckOnTwoMons
 	msgbox Route117_Text_SeeWifeIfYoudLikeMeToRaiseMon, MSGBOX_DEFAULT
+	compare VAR_EGG_CHAIN, 0
+	goto_if_eq NoEggChain
+	buffernumberstring 0, VAR_EGG_CHAIN
+	msgbox Route117_Text_EggChainInfo, MSGBOX_DEFAULT
+NoEggChain:
 	compare VAR_CHAIN, 3
-	goto_if_lt NotChain
+	goto_if_lt NoChain
 	bufferspeciesname 0, VAR_SPECIESCHAINED
 	buffernumberstring 1, VAR_CHAIN
 	msgbox Route117_Text_NormalChainInfo, MSGBOX_DEFAULT
-NotChain:
+NoChain:
 	release
 	end
 
@@ -66,6 +71,7 @@ Route117_EventScript_DaycareReceiveEgg:: @ 8291C9D
 	clearflag FLAG_PENDING_DAYCARE_EGG
 	buffernumberstring 0, VAR_EGG_CHAIN
 	msgbox Route117_Text_EggChainInfo, MSGBOX_DEFAULT
+	compare VAR_CHAIN, 3
 	goto_if_lt ZeroChaining
 	bufferspeciesname 0, VAR_SPECIESCHAINED
 	buffernumberstring 1, VAR_CHAIN

@@ -374,26 +374,27 @@ static const u8 gUnknown_082F467F[5][5] =
     {4, 6},
     {3, 5, 7},
     {2, 4, 6, 8},
-    {1, 3, 5, 6, 9},
+    //{1, 3, 5, 6, 9}, // BUG: Column 6 is shared, 7 is not. As a result, the player in column 7 will have their difficulty influenced by their neighbors
+    {1, 3, 5, 7, 9},
 };
 
 // Duplicate and unused gfx. Feel free to remove.
-static const u32 sDuplicateGfx[] = INCBIN_U32("graphics/link_games/dodrioberry_bg1.gbapal",
-                                     "graphics/link_games/dodrioberry_bg2.gbapal",
-                                     "graphics/link_games/dodrioberry_pkmn.gbapal",
-                                     "graphics/link_games/dodrioberry_shiny.gbapal",
-                                     "graphics/link_games/dodrioberry_status.gbapal",
-                                     "graphics/link_games/dodrioberry_berrysprites.gbapal",
-                                     "graphics/link_games/dodrioberry_berrysprites.4bpp.lz",
-                                     "graphics/link_games/dodrioberry_platform.gbapal",
-                                     "graphics/link_games/dodrioberry_bg1.4bpp.lz",
-                                     "graphics/link_games/dodrioberry_bg2.4bpp.lz",
-                                     "graphics/link_games/dodrioberry_status.4bpp.lz",
-                                     "graphics/link_games/dodrioberry_platform.4bpp.lz",
-                                     "graphics/link_games/dodrioberry_pkmn.4bpp.lz",
-                                     "graphics/link_games/dodrioberry_bg1.bin.lz",
-                                     "graphics/link_games/dodrioberry_bg2right.bin.lz",
-                                     "graphics/link_games/dodrioberry_bg2left.bin.lz");
+//static const u32 sDuplicateGfx[] = INCBIN_U32("graphics/link_games/dodrioberry_bg1.gbapal",
+//                                     "graphics/link_games/dodrioberry_bg2.gbapal",
+//                                     "graphics/link_games/dodrioberry_pkmn.gbapal",
+//                                     "graphics/link_games/dodrioberry_shiny.gbapal",
+//                                     "graphics/link_games/dodrioberry_status.gbapal",
+//                                     "graphics/link_games/dodrioberry_berrysprites.gbapal",
+//                                     "graphics/link_games/dodrioberry_berrysprites.4bpp.lz",
+//                                     "graphics/link_games/dodrioberry_platform.gbapal",
+//                                     "graphics/link_games/dodrioberry_bg1.4bpp.lz",
+//                                     "graphics/link_games/dodrioberry_bg2.4bpp.lz",
+//                                     "graphics/link_games/dodrioberry_status.4bpp.lz",
+//                                     "graphics/link_games/dodrioberry_platform.4bpp.lz",
+//                                     "graphics/link_games/dodrioberry_pkmn.4bpp.lz",
+//                                     "graphics/link_games/dodrioberry_bg1.bin.lz",
+//                                     "graphics/link_games/dodrioberry_bg2right.bin.lz",
+//                                     "graphics/link_games/dodrioberry_bg2left.bin.lz");
 
 
 static const u8 gUnknown_082F7A88[][3] =
@@ -1707,7 +1708,10 @@ static void sub_8026324(void)
                 gUnknown_02022C98->unkA8[r4] = 3;
                 gUnknown_02022C98->unkB8[r5] = r4;
                 gUnknown_02022C98->unk31A0[r4].unk2C.unk4 = 1;
-                gUnknown_02022C98->unk31A0[id].unk2C.unk8 = 1;
+
+                if(id != 0xFF)
+                    gUnknown_02022C98->unk31A0[id].unk2C.unk8 = 1;
+
                 gUnknown_02022C98->unk86[r4]++;
                 sub_8026F1C(0, r5, r4);
                 sub_8027234(TRUE);
@@ -1968,7 +1972,7 @@ static bool32 sub_8026BB8(void)
     // This loop won't ever run, the seemingly poitnless assingment below is to make the compiler
     // generate code for it.
     count = count;
-    for (; i < count; i++)
+    for (i = 1; i < count; i++)
     {
         if (gUnknown_02022C98->unk158[i] == 0)
             return FALSE;
@@ -3469,6 +3473,7 @@ static void sub_8028614(u8 count)
         if (sprite != NULL)
             DestroySpriteAndFreeResources(sprite);
         // Memory should be freed here but is not.
+        FREE_AND_SET_NULL(gUnknown_02022C9C[i]);
     }
 }
 
@@ -3737,11 +3742,11 @@ static void sub_8028CD0(u8 spriteId)
 
 // Gamefreak made a mistake there and goes out of bounds for the data array as it holds 8 elements
 // in turn overwriting sprite's subpriority and subsprites fields.
-#if defined(NONMATCHING) || MODERN
+//#if defined(NONMATCHING) || MODERN
     #define sKeepPosX data[1]
-#else
-    #define sKeepPosX data[10]
-#endif // NONMATCHING
+//#else
+//    #define sKeepPosX data[10]
+//#endif // NONMATCHING
 
 static void sub_8028CF4(struct Sprite *sprite)
 {

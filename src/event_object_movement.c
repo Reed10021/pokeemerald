@@ -485,7 +485,9 @@ const struct SpritePalette sObjectEventSpritePalettes[] = {
     {gObjectEventPalette32, OBJ_EVENT_PAL_TAG_32},
     {gObjectEventPalette33, OBJ_EVENT_PAL_TAG_33},
     {gObjectEventPalette34, OBJ_EVENT_PAL_TAG_34},
-    {NULL,                  0x0000},
+    {NULL,                  OBJ_EVENT_PAL_TAG_NONE},
+        // BUG: (fixed) FindObjectEventPaletteIndexByTag looks for OBJ_EVENT_PAL_TAG_NONE and not 0x0.
+        // If it's looking for a tag that isn't in this table, the game locks in an infinite loop.
 };
 
 const u16 gPlayerReflectionPaletteTags[] = {
@@ -1977,7 +1979,9 @@ static void LoadObjectEventPalette(u16 paletteTag)
 {
     u16 i = FindObjectEventPaletteIndexByTag(paletteTag);
 
-    if (i != OBJ_EVENT_PAL_TAG_NONE) // always true
+    // FindObjectEventPaletteIndexByTag returns 0xFF on failure, not OBJ_EVENT_PAL_TAG_NONE.
+    //if (i != OBJ_EVENT_PAL_TAG_NONE) // always true
+    if (i != 0xFF)
     {
         sub_808E8F4(&sObjectEventSpritePalettes[i]);
     }

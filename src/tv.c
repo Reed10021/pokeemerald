@@ -501,6 +501,55 @@ static const struct {
         .location = MAP_NUM(ROUTE104)
     },
     {
+        // Gen 2 starter(s)
+        .species = SPECIES_CHIKORITA,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_LEAF_BLADE, MOVE_BONEMERANG, MOVE_SPORE},
+        .level = 15,
+        .location = MAP_NUM(ROUTE104)
+    },
+    {
+        .species = SPECIES_CHIKORITA,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_PETAL_DANCE, MOVE_MUD_SHOT, MOVE_SPORE},
+        .level = 15,
+        .location = MAP_NUM(ROUTE116)
+    },
+    {
+        .species = SPECIES_BELLSPROUT,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_PETAL_DANCE, MOVE_SLUDGE_BOMB, MOVE_SPORE},
+        .level = 21,
+        .location = MAP_NUM(ROUTE117)
+    },
+    {
+        .species = SPECIES_EXEGGCUTE,
+        .moves = {MOVE_TAIL_GLOW, MOVE_PETAL_DANCE, MOVE_PSYCHO_BOOST, MOVE_SPORE},
+        .level = 26,
+        .location = MAP_NUM(ROUTE120)
+    },
+    {
+        .species = SPECIES_MR_MIME,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_SURF, MOVE_DREAM_EATER, MOVE_HYPNOSIS},
+        .level = 35,
+        .location = MAP_NUM(ROUTE123)
+    },
+    {
+        .species = SPECIES_EEVEE,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_THIEF, MOVE_SHADOW_BALL, MOVE_ACID_ARMOR},
+        .level = 13,
+        .location = MAP_NUM(ROUTE104)
+    },
+    {
+        .species = SPECIES_DUNSPARCE,
+        .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_ROCK_SLIDE, MOVE_THRASH},
+        .level = 18,
+        .location = MAP_NUM(ROUTE103)
+    },
+    {
+        .species = SPECIES_HOPPIP,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_FURY_CUTTER, MOVE_LEAF_BLADE, MOVE_FLY},
+        .level = 5,
+        .location = MAP_NUM(ROUTE102)
+    },
+    {
         .species = SPECIES_PARASECT,
         .moves = {MOVE_BELLY_DRUM, MOVE_FURY_CUTTER, MOVE_SPORE, MOVE_EXTREME_SPEED},
         .level = 50,
@@ -1937,7 +1986,7 @@ void StartMassOutbreak(void)
     gSaveBlock1Ptr->outbreakPokemonMoves[3] = show->massOutbreak.moves[3];
     gSaveBlock1Ptr->outbreakUnk4 = show->massOutbreak.var03;
     gSaveBlock1Ptr->outbreakPokemonProbability = show->massOutbreak.probability;
-    gSaveBlock1Ptr->outbreakDaysLeft = 2;
+    gSaveBlock1Ptr->outbreakDaysLeft = 1; // Days for the outbreak to last
 }
 
 void PutLilycoveContestLadyShowOnTheAir(void)
@@ -2055,34 +2104,26 @@ static void sub_80ED718(void)
         {
             default:
             case 0:
-                if (rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
-                    return;
-                break;
+                //if (rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
+                //    return;
+                //break;
             case 1:
             case 2:
-                if (rbernoulli(2, 20)) // FFFF * (firstnum) / (secondnum) >= Random()
-                    return;
-                break;
             case 3:
-            case 4:
                 if (rbernoulli(3, 20))
                     return;
                 break;
+            case 4:
             case 5:
             case 6:
-            case 7:
                 if (rbernoulli(4, 10))
                     return;
                 break;
+            case 7:
             case 8:
-                if (FlagGet(FLAG_SYS_GAME_CLEAR))
-                {
-                    // If we beat the game, generate an outbreak every day.
-                    break;
-                }
-                else if (rbernoulli(4, 5))
-                        return;
+                // generate an outbreak every day.
                 break;
+
         }
         // We didn't return, so generate news.
         {
@@ -3010,16 +3051,16 @@ static void sub_80EED88(void)
                 case 0:
                 case 1:
                 case 2:
-                case 3:
-                    if (rbernoulli(1, 100))
-                        return;
-                    break;
-                case 4:
-                case 5:
-                case 6:
                     if (rbernoulli(2, 50))
                         return;
                     break;
+                case 3:
+                case 4:
+                case 5:
+                    if (rbernoulli(2, 25))
+                        return;
+                    break;
+                case 6:
                 case 7:
                 case 8:
                     if (FlagGet(FLAG_SYS_GAME_CLEAR))
@@ -3639,9 +3680,31 @@ s8 FindEmptyTVSlotWithinFirstFiveShowsOfArray(TVShow *shows)
 {
     u8 i;
 
+    // Because the game persists show kind forever and never resets it to Off Air,
+    // you are only ever allowed 5 shows in the first 5 slots. If the game tries
+    // to spawn a 6th show, there are no more slots with the Off Air kind so it fails.
+    // There are two solutions here. Reset TV shows to Off Air when they are done,
+    // or look for the active flag to determine what shows are done.
+    // Using the active flag preserves record mixing functionality (mixing only done shows/outbreaks).
     for (i = 0; i < 5; i ++)
     {
         if (shows[i].common.kind == TVSHOW_OFF_AIR)
+        {
+            return i;
+        }
+    }
+    // First inactive loop - try to preserve outbreak shows for record mixing
+    for (i = 0; i < 5; i++)
+    {
+        if (shows[i].common.active == FALSE && shows[i].common.kind != TVSHOW_MASS_OUTBREAK)
+        {
+            return i;
+        }
+    }
+    // Second inactive loop - if we haven't returned, try and find any inactive show
+    for (i = 0; i < 5; i++)
+    {
+        if (shows[i].common.active == FALSE)
         {
             return i;
         }
@@ -4120,6 +4183,8 @@ static bool8 sub_80F049C(TVShow *dest[25], TVShow *src[25], u8 idx)
     return FALSE;
 }
 
+// Link/Record Mixing functions activate TV shows by setting the active field to true.
+// Because TVShow is a union of structs, common.active and literallyAnythingElse.active point to the same memory.
 static bool8 sub_80F0580(TVShow *tv1, TVShow *tv2, u8 idx)
 {
     u32 linkTrainerId = GetLinkPlayerTrainerId(idx);
@@ -7626,6 +7691,7 @@ void TVShowDone(void)
     gSpecialVar_Result = TRUE;
     sTVShowState = 0;
     gSaveBlock1Ptr->tvShows[gSpecialVar_0x8004].common.active = FALSE;
+    //gSaveBlock1Ptr->tvShows[gSpecialVar_0x8004].common.kind = TVSHOW_OFF_AIR;
 }
 
 void ResetTVShowState(void)

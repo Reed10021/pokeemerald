@@ -2060,12 +2060,19 @@ AI_CV_Protect_ScoreDown2:
 AI_CV_Protect_End:
 	end
 
+@ BUG: (fixed) Foresight is only encouraged if the user is Ghost type or
+@      has high evasion, but should check target instead
 AI_CV_Foresight:
-	get_user_type1
+	get_target_type1
 	if_equal TYPE_GHOST, AI_CV_Foresight2
-	get_user_type2
+	get_target_type2
 	if_equal TYPE_GHOST, AI_CV_Foresight2
-	if_stat_level_more_than AI_USER, STAT_EVASION, 8, AI_CV_Foresight3
+	if_stat_level_more_than AI_TARGET, STAT_EVASION, 8, AI_CV_Foresight3
+@	get_user_type1
+@	if_equal TYPE_GHOST, AI_CV_Foresight2
+@	get_user_type2
+@	if_equal TYPE_GHOST, AI_CV_Foresight2
+@	if_stat_level_more_than AI_USER, STAT_EVASION, 8, AI_CV_Foresight3
 	score -2
 	goto AI_CV_Foresight_End
 
@@ -3356,7 +3363,7 @@ AI_HPAware_DiscouragedEffectsWhenTargetLowHP: @ 82DE2B1
 AI_Unknown:
 	if_target_is_ally AI_TryOnAlly
 	if_not_effect EFFECT_SUNNY_DAY, AI_Unknown_End
-	if_equal 0, AI_Unknown_End
+@	if_equal 0, AI_Unknown_End  @ BUG: (fixed) funcResult has not been set in this script yet, below call is nonsense
 	is_first_turn_for AI_USER
 	if_equal 0, AI_Unknown_End
 	score +5
