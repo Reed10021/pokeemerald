@@ -984,17 +984,6 @@ struct SaveBlock1
     /*0x31F8*/ struct EnigmaBerry enigmaBerry;
     /*0x322C*/ struct MEventBuffers unk_322C;
     /*0x3598*/ u8 field_3598[0x180];
-//    /*0x3598*/ u8 field_3598[0x170]; //Unused?
-    /*Seperated out 16 bytes from field_3598 since field_3598 is unused. Old field_3598 = 0x180*/
-    /*0x3598 + 0x170 = 0x3708*/
-//    /*0x3708*/ u16 outbreakPokemonSpecies2;
-//    /*0x370A*/ u8 outbreakLocationMapNum2;
-//    /*0x370B*/ u8 outbreakLocationMapGroup2;
-//    /*0x370C*/ u8 outbreakPokemonLevel2;
-//    /*0x370D*/ u16 outbreakPokemonMoves2[MAX_MON_MOVES]; //2(u16) * MAX_MON_MOVES
-//    /*0x3715*/ u8 outbreakPokemonProbability2;
-//    /*0x3716*/ u16 outbreakDaysLeft2;
-    /*Normal saveblock should resume here*/
     /*0x3718*/ u32 trainerHillTimes[4];
     /*0x3728*/ struct RamScript ramScript;
     /*0x3B14*/ struct RecordMixingGift recordMixingGift;

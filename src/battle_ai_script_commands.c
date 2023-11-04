@@ -1479,7 +1479,7 @@ static void Cmd_get_highest_type_effectiveness(void)
 
         if (gCurrentMove != MOVE_NONE)
         {
-            TypeCalc(gCurrentMove, sBattler_AI, gBattlerTarget);
+            gMoveResultFlags = TypeCalc(gCurrentMove, sBattler_AI, gBattlerTarget);
 
             if (gBattleMoveDamage == 120) // Super effective STAB.
                 gBattleMoveDamage = AI_EFFECTIVENESS_x2;
@@ -1491,6 +1491,8 @@ static void Cmd_get_highest_type_effectiveness(void)
                 gBattleMoveDamage = AI_EFFECTIVENESS_x0_25;
 
             if (gMoveResultFlags & MOVE_RESULT_DOESNT_AFFECT_FOE)
+                gBattleMoveDamage = AI_EFFECTIVENESS_x0;
+            if (gMoveResultFlags & MOVE_RESULT_MISSED)
                 gBattleMoveDamage = AI_EFFECTIVENESS_x0;
 
             if (AI_THINKING_STRUCT->funcResult < gBattleMoveDamage)
@@ -1514,7 +1516,7 @@ static void Cmd_if_type_effectiveness(void)
     gBattleMoveDamage = AI_EFFECTIVENESS_x1;
     gCurrentMove = AI_THINKING_STRUCT->moveConsidered;
 
-    TypeCalc(gCurrentMove, sBattler_AI, gBattlerTarget);
+    gMoveResultFlags = TypeCalc(gCurrentMove, sBattler_AI, gBattlerTarget);
 
     if (gBattleMoveDamage == 120) // Super effective STAB.
         gBattleMoveDamage = AI_EFFECTIVENESS_x2;
@@ -1526,6 +1528,8 @@ static void Cmd_if_type_effectiveness(void)
         gBattleMoveDamage = AI_EFFECTIVENESS_x0_25;
 
     if (gMoveResultFlags & MOVE_RESULT_DOESNT_AFFECT_FOE)
+        gBattleMoveDamage = AI_EFFECTIVENESS_x0;
+    if (gMoveResultFlags & MOVE_RESULT_MISSED)
         gBattleMoveDamage = AI_EFFECTIVENESS_x0;
 
     // Store gBattleMoveDamage in a u8 variable because gAIScriptPtr[1] is a u8.

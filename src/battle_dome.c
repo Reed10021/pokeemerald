@@ -2750,6 +2750,7 @@ static int GetTypeEffectivenessPoints(int move, int targetSpecies, int arg2)
     {
         if (arg2 == 1)
             typePower = 8;
+        return typePower;
     }
     else
     {
@@ -2764,10 +2765,10 @@ static int GetTypeEffectivenessPoints(int move, int targetSpecies, int arg2)
             {
                 // BUG: (fixed) TYPE_x2 is not necessary and makes the condition always false if the ability is wonder guard.
                 if (TYPE_EFFECT_DEF_TYPE(i) == defType1)
-                    if ((defAbility == ABILITY_WONDER_GUARD  && TYPE_EFFECT_MULTIPLIER(i)/* == TYPE_x2*/) || defAbility != ABILITY_WONDER_GUARD)
+                    if ((defAbility == ABILITY_WONDER_GUARD  && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_SUPER_EFFECTIVE) || defAbility != ABILITY_WONDER_GUARD)
                         typePower = typePower * TYPE_EFFECT_MULTIPLIER(i) / 10;
                 if (TYPE_EFFECT_DEF_TYPE(i) == defType2 && defType1 != defType2)
-                    if ((defAbility == ABILITY_WONDER_GUARD  && TYPE_EFFECT_MULTIPLIER(i)/* == TYPE_x2*/) || defAbility != ABILITY_WONDER_GUARD)
+                    if ((defAbility == ABILITY_WONDER_GUARD  && TYPE_EFFECT_MULTIPLIER(i) == TYPE_MUL_SUPER_EFFECTIVE) || defAbility != ABILITY_WONDER_GUARD)
                         typePower = typePower * TYPE_EFFECT_MULTIPLIER(i) / 10;
             }
             i += 3;

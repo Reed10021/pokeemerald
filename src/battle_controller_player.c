@@ -1501,6 +1501,10 @@ static void MoveSelectionDisplayMoveDescription(void)
     } else if (move == MOVE_WEATHER_BALL) {
         if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_ANY))
             pwr *= 2;
+    } else if (move == MOVE_FURY_CUTTER) {
+        u8 i;
+        for (i = 1; i < gDisableStructs[gBattlerAttacker].furyCutterCounter; i++)
+            pwr *= 2;
     }
 
     if (move == MOVE_THUNDER) {
@@ -1509,7 +1513,33 @@ static void MoveSelectionDisplayMoveDescription(void)
     } else if (move == MOVE_BLIZZARD) {
         if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_HAIL_ANY))
             acc = 100;
+    } else if (move == MOVE_SOLAR_BEAM) {
+        if (WEATHER_HAS_EFFECT && (gBattleWeather & (WEATHER_RAIN_ANY | WEATHER_SANDSTORM_ANY | WEATHER_HAIL_ANY)))
+            pwr /= 2;
     }
+
+    if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_SUN_ANY)) {
+        switch (gBattleMoves[move].type)
+        {
+            case TYPE_FIRE:
+                pwr = (15 * pwr) / 10;
+                break;
+            case TYPE_WATER:
+                pwr /= 2;
+                break;
+        }
+    } else if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_RAIN_ANY)) {
+        switch (gBattleMoves[move].type)
+        {
+            case TYPE_FIRE:
+                pwr /= 2;
+                break;
+            case TYPE_WATER:
+                pwr = (15 * pwr) / 10;
+                break;
+        }
+    }
+
 
     if (pwr < 2)
         StringCopy(pwr_num, gText_BattleSwitchWhich5);
@@ -1581,6 +1611,12 @@ u8 TypeEffectiveness(u8 targetId)
     struct ChooseMoveStruct* moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
     u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
     u8 moveFlags = AI_TypeCalc(move, gBattleMons[targetId].type1, gBattleMons[targetId].type2, gBattleMons[targetId].ability);
+    u8 moveCategory = GetBattleMoveSplit(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]);
+
+    if (moveCategory == 2) { // Status Move
+        if (move != MOVE_THUNDER_WAVE && move != MOVE_GLARE)
+            return 10; // 10 - normal effectiveness
+    }
 
     if (moveFlags & MOVE_RESULT_NO_EFFECT) {
         return 26;
@@ -1681,7 +1717,7 @@ static void MoveSelectionDisplayMoveType(void)
 
 static void MoveSelectionDisplaySplitIcon(void) {
     struct ChooseMoveStruct* moveInfo;
-    u32 moveCategory;
+    u8 moveCategory;
 
     moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
     if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_HIDDEN_POWER)

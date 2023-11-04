@@ -206,6 +206,12 @@ static const struct {
         .location = MAP_NUM(ROUTE110),
     },
     {
+        .species = SPECIES_FEEBAS,
+        .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_PUMP, MOVE_ICE_BEAM, MOVE_THUNDER},
+        .level = 20,
+        .location = MAP_NUM(ROUTE109)
+    },
+    {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_BIDE, MOVE_HARDEN, MOVE_LEECH_SEED},
         .level = 3, 
@@ -242,6 +248,12 @@ static const struct {
         .location = MAP_NUM(ROUTE112)
     },
     {
+        .species = SPECIES_ANORITH,
+        .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_ROCK_SLIDE, MOVE_EARTHQUAKE},
+        .level = 26,
+        .location = MAP_NUM(ROUTE122)
+    },
+    {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_HARDEN, MOVE_GROWTH, MOVE_NATURE_POWER, MOVE_LEECH_SEED},
         .level = 13, 
@@ -264,6 +276,12 @@ static const struct {
         .moves = {MOVE_GROWL, MOVE_TACKLE, MOVE_TAIL_WHIP, MOVE_ATTRACT},
         .level = 8, 
         .location = MAP_NUM(ROUTE116),
+    },
+    {
+        .species = SPECIES_LILEEP,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_GIGA_DRAIN, MOVE_ROCK_SLIDE, MOVE_CRUNCH},
+        .level = 31,
+        .location = MAP_NUM(ROUTE124)
     },
     {
         .species = SPECIES_PICHU,
@@ -374,6 +392,12 @@ static const struct {
         .location = MAP_NUM(ROUTE109)
     },
     {
+        .species = SPECIES_GOREBYSS,
+        .moves = {MOVE_THUNDER_WAVE, MOVE_TAIL_GLOW, MOVE_MUDDY_WATER, MOVE_SHEER_COLD},
+        .level = 40,
+        .location = MAP_NUM(ROUTE133),
+    },
+    {
         .species = SPECIES_LAPRAS,
         .moves = {MOVE_RAIN_DANCE, MOVE_HYDRO_CANNON, MOVE_TAIL_GLOW, MOVE_YAWN},
         .level = 30,
@@ -402,6 +426,12 @@ static const struct {
         .moves = {MOVE_BELLY_DRUM, MOVE_REST, MOVE_THRASH, MOVE_EARTHQUAKE},
         .level = 35,
         .location = MAP_NUM(ROUTE121)
+    },
+    {
+        .species = SPECIES_HUNTAIL,
+        .moves = {MOVE_FURY_CUTTER, MOVE_DRAGON_DANCE, MOVE_HYDRO_CANNON, MOVE_COUNTER},
+        .level = 40,
+        .location = MAP_NUM(ROUTE127),
     },
     {
         .species = SPECIES_SNORLAX,
@@ -2066,6 +2096,14 @@ static void InterviewAfter_DummyShow4(void)
     show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
 }
 
+//#define outbreakPokemonSpecies2 ((u16*)gSaveBlock1Ptr->field_3598)[184] // 368 + 369 u16
+//#define outbreakLocationMapNum2 gSaveBlock1Ptr->field_3598[370] // u8
+//#define outbreakLocationMapGroup2 gSaveBlock1Ptr->field_3598[371] // u8
+//#define outbreakPokemonMoves2 ((u16*)gSaveBlock1Ptr->field_3598) // 372 + 373, 374 + 375, 376 + 377, 378 + 379 u16
+//#define outbreakPokemonLevel2 gSaveBlock1Ptr->field_3598[380] // u8
+//#define outbreakPokemonProbability2 gSaveBlock1Ptr->field_3598[381] // u8
+//#define outbreakDaysLeft2 ((u16*)gSaveBlock1Ptr->field_3598)[191] // 382 + 383 u16
+
 static void sub_80ED718(void)
 {
     s8 existingOutbreak;
@@ -2087,9 +2125,20 @@ static void sub_80ED718(void)
         // Don't overwrite existing outbreak. Probably what the above code was meant to do, but they botched it.
         existingOutbreak = FindExistingOutbreakWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
         // If we found an existing active outbreak show or if the saveblock outbreakSpecies is not SPECIES_NONE (active outbreak) don't create an outbreak.
-        if (existingOutbreak != -1 || gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
+        if (existingOutbreak != -1)
         {
             return;
+        }
+
+        if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
+        {
+            //if (FlagGet(FLAG_SYS_GAME_CLEAR))
+            //{
+            //    if (outbreakPokemonSpecies2 != SPECIES_NONE)
+            //        return;
+            //}
+            //else
+                return;
         }
 
         for (i = FLAG_BADGE01_GET, nBadges = 0; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
@@ -2104,13 +2153,10 @@ static void sub_80ED718(void)
         {
             default:
             case 0:
-                //if (rbernoulli(1, 100)) // FFFF * (firstnum) / (secondnum) >= Random()
-                //    return;
-                //break;
             case 1:
             case 2:
             case 3:
-                if (rbernoulli(3, 20))
+                if (rbernoulli(3, 20)) // FFFF * (firstnum) / (secondnum) >= Random()
                     return;
                 break;
             case 4:

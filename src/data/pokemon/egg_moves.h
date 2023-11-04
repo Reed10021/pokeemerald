@@ -21,7 +21,8 @@ const u16 gEggMoves[] = {
               MOVE_OUTRAGE,
               MOVE_BEAT_UP,
               MOVE_SWORDS_DANCE,
-              MOVE_DRAGON_DANCE),
+              MOVE_DRAGON_DANCE,
+              MOVE_DRILL_PECK),
 
     egg_moves(SQUIRTLE,
               MOVE_MIRROR_COAT,
@@ -596,7 +597,9 @@ const u16 gEggMoves[] = {
               MOVE_FORESIGHT,
               MOVE_FUTURE_SIGHT,
               MOVE_SUBSTITUTE,
-              MOVE_PSYCH_UP),
+              MOVE_PSYCH_UP,
+              MOVE_TRI_ATTACK,
+              MOVE_TAIL_GLOW),
 
     egg_moves(NATU,
               MOVE_HAZE,
@@ -1267,7 +1270,9 @@ const u16 gEggMoves[] = {
               MOVE_ENDEAVOR,
               MOVE_BATON_PASS,
               MOVE_FUTURE_SIGHT,
-              MOVE_PSYCH_UP),
+              MOVE_PSYCH_UP,
+              MOVE_SWORDS_DANCE,
+              MOVE_TAIL_GLOW),
 
     egg_moves(VOLBEAT,
               MOVE_BATON_PASS,

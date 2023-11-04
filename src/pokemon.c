@@ -3460,8 +3460,10 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         spAttack *= 2;
     if (defenderHoldEffect == HOLD_EFFECT_DEEP_SEA_SCALE && defender->species == SPECIES_CLAMPERL)
         spDefense *= 2;
-    if (attackerHoldEffect == HOLD_EFFECT_LIGHT_BALL && attacker->species == SPECIES_PIKACHU)
+    if (attackerHoldEffect == HOLD_EFFECT_LIGHT_BALL && (attacker->species == SPECIES_PIKACHU || attacker->species == SPECIES_PICHU)) {
         spAttack *= 2;
+        attack *= 2;
+    }
     if (defenderHoldEffect == HOLD_EFFECT_METAL_POWDER && defender->species == SPECIES_DITTO)
         defense *= 2;
     if (attackerHoldEffect == HOLD_EFFECT_THICK_CLUB && (attacker->species == SPECIES_CUBONE || attacker->species == SPECIES_MAROWAK))
@@ -3493,12 +3495,12 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (gBattleMoves[gCurrentMove].effect == EFFECT_EXPLOSION)
         defense /= 2;
     //hailing
-    if (WEATHER_HAS_EFFECT2 && gBattleWeather & WEATHER_HAIL_ANY) {
+    if (WEATHER_HAS_EFFECT && gBattleWeather & WEATHER_HAIL_ANY) {
         // Implement gen 9 snow effect: +50% DEF for hail.
         if (defender->type1 == TYPE_ICE || defender->type2 == TYPE_ICE)
             defense = (150 * defense) / 100;
     }
-    if (WEATHER_HAS_EFFECT2 && gBattleWeather & WEATHER_SANDSTORM_ANY) {
+    if (WEATHER_HAS_EFFECT && gBattleWeather & WEATHER_SANDSTORM_ANY) {
         // Implement gen 4 sandstorm effect: +50% SPDEF.
         if (defender->type1 == TYPE_ROCK || defender->type2 == TYPE_ROCK)
             spDefense = (150 * spDefense) / 100;
@@ -3532,7 +3534,7 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         damage = damage / damageHelper;
         damage /= 50;
 
-        if ((attacker->status1 & STATUS1_BURN) && attacker->ability != ABILITY_GUTS)
+        if ((attacker->status1 & STATUS1_BURN) && attacker->ability != ABILITY_GUTS && move != MOVE_FACADE)
             damage /= 2;
 
         if ((sideStatus & SIDE_STATUS_REFLECT) && gCritMultiplier == 1)
@@ -3594,7 +3596,7 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
             damage /= 2;
 
         // are effects of weather negated with cloud nine or air lock
-        if (WEATHER_HAS_EFFECT2)
+        if (WEATHER_HAS_EFFECT)
         {
             if (gBattleWeather & WEATHER_RAIN_ANY)
             {

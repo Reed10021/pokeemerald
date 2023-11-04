@@ -2736,6 +2736,8 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             case ABILITY_EFFECT_SPORE:
                 if (!(gMoveResultFlags & MOVE_RESULT_NO_EFFECT)
                  && gBattleMons[gBattlerAttacker].hp != 0
+                 && gBattleMons[battler].type1 != TYPE_GRASS
+                 && gBattleMons[battler].type2 != TYPE_GRASS
                  && !gProtectStructs[gBattlerAttacker].confusionSelfDmg
                  && TARGET_TURN_DAMAGED
                  && (gBattleMoves[move].flags & FLAG_MAKES_CONTACT)

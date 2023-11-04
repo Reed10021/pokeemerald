@@ -1140,8 +1140,15 @@ void Overworld_PlaySpecialMapMusic(void)
             music = gSaveBlock1Ptr->savedMusic;
         else if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
             music = MUS_UNDERWATER;
-        else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-            music = (Random() % 2) == 0 ? MUS_SURF : MUS_RG_SURF;
+        //else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+        //    music = (Random() % 2) == 0 ? MUS_SURF : MUS_RG_SURF;
+    }
+
+    if (music == MUS_POKE_CENTER)
+    {
+        u16 currentMusic = GetCurrentMapMusic();
+        if (currentMusic == MUS_RG_NET_CENTER || currentMusic == MUS_C_COMM_CENTER || currentMusic == MUS_RG_POKE_CENTER)
+            return;
     }
 
     if (music != GetCurrentMapMusic())
@@ -1210,6 +1217,9 @@ void TryFadeOutOldMapMusic(void)
 {
     u16 currentMusic = GetCurrentMapMusic();
     u16 warpMusic = GetWarpDestinationMusic();
+    if (warpMusic == MUS_POKE_CENTER && (currentMusic == MUS_RG_NET_CENTER || currentMusic == MUS_C_COMM_CENTER || currentMusic == MUS_RG_POKE_CENTER))
+        return;
+
     if (FlagGet(FLAG_DONT_TRANSITION_MUSIC) != TRUE && warpMusic != GetCurrentMapMusic())
     {
         if ((currentMusic == MUS_SURF || currentMusic == MUS_RG_SURF)

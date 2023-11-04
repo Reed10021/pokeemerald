@@ -831,7 +831,7 @@ static const u8 sDragonScaleDesc[] = _(
 static const u8 sLightBallDesc[] = _(
     "A hold item that\n"
     "raises the SP. ATK\n"
-    "of PIKACHU.");
+    "of PIKACHU & PICHU.");
 
 static const u8 sSoftSandDesc[] = _(
     "A hold item that\n"

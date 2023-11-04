@@ -48,6 +48,7 @@
 #include "battle_pike.h"
 #include "battle_pyramid.h"
 #include "field_specials.h"
+#include "field_player_avatar.h"
 #include "pokemon_summary_screen.h"
 #include "pokenav.h"
 #include "menu_specialized.h"
@@ -838,7 +839,7 @@ static const u8 sBallCatchBonuses[] =
     [ITEM_ULTRA_BALL - ITEM_ULTRA_BALL]  = 20, 
     [ITEM_GREAT_BALL - ITEM_ULTRA_BALL]  = 15, 
     [ITEM_POKE_BALL - ITEM_ULTRA_BALL]   = 10, 
-    [ITEM_SAFARI_BALL - ITEM_ULTRA_BALL] = 20
+    [ITEM_SAFARI_BALL - ITEM_ULTRA_BALL] = 18
 };
 
 // In Battle Palace, moves are chosen based on the pokemons nature rather than by the player
@@ -906,6 +907,224 @@ static const u8 sBattlePalaceNatureToFlavorTextId[NUM_NATURES] =
     [NATURE_SASSY]   = 2,
     [NATURE_CAREFUL] = 2,
     [NATURE_QUIRKY]  = 3,
+};
+
+// table to avoid ugly powing on gba (courtesy of doesnt)
+// this returns (i^2.5)/4
+// the quarters cancel so no need to re-quadruple them in actual calculation
+static const s32 sExperienceScalingFactors[] =
+{
+    0,
+    0,
+    1,
+    3,
+    8,
+    13,
+    22,
+    32,
+    45,
+    60,
+    79,
+    100,
+    124,
+    152,
+    183,
+    217,
+    256,
+    297,
+    343,
+    393,
+    447,
+    505,
+    567,
+    634,
+    705,
+    781,
+    861,
+    946,
+    1037,
+    1132,
+    1232,
+    1337,
+    1448,
+    1563,
+    1685,
+    1811,
+    1944,
+    2081,
+    2225,
+    2374,
+    2529,
+    2690,
+    2858,
+    3031,
+    3210,
+    3396,
+    3587,
+    3786,
+    3990,
+    4201,
+    4419,
+    4643,
+    4874,
+    5112,
+    5357,
+    5608,
+    5866,
+    6132,
+    6404,
+    6684,
+    6971,
+    7265,
+    7566,
+    7875,
+    8192,
+    8515,
+    8847,
+    9186,
+    9532,
+    9886,
+    10249,
+    10619,
+    10996,
+    11382,
+    11776,
+    12178,
+    12588,
+    13006,
+    13433,
+    13867,
+    14310,
+    14762,
+    15222,
+    15690,
+    16167,
+    16652,
+    17146,
+    17649,
+    18161,
+    18681,
+    19210,
+    19748,
+    20295,
+    20851,
+    21417,
+    21991,
+    22574,
+    23166,
+    23768,
+    24379,
+    25000,
+    25629,
+    26268,
+    26917,
+    27575,
+    28243,
+    28920,
+    29607,
+    30303,
+    31010,
+    31726,
+    32452,
+    33188,
+    33934,
+    34689,
+    35455,
+    36231,
+    37017,
+    37813,
+    38619,
+    39436,
+    40262,
+    41099,
+    41947,
+    42804,
+    43673,
+    44551,
+    45441,
+    46340,
+    47251,
+    48172,
+    49104,
+    50046,
+    50999,
+    51963,
+    52938,
+    53924,
+    54921,
+    55929,
+    56947,
+    57977,
+    59018,
+    60070,
+    61133,
+    62208,
+    63293,
+    64390,
+    65498,
+    66618,
+    67749,
+    68891,
+    70045,
+    71211,
+    72388,
+    73576,
+    74777,
+    75989,
+    77212,
+    78448,
+    79695,
+    80954,
+    82225,
+    83507,
+    84802,
+    86109,
+    87427,
+    88758,
+    90101,
+    91456,
+    92823,
+    94202,
+    95593,
+    96997,
+    98413,
+    99841,
+    101282,
+    102735,
+    104201,
+    105679,
+    107169,
+    108672,
+    110188,
+    111716,
+    113257,
+    114811,
+    116377,
+    117956,
+    119548,
+    121153,
+    122770,
+    124401,
+    126044,
+    127700,
+    129369,
+    131052,
+    132747,
+    134456,
+    136177,
+    137912,
+    139660,
+    141421,
+    143195,
+    144983,
+    146784,
+    148598,
+    150426,
+    152267,
+    154122,
+    155990,
+    157872,
+    159767,
 };
 
 static void Cmd_attackcanceler(void)
@@ -2409,6 +2628,19 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 else
                     break;
             }
+            if (IS_BATTLER_OF_TYPE(gEffectBattler, TYPE_ELECTRIC)
+                && (gHitMarker & HITMARKER_IGNORE_SAFEGUARD)
+                && (primary == TRUE || certain == MOVE_EFFECT_CERTAIN))
+            {
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_PRLZPrevention;
+
+                gBattleCommunication[MULTISTRING_CHOOSER] = 2;
+                RESET_RETURN
+            }
+            if (IS_BATTLER_OF_TYPE(gEffectBattler, TYPE_ELECTRIC))
+                break;
+
             if (gBattleMons[gEffectBattler].status1)
                 break;
 
@@ -3293,13 +3525,13 @@ static void Cmd_getexp(void)
                     viaExpShare++;
             }
 
-            calculatedExp = (gBaseStats[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level) / 5; // original: divide by 7
+            calculatedExp = (gBaseStats[gBattleMons[gBattlerFainted].species].expYield * gBattleMons[gBattlerFainted].level) / 6; // original: divide by 7
 
             if (viaExpShare) // at least one mon is getting exp via exp share
             {
-                *exp = calculatedExp / viaSentIn; /// / 2 / viaSentIn;
+                *exp = calculatedExp / viaSentIn; // calculatedExp / 2 / viaSentIn;
 
-                gExpShareExp = calculatedExp / 2; // / viaExpShare;
+                gExpShareExp = calculatedExp; // calculatedExp / 2 / viaExpShare;
                 gExpShareExp = gExpShareExp + 1;
             }
             else
@@ -3357,11 +3589,12 @@ static void Cmd_getexp(void)
                     if (holdEffect == HOLD_EFFECT_EXP_SHARE)
                         gBattleMoveDamage += gExpShareExp;
                     {
-                        u32 levelDiffTop;
-                        u32 levelDiffBottom;
-                        levelDiffTop = (2 * gBattleMons[gBattlerFainted].level) + 10;
-                        levelDiffBottom = (gBattleMons[gBattlerFainted].level + GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL) + 10);
-                        gBattleMoveDamage = gBattleMoveDamage * (((levelDiffTop * levelDiffTop) / (levelDiffBottom * levelDiffBottom)) * (Sqrt(levelDiffTop) / Sqrt(levelDiffBottom))); // exponent: 2.5
+                        u64 expValue = gBattleMoveDamage;
+                        u8 faintedLevel = gBattleMons[gBattlerFainted].level;
+                        u8 playerMonLevel = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_LEVEL);
+                        expValue *= sExperienceScalingFactors[(faintedLevel * 2) + 10];
+                        expValue /= sExperienceScalingFactors[faintedLevel + playerMonLevel + 10];
+                        gBattleMoveDamage = expValue;
                         if (gBattleMoveDamage < *exp) {
                             if (gBattleStruct->sentInPokes & 1)
                                 gBattleMoveDamage = *exp;
@@ -3490,8 +3723,7 @@ static void Cmd_getexp(void)
                     gBattleMons[0].defense = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_DEF);
                     // Why is this duplicated?
                     gBattleMons[0].speed = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPEED);
-                    gBattleMons[0].speed = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPEED);
-
+                    //gBattleMons[0].speed = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPEED);
                     gBattleMons[0].spAttack = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPATK);
                     gBattleMons[0].spDefense = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPDEF);
                 }
@@ -3505,8 +3737,8 @@ static void Cmd_getexp(void)
                     gBattleMons[2].defense = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_DEF);
                     // Duplicated again, but this time there's no Sp Defense
                     gBattleMons[2].speed = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPEED);
-                    gBattleMons[2].speed = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPEED);
-
+                    //gBattleMons[2].speed = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPEED);
+                    gBattleMons[2].spDefense = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPDEF);
                     gBattleMons[2].spAttack = GetMonData(&gPlayerParty[gBattleStruct->expGetterMonId], MON_DATA_SPATK);
                 }
                 gBattleScripting.getexpState = 5;
@@ -4685,11 +4917,11 @@ static void Cmd_switchinanim(void)
     gActiveBattler = GetBattlerForBattleScript(gBattlescriptCurrInstr[1]);
 
     if (GetBattlerSide(gActiveBattler) == B_SIDE_OPPONENT
-        && !(gBattleTypeFlags & (BATTLE_TYPE_LINK
+/*        && !(gBattleTypeFlags & (BATTLE_TYPE_LINK
                                  | BATTLE_TYPE_EREADER_TRAINER
                                  | BATTLE_TYPE_x2000000
                                  | BATTLE_TYPE_TRAINER_HILL
-                                 | BATTLE_TYPE_FRONTIER)))
+                                 | BATTLE_TYPE_FRONTIER))*/)
             HandleSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[gActiveBattler].species), FLAG_SET_SEEN, gBattleMons[gActiveBattler].personality);
 
     gAbsentBattlerFlags &= ~(gBitTable[gActiveBattler]);
@@ -9822,7 +10054,7 @@ static void Cmd_removelightscreenreflect(void) // brick break
 
 static void Cmd_handleballthrow(void)
 {
-    u8 ballMultiplier = 0;
+    u16 ballMultiplier = 0;
 
     if (gBattleControllerExecFlags)
         return;
@@ -9858,20 +10090,20 @@ static void Cmd_handleballthrow(void)
             {
             case ITEM_NET_BALL:
                 if (IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_WATER) || IS_BATTLER_OF_TYPE(gBattlerTarget, TYPE_BUG))
-                    ballMultiplier = 30;
+                    ballMultiplier = 35;
                 else
                     ballMultiplier = 10;
                 break;
             case ITEM_DIVE_BALL:
-                if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
+                if (GetCurrentMapType() == MAP_TYPE_UNDERWATER || TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
                     ballMultiplier = 35;
                 else
                     ballMultiplier = 10;
                 break;
             case ITEM_NEST_BALL:
-                if (gBattleMons[gBattlerTarget].level < 40)
+                if (gBattleMons[gBattlerTarget].level < 50)
                 {
-                    ballMultiplier = 40 - gBattleMons[gBattlerTarget].level;
+                    ballMultiplier = 50 - gBattleMons[gBattlerTarget].level;
                     if (ballMultiplier <= 9)
                         ballMultiplier = 10;
                 }
@@ -9882,12 +10114,12 @@ static void Cmd_handleballthrow(void)
                 break;
             case ITEM_REPEAT_BALL:
                 if (GetSetPokedexFlag(SpeciesToNationalPokedexNum(gBattleMons[gBattlerTarget].species), FLAG_GET_CAUGHT))
-                    ballMultiplier = 30;
+                    ballMultiplier = 35;
                 else
                     ballMultiplier = 10;
                 break;
             case ITEM_TIMER_BALL:
-                ballMultiplier = gBattleResults.battleTurnCounter + 10;
+                ballMultiplier = (gBattleResults.battleTurnCounter * 3) + 10;
                 if (ballMultiplier > 40)
                     ballMultiplier = 40;
                 break;
@@ -9895,7 +10127,7 @@ static void Cmd_handleballthrow(void)
 				if (IsMonShiny(&gEnemyParty[gBattlerPartyIndexes[gBattlerTarget]]))
 					ballMultiplier = 50;
 				else 
-					ballMultiplier = 20;
+					ballMultiplier = 25;
 				break;
             case ITEM_LUXURY_BALL:
                 ballMultiplier = 15;

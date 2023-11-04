@@ -2975,8 +2975,9 @@ u8 FldEff_UseSurf(void)
 {
     u8 taskId = CreateTask(Task_SurfFieldEffect, 0xff);
     gTasks[taskId].tMonId = gFieldEffectArguments[0];
-    Overworld_ClearSavedMusic();
-    Overworld_ChangeMusicTo((Random() % 2) == 0 ? MUS_SURF : MUS_RG_SURF);
+    //Overworld_ClearSavedMusic();
+    Overworld_SetSavedMusic(MUS_SURF);
+    Overworld_ChangeMusicTo(MUS_SURF);
     return FALSE;
 }
 
