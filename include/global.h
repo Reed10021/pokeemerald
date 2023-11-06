@@ -213,7 +213,7 @@ struct BerryPickingResults
 struct PyramidBag
 {
     u16 itemId[2][PYRAMID_BAG_ITEMS_COUNT];
-    u16 quantity[2][PYRAMID_BAG_ITEMS_COUNT];
+    u8 quantity[2][PYRAMID_BAG_ITEMS_COUNT];
 };
 
 struct BerryCrush

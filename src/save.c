@@ -749,6 +749,41 @@ static void UpdateSaveAddresses(void)
     }
 }
 
+u8 HandleThrobber(u8 throbberSpriteId, u8 flashLevel)
+{
+    if (throbberSpriteId == 0) {
+        // If in a cave, handle flash.
+        if (flashLevel != 0 || InBattlePyramid_())
+        {
+            // Set the first buffer to be not dark
+            SetFlashScanlineEffectWindowBoundaries(&gScanlineEffectRegBuffers[0][0], DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, 200);
+            // Copy the first buffer to the second buffer, that way we don't end up with a flickering effect.
+            CpuFastSet(&gScanlineEffectRegBuffers[0], &gScanlineEffectRegBuffers[1], 480);
+            ScanlineEffect_Stop();
+            ScanlineEffect_Clear();
+        }
+        return ShowThrobber();
+    }
+    else {
+        DestroySpriteAndFreeResources(&gSprites[throbberSpriteId]);
+        // If in a cave, restore flash level.
+        if (flashLevel != 0 || InBattlePyramid_())
+        {
+            // Set the first buffer back
+            InitCurrentFlashLevelScanlineEffect();
+            if (flashLevel != 0)
+            {
+                WriteFlashScanlineEffectBuffer(flashLevel);
+            }
+            else
+            {
+                WriteBattlePyramidViewScanlineEffectBuffer();
+            }
+        }
+    }
+
+    return 0;
+}
 u8 HandleSavingData(u8 saveType)
 {
     IntrCallback prevVblankCB;
@@ -810,43 +845,19 @@ u8 HandleSavingData(u8 saveType)
 
 u8 TrySavingData(u8 saveType)
 {
-    u16 sFlashLevelPixelRadii[] = { 200, 72, 64, 56, 48, 40, 32, 24, 0 };
     u8 flashLevel = Overworld_GetFlashLevel();
-    u8 pyramidLightRadius = gSaveBlock2Ptr->frontier.pyramidLightRadius;
     u8 throbberSpriteId = 0;
     if (gFlashMemoryPresent != TRUE)
     {
         gSaveAttemptStatus = SAVE_STATUS_ERROR;
         return SAVE_STATUS_ERROR;
     }
-
-    // If in a cave, handle flash.
-    if (flashLevel != 0 || InBattlePyramid_())
-    {
-        // Set the first buffer to be not dark
-        SetFlashScanlineEffectWindowBoundaries(&gScanlineEffectRegBuffers[0][0], DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2, 200);
-        // Copy the first buffer to the second buffer, that way we don't end up with a flickering effect.
-        CpuFastSet(&gScanlineEffectRegBuffers[0], &gScanlineEffectRegBuffers[1], 480);
-        ScanlineEffect_Stop();
-        ScanlineEffect_Clear();
-    }
-    throbberSpriteId = ShowThrobber();
+    
+    // Show throbber, store sprite ID
+    throbberSpriteId = HandleThrobber(throbberSpriteId, flashLevel);
     HandleSavingData(saveType);
-    DestroySpriteAndFreeResources(&gSprites[throbberSpriteId]);
-    // If in a cave, restore flash level.
-    if (flashLevel != 0 || InBattlePyramid_())
-    {
-        // Set the first buffer back
-        InitCurrentFlashLevelScanlineEffect();
-        if (flashLevel != 0)
-        {
-            WriteFlashScanlineEffectBuffer(flashLevel);
-        }
-        else
-        {
-            WriteBattlePyramidViewScanlineEffectBuffer();
-        }
-    }
+    // Delete throbber, restore flash level
+    HandleThrobber(throbberSpriteId, flashLevel);
 
     if (!gDamagedSaveSectors)
     {
@@ -1029,6 +1040,8 @@ u32 TryWriteSpecialSaveSection(u8 sector, u8* src)
 #define tState       data[0]
 #define tTimer       data[1]
 #define tPartialSave data[2]
+#define tFlashLevel  data[3]
+#define tSpriteID    data[4]
 
 void Task_LinkSave(u8 taskId)
 {
@@ -1038,6 +1051,8 @@ void Task_LinkSave(u8 taskId)
     {
     case 0:
         gSoftResetDisabled = TRUE;
+        tFlashLevel = Overworld_GetFlashLevel();
+        tSpriteID = HandleThrobber(0, tFlashLevel);
         tState = 1;
         break;
     case 1:
@@ -1099,6 +1114,7 @@ void Task_LinkSave(u8 taskId)
     case 11:
         if (++tTimer > 5)
         {
+            HandleThrobber(tSpriteID, tFlashLevel);
             gSoftResetDisabled = FALSE;
             DestroyTask(taskId);
         }
