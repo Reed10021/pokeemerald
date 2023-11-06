@@ -364,7 +364,14 @@ static void LoadMapNamePopUpWindowBg(void)
         if (regionMapSectionId > KANTO_MAPSEC_END)
             regionMapSectionId -= KANTO_MAPSEC_COUNT;
         else
-            regionMapSectionId = 0; // Discard kanto region sections;
+        {
+            if (regionMapSectionId == MAPSEC_WATER_PATH)
+                regionMapSectionId = MAPSEC_ROUTE_105;
+            else if(regionMapSectionId == MAPSEC_OUTCAST_ISLAND)
+                regionMapSectionId = MAPSEC_CAVE_OF_ORIGIN;
+            else
+                regionMapSectionId = 0; // Discard kanto region sections;
+        }
     }
     popUpThemeId = gRegionMapSectionId_To_PopUpThemeIdMapping[regionMapSectionId];
 

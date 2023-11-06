@@ -79,46 +79,37 @@ MossdeepCity_SpaceCenter_1F_EventScript_NoLaunchesYet:: @ 8223012
 
 MossdeepCity_SpaceCenter_1F_EventScript_ShowLaunchNumber:: @ 822301B
 	msgbox MossdeepCity_SpaceCenter_1F_Text_SuccessfulLaunchNumber, MSGBOX_DEFAULT
-	compare VAR_RESULT, 10
+	compare VAR_RESULT, 7
 	goto_if_lt noJirachi
-	call_if_unset FLAG_JIRACHI_BATTLE, MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle
+	call_if_set FLAG_JIRACHI_DOOR, MossdeepCity_SpaceCenter_1F_EventScript_JirachiLocation
+	call_if_unset FLAG_JIRACHI_DOOR, MossdeepCity_SpaceCenter_1F_EventScript_JirachiUnlock
 noJirachi:
 	return
 
-MossdeepCity_SpaceCenter_1F_EventScript_JirachiBattle::
+MossdeepCity_SpaceCenter_1F_EventScript_JirachiUnlock::
 	msgbox MossdeepCity_SpaceCenter_1F_Text_JirachiFound, MSGBOX_YESNO
-	closemessage
 	compare VAR_RESULT, NO
 	goto_if_eq jirachiReturn
-	playmoncry SPECIES_JIRACHI, 2
-	waitmoncry
-	delay 20
 	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
 	waitmovement 0
-	release
-	setvar VAR_0x8004, SPECIES_JIRACHI
-	setvar VAR_0x8005, 50  @ level
-	setvar VAR_0x8006, ITEM_STAR_PIECE
-	special CreateObedientEnemyMon
-	special BattleSetup_StartLegendaryBattle
-	waitstate
-	specialvar VAR_RESULT, GetBattleOutcome
-	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi
-	compare VAR_RESULT, B_OUTCOME_RAN
-	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi
-	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
-	goto_if_eq MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi
-	setflag FLAG_JIRACHI_BATTLE
+	playmoncry SPECIES_JIRACHI, 2
+	waitmoncry
+	delay 40
+	playse SE_DOOR
+	delay 50
+	faceplayer
+	msgbox MossdeepCity_SpaceCenter_1F_Text_JirachiRanAway, MSGBOX_DEFAULT
+	closemessage
+	setflag FLAG_JIRACHI_DOOR
 jirachiReturn:
 	return
 
-MossdeepCity_SpaceCenter_1F_EventScript_RanFromJirachi::
-	setvar VAR_0x8004, SPECIES_JIRACHI
-	bufferspeciesname 0, VAR_0x8004
-	msgbox gText_LegendaryFlewAway, MSGBOX_DEFAULT
-	release
-	end
+MossdeepCity_SpaceCenter_1F_EventScript_JirachiLocation::
+	goto_if_set FLAG_JIRACHI_BATTLE, noJirachiHint
+	msgbox MossdeepCity_SpaceCenter_1F_Text_JirachiLocation, MSGBOX_DEFAULT
+	closemessage
+noJirachiHint:
+	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_RocketLaunchCounterMagma:: @ 8223024
 	dotimebasedevents
@@ -346,8 +337,24 @@ MossdeepCity_SpaceCenter_1F_Text_JirachiFound:
 	.string "Oh wow! It looks like a strange POKéMON\n"
 	.string "has come from space!\l"
 	.string "Maybe it followed our rockets?\p"
-	.string "I'm not a TRAINER, so would you mind\l"
+	.string "I'm not a TRAINER, so would you mind\n"
 	.string "investigating this POKéMON for us?$"
+
+MossdeepCity_SpaceCenter_1F_Text_JirachiRanAway:
+	.string "The strange POKéMON ran away!\n"
+	.string "It looks like it is heading\l"
+	.string "to the WATER PATH.\p"
+	.string "The WATER PATH is located\n"
+	.string "east from OLDALE TOWN.\l"
+	.string "Maybe there's a cave there?$"
+
+MossdeepCity_SpaceCenter_1F_Text_JirachiLocation:
+	.string "Have you found that strange POKéMON\n"
+	.string "yet? It looked like it was heading\l"
+	.string "to the WATER PATH.\p"
+	.string "The WATER PATH is located\n"
+	.string "east from OLDALE TOWN.\l"
+	.string "Maybe there's a cave there?$"
 
 MossdeepCity_SpaceCenter_1F_Text_HaywireButRocketLaunchImminent: @ 8223305
 	.string "I know that things are a little\n"
