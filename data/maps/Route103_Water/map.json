@@ -2,7 +2,7 @@
   "id": "MAP_ROUTE103_WATER",
   "name": "Route103_Water",
   "layout": "LAYOUT_ROUTE103_WATER",
-  "music": "MUS_ROUTE118",
+  "music": "MUS_GSC_ROUTE38",
   "region_map_section": "MAPSEC_WATER_PATH",
   "requires_flash": false,
   "weather": "WEATHER_ROUTE103_110_CYCLE",

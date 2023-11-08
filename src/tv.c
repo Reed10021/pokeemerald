@@ -3097,7 +3097,7 @@ static void sub_80EED88(void)
                 case 0:
                 case 1:
                 case 2:
-                    if (rbernoulli(2, 50))
+                    if (rbernoulli(2, 35))
                         return;
                     break;
                 case 3:
@@ -3111,7 +3111,7 @@ static void sub_80EED88(void)
                 case 8:
                     if (FlagGet(FLAG_SYS_GAME_CLEAR))
                     {
-                        if (rbernoulli(4, 20))
+                        if (rbernoulli(4, 15))
                             return;
                     }
                     else if (rbernoulli(3, 25))
@@ -3125,7 +3125,7 @@ static void sub_80EED88(void)
                     return;
                 newsKind = (Random() % 4) + POKENEWS_SLATEPORT;
                 i++;
-            } while (sub_80EF0E4(newsKind) != TRUE);
+            } while (sub_80EF0E4(newsKind) == TRUE); // Loop while we pick an already-generated news.
             
             // IF we get here then we haven't returned and have generated a valid newskind.
             //if (sub_80EF0E4(newsKind) != TRUE)

@@ -32,6 +32,7 @@ MauvilleCity_GameCorner_EventScript_ChooseCoinsDefault50:: @ 820FBE5
 	switch VAR_RESULT
 	case 0, MauvilleCity_GameCorner_EventScript_Buy50Coins
 	case 1, MauvilleCity_GameCorner_EventScript_Buy500Coins
+	case 2, MauvilleCity_GameCorner_EventScript_Buy10000Yen
 	goto MauvilleCity_GameCorner_EventScript_CancelBuyCoins
 	end
 
@@ -80,6 +81,21 @@ MauvilleCity_GameCorner_EventScript_Buy500Coins:: @ 820FC75
 	release
 	end
 
+MauvilleCity_GameCorner_EventScript_Buy10000Yen:: @ 820FC75
+	checkcoins VAR_TEMP_1
+	compare VAR_TEMP_1, 500
+	goto_if_lt MauvilleCity_GameCorner_EventScript_NotEnoughCoins
+	removecoins 500
+	addmoney COINS_PRICE_500, 0
+	updatemoneybox 0, 0
+	updatecoinsbox 1, 6
+	playse SE_SHOP
+	msgbox MauvilleCity_GameCorner_Text_ThankYouHereIsYourMoney, MSGBOX_DEFAULT
+	hidemoneybox
+	hidecoinsbox 0, 5
+	release
+	end
+
 MauvilleCity_GameCorner_EventScript_NeedCoinCase:: @ 820FCB7
 	msgbox MauvilleCity_GameCorner_Text_NeedCoinCaseForCoins, MSGBOX_DEFAULT
 	release
@@ -87,6 +103,13 @@ MauvilleCity_GameCorner_EventScript_NeedCoinCase:: @ 820FCB7
 
 MauvilleCity_GameCorner_EventScript_NotEnoughMoney:: @ 820FCC1
 	msgbox MauvilleCity_GameCorner_Text_DontHaveEnoughMoney, MSGBOX_DEFAULT
+	hidemoneybox
+	hidecoinsbox 0, 5
+	release
+	end
+
+MauvilleCity_GameCorner_EventScript_NotEnoughCoins:: @ 820FCC1
+	msgbox MauvilleCity_GameCorner_Text_DontHaveEnoughCoins, MSGBOX_DEFAULT
 	hidemoneybox
 	hidecoinsbox 0, 5
 	release
@@ -830,9 +853,17 @@ MauvilleCity_GameCorner_Text_ThankYouHereAreYourCoins: @ 8210529
 	.string "Thank you very much!\n"
 	.string "Here are your COINS!$"
 
+MauvilleCity_GameCorner_Text_ThankYouHereIsYourMoney: @ 8210529
+	.string "Thank you very much!\n"
+	.string "Here is your money!$"
+
 MauvilleCity_GameCorner_Text_DontHaveEnoughMoney: @ 8210553
 	.string "Um… You don't appear to have\n"
 	.string "enough money…$"
+
+MauvilleCity_GameCorner_Text_DontHaveEnoughCoins: @ 8210553
+	.string "Um… You don't appear to have\n"
+	.string "enough COINS…$"
 
 MauvilleCity_GameCorner_Text_CoinCaseIsFull: @ 821057E
 	.string "Oh?\n"
