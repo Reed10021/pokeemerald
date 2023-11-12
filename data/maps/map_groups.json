@@ -93,7 +93,8 @@
     "Underwater_Route129",
     "Underwater_Route105",
     "Underwater_Route125",
-    "Route103_Water"
+    "WaterPath",
+    "GreenPath"
   ],
   "gMapGroup1": [
     "LittlerootTown_BrendansHouse_1F",

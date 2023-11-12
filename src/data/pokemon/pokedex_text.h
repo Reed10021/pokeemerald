@@ -2310,9 +2310,9 @@ const u8 gRayquazaPokedexText[] = _(
 
 const u8 gJirachiPokedexText[] = _(
     "JIRACHI is said to make wishes come true.\n"
-    "While it sleeps, a tough crystalline shell\n"
-    "envelops the body to protect it from\n"
-    "enemies.");
+    "While it sleeps for a thousand years, a\n"
+    "tough crystalline shell envelops the body\n"
+    "to protect it from enemies");
 
 const u8 gDeoxysPokedexText[] = _(
     "A POKéMON that mutated from an\n"

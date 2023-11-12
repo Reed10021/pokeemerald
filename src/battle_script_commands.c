@@ -606,7 +606,7 @@ static const struct StatFractions sAccuracyStageRatios[] =
 };
 
 // The chance is 1/N for each stage.
-static const u16 sCriticalHitChance[] = {16, 8, 4, 3, 2};
+static const u16 sCriticalHitChance[] = {24, 8, 3, 2, 1}; // Amalgamation of Gen 3 & Gen 7+ critical chances. Grant 100% at level 4, 33% at level 2, 50% at level 3.
 
 static const u32 sStatusFlagsForMoveEffects[NUM_MOVE_EFFECTS] =
 {

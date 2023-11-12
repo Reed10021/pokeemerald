@@ -1,9 +1,9 @@
 {
-  "id": "MAP_ROUTE103_WATER",
-  "name": "Route103_Water",
-  "layout": "LAYOUT_ROUTE103_WATER",
+  "id": "MAP_GREEN_PATH",
+  "name": "GreenPath",
+  "layout": "LAYOUT_GREEN_PATH",
   "music": "MUS_GSC_ROUTE38",
-  "region_map_section": "MAPSEC_WATER_PATH",
+  "region_map_section": "MAPSEC_GREEN_PATH",
   "requires_flash": false,
   "weather": "WEATHER_ROUTE103_110_CYCLE",
   "map_type": "MAP_TYPE_ROUTE",
@@ -16,30 +16,19 @@
     {
       "direction": "left",
       "offset": 0,
-      "map": "MAP_OLDALE_TOWN"
-    },
-    {
-      "direction": "down",
-      "offset": -24,
       "map": "MAP_ROUTE101"
     },
     {
       "direction": "up",
-      "offset": -24,
-      "map": "MAP_ROUTE103"
+      "offset": -16,
+      "map": "MAP_WATER_PATH"
     }
   ],
   "object_events": [
 
   ],
   "warp_events": [
-    {
-      "x": 14,
-      "y": 11,
-      "elevation": 0,
-      "dest_map": "MAP_PURITY_CAVE",
-      "dest_warp_id": 0
-    }
+
   ],
   "coord_events": [
 

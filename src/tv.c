@@ -218,6 +218,12 @@ static const struct {
         .location = MAP_NUM(ROUTE102)
     },
     {
+        .species = SPECIES_FARFETCHD,
+        .moves = {MOVE_SLASH, MOVE_FOCUS_ENERGY, MOVE_AIR_CUTTER, MOVE_DRAGON_DANCE},
+        .level = 10,
+        .location = MAP_NUM(GREEN_PATH)
+    },
+    {
         .species = SPECIES_DITTO,
         .moves = {MOVE_TRANSFORM},
         .level = 24,
@@ -290,10 +296,16 @@ static const struct {
         .location = MAP_NUM(ROUTE103)
     },
     {
+        .species = SPECIES_FARFETCHD,
+        .moves = {MOVE_SLASH, MOVE_FOCUS_ENERGY, MOVE_AIR_CUTTER, MOVE_DRAGON_DANCE},
+        .level = 15,
+        .location = MAP_NUM(WATER_PATH)
+    },
+    {
         .species = SPECIES_UNOWN,
         .moves = {MOVE_HIDDEN_POWER, MOVE_PSYCHIC},
         .level = 30,
-        .location = MAP_NUM(ROUTE123)
+        .location = MAP_NUM(GREEN_PATH)
     },
     {
         .species = SPECIES_SHELLDER,
@@ -354,6 +366,12 @@ static const struct {
         .moves = {MOVE_WEATHER_BALL, MOVE_TAIL_GLOW, MOVE_SUNNY_DAY, MOVE_SOLAR_BEAM},
         .level = 30,
         .location = MAP_NUM(ROUTE112)
+    },
+    {
+        .species = SPECIES_AIPOM,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_FALSE_SWIPE, MOVE_YAWN, MOVE_THRASH},
+        .level = 14,
+        .location = MAP_NUM(WATER_PATH)
     },
     {
         .species = SPECIES_ELEKID,
@@ -452,6 +470,12 @@ static const struct {
         .location = MAP_NUM(ROUTE130)
     },
     {
+        .species = SPECIES_BELDUM,
+        .moves = {MOVE_ICE_PUNCH, MOVE_THUNDER_PUNCH, MOVE_IRON_DEFENSE, MOVE_DRAGON_DANCE},
+        .level = 8,
+        .location = MAP_NUM(GREEN_PATH)
+    },
+    {
         .species = SPECIES_KINGDRA,
         .moves = {MOVE_DRAGON_DANCE, MOVE_HYDRO_PUMP, MOVE_OUTRAGE, MOVE_THUNDER},
         .level = 60,
@@ -492,6 +516,12 @@ static const struct {
         .moves = {MOVE_TAIL_GLOW, MOVE_HAIL, MOVE_ICE_BALL, MOVE_HYDRO_PUMP},
         .level = 50,
         .location = MAP_NUM(ROUTE126)
+    },
+    {
+        .species = SPECIES_EEVEE,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_THIEF, MOVE_SHADOW_BALL, MOVE_ACID_ARMOR},
+        .level = 13,
+        .location = MAP_NUM(WATER_PATH)
     },
     {
         .species = SPECIES_OMASTAR,

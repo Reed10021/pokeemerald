@@ -31,7 +31,7 @@
     {
       "direction": "right",
       "offset": 0,
-      "map": "MAP_ROUTE103_WATER"
+      "map": "MAP_WATER_PATH"
     }
   ],
   "object_events": [

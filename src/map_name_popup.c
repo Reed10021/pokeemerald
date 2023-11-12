@@ -365,7 +365,7 @@ static void LoadMapNamePopUpWindowBg(void)
             regionMapSectionId -= KANTO_MAPSEC_COUNT;
         else
         {
-            if (regionMapSectionId == MAPSEC_WATER_PATH)
+            if (regionMapSectionId == MAPSEC_WATER_PATH || regionMapSectionId == MAPSEC_GREEN_PATH)
                 regionMapSectionId = MAPSEC_ROUTE_105;
             else if(regionMapSectionId == MAPSEC_OUTCAST_ISLAND)
                 regionMapSectionId = MAPSEC_CAVE_OF_ORIGIN;
