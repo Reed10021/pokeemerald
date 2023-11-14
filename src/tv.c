@@ -3769,18 +3769,18 @@ s8 FindEmptyTVSlotWithinFirstFiveShowsOfArray(TVShow *shows)
             return i;
         }
     }
-    // First inactive loop - try to preserve outbreak shows for record mixing
-    for (i = 0; i < 5; i++)
-    {
-        if (shows[i].common.active == FALSE && shows[i].common.kind != TVSHOW_MASS_OUTBREAK)
-        {
-            return i;
-        }
-    }
-    // Second inactive loop - if we haven't returned, try and find any inactive show
+    // No more off air shows available - turn all inactive shows into off air shows.
     for (i = 0; i < 5; i++)
     {
         if (shows[i].common.active == FALSE)
+        {
+            shows[i].common.kind = TVSHOW_OFF_AIR;
+        }
+    }
+    // Search again for an off air tv show
+    for (i = 0; i < 5; i++)
+    {
+        if (shows[i].common.kind == TVSHOW_OFF_AIR)
         {
             return i;
         }
