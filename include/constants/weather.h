@@ -38,6 +38,7 @@
 #define WEATHER_PACIFIDLOG_CYCLE        37
 #define WEATHER_LILYCOVE_CYCLE          38
 #define WEATHER_PETALBURGWOODS_CYCLE    39
+#define WEATHER_TIMELESS_FOREST         40
 
 // These are used in maps' coord_weather_event entries.
 // They are not a one-to-one mapping with the engine's

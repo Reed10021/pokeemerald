@@ -415,6 +415,9 @@ const struct CompressedSpriteSheet gMonStillFrontPicTable[] =
     SPECIES_SPRITE(JIRACHI,       gMonStillFrontPic_Jirachi),
     SPECIES_SPRITE(DEOXYS,        gMonStillFrontPic_Deoxys),
     SPECIES_SPRITE(CHIMECHO,      gMonStillFrontPic_Chimecho),
+    SPECIES_SPRITE(DEOXYS_ATTACK, gMonStillFrontPic_Deoxys_Attack),
+    SPECIES_SPRITE(DEOXYS_DEFENSE,gMonStillFrontPic_Deoxys_Defense),
+    SPECIES_SPRITE(DEOXYS_SPEED,  gMonStillFrontPic_Deoxys_Speed),
     SPECIES_SPRITE(EGG,           gMonStillFrontPic_Egg),
     SPECIES_SPRITE(UNOWN_B,       gMonStillFrontPic_UnownB),
     SPECIES_SPRITE(UNOWN_C,       gMonStillFrontPic_UnownC),
@@ -443,7 +446,4 @@ const struct CompressedSpriteSheet gMonStillFrontPicTable[] =
     SPECIES_SPRITE(UNOWN_Z,       gMonStillFrontPic_UnownZ),
     SPECIES_SPRITE(UNOWN_EMARK,   gMonStillFrontPic_UnownExclamationMark),
     SPECIES_SPRITE(UNOWN_QMARK,   gMonStillFrontPic_UnownQuestionMark),
-    SPECIES_SPRITE(DEOXYS_ATTACK, gMonStillFrontPic_Deoxys_Attack),
-    SPECIES_SPRITE(DEOXYS_DEFENSE,gMonStillFrontPic_Deoxys_Defense),
-    SPECIES_SPRITE(DEOXYS_SPEED,  gMonStillFrontPic_Deoxys_Speed),
 };

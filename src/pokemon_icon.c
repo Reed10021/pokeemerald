@@ -437,6 +437,9 @@ const u8 *const gMonIconTable[] =
     [SPECIES_JIRACHI] = gMonIcon_Jirachi,
     [SPECIES_DEOXYS] = gMonIcon_Deoxys,
     [SPECIES_CHIMECHO] = gMonIcon_Chimecho,
+    [SPECIES_DEOXYS_ATTACK] = gMonIcon_Deoxys_Attack,
+    [SPECIES_DEOXYS_DEFENSE] = gMonIcon_Deoxys_Defense,
+    [SPECIES_DEOXYS_SPEED] = gMonIcon_Deoxys_Speed,
     [SPECIES_EGG] = gMonIcon_Egg,
     [SPECIES_UNOWN_B] = gMonIcon_UnownB,
     [SPECIES_UNOWN_C] = gMonIcon_UnownC,
@@ -465,9 +468,6 @@ const u8 *const gMonIconTable[] =
     [SPECIES_UNOWN_Z] = gMonIcon_UnownZ,
     [SPECIES_UNOWN_EMARK] = gMonIcon_UnownExclamationMark,
     [SPECIES_UNOWN_QMARK] = gMonIcon_UnownQuestionMark,
-    [SPECIES_DEOXYS_ATTACK] = gMonIcon_Deoxys_Attack,
-    [SPECIES_DEOXYS_DEFENSE] = gMonIcon_Deoxys_Defense,
-    [SPECIES_DEOXYS_SPEED] = gMonIcon_Deoxys_Speed,
 };
 
 const u8 gMonIconPaletteIndices[] =

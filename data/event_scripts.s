@@ -575,6 +575,7 @@ gStdScripts_End:: @ 81DC2CC
 	.include "data/maps/WaterPath/scripts.inc"
 	.include "data/maps/PurityCave/scripts.inc"
 	.include "data/maps/GreenPath/scripts.inc"
+	.include "data/maps/TimelessForest/scripts.inc"
 
 	.include "data/scripts/std_msgbox.inc"
 	.include "data/scripts/trainer_battle.inc"
@@ -929,6 +930,15 @@ gText_SorryWirelessClubAdjustments:: @ 827306F
 gText_UndergoingAdjustments:: @ 82730BC
 	.string "It appears to be undergoing\n"
 	.string "adjustments…$"
+
+gText_ShinyRoamer::
+    .string "...You hear the faint sparkle of a\n"
+    .string "shiny POKéMON roaming the region\l"
+    .string "outside...!$"
+
+gText_Roamer::
+    .string "...It sounds like a POKéMON\n"
+    .string "started roaming the region...!$"
 
 @ Unused
 gText_SorryTradeCenterInspections:: @ 82730E5

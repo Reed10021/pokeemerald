@@ -538,3 +538,5 @@ gSpecials:: @ 81DBA64
 	def_special IsDeoxysInParty
 	def_special TryChangeDeoxysForm
 	def_special GetOutbreakMon
+	def_special CheckShinyRoamer
+	def_special CelebiRandomEgg

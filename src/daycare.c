@@ -19,6 +19,7 @@
 #include "party_menu.h"
 #include "list_menu.h"
 #include "overworld.h"
+#include "tv.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/region_map_sections.h"
@@ -485,6 +486,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
 
 static u32 RollEggChains(struct DayCare* daycare, u8 mode)
 {
+    u8 i = 0;
     u32 personality;
     u32 eggChainCount = VarGet(VAR_EGG_CHAIN);
     u32 rolls = 0; // We start rolls at 0. So a VAR_EGG_CHAIN of 24 = 24 additional rolls for shiny.
@@ -524,6 +526,22 @@ static u32 RollEggChains(struct DayCare* daycare, u8 mode)
             VarSet(VAR_EGG_CHAIN, eggChainCount);
             VarSet(VAR_EGG_CHAIN_PARENT_1, GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES));
             VarSet(VAR_EGG_CHAIN_PARENT_2, GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES));
+        }
+    }
+
+    // Reward battle frontier symbols.
+    for (i = 0; i < 7; i++)
+    {
+        if (FlagGet(sSilverSymbolFlags[i]) == TRUE)
+        {
+            if (FlagGet(sGoldSymbolFlags[i]) == TRUE)
+            {
+                eggChainCount += 35;
+            }
+            else
+            {
+                eggChainCount += 12;
+            }
         }
     }
 
@@ -996,17 +1014,15 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
                 continue;
 
             eggCycles = GetMonData(&gPlayerParty[i], MON_DATA_FRIENDSHIP);
-            if (eggCycles != 0)
+            if (eggCycles != 0 && eggCycles >= toSub)
             {
-                if (eggCycles >= toSub)
-                    eggCycles -= toSub;
-                else
-                    eggCycles -= 1;
-
+                // If EggCycles does not equal zero and eggCycles is greater than the amount of cycles to subtract
+                eggCycles -= toSub;
                 SetMonData(&gPlayerParty[i], MON_DATA_FRIENDSHIP, &eggCycles);
             }
-            else 
+            else // hatch the egg
             {
+                // If egg cycles equal zero or the amount of egg cycles to subtract is greater than the amount of cycles left
                 gSpecialVar_0x8004 = i;
                 return TRUE;
             }

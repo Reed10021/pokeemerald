@@ -623,11 +623,27 @@ VictoryRoad_B2F_EventScript_ItemFullHeal:: @ 82914B7
 	end
 
 ArtisanCave_B1F_EventScript_ItemHPUp:: @ 82914C4
-	finditem ITEM_HP_UP
+	finditem ITEM_HP_UP, 3
+	end
+
+ArtisanCave_B1F_EventScript_ItemZinc::
+	finditem ITEM_ZINC, 3
+	end
+
+ArtisanCave_B1F_EventScript_ItemCalcium::
+	finditem ITEM_CALCIUM, 3
+	end
+
+ArtisanCave_B1F_EventScript_ItemProtein::
+	finditem ITEM_PROTEIN, 3
+	end
+
+ArtisanCave_B1F_EventScript_ItemIron::
+	finditem ITEM_IRON, 3
 	end
 
 ArtisanCave_1F_EventScript_ItemCarbos:: @ 82914D1
-	finditem ITEM_CARBOS
+	finditem ITEM_CARBOS, 3
 	end
 
 MagmaHideout_1F_EventScript_ItemRareCandy:: @ 82914DE

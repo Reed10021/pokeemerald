@@ -64,7 +64,7 @@ SkyPillar_Top_EventScript_Rayquaza:: @ 8239722
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq SkyPillar_Top_EventScript_RanFromRayquaza
 	setflag FLAG_DEFEATED_RAYQUAZA
-	releaseall
+	goto SkyPillar_Top_EventScript_DefeatedRayquaza2
 	end
 
 SkyPillar_Top_EventScript_DefeatedRayquaza:: @ 8239768
@@ -81,9 +81,13 @@ SkyPillar_Top_EventScript_DefeatedRayquaza2:: @ 823977C
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject VAR_LAST_TALKED
 	fadescreenswapbuffers FADE_FROM_BLACK
+	checkitem ITEM_AURORA_TICKET, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq SkyPillar_Top_EventScript_DefeatedRayquaza2_Return
 	msgbox SkyPillar_Top_Text_DefeatedRayquaza_SomethingOnTheGround, MSGBOX_DEFAULT
 	giveitem ITEM_AURORA_TICKET
 	setflag FLAG_ENABLE_SHIP_BIRTH_ISLAND
+SkyPillar_Top_EventScript_DefeatedRayquaza2_Return:
 	releaseall
 	end
 

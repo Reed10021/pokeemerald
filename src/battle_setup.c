@@ -539,6 +539,7 @@ void BattleSetup_StartLegendaryBattle(void)
         break;
     case SPECIES_LUGIA:
     case SPECIES_HO_OH:
+    case SPECIES_CELEBI:
         CreateBattleStartTask(B_TRANSITION_BLUR, MUS_C_VS_LEGEND_BEAST);
         break;
     case SPECIES_MEW:
@@ -650,7 +651,8 @@ static void CB2_EndWildBattle(void)
 		if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_PLAYER_TELEPORTED || gBattleOutcome == B_OUTCOME_MON_TELEPORTED || gBattleOutcome == B_OUTCOME_MON_FLED)
 		{
 			// if we have a species, the species wasn't correct, and the chain is not zero, yeet.
-			if (species != VarGet(VAR_SPECIESCHAINED) && chainCount != 0)
+            // Don't penalize for roamers.
+			if (species != VarGet(VAR_SPECIESCHAINED) && chainCount != 0 && !(gBattleTypeFlags & BATTLE_TYPE_ROAMER))
 			{
 				// If the chain was 3, show textbox showing you messed up.
 				if(chainCount >= 3)

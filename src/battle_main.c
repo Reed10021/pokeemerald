@@ -19,6 +19,7 @@
 #include "dma3.h"
 #include "event_data.h"
 #include "evolution_scene.h"
+#include "field_message_box.h"
 #include "graphics.h"
 #include "gpu_regs.h"
 #include "international_string_util.h"
@@ -1919,6 +1920,7 @@ static void sub_8038538(struct Sprite *sprite)
 
 u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel) 
 {
+    u16 returnVal = species;
     s8 seenFlag = GetSetPokedexFlag(SpeciesToNationalPokedexNum(species), FLAG_GET_SEEN);
 
     if (seenFlag) // If we've seen the base species, we have free reign to evolve it based on the scaledLevel
@@ -1941,31 +1943,45 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
             // Second, collect all valid evolution species into an array.
             for (i = 0; i < evoCount; i++)
             {
-                if (((gEvolutionTable[species][i].method == EVO_LEVEL || 
-                    gEvolutionTable[species][i].method == EVO_LEVEL_ATK_LT_DEF || 
-                    gEvolutionTable[species][i].method == EVO_LEVEL_ATK_GT_DEF || 
+                if (gEvolutionTable[species][i].method == EVO_LEVEL ||
+                    gEvolutionTable[species][i].method == EVO_LEVEL_ATK_LT_DEF ||
+                    gEvolutionTable[species][i].method == EVO_LEVEL_ATK_GT_DEF ||
                     gEvolutionTable[species][i].method == EVO_LEVEL_ATK_EQ_DEF ||
                     gEvolutionTable[species][i].method == EVO_LEVEL_SILCOON ||
                     gEvolutionTable[species][i].method == EVO_LEVEL_CASCOON ||
                     gEvolutionTable[species][i].method == EVO_LEVEL_NINJASK ||
-                    gEvolutionTable[species][i].method == EVO_LEVEL_SHEDINJA) && gEvolutionTable[species][i].param + 7 <= scaledLevel) // If evo level + 7 is less than or equal to the scaled level, add as possible evo
-                    || (normalLevel + 7 < scaledLevel)) // If method is not level up, and the normalLevel+7 is less than the scaledLevel, add as possible evo
-                {
-                    validEvoArray[validCount] = gEvolutionTable[species][i].targetSpecies;
-                    validCount++;
+                    gEvolutionTable[species][i].method == EVO_LEVEL_SHEDINJA) 
+                {   // If evo level + 5 is less than or equal to the scaled level, add as possible evo
+                    if (gEvolutionTable[species][i].param + 5 <= scaledLevel)
+                    {
+                        validEvoArray[validCount] = gEvolutionTable[species][i].targetSpecies;
+                        validCount++;
+                    }
+                }
+                else
+                {   // If method is not level up, and the normalLevel+7 is less than the scaledLevel, add as possible evo
+                    if (normalLevel + 7 < scaledLevel)
+                    {
+                        validEvoArray[validCount] = gEvolutionTable[species][i].targetSpecies;
+                        validCount++;
+                    }
                 }
             }
             // Third, return a random valid evolution.
-            return validEvoArray[Random() % validCount]; // We could do more calculations here to determine what evolution we should return. Or we could just return a random valid one.
+            returnVal = validEvoArray[Random() % validCount]; // We could do more calculations here to determine what evolution we should return. Or we could just return a random valid one.
+            if (returnVal == 0) // If we have evolutions available but we don't have any valid evolutions (likely because of the +5), don't evolve.
+                return species;
+            else
+                return returnVal;
         }
     }
     // If we haven't seen this species, or if this species has no evolutions, return the species.
-    return species;
+    return returnVal;
 }
 
 // If the player's average party level is lower than the opponents, don't do anything (+0).
 // If the player's average party level is higher than the opponents, scale the level using non-random scale steps, capping at +15 (or +difference if the game is beaten).
-// If the opponent is a leader, elite 4, champion, or rival ("bosses") and the average party level is higher than the opponents, increase by either difference + 1 or max mon level difference + 1.
+// If the opponent is a leader, elite 4, champion, or rival ("bosses") and the average party level is higher than the opponents, increase by either difference + 3 or max mon level difference + 3.
 u8 ScaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 totalMons, u8 maxMonLevel, u8 minMonLevel, u8 playerMonCount)
 {
     s8 difference;
@@ -1993,9 +2009,9 @@ u8 ScaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 t
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
         {
             if(maxMonLevel - avgLevel > 10)
-                scale = (maxMonLevel - pokeBaseLevel) + 1;
+                scale = (maxMonLevel - pokeBaseLevel) + 3;
             else
-                scale = (avgLevel - pokeBaseLevel) + 1;
+                scale = (avgLevel - pokeBaseLevel) + 3;
         }
         else
         {
@@ -2045,6 +2061,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     s32 i, j;
     u8 monsCount;
     u16 avgLevel = 0;
+    u8 playerMonCount = 0;
     u8 monCount = 0;
     u8 minMon = 100;
     u8 maxMon = 0;
@@ -2062,10 +2079,10 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 maxMon = temp;
             if (minMon > temp)
                 minMon = temp;
-            monCount++;
+            playerMonCount++;
         }
     }
-    avgLevel = (avgLevel * 100) / (monCount * 100);
+    avgLevel = (avgLevel * 100) / (playerMonCount * 100);
 
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && !(gBattleTypeFlags & (BATTLE_TYPE_FRONTIER
                                                                         | BATTLE_TYPE_EREADER_TRAINER
@@ -2110,9 +2127,10 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                         nameHash += gSpeciesNames[partyData[i].species][j];
 
+                    evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, monCount);
+                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, playerMonCount);
                     if (scaledLevel > partyData[i].lvl)
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
@@ -2126,9 +2144,10 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                         nameHash += gSpeciesNames[partyData[i].species][j];
 
+                    evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, monCount);
+                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, playerMonCount);
                     if (scaledLevel > partyData[i].lvl)
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
@@ -2147,9 +2166,10 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                         nameHash += gSpeciesNames[partyData[i].species][j];
 
+                    evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, monCount);
+                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, playerMonCount);
                     if (scaledLevel > partyData[i].lvl)
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
@@ -2164,9 +2184,10 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                         nameHash += gSpeciesNames[partyData[i].species][j];
 
+                    evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, monCount);
+                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, playerMonCount);
                     if (scaledLevel > partyData[i].lvl)
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
@@ -5306,10 +5327,24 @@ static void ReturnFromBattleToOverworld(void)
     {
         UpdateRoamerHPStatus(&gEnemyParty[0]);
         //if ((gBattleOutcome & B_OUTCOME_WON) || gBattleOutcome == B_OUTCOME_CAUGHT)
-        if ((gBattleOutcome == B_OUTCOME_WON) || gBattleOutcome == B_OUTCOME_CAUGHT) // Bug: (fixed) When Roar is used by roamer, gBattleOutcome is B_OUTCOME_PLAYER_TELEPORTED (5).
+        if (gBattleOutcome == B_OUTCOME_CAUGHT) // Bug: (fixed) When Roar is used by roamer, gBattleOutcome is B_OUTCOME_PLAYER_TELEPORTED (5).
             SetRoamerInactive();                                                     // & with B_OUTCOME_WON (1) will return TRUE and deactivates the roamer.
+        else if (gBattleOutcome == B_OUTCOME_WON) // If player defeated Lati@s, respawn it until they catch it.
+        {
+            SetRoamerInactive();
+            gSpecialVar_0x8004 = VarGet(VAR_ROAMER_POKEMON);
+            InitRoamer();
+            CheckShinyRoamer();
+            if (gSpecialVar_Result == TRUE) {
+                PlaySE(SE_SHINY);
+                ShowFieldMessage(gText_ShinyRoamer);
+            }
+            else {
+                ShowFieldMessage(gText_Roamer);
+            }
+        }
     }
-
+    gSpecialVar_Result = gBattleOutcome;
     m4aSongNumStop(SE_LOW_HEALTH);
     SetMainCallback2(gMain.savedCallback);
 }

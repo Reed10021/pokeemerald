@@ -367,8 +367,10 @@ static void LoadMapNamePopUpWindowBg(void)
         {
             if (regionMapSectionId == MAPSEC_WATER_PATH || regionMapSectionId == MAPSEC_GREEN_PATH)
                 regionMapSectionId = MAPSEC_ROUTE_105;
-            else if(regionMapSectionId == MAPSEC_OUTCAST_ISLAND)
+            else if(regionMapSectionId == MAPSEC_LOST_CAVE)
                 regionMapSectionId = MAPSEC_CAVE_OF_ORIGIN;
+            else if (regionMapSectionId == MAPSEC_PATTERN_BUSH)
+                regionMapSectionId = MAPSEC_LITTLEROOT_TOWN;
             else
                 regionMapSectionId = 0; // Discard kanto region sections;
         }

@@ -410,7 +410,7 @@ s32 ListMenu_ProcessInput(u8 listTaskId)
 {
     struct ListMenu *list = (void*) gTasks[listTaskId].data;
     s32 currentPosition = list->scrollOffset + list->selectedRow;
-    u8 lastPositon = list->template.totalItems - 1;
+    u16 lastPositon = list->template.totalItems - 1;
 
     if (JOY_NEW(A_BUTTON))
     {
@@ -1151,14 +1151,14 @@ static void Task_ScrollIndicatorArrowPair(u8 taskId)
     struct ScrollIndicatorPair *data = (void*) gTasks[taskId].data;
     u16 currItem = (*data->scrollOffset);
 
-    if (currItem == data->fullyUpThreshold && currItem != 0xFFFF)
-        gSprites[data->topSpriteId].invisible = TRUE;
-    else
+    //if (currItem == data->fullyUpThreshold && currItem != 0xFFFF)
+    //    gSprites[data->topSpriteId].invisible = TRUE;
+    //else
         gSprites[data->topSpriteId].invisible = FALSE;
 
-    if (currItem == data->fullyDownThreshold)
-        gSprites[data->bottomSpriteId].invisible = TRUE;
-    else
+    //if (currItem == data->fullyDownThreshold)
+    //    gSprites[data->bottomSpriteId].invisible = TRUE;
+    //else
         gSprites[data->bottomSpriteId].invisible = FALSE;
 }
 

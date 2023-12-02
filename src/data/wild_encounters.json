@@ -11912,6 +11912,75 @@
               }
             ]
           }
+        },
+        {
+          "map": "MAP_TIMELESS_FOREST",
+          "base_label": "gTimelessForest",
+          "land_mons": {
+            "encounter_rate": 20,
+            "mons": [
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_SUDOWOODO"
+              },
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_SUNFLORA"
+              },
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_ROSELIA"
+              },
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_URSARING"
+              },
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_VICTREEBEL"
+              },
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_AMPHAROS"
+              },
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_MEGANIUM"
+              },
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_TYPHLOSION"
+              },
+              {
+                "min_level": 50,
+                "max_level": 60,
+                "species": "SPECIES_FERALIGATR"
+              },
+              {
+                "min_level": 60,
+                "max_level": 70,
+                "species": "SPECIES_OMASTAR"
+              },
+              {
+                "min_level": 60,
+                "max_level": 70,
+                "species": "SPECIES_KABUTOPS"
+              },
+              {
+                "min_level": 60,
+                "max_level": 70,
+                "species": "SPECIES_KABUTOPS"
+              }
+            ]
+          }
         }
       ]
     },

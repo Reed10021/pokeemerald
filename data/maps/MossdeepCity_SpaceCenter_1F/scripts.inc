@@ -87,21 +87,41 @@ noJirachi:
 	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_JirachiUnlock::
+	playmoncry SPECIES_JIRACHI, 2
+	waitmoncry
+	playse SE_PIN
+	applymovement LOCALID_SCIENTIST_1, Common_Movement_ExclamationMark
+	delay 25
+	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	delay 60
+	faceplayer
 	msgbox MossdeepCity_SpaceCenter_1F_Text_JirachiFound, MSGBOX_YESNO
 	compare VAR_RESULT, NO
 	goto_if_eq jirachiReturn
-	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
-	waitmovement 0
+	closemessage
 	playmoncry SPECIES_JIRACHI, 2
 	waitmoncry
-	delay 40
+	playse SE_PIN
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
+	delay 15
+	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	delay 15
+	playse SE_PIN
+	applymovement LOCALID_SCIENTIST_1, Common_Movement_ExclamationMark
+	delay 45
 	playse SE_DOOR
+	waitse
+	playse SE_DOOR
+	waitse
 	delay 50
 	faceplayer
 	msgbox MossdeepCity_SpaceCenter_1F_Text_JirachiRanAway, MSGBOX_DEFAULT
 	closemessage
 	setflag FLAG_JIRACHI_DOOR
+	return
 jirachiReturn:
+	msgbox MossdeepCity_SpaceCenter_1F_Text_OhOkay, MSGBOX_DEFAULT
 	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_JirachiLocation::
@@ -340,21 +360,30 @@ MossdeepCity_SpaceCenter_1F_Text_JirachiFound:
 	.string "I'm not a TRAINER, so would you mind\n"
 	.string "investigating this POKéMON for us?$"
 
+MossdeepCity_SpaceCenter_1F_Text_OhOkay:
+	.string "Oh, okay then. We can certainly try\n"
+	.string "investigating ourselves, but we could\l"
+	.string "definitely use your help later.$"
+
 MossdeepCity_SpaceCenter_1F_Text_JirachiRanAway:
-	.string "The strange POKéMON ran away!\n"
-	.string "It looks like it is heading\l"
-	.string "to the WATER PATH.\p"
-	.string "The WATER PATH is located\n"
-	.string "east from OLDALE TOWN.\l"
-	.string "Maybe there's a cave there?$"
+	.string "The strange POKéMON ran away!\p"
+	.string "From its direction, it looks like it is\n"
+	.string "heading to the WATER PATH.\p"
+	.string "The WATER PATH is located east from\n"
+	.string "OLDALE TOWN.\p"
+	.string "If I remember correctly, there is a\n"
+	.string "suspicious rock feature located there.\p"
+	.string "Maybe it's a cave?$"
 
 MossdeepCity_SpaceCenter_1F_Text_JirachiLocation:
 	.string "Have you found that strange POKéMON\n"
 	.string "yet? It looked like it was heading\l"
 	.string "to the WATER PATH.\p"
-	.string "The WATER PATH is located\n"
-	.string "east from OLDALE TOWN.\l"
-	.string "Maybe there's a cave there?$"
+	.string "The WATER PATH is located east from\n"
+	.string "OLDALE TOWN.\p"
+	.string "If I remember correctly, there is a\n"
+	.string "suspicious rock feature located there.\p"
+	.string "Maybe it's a cave?$"
 
 MossdeepCity_SpaceCenter_1F_Text_HaywireButRocketLaunchImminent: @ 8223305
 	.string "I know that things are a little\n"

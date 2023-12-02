@@ -479,6 +479,17 @@ static bool8 SetUpMassOutbreakEncounter(u8 flags)
     return TRUE;
 }
 
+static u16 SetUpMassOutbreakEncounterFishing()
+{
+    u16 i;
+
+    CreateWildMon(gSaveBlock1Ptr->outbreakPokemonSpecies, gSaveBlock1Ptr->outbreakPokemonLevel);
+    for (i = 0; i < 4; i++)
+        SetMonMoveSlot(&gEnemyParty[0], gSaveBlock1Ptr->outbreakPokemonMoves[i], i);
+
+    return gSaveBlock1Ptr->outbreakPokemonSpecies;
+}
+
 static bool8 DoMassOutbreakEncounterTest(void)
 {
     u32 encounterRate = 1;
@@ -491,7 +502,6 @@ static bool8 DoMassOutbreakEncounterTest(void)
 
     if (chainCount >= 3) //If we're chaining.
         rerollCount += chainCount / 2;
-
 
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != 0
      && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
@@ -617,8 +627,9 @@ bool8 StandardWildEncounter(u16 currMetaTileBehavior, u16 previousMetaTileBehavi
             if (TryStartRoamerEncounter() == TRUE)
             {
                 roamer = &gSaveBlock1Ptr->roamer;
-                if (!IsWildLevelAllowedByRepel(roamer->level))
-                    return FALSE;
+                //if (!IsWildLevelAllowedByRepel(roamer->level))
+                //    return FALSE;
+                // Allow roamer to get through repel.
 
                 BattleSetup_StartRoamerBattle();
                 return TRUE;
@@ -656,14 +667,22 @@ bool8 StandardWildEncounter(u16 currMetaTileBehavior, u16 previousMetaTileBehavi
             if (TryStartRoamerEncounter() == TRUE)
             {
                 roamer = &gSaveBlock1Ptr->roamer;
-                if (!IsWildLevelAllowedByRepel(roamer->level))
-                    return FALSE;
+                //if (!IsWildLevelAllowedByRepel(roamer->level))
+                //    return FALSE;
+                // Allow roamer to get through repel.
 
                 BattleSetup_StartRoamerBattle();
                 return TRUE;
             }
-            else // try a regular surfing encounter
+            else
             {
+                if (DoMassOutbreakEncounterTest() == TRUE && SetUpMassOutbreakEncounter(WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
+                {
+                    BattleSetup_StartWildBattle();
+                    return TRUE;
+                }
+
+                // try a regular surfing encounter
                 if (TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, WILD_CHECK_REPEL | WILD_CHECK_KEEN_EYE) == TRUE)
                 {
                     BattleSetup_StartWildBattle();
@@ -771,7 +790,11 @@ bool8 SweetScentWildEncounter(void)
                 return TRUE;
             }
 
-            TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, 0);
+            if (DoMassOutbreakEncounterTest() == TRUE)
+                SetUpMassOutbreakEncounter(0);
+            else
+                TryGenerateWildMon(gWildMonHeaders[headerId].waterMonsInfo, WILD_AREA_WATER, 0);
+
             BattleSetup_StartWildBattle();
             return TRUE;
         }
@@ -803,7 +826,10 @@ void FishingWildEncounter(u8 rod)
     }
     else
     {
-        species = GenerateFishingWildMon(gWildMonHeaders[GetCurrentMapWildMonHeaderId()].fishingMonsInfo, rod);
+        if (DoMassOutbreakEncounterTest() == TRUE)
+            species = SetUpMassOutbreakEncounterFishing();
+        else
+            species = GenerateFishingWildMon(gWildMonHeaders[GetCurrentMapWildMonHeaderId()].fishingMonsInfo, rod);
     }
     IncrementGameStat(GAME_STAT_FISHING_CAPTURES);
     SetPokemonAnglerSpecies(species);

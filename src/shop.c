@@ -1123,15 +1123,24 @@ static void Task_ReturnToItemListAfterItemPurchase(u8 taskId)
     if (JOY_NEW(A_BUTTON | B_BUTTON))
     {
         PlaySE(SE_SELECT);
-        if ((ItemId_GetPocket(tItemId) == POCKET_POKE_BALLS) && tItemCount > 9 && AddBagItem(ITEM_PREMIER_BALL, tItemCount / 10) == TRUE)
+        if ((ItemId_GetPocket(tItemId) == POCKET_POKE_BALLS) && tItemId != ITEM_PREMIER_BALL)
         {
-            if (tItemCount > 19)
+            u16 premierBallCount = gShopDataPtr->totalCost / ItemId_GetPrice(ITEM_PREMIER_BALL);
+
+            if (premierBallCount > 0 && AddBagItem(ITEM_PREMIER_BALL, premierBallCount) == TRUE)
             {
-                BuyMenuDisplayMessage(taskId, gText_ThrowInPremierBalls, BuyMenuReturnToItemList);
+                if (premierBallCount > 1)
+                {
+                    BuyMenuDisplayMessage(taskId, gText_ThrowInPremierBalls, BuyMenuReturnToItemList);
+                }
+                else
+                {
+                    BuyMenuDisplayMessage(taskId, gText_ThrowInPremierBall, BuyMenuReturnToItemList);
+                }
             }
             else
             {
-                BuyMenuDisplayMessage(taskId, gText_ThrowInPremierBall, BuyMenuReturnToItemList);
+                BuyMenuReturnToItemList(taskId);
             }
         }
         else

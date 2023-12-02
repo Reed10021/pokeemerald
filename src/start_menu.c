@@ -190,7 +190,7 @@ static const struct WindowTemplate sUnknown_085105AC[] =
     DUMMY_WIN_TEMPLATE
 };
 
-static const struct WindowTemplate sSaveInfoWindowTemplate = {0, 1, 1, 0xE, 0xA, 0xF, 8};
+static const struct WindowTemplate sSaveInfoWindowTemplate = {0, 1, 1, 0xE, 0xC, 0xF, 8};
 
 // Local functions
 static void BuildStartMenuActions(void);
@@ -1301,6 +1301,11 @@ static void ShowSaveInfoWindow(void)
         saveInfoWindow.height -= 2;
     }
 
+    if (!FlagGet(FLAG_SET_WALL_CLOCK))
+    {
+        saveInfoWindow.height -= 2;
+    }
+
     sSaveInfoWindowId = AddWindow(&saveInfoWindow);
     DrawStdWindowFrame(sSaveInfoWindowId, FALSE);
 
@@ -1347,6 +1352,15 @@ static void ShowSaveInfoWindow(void)
     BufferSaveMenuText(SAVE_MENU_PLAY_TIME, gStringVar4, color);
     xOffset = GetStringRightAlignXOffset(1, gStringVar4, 0x70);
     AddTextPrinterParameterized(sSaveInfoWindowId, 1, gStringVar4, xOffset, yOffset, 0xFF, NULL);
+
+    if (FlagGet(FLAG_SET_WALL_CLOCK) == TRUE)
+    {
+        yOffset += 16;
+        AddTextPrinterParameterized(sSaveInfoWindowId, 1, gText_SavingClockTime, 0, yOffset, 0xFF, NULL);
+        BufferSaveMenuText(SAVE_MENU_CLOCKTIME, gStringVar4, color);
+        xOffset = GetStringRightAlignXOffset(1, gStringVar4, 0x70);
+        PrintPlayerNameOnWindow(sSaveInfoWindowId, gStringVar4, xOffset, yOffset);
+    }
 
     CopyWindowToVram(sSaveInfoWindowId, 2);
 }

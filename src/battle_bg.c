@@ -377,7 +377,7 @@ static const struct WindowTemplate gStandardBattleWindowTemplates[] =
         .paletteNum = 0,
         .baseBlock = 0x00b0,
     },
-    { // 24, super effective
+    { // 24, super effective B_WIN_TYPE_SUPER_EFF
         .bg = 0,
         .tilemapLeft = 21,
         .tilemapTop = 57,
@@ -386,7 +386,7 @@ static const struct WindowTemplate gStandardBattleWindowTemplates[] =
         .paletteNum = 5,
         .baseBlock = 0x02a0,
     },
-    { // 25, not very effective
+    { // 25, not very effective B_WIN_TYPE_NOT_VERY_EFF
         .bg = 0,
         .tilemapLeft = 21,
         .tilemapTop = 57,
@@ -395,7 +395,7 @@ static const struct WindowTemplate gStandardBattleWindowTemplates[] =
         .paletteNum = 5,
         .baseBlock = 0x02a0,
     },
-    { // 26, not effective
+    { // 26, not effective B_WIN_TYPE_NO_EFF
         .bg = 0,
         .tilemapLeft = 21,
         .tilemapTop = 57,
@@ -625,7 +625,7 @@ static const struct WindowTemplate gBattleArenaWindowTemplates[] =
         .paletteNum = 7,
         .baseBlock = 0x0090,
     },
-    [24] = { // 24, super effective
+    [24] = { // 24, super effective B_WIN_TYPE_SUPER_EFF
         .bg = 0,
         .tilemapLeft = 21,
         .tilemapTop = 57,
@@ -634,7 +634,7 @@ static const struct WindowTemplate gBattleArenaWindowTemplates[] =
         .paletteNum = 5,
         .baseBlock = 0x02a0,
     },
-    [25] = { // 25, not very effective
+    [25] = { // 25, not very effective B_WIN_TYPE_NOT_VERY_EFF
         .bg = 0,
         .tilemapLeft = 21,
         .tilemapTop = 57,
@@ -643,7 +643,7 @@ static const struct WindowTemplate gBattleArenaWindowTemplates[] =
         .paletteNum = 5,
         .baseBlock = 0x02a0,
     },
-    [26] = { // 26, not effective
+    [26] = { // 26, not effective B_WIN_TYPE_NO_EFF
         .bg = 0,
         .tilemapLeft = 21,
         .tilemapTop = 57,

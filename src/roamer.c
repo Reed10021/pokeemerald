@@ -1,6 +1,7 @@
 #include "global.h"
 #include "event_data.h"
 #include "pokemon.h"
+#include "pokedex.h"
 #include "random.h"
 #include "roamer.h"
 #include "constants/items.h"
@@ -68,7 +69,9 @@ static void CreateInitialRoamerMon(bool16 createLatios)
     else
         (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIOS;
 
-    CreateMon(&gEnemyParty[0], (&gSaveBlock1Ptr->roamer)->species, 40, 0x20, 0, 0, OT_ID_PLAYER_ID, 0);
+    GetSetPokedexFlag(SpeciesToNationalPokedexNum((&gSaveBlock1Ptr->roamer)->species), FLAG_SET_SEEN);
+
+    CreateMon(&gEnemyParty[0], (&gSaveBlock1Ptr->roamer)->species, 50, 0x20, 0, 0, OT_ID_PLAYER_ID, 0);
     (&gSaveBlock1Ptr->roamer)->level = 50;
     (&gSaveBlock1Ptr->roamer)->status = 0;
     (&gSaveBlock1Ptr->roamer)->active = TRUE;
@@ -86,9 +89,31 @@ static void CreateInitialRoamerMon(bool16 createLatios)
 
 void InitRoamer(void)
 {
+    if ((&gSaveBlock1Ptr->roamer)->active)
+        return;
     ClearRoamerData();
     ClearRoamerLocationData();
     CreateInitialRoamerMon(gSpecialVar_0x8004);
+}
+
+bool16 CheckShinyRoamer(void)
+{
+    if (!(&gSaveBlock1Ptr->roamer)->active)
+    {
+        gSpecialVar_Result = FALSE;
+        return;
+    }
+
+    {
+        u32 value = gSaveBlock2Ptr->playerTrainerId[0]
+            | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
+            | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
+            | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+        u32 shinyValue = (HIHALF(value) ^ LOHALF(value) ^ HIHALF((&gSaveBlock1Ptr->roamer)->personality) ^ LOHALF((&gSaveBlock1Ptr->roamer)->personality));
+
+        gSpecialVar_Result = shinyValue < SHINY_ODDS;
+        return;
+    }
 }
 
 void UpdateLocationHistoryForRoamer(void)

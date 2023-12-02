@@ -510,6 +510,21 @@ PlayersHouse_1F_EventScript_GetSSTicketAndSeeLatiTV:: @ 8292AF2
 	copyvar VAR_0x8004, VAR_RESULT
 	special InitRoamer
 	copyvar VAR_ROAMER_POKEMON, VAR_RESULT
+	copyvar VAR_TEMP_D, VAR_ROAMER_POKEMON
+	addvar VAR_TEMP_D, SPECIES_LATIAS
+	playmoncry VAR_TEMP_D, 2
+	waitmoncry
+	special CheckShinyRoamer
+	compare VAR_RESULT, FALSE
+	goto_if_eq Lati_NoShinyText
+	playse SE_SHINY
+	waitse
+	delay 10
+	msgbox gText_ShinyRoamer, MSGBOX_DEFAULT
+	goto Lati_Shiny_Resume
+Lati_NoShinyText:
+	msgbox gText_Roamer, MSGBOX_DEFAULT
+Lati_Shiny_Resume:
 	msgbox PlayersHouse_1F_Text_StillUnknownPokemon, MSGBOX_DEFAULT
 	closemessage
 	setvar VAR_LITTLEROOT_HOUSES_STATE_MAY, 4

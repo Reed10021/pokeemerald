@@ -1484,7 +1484,7 @@ static void Cmd_critcalc(void)
                 + (gBattleMoves[gCurrentMove].effect == EFFECT_BLAZE_KICK)
                 + (gBattleMoves[gCurrentMove].effect == EFFECT_POISON_TAIL)
                 + (holdEffect == HOLD_EFFECT_SCOPE_LENS)
-                + 2 * (holdEffect == HOLD_EFFECT_LUCKY_PUNCH && gBattleMons[gBattlerAttacker].species == SPECIES_CHANSEY)
+                + 2 * (holdEffect == HOLD_EFFECT_LUCKY_PUNCH && (gBattleMons[gBattlerAttacker].species == SPECIES_CHANSEY || gBattleMons[gBattlerAttacker].species == SPECIES_BLISSEY))
                 + 2 * (holdEffect == HOLD_EFFECT_STICK && gBattleMons[gBattlerAttacker].species == SPECIES_FARFETCHD);
 
     if (critChance >= ARRAY_COUNT(sCriticalHitChance))
@@ -9059,7 +9059,7 @@ static void Cmd_hiddenpowercalc(void)
               | ((gBattleMons[gBattlerAttacker].spAttackIV & 1) << 4)
               | ((gBattleMons[gBattlerAttacker].spDefenseIV & 1) << 5);
 
-    gDynamicBasePower = 75; //(40 * powerBits) / 63 + 30;
+    gDynamicBasePower = 80; //(40 * powerBits) / 63 + 30;
 
     gBattleStruct->dynamicMoveType = (15 * typeBits) / 63 + 1;
     if (gBattleStruct->dynamicMoveType >= TYPE_MYSTERY)
@@ -10178,15 +10178,15 @@ static void Cmd_handleballthrow(void)
             u32 crit = 0;
 
             if (caughtCount > 179) {        // 180+
-                crit = (odds * 250) / 100;  // * 2.5
+                crit = (odds * 255) / 100;  // * 2.55
             } else if (caughtCount > 104) { // 105+
                 crit = (odds * 200) / 100;  // * 2.0
             } else if (caughtCount > 29) {  // 30+
-                crit = (odds * 150) / 100;  // * 1.5
+                crit = (odds * 155) / 100;  // * 1.55
             } else if (caughtCount > 9) {   // 10+
                 crit = odds;                // * 1.0
             } else {                        // 0-9
-                crit = (odds * 50) / 100;   // else * 0.5
+                crit = (odds * 55) / 100;   // else * 0.55
             }
 
             crit /= 6;

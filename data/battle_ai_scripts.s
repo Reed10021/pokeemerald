@@ -3382,6 +3382,7 @@ AI_Roaming:
 	if_equal ABILITY_ARENA_TRAP, AI_Roaming_End
 
 AI_Roaming_Flee: @ 82DE335
+	if_random_greater_than 136, AI_Roaming_End @ if rand() % 256 > 136, do not flee
 	flee
 
 AI_Roaming_End: @ 82DE336

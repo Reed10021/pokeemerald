@@ -854,10 +854,12 @@ u8 TrySavingData(u8 saveType)
     }
     
     // Show throbber, store sprite ID
-    throbberSpriteId = HandleThrobber(throbberSpriteId, flashLevel);
+    if(saveType != SAVE_HALL_OF_FAME)
+        throbberSpriteId = HandleThrobber(throbberSpriteId, flashLevel);
     HandleSavingData(saveType);
     // Delete throbber, restore flash level
-    HandleThrobber(throbberSpriteId, flashLevel);
+    if (saveType != SAVE_HALL_OF_FAME)
+        HandleThrobber(throbberSpriteId, flashLevel);
 
     if (!gDamagedSaveSectors)
     {

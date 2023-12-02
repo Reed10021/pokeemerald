@@ -40,6 +40,7 @@
 #include "palette.h"
 #include "play_time.h"
 #include "random.h"
+#include "region_map.h"
 #include "roamer.h"
 #include "rotating_gate.h"
 #include "safari_zone.h"
@@ -1001,7 +1002,28 @@ static u8 GetObjectEventLoadFlag(void)
 static bool16 ShouldLegendaryMusicPlayAtLocation(struct WarpData *warp)
 {
     if (!FlagGet(FLAG_SYS_WEATHER_CTRL))
+    {
+        if (VarGet(VAR_ABNORMAL_WEATHER_LOCATION) != 0)
+        {
+            if (warp->mapGroup == 0)
+            {
+                switch (warp->mapNum)
+                {
+                case MAP_NUM(ROUTE105):
+                case MAP_NUM(ROUTE125):
+                case MAP_NUM(ROUTE127):
+                case MAP_NUM(ROUTE129):
+                    if (GetTerraOrMarineCaveMapSecId() == warp->mapNum)
+                        return TRUE;
+                default:
+                    return FALSE;
+                }
+            }
+        }
+
         return FALSE;
+    }
+
     if (warp->mapGroup == 0)
     {
         switch (warp->mapNum)
@@ -1028,6 +1050,29 @@ static bool16 ShouldLegendaryMusicPlayAtLocation(struct WarpData *warp)
             }
         }
     }
+    return FALSE;
+}
+
+static bool16 ShouldGroudonMusicPlayAtLocation(struct WarpData* warp)
+{
+    if (VarGet(VAR_ABNORMAL_WEATHER_LOCATION) != 0)
+    {
+        if (warp->mapGroup == 0)
+        {
+            switch (warp->mapNum)
+            {
+            case MAP_NUM(ROUTE114):
+            case MAP_NUM(ROUTE115):
+            case MAP_NUM(ROUTE116):
+            case MAP_NUM(ROUTE118):
+                if (GetTerraOrMarineCaveMapSecId() == warp->mapNum)
+                    return TRUE;
+            default:
+                return FALSE;
+            }
+        }
+    }
+
     return FALSE;
 }
 
@@ -1080,6 +1125,8 @@ u16 GetLocationMusic(struct WarpData *warp)
         return MUS_ENCOUNTER_MAGMA;
     else if (IsInfiltratedWeatherInstitute(warp) == TRUE)
         return MUS_MT_CHIMNEY;
+    else if (ShouldGroudonMusicPlayAtLocation(warp) == TRUE)
+        return MUS_WEATHER_GROUDON;
     else
         return Overworld_GetMapHeaderByGroupAndId(warp->mapGroup, warp->mapNum)->music;
 }
@@ -1134,14 +1181,14 @@ void Overworld_PlaySpecialMapMusic(void)
 {
     u16 music = GetCurrLocationDefaultMusic();
 
-    if (music != MUS_ABNORMAL_WEATHER && music != 0xFFFF)
+    if (music != MUS_WEATHER_GROUDON && music != MUS_ABNORMAL_WEATHER && music != 0xFFFF)
     {
         if (gSaveBlock1Ptr->savedMusic)
             music = gSaveBlock1Ptr->savedMusic;
         else if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
             music = MUS_UNDERWATER;
-        //else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-        //    music = (Random() % 2) == 0 ? MUS_SURF : MUS_RG_SURF;
+        else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+            music = MUS_SURF;
     }
 
     if (music == MUS_POKE_CENTER)
@@ -1171,12 +1218,12 @@ static void TransitionMapMusic(void)
     {
         u16 newMusic = GetWarpDestinationMusic();
         u16 currentMusic = GetCurrentMapMusic();
-        if (newMusic != MUS_ABNORMAL_WEATHER && newMusic != 0xFFFF)
+        if (newMusic != MUS_WEATHER_GROUDON && newMusic != MUS_ABNORMAL_WEATHER && newMusic != 0xFFFF)
         {
-            if (currentMusic == MUS_UNDERWATER /*|| currentMusic == MUS_SURF || currentMusic == MUS_RG_SURF*/)
+            if (currentMusic == MUS_UNDERWATER || currentMusic == MUS_SURF)
                 return;
-            //if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-            //    newMusic = (Random() % 2) == 0 ? MUS_SURF : MUS_RG_SURF;
+            if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+                newMusic = MUS_SURF;
         }
         if (newMusic != currentMusic)
         {
@@ -1200,7 +1247,7 @@ void Overworld_ChangeMusicToDefault(void)
 void Overworld_ChangeMusicTo(u16 newMusic)
 {
     u16 currentMusic = GetCurrentMapMusic();
-    if (currentMusic != newMusic && currentMusic != MUS_ABNORMAL_WEATHER)
+    if (currentMusic != newMusic && currentMusic != MUS_ABNORMAL_WEATHER && currentMusic != MUS_WEATHER_GROUDON)
         FadeOutAndPlayNewMapMusic(newMusic, 8);
 }
 
@@ -1222,7 +1269,7 @@ void TryFadeOutOldMapMusic(void)
 
     if (FlagGet(FLAG_DONT_TRANSITION_MUSIC) != TRUE && warpMusic != GetCurrentMapMusic())
     {
-        if ((currentMusic == MUS_SURF || currentMusic == MUS_RG_SURF)
+        if (currentMusic == MUS_SURF
             && VarGet(VAR_SKY_PILLAR_STATE) == 2
             && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(SOOTOPOLIS_CITY)
             && gSaveBlock1Ptr->location.mapNum == MAP_NUM(SOOTOPOLIS_CITY)

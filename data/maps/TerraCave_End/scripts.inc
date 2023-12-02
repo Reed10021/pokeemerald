@@ -51,7 +51,7 @@ TerraCave_End_EventScript_Groudon:: @ 823B0EC
 	goto_if_eq TerraCave_End_EventScript_RanFromGroudon
 	setvar VAR_SHOULD_END_ABNORMAL_WEATHER, 1
 	setflag FLAG_DEFEATED_GROUDON
-	releaseall
+	goto TerraCave_End_EventScript_DefeatedGroudon2
 	end
 
 TerraCave_End_EventScript_DefeatedGroudon:: @ 823B155
@@ -64,10 +64,14 @@ TerraCave_End_EventScript_DefeatedGroudon2::
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject VAR_LAST_TALKED
 	fadescreenswapbuffers FADE_FROM_BLACK
+	checkitem ITEM_MYSTIC_TICKET, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq TerraCave_End_EventScript_DefeatedGroudon2_Return
 	msgbox TerraCave_End_Text_DefeatedGroudon_SomethingOnTheGround, MSGBOX_DEFAULT
 	giveitem ITEM_MYSTIC_TICKET
 	setflag FLAG_ENABLE_SHIP_NAVEL_ROCK
-	release
+TerraCave_End_EventScript_DefeatedGroudon2_Return:
+	releaseall
 	end
 
 TerraCave_End_EventScript_RanFromGroudon:: @ 823B163

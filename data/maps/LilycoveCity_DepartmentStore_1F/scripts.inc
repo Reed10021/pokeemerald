@@ -43,14 +43,16 @@ LilycoveCity_DepartmentStore_1F_EventScript_LotteryClerk:: @ 821F69C
 	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_TicketMatchPCMon
 	bufferitemname 0, VAR_0x8005
 	compare VAR_0x8004, 1
-	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_TwoDigitMatch
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_OneDigitMatch
 	compare VAR_0x8004, 2
-	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_ThreeDigitMatch
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_TwoDigitMatch
 	compare VAR_0x8004, 3
-	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_FourDigitMatch
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_ThreeDigitMatch
 	compare VAR_0x8004, 4
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_FourDigitMatch
+	compare VAR_0x8004, 5
 	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_FullMatch
-	giveitem VAR_0x8005
+	giveitem VAR_0x8005, VAR_0x800A
 	compare VAR_RESULT, FALSE
 	goto_if_eq LilycoveCity_DepartmentStore_1F_EventScript_RecordPrizeNoRoom
 	special TryPutLotteryWinnerReportOnAir
@@ -84,6 +86,10 @@ LilycoveCity_DepartmentStore_1F_EventScript_PleaseVisitAgain2:: @ 821F7AF
 	msgbox LilycoveCity_DepartmentStore_1F_Text_PleaseVisitAgain2, MSGBOX_DEFAULT
 	release
 	end
+
+LilycoveCity_DepartmentStore_1F_EventScript_OneDigitMatch:: @ 821F7B9
+	msgbox LilycoveCity_DepartmentStore_1F_Text_OneDigitMatched, MSGBOX_DEFAULT
+	return
 
 LilycoveCity_DepartmentStore_1F_EventScript_TwoDigitMatch:: @ 821F7B9
 	msgbox LilycoveCity_DepartmentStore_1F_Text_TwoDigitsMatched, MSGBOX_DEFAULT

@@ -12,6 +12,7 @@
 #include "pokedex.h"
 #include "pokemon_icon.h"
 #include "region_map.h"
+#include "rtc.h"
 #include "sound.h"
 #include "string_util.h"
 #include "strings.h"
@@ -2137,7 +2138,6 @@ void BufferSaveMenuText(u8 textId, u8 *dest, u8 color)
     *(string++) = EXT_CTRL_CODE_BEGIN;
     *(string++) = EXT_CTRL_CODE_SHADOW;
     *(string++) = color + 1;
-
     switch (textId)
     {
         case SAVE_MENU_NAME:
@@ -2145,9 +2145,29 @@ void BufferSaveMenuText(u8 textId, u8 *dest, u8 color)
             break;
         case SAVE_MENU_CAUGHT:
             if (IsNationalPokedexEnabled())
+            {
+                *(string++) = CHAR_C;
+                *(string++) = CHAR_COLON;
+                *(string++) = CHAR_SPACE;
                 string = ConvertIntToDecimalStringN(string, GetNationalPokedexCount(FLAG_GET_CAUGHT), STR_CONV_MODE_LEFT_ALIGN, 3);
+                *(string++) = CHAR_SPACE;
+                *(string++) = CHAR_S;
+                *(string++) = CHAR_COLON;
+                *(string++) = CHAR_SPACE;
+                string = ConvertIntToDecimalStringN(string, GetNationalPokedexCount(FLAG_GET_SEEN), STR_CONV_MODE_LEFT_ALIGN, 3);
+            }
             else
+            {
+                *(string++) = CHAR_C;
+                *(string++) = CHAR_COLON;
+                *(string++) = CHAR_SPACE;
                 string = ConvertIntToDecimalStringN(string, GetHoennPokedexCount(FLAG_GET_CAUGHT), STR_CONV_MODE_LEFT_ALIGN, 3);
+                *(string++) = CHAR_SPACE;
+                *(string++) = CHAR_S;
+                *(string++) = CHAR_COLON;
+                *(string++) = CHAR_SPACE;
+                string = ConvertIntToDecimalStringN(string, GetHoennPokedexCount(FLAG_GET_SEEN), STR_CONV_MODE_LEFT_ALIGN, 3);
+            }
             *string = EOS;
             break;
         case SAVE_MENU_PLAY_TIME:
@@ -2166,6 +2186,12 @@ void BufferSaveMenuText(u8 textId, u8 *dest, u8 color)
             }
             *string = flagCount + CHAR_0;
             *endOfString = EOS;
+            break;
+        case SAVE_MENU_CLOCKTIME:
+            RtcCalcLocalTime();
+            string = ConvertIntToDecimalStringN(string, gLocalTime.hours, STR_CONV_MODE_LEADING_ZEROS, 2);
+            *(string++) = CHAR_COLON;
+            string = ConvertIntToDecimalStringN(string, gLocalTime.minutes, STR_CONV_MODE_LEADING_ZEROS, 2);
             break;
     }
 }

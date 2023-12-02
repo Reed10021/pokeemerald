@@ -34,6 +34,7 @@
 #include "task.h"
 #include "text.h"
 #include "trainer_hill.h"
+#include "tv.h"
 #include "util.h"
 #include "constants/abilities.h"
 #include "constants/battle_frontier.h"
@@ -2229,6 +2230,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     }
     else //Player is the OT
     {
+        u8 i = 0;
         value = gSaveBlock2Ptr->playerTrainerId[0]
               | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
               | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
@@ -2252,8 +2254,6 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             case SPECIES_GROUDON:
             case SPECIES_KYOGRE:
             case SPECIES_RAYQUAZA:
-            case SPECIES_LATIAS:
-            case SPECIES_LATIOS:
             case SPECIES_DEOXYS:
             case SPECIES_JIRACHI:
             case SPECIES_DEOXYS_ATTACK:
@@ -2261,6 +2261,12 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             case SPECIES_DEOXYS_SPEED:
                 adjustedChainCount += 250; // Use the current chain and increment it by 250. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
                 legendaryCheck = 1;
+                break;
+            case SPECIES_LATIAS:
+            case SPECIES_LATIOS:
+                adjustedChainCount += 750; // Give the player a decent shot at shiny roamers.
+                legendaryCheck = 1;
+                break;
         }
         // Reward long chains that haven't broken
         if (trueChainCount >= 250)
@@ -2275,6 +2281,22 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             adjustedChainCount += 40 + trueChainCount;
         else if (trueChainCount >= 10)
             adjustedChainCount += trueChainCount;
+        // Reward battle frontier symbols.
+        for (i = 0; i < 7; i++)
+        {
+            if (FlagGet(sSilverSymbolFlags[i]) == TRUE)
+            {
+                if (FlagGet(sGoldSymbolFlags[i]) == TRUE)
+                {
+                    adjustedChainCount += 35;
+                }
+                else
+                {
+                    adjustedChainCount += 12;
+                }
+            }
+        }
+
         if (!hasFixedPersonality) // Respect fixed personality (i.e eggs)
         {
             // Check the first personality roll.
@@ -2332,7 +2354,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
         u8 ivFlag = 0;
         if (legendaryCheck == 1 || (trueChainCount >= 3 && VarGet(VAR_SPECIESCHAINED) == species)) {
             rolls += 2 + (adjustedChainCount / 2);
-            if (trueChainCount >= 50 || legendaryCheck == 1)
+            if (trueChainCount >= 200)
+                ivFlag = 4;
+            else if (trueChainCount >= 60 || legendaryCheck == 1)
                 ivFlag = 3;
             else if (trueChainCount >= 30)
                 ivFlag = 2;
@@ -2340,7 +2364,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
                 ivFlag = 1;
         } else if (eggChainCount >= 3 && GetBoxMonData(boxMon, MON_DATA_IS_EGG, NULL)) {
             rolls += 2 + (eggChainCount / 2);
-            if (eggChainCount >= 50)
+            if (eggChainCount >= 200)
+                ivFlag = 4;
+            else if (eggChainCount >= 60)
                 ivFlag = 3;
             else if (eggChainCount >= 30)
                 ivFlag = 2;
@@ -2359,22 +2385,28 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 			iv = (value & 0x7C00) >> 10;
 			SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
 			if (ivFlag == 1) {
+                if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 10
+                    && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 10
+                    && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 10) {
+                    break;
+                }
+            }
+            else if (ivFlag == 2) {
                 if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 15
                     && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 15
                     && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 15) {
                     break;
                 }
-            }
-            else if (ivFlag == 2) {
+            } else if (ivFlag == 3) {
                 if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 20
                     && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 20
                     && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 20) {
                     break;
                 }
-            } else if (ivFlag == 3) {
-                if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 25
-                    && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 25
-                    && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 25) {
+            } else if (ivFlag == 4) {
+                if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 30
+                    && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 30
+                    && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 30) {
                     break;
                 }
             }
@@ -2399,23 +2431,30 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 			iv = (value & 0x7C00) >> 10;
 			SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
 			if (ivFlag == 1) {
+                if (GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 10
+                    && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 10
+                    && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 10) {
+                    break;
+                }
+            }
+            else if (ivFlag == 2) {
                 if (GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 15
                     && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 15
                     && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 15) {
                     break;
                 }
             }
-            else if (ivFlag == 2) {
+            else if (ivFlag == 3) {
                 if (GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 20
                     && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 20
                     && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 20) {
                     break;
                 }
             }
-            else if (ivFlag == 3) {
-                if (GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 25
-                    && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 25
-                    && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 25) {
+            else if (ivFlag == 4) {
+                if (GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 30
+                    && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 30
+                    && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 30) {
                     break;
                 }
             }
@@ -2443,6 +2482,7 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
     u32 shinyValue = HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality);
 
     {
+        u8 i = 0;
         u16 trueChainCount = VarGet(VAR_CHAIN);
         u32 adjustedChainCount = trueChainCount + 40; // Add some constant rerolls to the base chain rate because hard.
         u8 legendaryCheck = 0;
@@ -2493,6 +2533,22 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
             else if (trueChainCount >= 10)
                 adjustedChainCount += trueChainCount;
 
+            // Reward battle frontier symbols.
+            for (i = 0; i < 7; i++)
+            {
+                if (FlagGet(sSilverSymbolFlags[i]) == TRUE)
+                {
+                    if (FlagGet(sGoldSymbolFlags[i]) == TRUE)
+                    {
+                        adjustedChainCount += 35;
+                    }
+                    else
+                    {
+                        adjustedChainCount += 12;
+                    }
+                }
+            }
+
             if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1)
                 rolls = adjustedChainCount / 2; // If this is a pokemon we're not chaining, we get rolls equal to chainCount divided by 2. So a chainCount of 20 = 10 additional rolls for shiny.
             do
@@ -2542,6 +2598,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
 
         if (shinyValue >= SHINY_ODDS) // If not already shiny, do the additional rolls. That way the first roll counts.
         {
+            u8 i = 0;
             u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
             // Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
             switch (species)
@@ -2586,6 +2643,22 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
                 adjustedChainCount += 40 + trueChainCount;
             else if (trueChainCount >= 10)
                 adjustedChainCount += trueChainCount;
+
+            // Reward battle frontier symbols.
+            for (i = 0; i < 7; i++)
+            {
+                if (FlagGet(sSilverSymbolFlags[i]) == TRUE)
+                {
+                    if (FlagGet(sGoldSymbolFlags[i]) == TRUE)
+                    {
+                        adjustedChainCount += 35;
+                    }
+                    else
+                    {
+                        adjustedChainCount += 12;
+                    }
+                }
+            }
 
             if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1)
                 rolls = adjustedChainCount / 2; // If this is a pokemon we're not chaining, we get rolls equal to chainCount divided by 2. So a chainCount of 20 = 10 additional rolls for shiny.
@@ -3450,8 +3523,6 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
         }
     }
 
-    if (attackerHoldEffect == HOLD_EFFECT_CHOICE_BAND)
-        attack = (150 * attack) / 100;
     if (attackerHoldEffect == HOLD_EFFECT_SOUL_DEW && (attacker->species == SPECIES_LATIAS || attacker->species == SPECIES_LATIOS))
         spAttack = (150 * spAttack) / 100;
     if (defenderHoldEffect == HOLD_EFFECT_SOUL_DEW && (defender->species == SPECIES_LATIAS || defender->species == SPECIES_LATIOS))
@@ -3491,6 +3562,8 @@ s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *de
     if (type == TYPE_WATER && attacker->ability == ABILITY_TORRENT && attacker->hp <= (attacker->maxHP / 3))
         gBattleMovePower = (150 * gBattleMovePower) / 100;
     if (type == TYPE_BUG && attacker->ability == ABILITY_SWARM && attacker->hp <= (attacker->maxHP / 3))
+        gBattleMovePower = (150 * gBattleMovePower) / 100;
+    if (attackerHoldEffect == HOLD_EFFECT_CHOICE_BAND)
         gBattleMovePower = (150 * gBattleMovePower) / 100;
     if (gBattleMoves[gCurrentMove].effect == EFFECT_EXPLOSION)
         defense /= 2;
@@ -6652,7 +6725,7 @@ u16 GetBattleBGM(void)
             return MUS_VS_RIVAL;
         case TRAINER_CLASS_ELITE_FOUR:
             if(FlagGet(FLAG_IS_CHAMPION))
-                return (Random() % 2) == 0 ? MUS_VS_ELITE_FOUR : MUS_RG_VS_GYM_LEADER;
+                return (Random() % 2) == 0 ? MUS_VS_ELITE_FOUR : MUS_VS_FRONTIER_BRAIN;
             return MUS_VS_ELITE_FOUR;
         case TRAINER_CLASS_SALON_MAIDEN:
         case TRAINER_CLASS_DOME_ACE:
@@ -6664,9 +6737,9 @@ u16 GetBattleBGM(void)
             return MUS_VS_FRONTIER_BRAIN;
         default:
             if (FlagGet(FLAG_DEFEATED_SOOTOPOLIS_GYM))
-                if ((Random() % 4) == 0)
+                if ((Random() % 3) == 0)
                     return (Random() % 2) == 0 ? MUS_VS_RIVAL : MUS_VS_AQUA_MAGMA;
-            return (Random() % 3) != 0 ? MUS_VS_TRAINER : MUS_RG_VS_TRAINER;
+            return MUS_VS_TRAINER;
         }
     }
     else
@@ -6695,12 +6768,14 @@ u16 GetBattleBGM(void)
 		case SPECIES_ENTEI:
 		case SPECIES_SUICUNE:
 		case SPECIES_MEWTWO:
+        case SPECIES_LATIAS:
+        case SPECIES_LATIOS:
 			return MUS_C_VS_LEGEND_BEAST;
 		case SPECIES_MEW:
 		case SPECIES_CELEBI:
 			return MUS_VS_MEW;
 		}
-        return (Random() % 3) != 0 ? MUS_VS_WILD : MUS_RG_VS_WILD;
+        return MUS_VS_WILD;
 	}
 }
 

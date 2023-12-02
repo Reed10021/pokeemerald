@@ -275,6 +275,9 @@ extern const u8 gText_MenuOptionSave[];
 extern const u8 gText_MenuOptionOption[];
 extern const u8 gText_MenuOptionExit[];
 
+extern const u8 gText_ShinyRoamer[];
+extern const u8 gText_Roamer[];
+
 // save menu texts
 extern const u8 gText_ConfirmSave[];
 extern const u8 gText_DifferentSaveFile[];
@@ -287,6 +290,7 @@ extern const u8 gText_SavingPlayer[];
 extern const u8 gText_SavingBadges[];
 extern const u8 gText_SavingPokedex[];
 extern const u8 gText_SavingTime[];
+extern const u8 gText_SavingClockTime[];
 
 // Battle pyramid menu texts
 extern const u8 gText_BattlePyramidConfirmRest[];
@@ -1062,6 +1066,8 @@ extern const u8 gText_WontHaveEffect[];
 extern const u8 gText_LevelSymbol[];
 extern const u8 gText_PkmnInfo[];
 extern const u8 gText_PkmnSkills[];
+extern const u8 gText_PkmnIvs[];
+extern const u8 gText_PkmnEvs[];
 extern const u8 gText_BattleMoves[];
 extern const u8 gText_ContestMoves[];
 extern const u8 gText_HMMovesCantBeForgotten2[];

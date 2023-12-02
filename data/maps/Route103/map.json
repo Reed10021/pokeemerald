@@ -25,7 +25,7 @@
     },
     {
       "direction": "down",
-      "offset": 24,
+      "offset": 26,
       "map": "MAP_WATER_PATH"
     }
   ],

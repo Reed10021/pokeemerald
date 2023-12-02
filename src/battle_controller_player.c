@@ -1484,6 +1484,8 @@ static void MoveSelectionDisplayMoveDescription(void)
     u16 acc = gBattleMoves[move].accuracy;
     u16 pri = gBattleMoves[move].priority;
     u8 pwr_num[3], acc_num[3], pri_num[3], i;
+    u8 acc_flag = 0;
+    u8 prw_flag = 0;
     u8 pwr_desc[7] = _("PWR: ");
     u8 acc_desc[7] = _("ACC: ");
     u8 pri_desc[7] = _("PRI: ");
@@ -1493,7 +1495,7 @@ static void MoveSelectionDisplayMoveDescription(void)
     LoadMessageBoxAndBorderGfx();
     DrawStdWindowFrame(27, FALSE);
     if (move == MOVE_HIDDEN_POWER) {
-        pwr = 75;
+        pwr = 80;
     } else if (move == MOVE_RETURN) {
         pwr = (10 * GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP)) / 25;
     } else if (move == MOVE_FRUSTRATION) {
@@ -1502,53 +1504,75 @@ static void MoveSelectionDisplayMoveDescription(void)
         if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_ANY))
             pwr *= 2;
     } else if (move == MOVE_FURY_CUTTER) {
-        u8 i;
-        for (i = 1; i < gDisableStructs[gBattlerAttacker].furyCutterCounter; i++)
+        for (i = 0; i < gDisableStructs[gActiveBattler].furyCutterCounter; i++)
+        {
+            if (i == 4)
+                break;
             pwr *= 2;
-    }
-
-    if (move == MOVE_THUNDER) {
-        if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_RAIN_ANY))
-            acc = 100;
-    } else if (move == MOVE_BLIZZARD) {
-        if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_HAIL_ANY))
-            acc = 100;
-    } else if (move == MOVE_SOLAR_BEAM) {
-        if (WEATHER_HAS_EFFECT && (gBattleWeather & (WEATHER_RAIN_ANY | WEATHER_SANDSTORM_ANY | WEATHER_HAIL_ANY)))
-            pwr /= 2;
-    }
-
-    if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_SUN_ANY)) {
-        switch (gBattleMoves[move].type)
-        {
-            case TYPE_FIRE:
-                pwr = (15 * pwr) / 10;
-                break;
-            case TYPE_WATER:
-                pwr /= 2;
-                break;
-        }
-    } else if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_RAIN_ANY)) {
-        switch (gBattleMoves[move].type)
-        {
-            case TYPE_FIRE:
-                pwr /= 2;
-                break;
-            case TYPE_WATER:
-                pwr = (15 * pwr) / 10;
-                break;
         }
     }
-
 
     if (pwr < 2)
         StringCopy(pwr_num, gText_BattleSwitchWhich5);
     else
-        ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
+        prw_flag = 1;
 
     if (acc < 2)
         StringCopy(acc_num, gText_BattleSwitchWhich5);
     else
+        acc_flag = 1;
+
+    if (WEATHER_HAS_EFFECT)
+    {
+        if (move == MOVE_THUNDER) {
+            if (gBattleWeather & WEATHER_RAIN_ANY)
+                acc = 100;
+            else if (gBattleWeather & WEATHER_SUN_ANY)
+                acc = 50;
+        }
+        else if (move == MOVE_BLIZZARD) {
+            if (gBattleWeather & WEATHER_HAIL_ANY)
+                acc = 100;
+        }
+        else if (move == MOVE_SOLAR_BEAM) {
+            if (gBattleWeather & (WEATHER_RAIN_ANY | WEATHER_SANDSTORM_ANY | WEATHER_HAIL_ANY))
+                pwr /= 2;
+        }
+
+        if (gBattleWeather & WEATHER_SUN_ANY) {
+            switch (gBattleMoves[move].type)
+            {
+            case TYPE_FIRE:
+                pwr = (15 * pwr) / 10;
+                break;
+            case TYPE_WATER:
+                pwr /= 2;
+                break;
+            }
+        }
+        else if (gBattleWeather & WEATHER_RAIN_ANY) {
+            switch (gBattleMoves[move].type)
+            {
+            case TYPE_FIRE:
+                pwr /= 2;
+                break;
+            case TYPE_WATER:
+                pwr = (15 * pwr) / 10;
+                break;
+            }
+        }
+    }
+
+    if (gBattleMons[gActiveBattler].ability == ABILITY_COMPOUND_EYES)
+        acc = (acc * 130) / 100; // 1.3 compound eyes boost
+    if (gBattleMons[gActiveBattler].ability == ABILITY_HUSTLE && IS_TYPE_PHYSICAL(gBattleMoves[move].type))
+        acc = (acc * 80) / 100; // 1.2 hustle loss
+
+    if (acc > 100)
+        acc = 100;
+    if (prw_flag == 1)
+        ConvertIntToDecimalStringN(pwr_num, pwr, STR_CONV_MODE_LEFT_ALIGN, 3);
+    if (acc_flag == 1)
         ConvertIntToDecimalStringN(acc_num, acc, STR_CONV_MODE_LEFT_ALIGN, 3);
     ConvertIntToDecimalStringN(pri_num, pri, STR_CONV_MODE_LEFT_ALIGN, 3);
     StringCopy(gDisplayedStringBattle, pwr_start);
@@ -1677,9 +1701,31 @@ static void MoveSelectionDisplayMoveTypeDoubles(u8 targetId)
 static void MoveSelectionDisplayMoveType(void)
 {
     u8 *txtPtr;
-    u8 typeColor = IsDoubleBattle() ? 10 : TypeEffectiveness(GetBattlerAtPosition(BATTLE_OPPOSITE(GetBattlerPosition(gActiveBattler))));
+    u8 targetId = GetBattlerAtPosition(BATTLE_OPPOSITE(GetBattlerPosition(gActiveBattler)));
+    u8 typeColor = 10;
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
     u8 type = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type;
+    u8 moveTarget;
+
+    if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_CURSE)
+    {
+        if (moveInfo->monType1 != TYPE_GHOST && moveInfo->monType2 != TYPE_GHOST)
+            moveTarget = MOVE_TARGET_USER;
+        else
+            moveTarget = MOVE_TARGET_SELECTED;
+    }
+    else
+    {
+        moveTarget = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].target;
+    }
+
+    if (!IsDoubleBattle() ||
+        (moveTarget & (MOVE_TARGET_RANDOM | MOVE_TARGET_BOTH | MOVE_TARGET_DEPENDS
+                | MOVE_TARGET_FOES_AND_ALLY | MOVE_TARGET_OPPONENTS_FIELD | MOVE_TARGET_USER))
+        )
+    {
+        typeColor = TypeEffectiveness(targetId);
+    }
 
     txtPtr = StringCopy(gDisplayedStringBattle, gText_MoveInterfaceType);
     *(txtPtr)++ = EXT_CTRL_CODE_BEGIN;

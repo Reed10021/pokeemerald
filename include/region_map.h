@@ -94,6 +94,7 @@ struct RegionMapLocation
 void InitRegionMapData(struct RegionMap *regionMap, const struct BgTemplate *template, bool8 zoomed);
 bool8 LoadRegionMapGfx(void);
 void UpdateRegionMapVideoRegs(void);
+u16 GetTerraOrMarineCaveMapSecId(void);
 void InitRegionMap(struct RegionMap *regionMap, u8 argument);
 u8 DoRegionMapInputCallback(void);
 bool8 UpdateRegionMapZoom(void);

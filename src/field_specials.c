@@ -4469,3 +4469,13 @@ void GetOutbreakMon(void)
         gSpecialVar_Result = FALSE;
     }
 }
+
+void CelebiRandomEgg(void)
+{
+    // Give a random egg between all poke species.
+    // If the species chosen is greater than or equal to SPECIES_OLD_UNOWN_B
+    // and less than or equal to SPECIES_OLD_UNOWN_Z, then re-roll species so we don't use those.
+    do {
+        gSpecialVar_0x8004 = Random() % NUM_SPECIES;
+    } while (gSpecialVar_0x8004 >= SPECIES_OLD_UNOWN_B && gSpecialVar_0x8004 <= SPECIES_OLD_UNOWN_Z);
+}

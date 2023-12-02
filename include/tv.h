@@ -5,6 +5,8 @@
 #define ROULETTE 1
 
 extern u8 *const gTVStringVarPtrs[3];
+extern const u16 sGoldSymbolFlags[];
+extern const u16 sSilverSymbolFlags[];
 
 void ClearTVShowData(void);
 void sub_80EE184(void);

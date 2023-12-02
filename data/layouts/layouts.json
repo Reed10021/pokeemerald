@@ -104,7 +104,7 @@
     {
       "id": "LAYOUT_OLDALE_TOWN",
       "name": "OldaleTown_Layout",
-      "width": 24,
+      "width": 26,
       "height": 20,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_Petalburg",
@@ -4414,10 +4414,10 @@
     {
       "id": "LAYOUT_WATER_PATH",
       "name": "WaterPath_Layout",
-      "width": 36,
+      "width": 38,
       "height": 20,
       "primary_tileset": "gTileset_General",
-      "secondary_tileset": "gTileset_Petalburg",
+      "secondary_tileset": "gTileset_Rustboro",
       "border_filepath": "data/layouts/WaterPath/border.bin",
       "blockdata_filepath": "data/layouts/WaterPath/map.bin"
     },
@@ -4440,6 +4440,16 @@
       "secondary_tileset": "gTileset_Petalburg",
       "border_filepath": "data/layouts/GreenPath/border.bin",
       "blockdata_filepath": "data/layouts/GreenPath/map.bin"
+    },
+    {
+      "id": "LAYOUT_TIMELESS_FOREST",
+      "name": "TimelessForest_Layout",
+      "width": 50,
+      "height": 30,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Rustboro",
+      "border_filepath": "data/layouts/TimelessForest/border.bin",
+      "blockdata_filepath": "data/layouts/TimelessForest/map.bin"
     }
   ]
 }

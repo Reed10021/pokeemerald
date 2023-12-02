@@ -344,6 +344,12 @@ static const struct {
         .location = MAP_NUM(ROUTE112)
     },
     {
+        .species = SPECIES_LARVITAR,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_EARTHQUAKE, MOVE_THIEF, MOVE_ROCK_SLIDE},
+        .level = 10,
+        .location = MAP_NUM(ROUTE101)
+    },
+    {
         .species = SPECIES_BLISSEY,
         .moves = {MOVE_AMNESIA, MOVE_SWEET_KISS, MOVE_WISH, MOVE_HYDRO_PUMP},
         .level = 50,
@@ -542,11 +548,23 @@ static const struct {
         .location = MAP_NUM(ROUTE129)
     },
     {
+        .species = SPECIES_LARVITAR,
+        .moves = {MOVE_SWORDS_DANCE, MOVE_EARTHQUAKE, MOVE_METEOR_MASH, MOVE_FURY_CUTTER},
+        .level = 23,
+        .location = MAP_NUM(ROUTE113)
+    },
+    {
         // Gen 1 starters
         .species = SPECIES_SQUIRTLE,
         .moves = {MOVE_DRAGON_DANCE, MOVE_CURSE, MOVE_CROSS_CHOP, MOVE_HYDRO_CANNON},
         .level = 15,
         .location = MAP_NUM(ROUTE103)
+    },
+    {
+        .species = SPECIES_SQUIRTLE,
+        .moves = {MOVE_CURSE, MOVE_METEOR_MASH, MOVE_CROSS_CHOP, MOVE_HYDRO_CANNON},
+        .level = 25,
+        .location = MAP_NUM(ROUTE124)
     },
     {
         .species = SPECIES_CHARMANDER,
@@ -555,10 +573,22 @@ static const struct {
         .location = MAP_NUM(ROUTE110)
     },
     {
+        .species = SPECIES_CHARMANDER,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_DRILL_PECK, MOVE_BLAST_BURN, MOVE_OUTRAGE},
+        .level = 25,
+        .location = MAP_NUM(GREEN_PATH)
+    },
+    {
         .species = SPECIES_BULBASAUR,
         .moves = {MOVE_DRAGON_DANCE, MOVE_PETAL_DANCE, MOVE_SLUDGE_BOMB, MOVE_SPORE},
         .level = 15,
         .location = MAP_NUM(ROUTE104)
+    },
+    {
+        .species = SPECIES_BULBASAUR,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_FRENZY_PLANT, MOVE_SLUDGE_BOMB, MOVE_SPORE},
+        .level = 25,
+        .location = MAP_NUM(GREEN_PATH)
     },
     {
         // Gen 2 starter(s)
@@ -572,6 +602,30 @@ static const struct {
         .moves = {MOVE_DRAGON_DANCE, MOVE_PETAL_DANCE, MOVE_MUD_SHOT, MOVE_SPORE},
         .level = 15,
         .location = MAP_NUM(ROUTE116)
+    },
+    {
+        .species = SPECIES_CYNDAQUIL,
+        .moves = {MOVE_TAIL_GLOW, MOVE_HEAT_WAVE, MOVE_ICE_PUNCH, MOVE_HYPNOSIS},
+        .level = 15,
+        .location = MAP_NUM(ROUTE101)
+    },
+    {
+        .species = SPECIES_CYNDAQUIL,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_BLAST_BURN, MOVE_FURY_CUTTER, MOVE_ICE_PUNCH},
+        .level = 25,
+        .location = MAP_NUM(GREEN_PATH)
+    },
+    {
+        .species = SPECIES_TOTODILE,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_WATERFALL, MOVE_METEOR_MASH, MOVE_THRASH},
+        .level = 15,
+        .location = MAP_NUM(ROUTE101)
+    },
+    {
+        .species = SPECIES_TOTODILE,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_HYDRO_CANNON, MOVE_FURY_CUTTER, MOVE_METEOR_MASH},
+        .level = 25,
+        .location = MAP_NUM(WATER_PATH)
     },
     {
         .species = SPECIES_BELLSPROUT,
@@ -593,8 +647,14 @@ static const struct {
     },
     {
         .species = SPECIES_EEVEE,
-        .moves = {MOVE_DRAGON_DANCE, MOVE_THIEF, MOVE_SHADOW_BALL, MOVE_ACID_ARMOR},
-        .level = 13,
+        .moves = {MOVE_TAIL_GLOW, MOVE_SURF, MOVE_FLAMETHROWER, MOVE_THUNDERBOLT},
+        .level = 10,
+        .location = MAP_NUM(ROUTE101)
+    },
+    {
+        .species = SPECIES_EEVEE,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_THIEF, MOVE_PSYCHIC, MOVE_ACID_ARMOR},
+        .level = 17,
         .location = MAP_NUM(ROUTE104)
     },
     {
@@ -617,7 +677,7 @@ static const struct {
     }
 };
 
-static const u16 sGoldSymbolFlags[] = {
+const u16 sGoldSymbolFlags[] = {
     FLAG_SYS_TOWER_GOLD,
     FLAG_SYS_DOME_GOLD,
     FLAG_SYS_PALACE_GOLD,
@@ -627,7 +687,7 @@ static const u16 sGoldSymbolFlags[] = {
     FLAG_SYS_PYRAMID_GOLD
 };
 
-static const u16 sSilverSymbolFlags[] = {
+const u16 sSilverSymbolFlags[] = {
     FLAG_SYS_TOWER_SILVER,
     FLAG_SYS_DOME_SILVER,
     FLAG_SYS_PALACE_SILVER,
@@ -2256,6 +2316,8 @@ void UpdateTVShowsPerDay(u16 days)
     sub_80EF120(days);
     sub_80EDA48(days);
     sub_80EEB98(days);
+    sub_80ED718(); // Attempt to generate an outbreak at day start.
+    sub_80EED88(); // Attempt to generate pokenews at day start.
 }
 
 static void UpdateMassOutbreakTimeLeft(u16 days)

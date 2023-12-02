@@ -51,7 +51,7 @@ MarineCave_End_EventScript_Kyogre:: @ 823B01B
 	goto_if_eq MarineCave_End_EventScript_RanFromKyogre
 	setvar VAR_SHOULD_END_ABNORMAL_WEATHER, 1
 	setflag FLAG_DEFEATED_KYOGRE
-	releaseall
+	goto MarineCave_End_EventScript_DefeatedKyogre2
 	end
 
 MarineCave_End_EventScript_DefeatedKyogre:: @ 823B084
@@ -64,10 +64,14 @@ MarineCave_End_EventScript_DefeatedKyogre2::
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject VAR_LAST_TALKED
 	fadescreenswapbuffers FADE_FROM_BLACK
+	checkitem ITEM_OLD_SEA_MAP, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq MarineCave_End_EventScript_DefeatedKyogre2_Return
 	msgbox MarineCave_End_Text_DefeatedKyogre_SomethingOnTheGround, MSGBOX_DEFAULT
 	giveitem ITEM_OLD_SEA_MAP
 	setflag FLAG_ENABLE_SHIP_FARAWAY_ISLAND
-	release
+MarineCave_End_EventScript_DefeatedKyogre2_Return:
+	releaseall
 	end
 
 MarineCave_End_EventScript_RanFromKyogre:: @ 823B092

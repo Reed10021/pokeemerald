@@ -5429,7 +5429,7 @@ static void PrintStatsScreen_Moves_Bottom(u8 taskId)
         if (gBattleMoves[move].power < 2)
         {
             if(move == MOVE_HIDDEN_POWER)
-                ConvertIntToDecimalStringN(gStringVar1, 75, STR_CONV_MODE_RIGHT_ALIGN, 3);
+                ConvertIntToDecimalStringN(gStringVar1, 80, STR_CONV_MODE_RIGHT_ALIGN, 3);
             else
                 StringCopy(gStringVar1, gText_ThreeDashes);
         }

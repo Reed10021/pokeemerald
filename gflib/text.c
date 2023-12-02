@@ -861,6 +861,19 @@ u16 RenderText(struct TextPrinter *textPrinter)
     s32 widthHelper;
     u8 repeats;
 
+	switch (GetPlayerTextSpeed())
+	{
+		case OPTIONS_TEXT_SPEED_SLOW:
+			repeats = 1;
+			break;
+		case OPTIONS_TEXT_SPEED_MID:
+			repeats = 2;
+			break;
+		case OPTIONS_TEXT_SPEED_FAST:
+			repeats = 4;
+			break;
+	}
+
     switch (textPrinter->state)
     {
     case 0:
@@ -882,19 +895,6 @@ u16 RenderText(struct TextPrinter *textPrinter)
             textPrinter->delayCounter = 3;
         else
             textPrinter->delayCounter = textPrinter->textSpeed;
-
-		switch (GetPlayerTextSpeed())
-		{
-			case OPTIONS_TEXT_SPEED_SLOW:
-				repeats = 1;
-				break;
-			case OPTIONS_TEXT_SPEED_MID:
-				repeats = 2;
-				break;
-			case OPTIONS_TEXT_SPEED_FAST:
-				repeats = 4;
-				break;
-		}
 		
 		do
         {

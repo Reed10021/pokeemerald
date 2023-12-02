@@ -51,7 +51,8 @@
 #define FLAG_JIRACHI_BATTLE	     0x23
 //#define FLAG_UNUSED_0x024      0x24 // Unused Flag
 #define FLAG_JIRACHI_DOOR        0x24
-#define FLAG_UNUSED_0x025    0x25 // Unused Flag
+//#define FLAG_UNUSED_0x025      0x25 // Unused Flag
+#define FLAG_CELEBI_BATTLE       0x25
 #define FLAG_UNUSED_0x026    0x26 // Unused Flag
 #define FLAG_UNUSED_0x027    0x27 // Unused Flag
 #define FLAG_UNUSED_0x028    0x28 // Unused Flag
@@ -1211,8 +1212,8 @@
 #define FLAG_ITEM_ROUTE_134_STAR_PIECE                              0x487
 #define FLAG_ITEM_ROUTE_114_ENERGY_POWDER                           0x488
 #define FLAG_ITEM_ROUTE_115_PP_UP                                   0x489
-#define FLAG_ITEM_ARTISAN_CAVE_B1F_HP_UP                            0x48A
-#define FLAG_ITEM_ARTISAN_CAVE_1F_CARBOS                            0x48B
+#define FLAG_UNUSED_0x48A                                           0x48A
+#define FLAG_UNUSED_0x48B                                           0x48B
 #define FLAG_ITEM_MAGMA_HIDEOUT_2F_2R_MAX_ELIXIR                    0x48C
 #define FLAG_ITEM_MAGMA_HIDEOUT_2F_2R_FULL_RESTORE                  0x48D
 #define FLAG_ITEM_MAGMA_HIDEOUT_3F_1R_NUGGET                        0x48E
@@ -1569,16 +1570,16 @@
 // These flags are cleared once per day
 // The start and end are byte-aligned because the flags are cleared in byte increments
 #define DAILY_FLAGS_START                           (FLAG_UNUSED_0x91F + (8 - FLAG_UNUSED_0x91F % 8))
-#define FLAG_UNUSED_0x920                           (DAILY_FLAGS_START + 0x0)  // Unused Flag
+#define FLAG_DAILY_CELEBI_EGG                       (DAILY_FLAGS_START + 0x0)  // Unused Flag
 #define FLAG_DAILY_CONTEST_LOBBY_RECEIVED_BERRY     (DAILY_FLAGS_START + 0x1)
 #define FLAG_DAILY_SECRET_BASE                      (DAILY_FLAGS_START + 0x2)
-#define FLAG_UNUSED_0x923                           (DAILY_FLAGS_START + 0x3)  // Unused Flag
-#define FLAG_UNUSED_0x924                           (DAILY_FLAGS_START + 0x4)  // Unused Flag
-#define FLAG_UNUSED_0x925                           (DAILY_FLAGS_START + 0x5)  // Unused Flag
-#define FLAG_UNUSED_0x926                           (DAILY_FLAGS_START + 0x6)  // Unused Flag
-#define FLAG_UNUSED_0x927                           (DAILY_FLAGS_START + 0x7)  // Unused Flag
-#define FLAG_UNUSED_0x928                           (DAILY_FLAGS_START + 0x8)  // Unused Flag
-#define FLAG_UNUSED_0x929                           (DAILY_FLAGS_START + 0x9)  // Unused Flag
+#define FLAG_DAILY_JIRACHI_STAR_PIECE               (DAILY_FLAGS_START + 0x3)  // Unused Flag
+#define FLAG_DAILY_ARTISAN_CAVE_1F_CARBOS           (DAILY_FLAGS_START + 0x4)  // Unused Flag
+#define FLAG_DAILY_ARTISAN_CAVE_B1F_HP_UP           (DAILY_FLAGS_START + 0x5)  // Unused Flag
+#define FLAG_DAILY_ARTISAN_CAVE_B1F_ZINC            (DAILY_FLAGS_START + 0x6)  // Unused Flag
+#define FLAG_DAILY_ARTISAN_CAVE_B1F_CALCIUM         (DAILY_FLAGS_START + 0x7)  // Unused Flag
+#define FLAG_DAILY_ARTISAN_CAVE_B1F_PROTEIN         (DAILY_FLAGS_START + 0x8)  // Unused Flag
+#define FLAG_DAILY_ARTISAN_CAVE_B1F_IRON            (DAILY_FLAGS_START + 0x9)  // Unused Flag
 #define FLAG_DAILY_PICKED_LOTO_TICKET               (DAILY_FLAGS_START + 0xA)
 #define FLAG_DAILY_ROUTE_114_RECEIVED_BERRY         (DAILY_FLAGS_START + 0xB)
 #define FLAG_DAILY_ROUTE_111_RECEIVED_BERRY         (DAILY_FLAGS_START + 0xC)

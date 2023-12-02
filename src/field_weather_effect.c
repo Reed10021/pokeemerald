@@ -943,7 +943,7 @@ static void InitSnowflakeSpriteMovement(struct Sprite *sprite)
 
 static void WaitSnowflakeSprite(struct Sprite *sprite)
 {
-    if (++gWeatherPtr->unknown_6E2 > 18)
+    if (++gWeatherPtr->unknown_6E2 > 12)
     {
         sprite->invisible = FALSE;
         sprite->callback = UpdateSnowflakeSprite;
@@ -2503,7 +2503,7 @@ void ResumePausedWeather(void)
     SetCurrentAndNextWeather(weather);
 }
 
-static const u8 sWeatherCycleRoute102_104[] = //and Petalburg City
+static const u8 sWeatherCycleRoute102_104[] = //and Petalburg City, Oldale Town
 {
     WEATHER_SUNNY,
     WEATHER_RAIN_THUNDERSTORM,
@@ -2546,6 +2546,15 @@ static const u8 sWeatherCycleRoute103_110[] =
     WEATHER_FOG_HORIZONTAL,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
+    WEATHER_RAIN,
+};
+static const u8 sWeatherCycleTimelessForest[] =
+{
+    WEATHER_SHADE,
+    WEATHER_RAIN,
+    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SHADE,
+    WEATHER_SHADE,
     WEATHER_RAIN,
 };
 static const u8 sWeatherCycleRoute111_112[] =
@@ -2725,6 +2734,7 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_PACIFIDLOG_CYCLE:       return sWeatherCyclePacifidlog[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_LILYCOVE_CYCLE:         return sWeatherCycleLilycove[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_PETALBURGWOODS_CYCLE:   return sWeatherCyclePetalburgWoods[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_TIMELESS_FOREST:        return sWeatherCycleTimelessForest[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;
     }
 }

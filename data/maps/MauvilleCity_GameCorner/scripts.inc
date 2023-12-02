@@ -30,8 +30,8 @@ MauvilleCity_GameCorner_EventScript_CoinsClerk:: @ 820FBB9
 MauvilleCity_GameCorner_EventScript_ChooseCoinsDefault50:: @ 820FBE5
 	multichoicedefault 15, 0, MULTI_GAME_CORNER_COINS, 0, 0
 	switch VAR_RESULT
-	case 0, MauvilleCity_GameCorner_EventScript_Buy50Coins
-	case 1, MauvilleCity_GameCorner_EventScript_Buy500Coins
+	case 0, MauvilleCity_GameCorner_EventScript_Buy500Coins
+	case 1, MauvilleCity_GameCorner_EventScript_Buy50Coins
 	case 2, MauvilleCity_GameCorner_EventScript_Buy10000Yen
 	goto MauvilleCity_GameCorner_EventScript_CancelBuyCoins
 	end
@@ -47,7 +47,7 @@ MauvilleCity_GameCorner_EventScript_ChooseCoinsDefault500:: @ 820FC0C
 
 MauvilleCity_GameCorner_EventScript_Buy50Coins:: @ 820FC33
 	checkcoins VAR_TEMP_1
-	compare VAR_TEMP_1, (MAX_COINS + 1 - 50)
+	compare VAR_TEMP_1, MAX_COINS
 	goto_if_ge MauvilleCity_GameCorner_EventScript_NoRoomForCoins
 	checkmoney COINS_PRICE_50, 0
 	compare VAR_RESULT, FALSE
@@ -58,14 +58,15 @@ MauvilleCity_GameCorner_EventScript_Buy50Coins:: @ 820FC33
 	updatecoinsbox 1, 6
 	playse SE_SHOP
 	msgbox MauvilleCity_GameCorner_Text_ThankYouHereAreYourCoins, MSGBOX_DEFAULT
-	hidemoneybox
-	hidecoinsbox 0, 5
-	release
+	goto MauvilleCity_GameCorner_EventScript_ChooseCoinsDefault50
+@	hidemoneybox
+@	hidecoinsbox 0, 5
+@	release
 	end
 
 MauvilleCity_GameCorner_EventScript_Buy500Coins:: @ 820FC75
 	checkcoins VAR_TEMP_1
-	compare VAR_TEMP_1, (MAX_COINS + 1 - 500)
+	compare VAR_TEMP_1, MAX_COINS
 	goto_if_ge MauvilleCity_GameCorner_EventScript_NoRoomForCoins
 	checkmoney COINS_PRICE_500, 0
 	compare VAR_RESULT, FALSE
@@ -76,9 +77,10 @@ MauvilleCity_GameCorner_EventScript_Buy500Coins:: @ 820FC75
 	updatecoinsbox 1, 6
 	playse SE_SHOP
 	msgbox MauvilleCity_GameCorner_Text_ThankYouHereAreYourCoins, MSGBOX_DEFAULT
-	hidemoneybox
-	hidecoinsbox 0, 5
-	release
+	goto MauvilleCity_GameCorner_EventScript_ChooseCoinsDefault50
+@	hidemoneybox
+@	hidecoinsbox 0, 5
+@	release
 	end
 
 MauvilleCity_GameCorner_EventScript_Buy10000Yen:: @ 820FC75
@@ -91,9 +93,10 @@ MauvilleCity_GameCorner_EventScript_Buy10000Yen:: @ 820FC75
 	updatecoinsbox 1, 6
 	playse SE_SHOP
 	msgbox MauvilleCity_GameCorner_Text_ThankYouHereIsYourMoney, MSGBOX_DEFAULT
-	hidemoneybox
-	hidecoinsbox 0, 5
-	release
+	goto MauvilleCity_GameCorner_EventScript_ChooseCoinsDefault50
+@	hidemoneybox
+@	hidecoinsbox 0, 5
+@	release
 	end
 
 MauvilleCity_GameCorner_EventScript_NeedCoinCase:: @ 820FCB7

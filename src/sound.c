@@ -137,16 +137,11 @@ void PlayNewMapMusic(u16 songNum)
         {
             if (gLocalTime.hours >= DAY_START && gLocalTime.hours < NIGHT_START) //Daytime
             {
-                songNum = (Random() % 2) == 0 ? MUS_POKE_CENTER : MUS_RG_NET_CENTER;
+                //songNum = (Random() % 7) == 0 ? MUS_RG_NET_CENTER : MUS_POKE_CENTER; // no change
             }
             else // Nighttime
             {
-                songNum = (Random() % 2) == 0 ? MUS_C_COMM_CENTER : MUS_RG_POKE_CENTER;
-            }
-        }
-        else {
-            if (gLocalTime.hours >= NIGHT_START || gLocalTime.hours < DAY_START) {
-                songNum = MUS_C_COMM_CENTER;
+                songNum = MUS_RG_NET_CENTER;
             }
         }
     }
