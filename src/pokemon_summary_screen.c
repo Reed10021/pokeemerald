@@ -1679,6 +1679,7 @@ static void Task_HandleInput(u8 taskId)
             if (sMonSummaryScreen->currPageIndex == PSS_PAGE_SKILLS)
             {
                 // Cycle through IVs/EVs/stats on pressing A
+                PlaySE(SE_SELECT);
                 ChangeSummaryState(data, taskId);
                 BufferIvOrEvStats(data[3]);
             }
@@ -3834,7 +3835,14 @@ static void PrintMovePowerAndAccuracy(u16 moveIndex)
 
         PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, text, 53, 1, 0, 0);
 
-        if (gBattleMoves[moveIndex].accuracy == 0)
+        if (gBattleMoves[moveIndex].accuracy == 0 ||
+            moveIndex == MOVE_ASSIST || moveIndex == MOVE_BLOCK || moveIndex == MOVE_CAMOUFLAGE || moveIndex == MOVE_CHARGE ||
+            moveIndex == MOVE_CONVERSION_2 || moveIndex == MOVE_FOLLOW_ME || moveIndex == MOVE_GRUDGE || moveIndex == MOVE_HELPING_HAND ||
+            moveIndex == MOVE_IMPRISON || moveIndex == MOVE_INGRAIN || moveIndex == MOVE_MAGIC_COAT || moveIndex == MOVE_MEAN_LOOK ||
+            moveIndex == MOVE_MEMENTO || moveIndex == MOVE_MIMIC || moveIndex == MOVE_MUD_SPORT || moveIndex == MOVE_NIGHTMARE ||
+            moveIndex == MOVE_PAIN_SPLIT || moveIndex == MOVE_RECYCLE || moveIndex == MOVE_REFRESH || moveIndex == MOVE_ROLE_PLAY ||
+            moveIndex == MOVE_SKILL_SWAP || moveIndex == MOVE_SLACK_OFF || moveIndex == MOVE_SNATCH || moveIndex == MOVE_SOFT_BOILED ||
+            moveIndex == MOVE_SPIDER_WEB || moveIndex == MOVE_TAIL_GLOW || moveIndex == MOVE_WATER_SPORT || moveIndex == MOVE_WISH || moveIndex == MOVE_YAWN)
         {
             text = gText_ThreeDashes;
         }

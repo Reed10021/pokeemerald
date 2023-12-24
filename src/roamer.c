@@ -68,13 +68,13 @@ static void CreateInitialRoamerMon(bool16 createLatios)
         (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIAS;
     else
         (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIOS;
+    (&gSaveBlock1Ptr->roamer)->active = TRUE;
 
     GetSetPokedexFlag(SpeciesToNationalPokedexNum((&gSaveBlock1Ptr->roamer)->species), FLAG_SET_SEEN);
 
     CreateMon(&gEnemyParty[0], (&gSaveBlock1Ptr->roamer)->species, 50, 0x20, 0, 0, OT_ID_PLAYER_ID, 0);
     (&gSaveBlock1Ptr->roamer)->level = 50;
     (&gSaveBlock1Ptr->roamer)->status = 0;
-    (&gSaveBlock1Ptr->roamer)->active = TRUE;
     (&gSaveBlock1Ptr->roamer)->ivs = GetMonData(&gEnemyParty[0], MON_DATA_IVS);
     (&gSaveBlock1Ptr->roamer)->personality = GetMonData(&gEnemyParty[0], MON_DATA_PERSONALITY);
     (&gSaveBlock1Ptr->roamer)->hp = GetMonData(&gEnemyParty[0], MON_DATA_MAX_HP);
@@ -116,6 +116,15 @@ bool16 CheckShinyRoamer(void)
     }
 }
 
+u16 GetSpeciesFromRoamer(void)
+{
+    if (!(&gSaveBlock1Ptr->roamer)->active)
+        gSpecialVar_Result = SPECIES_NONE;
+    else
+        gSpecialVar_Result = (&gSaveBlock1Ptr->roamer)->species;
+    return gSpecialVar_Result;
+}
+
 void UpdateLocationHistoryForRoamer(void)
 {
     sLocationHistory[2][MAP_GRP] = sLocationHistory[1][MAP_GRP];
@@ -126,6 +135,11 @@ void UpdateLocationHistoryForRoamer(void)
 
     sLocationHistory[0][MAP_GRP] = gSaveBlock1Ptr->location.mapGroup;
     sLocationHistory[0][MAP_NUM] = gSaveBlock1Ptr->location.mapNum;
+}
+
+bool8 IsRoamerActive(void)
+{
+    return (&gSaveBlock1Ptr->roamer)->active;
 }
 
 void RoamerMoveToOtherLocationSet(void)
@@ -162,6 +176,10 @@ void RoamerMove(void)
         struct Roamer *roamer = &gSaveBlock1Ptr->roamer;
 
         if (!roamer->active)
+            return;
+
+        // Chance for roamer to not move
+        if (Random() % 3 != 0)
             return;
 
         while (locSet < (ARRAY_COUNT(sRoamerLocations) - 1))
@@ -221,7 +239,7 @@ void CreateRoamerMonInstance(void)
 
 bool8 TryStartRoamerEncounter(void)
 {
-    if (IsRoamerAt(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum) == TRUE && (Random() % 4) == 0)
+    if (IsRoamerAt(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum) == TRUE && (Random() % 3) == 0)
     {
         CreateRoamerMonInstance();
         return TRUE;

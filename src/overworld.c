@@ -855,7 +855,7 @@ static void LoadMapFromWarp(bool32 a1)
     Overworld_ClearSavedMusic();
     RunOnTransitionMapScript();
     UpdateLocationHistoryForRoamer();
-    RoamerMoveToOtherLocationSet();
+    RoamerMove();
     if (gMapHeader.mapLayoutId == LAYOUT_BATTLE_FRONTIER_BATTLE_PYRAMID_FLOOR)
         InitBattlePyramidMap(FALSE);
     else if (InTrainerHill())
@@ -1366,6 +1366,21 @@ static void ChooseAmbientCrySpecies(void)
     {
         sAmbientCrySpecies = GetLocalWildMon(&sIsAmbientCryWaterMon);
     }
+}
+
+bool32 Overworld_MusicCanOverrideMapMusic(u16 music)
+{
+    if (music == MUS_CYCLING || music == MUS_SURF)
+    {
+        if (gMapHeader.regionMapSectionId == MAPSEC_WATER_PATH 
+            || gMapHeader.regionMapSectionId == MAPSEC_GREEN_PATH 
+            || gMapHeader.regionMapSectionId == MAPSEC_PATTERN_BUSH
+            || gMapHeader.regionMapSectionId == MAPSEC_LOST_CAVE
+            || gMapHeader.regionMapSectionId == MAPSEC_EVER_GRANDE_CITY
+            || gMapHeader.regionMapSectionId == MAPSEC_BATTLE_FRONTIER)
+            return FALSE;
+    }
+    return TRUE;
 }
 
 u8 GetMapTypeByGroupAndId(s8 mapGroup, s8 mapNum)

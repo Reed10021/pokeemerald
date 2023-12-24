@@ -66,7 +66,7 @@ struct RedArrowCursor
 
 // this file's functions
 static u8 ListMenuInitInternal(struct ListMenuTemplate *listMenuTemplate, u16 scrollOffset, u16 selectedRow);
-static bool8 ListMenuChangeSelection(struct ListMenu *list, bool8 updateCursorAndCallCallback, u8 count, bool8 movingDown);
+static bool8 ListMenuChangeSelection(struct ListMenu *list, bool8 updateCursorAndCallCallback, u16 count, bool8 movingDown);
 static void ListMenuPrintEntries(struct ListMenu *list, u16 startIndex, u16 yOffset, u16 count);
 static void ListMenuDrawCursor(struct ListMenu *list);
 static void ListMenuCallSelectionChangedCallback(struct ListMenu *list, u8 onInit);
@@ -422,7 +422,7 @@ s32 ListMenu_ProcessInput(u8 listTaskId)
     }
     else if (JOY_REPEAT(DPAD_UP))
     {
-        if(currentPosition == 0)
+        if(currentPosition == 0 || (currentPosition == 1 && list->template.items[0].id == LIST_HEADER))
             ListMenuChangeSelection(list, TRUE, lastPositon, TRUE);
         else
             ListMenuChangeSelection(list, TRUE, 1, FALSE);
@@ -458,12 +458,18 @@ s32 ListMenu_ProcessInput(u8 listTaskId)
 
         if (leftButton)
         {
-            ListMenuChangeSelection(list, TRUE, list->template.maxShowed, FALSE);
+            if (currentPosition == 0 || (currentPosition == 1 && list->template.items[0].id == LIST_HEADER))
+                ListMenuChangeSelection(list, TRUE, lastPositon, TRUE);
+            else
+                ListMenuChangeSelection(list, TRUE, list->template.maxShowed, FALSE);
             return LIST_NOTHING_CHOSEN;
         }
         else if (rightButton)
         {
-            ListMenuChangeSelection(list, TRUE, list->template.maxShowed, TRUE);
+            if (currentPosition == lastPositon)
+                ListMenuChangeSelection(list, TRUE, lastPositon, FALSE);
+            else
+                ListMenuChangeSelection(list, TRUE, list->template.maxShowed, TRUE);
             return LIST_NOTHING_CHOSEN;
         }
         else
@@ -839,10 +845,10 @@ static void ListMenuScroll(struct ListMenu *list, u8 count, bool8 movingDown)
     }
 }
 
-static bool8 ListMenuChangeSelection(struct ListMenu *list, bool8 updateCursorAndCallCallback, u8 count, bool8 movingDown)
+static bool8 ListMenuChangeSelection(struct ListMenu *list, bool8 updateCursorAndCallCallback, u16 count, bool8 movingDown)
 {
     u16 oldSelectedRow;
-    u8 selectionChange, i, cursorCount;
+    u16 selectionChange, i, cursorCount;
 
     oldSelectedRow = list->selectedRow;
     cursorCount = 0;

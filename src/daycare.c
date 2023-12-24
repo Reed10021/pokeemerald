@@ -30,9 +30,6 @@ static void ClearDaycareMonMail(struct DayCareMail *mail);
 static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *daycare);
 static u8 GetDaycareCompatibilityScore(struct DayCare *daycare);
 static void DaycarePrintMonInfo(u8 windowId, s32 daycareSlotId, u8 y);
-static bool8 IsEggShiny(struct DayCare* daycare);
-static bool8 IsPersonalityShiny(u32 personality);
-static u32 ForceShiny(u32 personality);
 static u32 RollEggChains(struct DayCare* daycare, u8 mode);
 
 // RAM buffers used to assist with BuildEggMoveset()
@@ -464,7 +461,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
         u8 wantedNature = GetNatureFromPersonality(GetBoxMonData(&daycare->mons[parent].mon, MON_DATA_PERSONALITY, NULL));
         personality = RollEggChains(daycare, 2);
         // If we got a shiny from the chain, then set the isShiny flag to true.
-        if (IsPersonalityShiny(personality))
+        if (IsPersonalityShiny(personality, 0))
             isShiny = 1;
         do
         {
@@ -551,14 +548,14 @@ static u32 RollEggChains(struct DayCare* daycare, u8 mode)
         {
             personality = (Random2() << 16) | ((Random() % 0xfffe) + 1);
             rolls++;
-        } while (!IsPersonalityShiny(personality) && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+        } while (!IsPersonalityShiny(personality, 0) && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
     } else {
         // Since we have a do-while loop for nature, first do the loop for chain shininess.
         do
         {
             personality = (Random2() << 16) | (Random());
             rolls++;
-        } while (!IsPersonalityShiny(personality) && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
+        } while (!IsPersonalityShiny(personality, 0) && rolls < eggChainCount); // While not shiny (>= as opposed to < for the check) and while we haven't exceeded VAR_CHAIN rolls.
     }
     return personality;
 }
@@ -1042,7 +1039,7 @@ static bool8 IsEggPending(struct DayCare *daycare)
     return (daycare->offspringPersonality != 0);
 }
 
-static bool8 IsEggShiny(struct DayCare* daycare)
+bool8 IsEggShiny(struct DayCare* daycare)
 {
     u32 value = gSaveBlock2Ptr->playerTrainerId[0]
         | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
@@ -1053,18 +1050,26 @@ static bool8 IsEggShiny(struct DayCare* daycare)
     return shinyValue < SHINY_ODDS;
 }
 
-static bool8 IsPersonalityShiny(u32 personality)
+bool8 IsPersonalityShiny(u32 personality, u32 value)
 {
-    u32 value = gSaveBlock2Ptr->playerTrainerId[0]
-        | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
-        | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
-        | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
-    u32 shinyValue = (HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality));
+    u32 shinyValue;
+    if (value)
+    {
+        shinyValue = (HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality));
+    }
+    else
+    {
+        value = gSaveBlock2Ptr->playerTrainerId[0]
+            | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
+            | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
+            | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+        shinyValue = (HIHALF(value) ^ LOHALF(value) ^ HIHALF(personality) ^ LOHALF(personality));
+    }
 
     return shinyValue < SHINY_ODDS;
 }
 
-static u32 ForceShiny(u32 personality)
+u32 ForceShiny(u32 personality)
 {
     u32 value = gSaveBlock2Ptr->playerTrainerId[0]
         | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
@@ -1072,6 +1077,18 @@ static u32 ForceShiny(u32 personality)
         | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
     personality = ((((Random() % SHINY_ODDS) ^ (HIHALF(value) ^ LOHALF(value))) ^ LOHALF(personality)) << 16) | LOHALF(personality);
     return personality;
+
+    // Mathematical explaination of the above
+    // Personality is formatted like so: 00000000 00000000 00000000 00000000
+    // Seperating it out into high and low halfs, we end up with the following: High(00000000 00000000) Low(00000000 00000000)
+    // shinyValue is calculated by doing Trainer ID XOR Secret ID XOR High XOR Low
+    // If this shinyValue is < SHINY_ODDS, then the pokemon is shiny.
+    // For any generated personality value, we can perform (Trainer ID XOR Secret ID) XOR Low, then perform a shift (<<) by 16 bits
+    // to get a High value that, when XOR'd with the Low value again, will result in a shiny value of 0. To get the Low value
+    // in the personality value we just OR it with the High value we generated and shifted.
+    // But because we can technically have any shiny value from 0 to SHINY_ODDS minus 1, if we perform
+    // (Random() % SHINY_ODDS XOR (Trainer ID XOR Secret ID) XOR Low << 16) | Low, when we generate our shinyValue
+    // it will be equal to the Random() % SHINY_ODDS value.
 }
 
 // gStringVar1 = first mon's nickname

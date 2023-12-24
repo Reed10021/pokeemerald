@@ -2065,6 +2065,9 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     u8 monCount = 0;
     u8 minMon = 100;
     u8 maxMon = 0;
+    u8 badEvs = 35;
+    u8 mediumEvs = 85;
+    u8 goodEvs = 175;
 
     if (trainerNum == TRAINER_SECRET_BASE)
         return 0;
@@ -2135,6 +2138,11 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
                     CreateMon(&party[i], evolution, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                    for (j = 0; j < NUM_STATS; j++)
+                    {
+                        SetMonData(&party[i], MON_DATA_HP_EV + j, &badEvs);
+                    }
+                    CalculateMonStats(&party[i]);
                     break;
                 }
                 case F_TRAINER_PARTY_CUSTOM_MOVESET:
@@ -2157,6 +2165,11 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                         SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
                         SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
                     }
+                    for (j = 0; j < NUM_STATS; j++)
+                    {
+                        SetMonData(&party[i], MON_DATA_HP_EV + j, &mediumEvs);
+                    }
+                    CalculateMonStats(&party[i]);
                     break;
                 }
                 case F_TRAINER_PARTY_HELD_ITEM:
@@ -2175,6 +2188,11 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
                     CreateMon(&party[i], evolution, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
                     SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
+                    for (j = 0; j < NUM_STATS; j++)
+                    {
+                        SetMonData(&party[i], MON_DATA_HP_EV + j, &mediumEvs);
+                    }
+                    CalculateMonStats(&party[i]);
                     break;
                 }
                 case F_TRAINER_PARTY_CUSTOM_MOVESET | F_TRAINER_PARTY_HELD_ITEM:
@@ -2199,6 +2217,11 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                         SetMonData(&party[i], MON_DATA_MOVE1 + j, &partyData[i].moves[j]);
                         SetMonData(&party[i], MON_DATA_PP1 + j, &gBattleMoves[partyData[i].moves[j]].pp);
                     }
+                    for (j = 0; j < NUM_STATS; j++)
+                    {
+                        SetMonData(&party[i], MON_DATA_HP_EV + j, &goodEvs);
+                    }
+                    CalculateMonStats(&party[i]);
                     break;
                 }
             }

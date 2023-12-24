@@ -20,6 +20,9 @@ static const u16 sFrontierExchangeCorner_Decor2[] =
     DECOR_VENUSAUR_DOLL, 
     DECOR_CHARIZARD_DOLL, 
     DECOR_BLASTOISE_DOLL, 
+    DECOR_REGIROCK_DOLL,
+    DECOR_REGICE_DOLL,
+    DECOR_REGISTEEL_DOLL,
     0xFFFF 
 };
 
@@ -31,11 +34,34 @@ static const u16 sFrontierExchangeCorner_Vitamins[] =
     ITEM_ZINC, 
     ITEM_CARBOS, 
     ITEM_HP_UP, 
+    ITEM_ADAMANT_MINT,
+    ITEM_BOLD_MINT,
+    ITEM_BRAVE_MINT,
+    ITEM_CALM_MINT,
+    ITEM_CAREFUL_MINT,
+    ITEM_GENTLE_MINT,
+    ITEM_HASTY_MINT,
+    ITEM_IMPISH_MINT,
+    ITEM_JOLLY_MINT,
+    ITEM_LAX_MINT,
+    ITEM_LONELY_MINT,
+    ITEM_MILD_MINT,
+    ITEM_MODEST_MINT,
+    ITEM_NAIVE_MINT,
+    ITEM_NAUGHTY_MINT,
+    ITEM_QUIET_MINT,
+    ITEM_RASH_MINT,
+    ITEM_RELAXED_MINT,
+    ITEM_SASSY_MINT,
+    ITEM_SERIOUS_MINT,
+    ITEM_TIMID_MINT,
     0xFFFF 
 };
 
 static const u16 sFrontierExchangeCorner_HoldItems[] =
 { 
+    ITEM_RARE_CANDY,
+    ITEM_ABILITY_CAPSULE,
     ITEM_LEFTOVERS, 
     ITEM_WHITE_HERB, 
     ITEM_QUICK_CLAW, 
@@ -70,6 +96,9 @@ static const u8 *const sFrontierExchangeCorner_Decor2Descriptions[] =
     BattleFrontier_ExchangeServiceCorner_Text_LargeDollDesc,
     BattleFrontier_ExchangeServiceCorner_Text_LargeDollDesc,
     BattleFrontier_ExchangeServiceCorner_Text_LargeDollDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_LargeDollDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_LargeDollDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_LargeDollDesc,
     gText_Exit
 };
 
@@ -81,11 +110,34 @@ static const u8 *const sFrontierExchangeCorner_VitaminsDescriptions[] =
     BattleFrontier_ExchangeServiceCorner_Text_ZincDesc,
     BattleFrontier_ExchangeServiceCorner_Text_CarbosDesc,
     BattleFrontier_ExchangeServiceCorner_Text_HPUpDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_AdamantMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_BoldMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_BraveMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_CalmMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_CarefulMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_GentleMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_HastyMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_ImpishMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_JollyMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_LaxMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_LonelyMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_MildMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_ModestMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_NaiveMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_NaughtyMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_QuietMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_RashMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_RelaxedMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_SassyMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_SeriousMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_TimidMintDesc,
     gText_Exit
 };
 
 static const u8 *const sFrontierExchangeCorner_HoldItemsDescriptions[] = 
 {
+    BattleFrontier_ExchangeServiceCorner_Text_RareCandyDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_AbilityCapsuleDesc,
     BattleFrontier_ExchangeServiceCorner_Text_LeftoversDesc,
     BattleFrontier_ExchangeServiceCorner_Text_WhiteHerbDesc,
     BattleFrontier_ExchangeServiceCorner_Text_QuickClawDesc,

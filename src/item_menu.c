@@ -2534,7 +2534,14 @@ void PrintTMHMMoveData(u16 itemId)
             text = gStringVar1;
         }
         BagMenu_Print(4, 1, text, 7, 12, 0, 0, -1, 4);
-        if (gBattleMoves[moveId].accuracy == 0)
+        if (gBattleMoves[moveId].accuracy == 0 ||
+            moveId == MOVE_ASSIST || moveId == MOVE_BLOCK || moveId == MOVE_CAMOUFLAGE || moveId == MOVE_CHARGE ||
+            moveId == MOVE_CONVERSION_2 || moveId == MOVE_FOLLOW_ME || moveId == MOVE_GRUDGE || moveId == MOVE_HELPING_HAND ||
+            moveId == MOVE_IMPRISON || moveId == MOVE_INGRAIN || moveId == MOVE_MAGIC_COAT || moveId == MOVE_MEAN_LOOK ||
+            moveId == MOVE_MEMENTO || moveId == MOVE_MIMIC || moveId == MOVE_MUD_SPORT || moveId == MOVE_NIGHTMARE ||
+            moveId == MOVE_PAIN_SPLIT || moveId == MOVE_RECYCLE || moveId == MOVE_REFRESH || moveId == MOVE_ROLE_PLAY ||
+            moveId == MOVE_SKILL_SWAP || moveId == MOVE_SLACK_OFF || moveId == MOVE_SNATCH || moveId == MOVE_SOFT_BOILED ||
+            moveId == MOVE_SPIDER_WEB || moveId == MOVE_TAIL_GLOW || moveId == MOVE_WATER_SPORT || moveId == MOVE_WISH || moveId == MOVE_YAWN)
         {
             text = gText_ThreeDashes;
         }

@@ -703,9 +703,9 @@ static void SetPlayerCardData(struct TrainerCard *trainerCard, u8 cardType)
     trainerCard->hofDebutHours = playTime >> 16;
     trainerCard->hofDebutMinutes = (playTime >> 8) & 0xFF;
     trainerCard->hofDebutSeconds = playTime & 0xFF;
-    if ((playTime >> 16) > 999)
+    if ((playTime >> 16) > 64999)
     {
-        trainerCard->hofDebutHours = 999;
+        trainerCard->hofDebutHours = 64999;
         trainerCard->hofDebutMinutes = 59;
         trainerCard->hofDebutSeconds = 59;
     }

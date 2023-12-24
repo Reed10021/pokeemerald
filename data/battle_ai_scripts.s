@@ -214,6 +214,7 @@ AI_CheckBadMove_CheckEffect: @ 82DC045
 	if_effect EFFECT_WATER_SPORT, AI_CBM_WaterSport
 	if_effect EFFECT_CALM_MIND, AI_CBM_CalmMind
 	if_effect EFFECT_DRAGON_DANCE, AI_CBM_DragonDance
+	if_effect EFFECT_GROWTH, AI_CBM_Growth
 	end
 
 AI_CBM_Sleep: @ 82DC2D4
@@ -605,6 +606,11 @@ AI_CBM_DragonDance: @ 82DC778
 	if_stat_level_equal AI_USER, STAT_SPEED, MAX_STAT_STAGE, Score_Minus3
 	end
 
+AI_CBM_Growth:
+	if_stat_level_equal AI_USER, STAT_ATK, MAX_STAT_STAGE, Score_Minus8
+	if_stat_level_equal AI_USER, STAT_SPATK, MAX_STAT_STAGE, Score_Minus8
+	end
+
 Score_Minus1:
 	score -1
 	end
@@ -781,6 +787,7 @@ AI_CheckViability:
 	if_effect EFFECT_WATER_SPORT, AI_CV_WaterSport
 	if_effect EFFECT_CALM_MIND, AI_CV_SpDefUp
 	if_effect EFFECT_DRAGON_DANCE, AI_CV_DragonDance
+	if_effect EFFECT_GROWTH, AI_CV_Growth
 	end
 
 AI_CV_Sleep: @ 82DCA92
@@ -1645,6 +1652,19 @@ AI_CV_VitalThrow2:
 	score -1
 
 AI_CV_VitalThrow_End:
+	if_stat_level_more_than AI_TARGET, STAT_EVASION, 10, AI_CV_VitalThrow_AlwaysHit_ScoreUp2
+	if_stat_level_less_than AI_USER, STAT_ACC, 2, AI_CV_VitalThrow_AlwaysHit_ScoreUp2
+	if_stat_level_more_than AI_TARGET, STAT_EVASION, 8, AI_CV_VitalThrow_AlwaysHit2
+	if_stat_level_less_than AI_USER, STAT_ACC, 4, AI_CV_VitalThrow_AlwaysHit2
+
+AI_CV_VitalThrow_AlwaysHit_ScoreUp2:
+	score +2
+
+AI_CV_VitalThrow_AlwaysHit2:
+	if_random_less_than 100, AI_CV_VitalThrow_AlwaysHit_End
+	score +1
+
+AI_CV_VitalThrow_AlwaysHit_End:
 	end
 
 AI_CV_Substitute:
@@ -1872,6 +1892,7 @@ AI_CV_Encore_EncouragedMovesToEncore:
     .byte EFFECT_WATER_SPORT
     .byte EFFECT_DRAGON_DANCE
     .byte EFFECT_CAMOUFLAGE
+    .byte EFFECT_GROWTH
     .byte -1
 
 AI_CV_PainSplit:
@@ -2769,6 +2790,29 @@ AI_CV_DragonDance2:
 AI_CV_DragonDance_End:
 	end
 
+AI_CV_Growth::
+	if_stat_level_less_than AI_USER, STAT_ATK, 9, AI_CV_Growth2
+	if_stat_level_less_than AI_USER, STAT_SPATK, 9, AI_CV_Growth2
+	if_random_less_than 100, AI_CV_Growth3
+	score -1
+	goto AI_CV_Growth3
+
+AI_CV_Growth2::
+	if_hp_not_equal AI_USER, 100, AI_CV_Growth3
+	if_random_less_than 128, AI_CV_Growth3
+	score +2
+
+AI_CV_Growth3::
+	if_hp_more_than AI_USER, 70, AI_CV_Growth_End
+	if_hp_less_than AI_USER, 40, AI_CV_Growth_ScoreDown2
+	if_random_less_than 40, AI_CV_Growth_End
+
+AI_CV_Growth_ScoreDown2::
+	score -2
+
+AI_CV_Growth_End::
+	end
+
 AI_TryToFaint:
 	if_target_is_ally AI_Ret
 	if_can_faint AI_TryToFaint_TryToEncourageQuickAttack
@@ -2861,6 +2905,7 @@ AI_SetupFirstTurn_SetupEffectsToEncourage:
     .byte EFFECT_BULK_UP
     .byte EFFECT_CALM_MIND
     .byte EFFECT_CAMOUFLAGE
+    .byte EFFECT_GROWTH
     .byte -1
 
 AI_PreferStrongestMove:
@@ -3201,6 +3246,7 @@ AI_HPAware_DiscouragedEffectsWhenMediumHP: @ 82DE22D
     .byte EFFECT_BULK_UP
     .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
+    .byte EFFECT_GROWTH
     .byte -1
 
 AI_HPAware_DiscouragedEffectsWhenLowHP: @ 82DE258
@@ -3251,6 +3297,7 @@ AI_HPAware_DiscouragedEffectsWhenLowHP: @ 82DE258
     .byte EFFECT_BULK_UP
     .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
+    .byte EFFECT_GROWTH
     .byte -1
 
 AI_HPAware_DiscouragedEffectsWhenTargetHighHP: @ 82DE288
@@ -3296,6 +3343,7 @@ AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
     .byte EFFECT_BULK_UP
     .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
+    .byte EFFECT_GROWTH
     .byte -1
 
 AI_HPAware_DiscouragedEffectsWhenTargetLowHP: @ 82DE2B1
@@ -3358,6 +3406,7 @@ AI_HPAware_DiscouragedEffectsWhenTargetLowHP: @ 82DE2B1
     .byte EFFECT_BULK_UP
     .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
+    .byte EFFECT_GROWTH
     .byte -1
 
 AI_Unknown:
@@ -3382,7 +3431,7 @@ AI_Roaming:
 	if_equal ABILITY_ARENA_TRAP, AI_Roaming_End
 
 AI_Roaming_Flee: @ 82DE335
-	if_random_greater_than 136, AI_Roaming_End @ if rand() % 256 > 136, do not flee
+	if_random_less_than 200, AI_Roaming_End @ if rand() % 256 < 200, do not flee (~3/4 chance not to flee)
 	flee
 
 AI_Roaming_End: @ 82DE336

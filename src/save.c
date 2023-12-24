@@ -31,6 +31,8 @@ static u8 HandleWriteSector(u16 a1, const struct SaveSectionLocation *location);
 #define TAG_THROBBER 0x1000
 static const u16 sThrobber_Pal[] = INCBIN_U16("graphics/text_window/throbber.gbapal");
 const u32 gThrobber_Gfx[] = INCBIN_U32("graphics/text_window/throbber.4bpp.lz");
+static const u16 sThrobber_Pal2[] = INCBIN_U16("graphics/text_window/throbber2.gbapal");
+const u32 gThrobber_Gfx2[] = INCBIN_U32("graphics/text_window/throbber2.4bpp.lz");
 
 static const struct OamData sOam_Throbber =
 {
@@ -94,6 +96,68 @@ static const struct SpriteTemplate sSpriteTemplate_Throbber =
     .callback = SpriteCallbackDummy
 };
 
+static const struct OamData sOam_Throbber2 =
+{
+    .y = DISPLAY_HEIGHT,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = FALSE,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x64),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x64),
+    .tileNum = 0,
+    .priority = 0,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const union AnimCmd sAnim_Throbber2[] =
+{
+    ANIMCMD_FRAME(0, 4),
+    ANIMCMD_FRAME(32, 4),
+    ANIMCMD_FRAME(64, 4),
+    ANIMCMD_FRAME(96, 4),
+    ANIMCMD_FRAME(128, 4),
+    ANIMCMD_FRAME(160, 4),
+    ANIMCMD_FRAME(192, 4),
+    ANIMCMD_FRAME(224, 4),
+    ANIMCMD_JUMP(0),
+};
+
+static const union AnimCmd* const sAnims_Throbber2[] = { sAnim_Throbber2, };
+
+static const struct CompressedSpriteSheet sSpriteSheet_Throbber2[] =
+{
+    {
+        .data = gThrobber_Gfx2,
+        .size = 0x3200,
+        .tag = TAG_THROBBER
+    },
+    {}
+};
+
+static const struct SpritePalette sSpritePalettes_Throbber2[] =
+{
+    {
+        .data = sThrobber_Pal2,
+        .tag = TAG_THROBBER
+    },
+    {},
+};
+
+static const struct SpriteTemplate sSpriteTemplate_Throbber2 =
+{
+    .tileTag = TAG_THROBBER,
+    .paletteTag = TAG_THROBBER,
+    .oam = &sOam_Throbber2,
+    .anims = sAnims_Throbber2,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCallbackDummy
+};
+
 u8 ShowThrobber(void)
 {
     LoadCompressedSpriteSheet(&sSpriteSheet_Throbber[0]);
@@ -101,6 +165,15 @@ u8 ShowThrobber(void)
 
     // 217 and 123 are the x and y coordinates (in pixels)
     return CreateSprite(&sSpriteTemplate_Throbber, 217, 123, 2);
+};
+
+u8 ShowThrobber2(void)
+{
+    LoadCompressedSpriteSheet(&sSpriteSheet_Throbber2[0]);
+    LoadSpritePalettes(sSpritePalettes_Throbber2);
+
+    // 217 and 123 are the x and y coordinates (in pixels)
+    return CreateSprite(&sSpriteTemplate_Throbber2, 217, 123, 2);
 };
 
 // Divide save blocks into individual chunks to be written to flash sectors
@@ -212,7 +285,7 @@ static bool32 SetDamagedSectorBits(u8 op, u8 bit)
     return retVal;
 }
 
-static void VBlankCB_Saving(void)
+void VBlankCB_Saving(void)
 {
     AnimateSprites();
     BuildOamBuffer();
@@ -749,9 +822,9 @@ static void UpdateSaveAddresses(void)
     }
 }
 
-u8 HandleThrobber(u8 throbberSpriteId, u8 flashLevel)
+u8 HandleThrobber(u8 throbberSpriteId, u8 flashLevel, u8 mode)
 {
-    if (throbberSpriteId == 0) {
+    if (throbberSpriteId == 250) {
         // If in a cave, handle flash.
         if (flashLevel != 0 || InBattlePyramid_())
         {
@@ -762,10 +835,16 @@ u8 HandleThrobber(u8 throbberSpriteId, u8 flashLevel)
             ScanlineEffect_Stop();
             ScanlineEffect_Clear();
         }
-        return ShowThrobber();
+        if (mode == 0)
+            return ShowThrobber();
+        else
+            return ShowThrobber2();
     }
     else {
-        DestroySpriteAndFreeResources(&gSprites[throbberSpriteId]);
+        // Handle MAX_SPRITES -> out of space for sprites.
+        if (throbberSpriteId != MAX_SPRITES)
+            DestroySpriteAndFreeResources(&gSprites[throbberSpriteId]);
+
         // If in a cave, restore flash level.
         if (flashLevel != 0 || InBattlePyramid_())
         {
@@ -782,7 +861,7 @@ u8 HandleThrobber(u8 throbberSpriteId, u8 flashLevel)
         }
     }
 
-    return 0;
+    return 250; // Set back to initial value
 }
 u8 HandleSavingData(u8 saveType)
 {
@@ -846,7 +925,7 @@ u8 HandleSavingData(u8 saveType)
 u8 TrySavingData(u8 saveType)
 {
     u8 flashLevel = Overworld_GetFlashLevel();
-    u8 throbberSpriteId = 0;
+    u8 throbberSpriteId = 250; // MAX_SPRITE is 64, so use a higher value than that for the unitialized value.
     if (gFlashMemoryPresent != TRUE)
     {
         gSaveAttemptStatus = SAVE_STATUS_ERROR;
@@ -855,11 +934,11 @@ u8 TrySavingData(u8 saveType)
     
     // Show throbber, store sprite ID
     if(saveType != SAVE_HALL_OF_FAME)
-        throbberSpriteId = HandleThrobber(throbberSpriteId, flashLevel);
+        throbberSpriteId = HandleThrobber(throbberSpriteId, flashLevel, 0);
     HandleSavingData(saveType);
     // Delete throbber, restore flash level
     if (saveType != SAVE_HALL_OF_FAME)
-        HandleThrobber(throbberSpriteId, flashLevel);
+        HandleThrobber(throbberSpriteId, flashLevel, 0);
 
     if (!gDamagedSaveSectors)
     {
@@ -1054,7 +1133,7 @@ void Task_LinkSave(u8 taskId)
     case 0:
         gSoftResetDisabled = TRUE;
         tFlashLevel = Overworld_GetFlashLevel();
-        tSpriteID = HandleThrobber(0, tFlashLevel);
+        tSpriteID = HandleThrobber(0, tFlashLevel, 0);
         tState = 1;
         break;
     case 1:
@@ -1116,7 +1195,7 @@ void Task_LinkSave(u8 taskId)
     case 11:
         if (++tTimer > 5)
         {
-            HandleThrobber(tSpriteID, tFlashLevel);
+            HandleThrobber(tSpriteID, tFlashLevel, 0);
             gSoftResetDisabled = FALSE;
             DestroyTask(taskId);
         }

@@ -321,6 +321,10 @@ void SetMultiuseSpriteTemplateToTrainerFront(u16 arg0, u8 battlerPosition);
 u32 GetMonData();
 u32 GetBoxMonData();
 
+u16 CalculateBoxMonChecksum(struct BoxPokemon* boxMon);
+void EncryptBoxMon(struct BoxPokemon* boxMon);
+void DecryptBoxMon(struct BoxPokemon* boxMon);
+
 void SetMonData(struct Pokemon *mon, s32 field, const void *dataArg);
 void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg);
 void CopyMon(void *dest, void *src, size_t size);

@@ -197,13 +197,13 @@ static const struct {
         .species = SPECIES_TOGEPI,
         .moves = {MOVE_ANCIENT_POWER, MOVE_TRI_ATTACK, MOVE_FOLLOW_ME, MOVE_HELPING_HAND},
         .level = 9,
-        .location = MAP_NUM(ROUTE101),
+        .location = MAP_NUM(ROUTE101)
     },
     {
         .species = SPECIES_TOGETIC,
         .moves = {MOVE_ICE_BEAM, MOVE_TRI_ATTACK, MOVE_TAIL_GLOW, MOVE_THUNDER},
         .level = 23,
-        .location = MAP_NUM(ROUTE110),
+        .location = MAP_NUM(ROUTE110)
     },
     {
         .species = SPECIES_FEEBAS,
@@ -239,7 +239,7 @@ static const struct {
         .species = SPECIES_NUZLEAF,
         .moves = {MOVE_HARDEN, MOVE_GROWTH, MOVE_NATURE_POWER, MOVE_LEECH_SEED},
         .level = 15, 
-        .location = MAP_NUM(ROUTE114),
+        .location = MAP_NUM(ROUTE114)
     },
     {
         .species = SPECIES_STEELIX,
@@ -263,7 +263,7 @@ static const struct {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_HARDEN, MOVE_GROWTH, MOVE_NATURE_POWER, MOVE_LEECH_SEED},
         .level = 13, 
-        .location = MAP_NUM(ROUTE117),
+        .location = MAP_NUM(ROUTE117)
     },
     {
         .species = SPECIES_CASTFORM,
@@ -275,13 +275,13 @@ static const struct {
         .species = SPECIES_SEEDOT,
         .moves = {MOVE_GIGA_DRAIN, MOVE_FRUSTRATION, MOVE_SOLAR_BEAM, MOVE_LEECH_SEED},
         .level = 25, 
-        .location = MAP_NUM(ROUTE120),
+        .location = MAP_NUM(ROUTE120)
     },
     {
         .species = SPECIES_SKITTY,
         .moves = {MOVE_GROWL, MOVE_TACKLE, MOVE_TAIL_WHIP, MOVE_ATTRACT},
         .level = 8, 
-        .location = MAP_NUM(ROUTE116),
+        .location = MAP_NUM(ROUTE116)
     },
     {
         .species = SPECIES_LILEEP,
@@ -419,7 +419,7 @@ static const struct {
         .species = SPECIES_GOREBYSS,
         .moves = {MOVE_THUNDER_WAVE, MOVE_TAIL_GLOW, MOVE_MUDDY_WATER, MOVE_SHEER_COLD},
         .level = 40,
-        .location = MAP_NUM(ROUTE133),
+        .location = MAP_NUM(ROUTE133)
     },
     {
         .species = SPECIES_LAPRAS,
@@ -455,7 +455,7 @@ static const struct {
         .species = SPECIES_HUNTAIL,
         .moves = {MOVE_FURY_CUTTER, MOVE_DRAGON_DANCE, MOVE_HYDRO_CANNON, MOVE_COUNTER},
         .level = 40,
-        .location = MAP_NUM(ROUTE127),
+        .location = MAP_NUM(ROUTE127)
     },
     {
         .species = SPECIES_SNORLAX,
@@ -2200,6 +2200,7 @@ static void sub_80ED718(void)
     u32 i;
     u8 nBadges = 0;
     u16 outbreakIdx;
+    u16 oldOutbreak = VarGet(VAR_PREVIOUS_OUTBREAK);
     TVShow *show;
 
 
@@ -2266,7 +2267,10 @@ static void sub_80ED718(void)
             sCurTVShowSlot = FindEmptyTVSlotWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
             if (sCurTVShowSlot != -1)
             {
-                outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesList);
+                do
+                {
+                    outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesList);
+                } while (sPokeOutbreakSpeciesList[outbreakIdx].species == oldOutbreak);
                 show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
                 show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
                 show->massOutbreak.active = TRUE;
@@ -2287,6 +2291,7 @@ static void sub_80ED718(void)
                 show->massOutbreak.daysLeft = 0; // How many days to delay before showing on tv.
                 tv_store_id_2x(show);
                 show->massOutbreak.language = gGameLanguage;
+                VarSet(VAR_PREVIOUS_OUTBREAK, sPokeOutbreakSpeciesList[outbreakIdx].species);
             }
         }
     }

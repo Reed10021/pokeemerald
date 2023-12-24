@@ -933,8 +933,7 @@ gText_UndergoingAdjustments:: @ 82730BC
 
 gText_ShinyRoamer::
     .string "...You hear the faint sparkle of a\n"
-    .string "shiny POKéMON roaming the region\l"
-    .string "outside...!$"
+    .string "shiny POKéMON roaming the region...!$"
 
 gText_Roamer::
     .string "...It sounds like a POKéMON\n"

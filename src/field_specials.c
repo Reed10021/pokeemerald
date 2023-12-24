@@ -2357,7 +2357,7 @@ void ShowScrollableMultichoice(void)
             break;
         case SCROLL_MULTI_BF_EXCHANGE_CORNER_DECOR_VENDOR_2:
             task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
-            task->tNumItems = 6;
+            task->tNumItems = 9;
             task->tLeft = 14;
             task->tTop = 1;
             task->tWidth = 15;
@@ -2367,7 +2367,7 @@ void ShowScrollableMultichoice(void)
             break;
         case SCROLL_MULTI_BF_EXCHANGE_CORNER_VITAMIN_VENDOR:
             task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
-            task->tNumItems = 7;
+            task->tNumItems = 28;
             task->tLeft = 14;
             task->tTop = 1;
             task->tWidth = 15;
@@ -2377,7 +2377,7 @@ void ShowScrollableMultichoice(void)
             break;
         case SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR:
             task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
-            task->tNumItems = 10;
+            task->tNumItems = 12;
             task->tLeft = 14;
             task->tTop = 1;
             task->tWidth = 15;
@@ -2496,6 +2496,9 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
         gText_VenusaurDoll256BP,
         gText_CharizardDoll256BP,
         gText_BlastoiseDoll256BP,
+        gText_RegirockDoll512BP,
+        gText_RegiceDoll512BP,
+        gText_RegisteelDoll512BP,
         gText_Exit
     },
     [SCROLL_MULTI_BF_EXCHANGE_CORNER_VITAMIN_VENDOR] =
@@ -2506,10 +2509,33 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
         gText_Zinc1BP,
         gText_Carbos1BP,
         gText_HpUp1BP,
+        gText_AdamantMint10BP,
+        gText_BoldMint10BP,
+        gText_BraveMint10BP,
+        gText_CalmMint10BP,
+        gText_CarefulMint10BP,
+        gText_GentleMint10BP,
+        gText_HastyMint10BP,
+        gText_ImpishMint10BP,
+        gText_JollyMint10BP,
+        gText_LaxMint10BP,
+        gText_LonelyMint10BP,
+        gText_MildMint10BP,
+        gText_ModestMint10BP,
+        gText_NaiveMint10BP,
+        gText_NaughtyMint10BP,
+        gText_QuietMint10BP,
+        gText_RashMint10BP,
+        gText_RelaxedMint10BP,
+        gText_SassyMint10BP,
+        gText_SeriousMint10BP,
+        gText_TimidMint10BP,
         gText_Exit
     },
     [SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR] =
     {
+        gText_RareCandy2BP,
+        gText_AbilityCapsule25BP,
         gText_Leftovers48BP,
         gText_WhiteHerb48BP,
         gText_QuickClaw48BP,
@@ -4241,7 +4267,7 @@ u16 GetNumFansOfPlayerInTrainerFanClub(void)
 void TryLoseFansFromPlayTime(void)
 {
     u8 i = 0;
-    if (gSaveBlock2Ptr->playTimeHours < 999)
+    if (gSaveBlock2Ptr->playTimeHours < 64999)
     {
         while (TRUE)
         {

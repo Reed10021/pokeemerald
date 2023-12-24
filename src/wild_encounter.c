@@ -500,7 +500,7 @@ static bool8 DoMassOutbreakEncounterTest(void)
     if (encounterRate == 0)
         return FALSE;
 
-    if (chainCount >= 3) //If we're chaining.
+    if (chainCount >= 3 && gSaveBlock1Ptr->outbreakPokemonSpecies == VarGet(VAR_SPECIESCHAINED)) //If we're chaining.
         rerollCount += chainCount / 2;
 
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != 0
@@ -575,7 +575,7 @@ static bool8 AreLegendariesInSootopolisPreventingEncounters(void)
 bool8 StandardWildEncounter(u16 currMetaTileBehavior, u16 previousMetaTileBehavior)
 {
     u16 headerId;
-    struct Roamer *roamer;
+    //struct Roamer *roamer;
 
     if (sWildEncountersDisabled == TRUE)
         return FALSE;
@@ -626,7 +626,7 @@ bool8 StandardWildEncounter(u16 currMetaTileBehavior, u16 previousMetaTileBehavi
 
             if (TryStartRoamerEncounter() == TRUE)
             {
-                roamer = &gSaveBlock1Ptr->roamer;
+                //roamer = &gSaveBlock1Ptr->roamer;
                 //if (!IsWildLevelAllowedByRepel(roamer->level))
                 //    return FALSE;
                 // Allow roamer to get through repel.
@@ -666,7 +666,7 @@ bool8 StandardWildEncounter(u16 currMetaTileBehavior, u16 previousMetaTileBehavi
 
             if (TryStartRoamerEncounter() == TRUE)
             {
-                roamer = &gSaveBlock1Ptr->roamer;
+                //roamer = &gSaveBlock1Ptr->roamer;
                 //if (!IsWildLevelAllowedByRepel(roamer->level))
                 //    return FALSE;
                 // Allow roamer to get through repel.

@@ -2976,8 +2976,11 @@ u8 FldEff_UseSurf(void)
     u8 taskId = CreateTask(Task_SurfFieldEffect, 0xff);
     gTasks[taskId].tMonId = gFieldEffectArguments[0];
     //Overworld_ClearSavedMusic();
-    Overworld_SetSavedMusic(MUS_SURF);
-    Overworld_ChangeMusicTo(MUS_SURF);
+    if (Overworld_MusicCanOverrideMapMusic(MUS_SURF))
+    {
+        Overworld_SetSavedMusic(MUS_SURF);
+        Overworld_ChangeMusicTo(MUS_SURF);
+    }
     return FALSE;
 }
 

@@ -9822,9 +9822,23 @@ static void Cmd_pickup(void)
             else if (species == SPECIES_SHUCKLE
                 && heldItem >= FIRST_BERRY_INDEX
                 && heldItem <= LAST_BERRY_INDEX
-                && !(Random() % 8))
+                && !(Random() % 2))
             {
                 heldItem = ITEM_BERRY_JUICE;
+                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+            }
+            else if (species == SPECIES_PARAS
+                && heldItem == ITEM_NONE
+                && (Random() % 10) <= 4)
+            {
+                heldItem = ITEM_TINY_MUSHROOM;
+                SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
+            }
+            else if (species == SPECIES_PARASECT
+                && heldItem == ITEM_NONE
+                && (Random() % 10) <= 4)
+            {
+                heldItem = ITEM_BIG_MUSHROOM;
                 SetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM, &heldItem);
             }
         }

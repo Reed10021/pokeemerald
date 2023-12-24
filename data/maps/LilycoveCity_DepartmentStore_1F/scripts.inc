@@ -110,6 +110,7 @@ LilycoveCity_DepartmentStore_1F_EventScript_FullMatch:: @ 821F7D4
 LilycoveCity_DepartmentStore_1F_EventScript_RecordPrizeNoRoom:: @ 821F7DD
 	copyvar VAR_POKELOT_PRIZE_PLACE, VAR_0x8004
 	copyvar VAR_POKELOT_PRIZE_ITEM, VAR_0x8005
+	copyvar VAR_POKELOT_PRIZE_COUNT, VAR_0x800A
 	goto LilycoveCity_DepartmentStore_1F_EventScript_NoRoomForPrize
 	end
 
@@ -120,14 +121,16 @@ LilycoveCity_DepartmentStore_1F_EventScript_NoRoomForPrize:: @ 821F7ED
 
 LilycoveCity_DepartmentStore_1F_EventScript_GivePrizeFromEarlier:: @ 821F7F7
 	msgbox LilycoveCity_DepartmentStore_1F_Text_PrizeWeveBeenHolding, MSGBOX_DEFAULT
-	giveitem VAR_POKELOT_PRIZE_ITEM
+	giveitem VAR_POKELOT_PRIZE_ITEM, VAR_POKELOT_PRIZE_COUNT
 	compare VAR_RESULT, FALSE
 	goto_if_eq LilycoveCity_DepartmentStore_1F_EventScript_NoRoomForPrize
 	copyvar VAR_0x8004, VAR_POKELOT_PRIZE_PLACE
 	copyvar VAR_0x8005, VAR_POKELOT_PRIZE_ITEM
+	copyvar VAR_0x800A, VAR_POKELOT_PRIZE_COUNT
 	special TryPutLotteryWinnerReportOnAir
 	setvar VAR_POKELOT_PRIZE_ITEM, ITEM_NONE
 	setvar VAR_POKELOT_PRIZE_PLACE, 0
+	setvar VAR_POKELOT_PRIZE_COUNT, 0
 	release
 	end
 

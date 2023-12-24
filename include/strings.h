@@ -807,6 +807,9 @@ extern const u8 gText_SnorlaxDoll128BP[];
 extern const u8 gText_VenusaurDoll256BP[];
 extern const u8 gText_CharizardDoll256BP[];
 extern const u8 gText_BlastoiseDoll256BP[];
+extern const u8 gText_RegirockDoll512BP[];
+extern const u8 gText_RegiceDoll512BP[];
+extern const u8 gText_RegisteelDoll512BP[];
 
 extern const u8 gText_Protein1BP[];
 extern const u8 gText_Calcium1BP[];
@@ -814,6 +817,31 @@ extern const u8 gText_Iron1BP[];
 extern const u8 gText_Zinc1BP[];
 extern const u8 gText_Carbos1BP[];
 extern const u8 gText_HpUp1BP[];
+
+extern const u8 gText_AdamantMint10BP[];
+extern const u8 gText_BoldMint10BP[];
+extern const u8 gText_BraveMint10BP[];
+extern const u8 gText_CalmMint10BP[];
+extern const u8 gText_CarefulMint10BP[];
+extern const u8 gText_GentleMint10BP[];
+extern const u8 gText_HastyMint10BP[];
+extern const u8 gText_ImpishMint10BP[];
+extern const u8 gText_JollyMint10BP[];
+extern const u8 gText_LaxMint10BP[];
+extern const u8 gText_LonelyMint10BP[];
+extern const u8 gText_MildMint10BP[];
+extern const u8 gText_ModestMint10BP[];
+extern const u8 gText_NaiveMint10BP[];
+extern const u8 gText_NaughtyMint10BP[];
+extern const u8 gText_QuietMint10BP[];
+extern const u8 gText_RashMint10BP[];
+extern const u8 gText_RelaxedMint10BP[];
+extern const u8 gText_SassyMint10BP[];
+extern const u8 gText_SeriousMint10BP[];
+extern const u8 gText_TimidMint10BP[];
+
+extern const u8 gText_AbilityCapsule25BP[];
+extern const u8 gText_RareCandy2BP[];
 
 extern const u8 gText_Leftovers48BP[];
 extern const u8 gText_WhiteHerb48BP[];
@@ -981,6 +1009,32 @@ extern const u8 BattleFrontier_ExchangeServiceCorner_Text_IronDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_ZincDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_CarbosDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_HPUpDesc[];
+
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_AdamantMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_BoldMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_BraveMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_CalmMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_CarefulMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_GentleMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_HastyMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_ImpishMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_JollyMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_LaxMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_LonelyMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_MildMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_ModestMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_NaiveMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_NaughtyMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_QuietMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_RashMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_RelaxedMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_SassyMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_SeriousMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_TimidMintDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_AbilityCapsuleDesc[];
+
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_RareCandyDesc[];
+
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_LeftoversDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_WhiteHerbDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_QuickClawDesc[];

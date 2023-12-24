@@ -94,7 +94,7 @@
 #define VAR_POKELOT_RND1                     0x404B
 #define VAR_POKELOT_RND2                     0x404C
 #define VAR_POKELOT_PRIZE_PLACE              0x404D
-//#define VAR_UNUSED_0x404E                    0x404E // Unused Var
+//#define VAR_UNUSED_0x404E                  0x404E // Unused Var
 #define VAR_REPEL_LAST_USED                  0x404E
 #define VAR_LOTAD_SIZE_RECORD                0x404F
 #define VAR_LITTLEROOT_TOWN_STATE            0x4050
@@ -148,7 +148,7 @@
 #define VAR_ROUTE133_STATE                   0x4080 // Unused Var
 #define VAR_ROUTE134_STATE                   0x4081 // Unused Var
 #define VAR_LITTLEROOT_HOUSES_STATE_MAY      0x4082
-//#define VAR_UNUSED_0x4083                    0x4083 // Unused Var
+//#define VAR_UNUSED_0x4083                  0x4083 // Unused Var
 #define VAR_EGG_CHAIN	                     0x4083
 #define VAR_BIRCH_LAB_STATE                  0x4084
 #define VAR_PETALBURG_GYM_STATE              0x4085 // 0-1: Wally tutorial, 2-6: 0-4 badges, 7: Defeated Norman, 8: Rematch Norman 
@@ -157,14 +157,14 @@
 #define VAR_CONTEST_TYPE                     0x4088
 #define VAR_SECRET_BASE_INITIALIZED          0x4089
 #define VAR_CONTEST_PRIZE_PICKUP             0x408A
-//#define VAR_UNUSED_0x408B                    0x408B // Unused Var
+//#define VAR_UNUSED_0x408B                  0x408B // Unused Var
 #define VAR_EGG_CHAIN_PARENT_1               0x408B
 #define VAR_LITTLEROOT_HOUSES_STATE_BRENDAN  0x408C
 #define VAR_LITTLEROOT_RIVAL_STATE           0x408D
 #define VAR_BOARD_BRINEY_BOAT_STATE          0x408E
 #define VAR_DEVON_CORP_3F_STATE              0x408F
 #define VAR_BRINEY_HOUSE_STATE               0x4090
-//#define VAR_UNUSED_0x4091                    0x4091 // Unused Var
+//#define VAR_UNUSED_0x4091                  0x4091 // Unused Var
 #define VAR_EGG_CHAIN_PARENT_2               0x4091
 #define VAR_LITTLEROOT_INTRO_STATE           0x4092
 #define VAR_MAUVILLE_GYM_STATE               0x4093
@@ -175,22 +175,24 @@
 #define VAR_PETALBURG_WOODS_STATE            0x4098
 #define VAR_LILYCOVE_CONTEST_LOBBY_STATE     0x4099
 #define VAR_RUSTURF_TUNNEL_STATE             0x409A
-//#define VAR_UNUSED_0x409B                    0x409B // Unused Var
+//#define VAR_UNUSED_0x409B                  0x409B // Unused Var
 #define VAR_REGISTERED_L_ITEM                0x409B
 #define VAR_ELITE_4_STATE                    0x409C
-//#define VAR_UNUSED_0x409D                    0x409D // Unused Var
+//#define VAR_UNUSED_0x409D                  0x409D // Unused Var
 #define VAR_REGISTERED_R_ITEM                0x409D
 #define VAR_MOSSDEEP_SPACE_CENTER_STAIR_GUARD_STATE    0x409E
 #define VAR_MOSSDEEP_SPACE_CENTER_STATE      0x409F
 #define VAR_SLATEPORT_HARBOR_STATE           0x40A0
-#define VAR_UNUSED_0x40A1                    0x40A1 // Unused var
+#define VAR_POKELOT_PRIZE_COUNT              0x40A1 // Unused var
+//#define VAR_UNUSED_0x40A1                  0x40A1 // Unused var
 #define VAR_SEAFLOOR_CAVERN_STATE            0x40A2
 #define VAR_CABLE_CAR_STATION_STATE          0x40A3
 #define VAR_SAFARI_ZONE_STATE                0x40A4  // 0: In or out of SZ, 1: Player exiting SZ, 2: Player entering SZ
 #define VAR_TRICK_HOUSE_BEING_WATCHED_STATE  0x40A5
 #define VAR_TRICK_HOUSE_FOUND_TRICK_MASTER   0x40A6
 #define VAR_TRICK_HOUSE_ENTRANCE_STATE       0x40A7
-#define VAR_UNUSED_0x40A8                    0x40A8 // Unused Var
+//#define VAR_UNUSED_0x40A8                  0x40A8 // Unused Var
+#define VAR_PREVIOUS_OUTBREAK                0x40A8
 #define VAR_CYCLING_CHALLENGE_STATE          0x40A9
 #define VAR_SLATEPORT_MUSEUM_1F_STATE        0x40AA
 #define VAR_TRICK_HOUSE_PUZZLE_1_STATE       0x40AB
@@ -278,8 +280,8 @@
 #define VAR_UNUSED_0x40FD                    0x40FD // Unused Var
 #define VAR_CHAIN			    			 0x40FE
 #define VAR_SPECIESCHAINED                   0x40FF
-//#define VAR_UNUSED_0x40FE                    0x40FE // Unused Var
-//#define VAR_UNUSED_0x40FF                    0x40FF // Unused Var
+//#define VAR_UNUSED_0x40FE                  0x40FE // Unused Var
+//#define VAR_UNUSED_0x40FF                  0x40FF // Unused Var
 
 
 #define VARS_END                             0x40FF

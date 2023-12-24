@@ -2372,6 +2372,8 @@ static void UpdateBubbleSprite(struct Sprite *sprite)
 #undef tCounter
 
 //------------------------------------------------------------------------------
+// WEATHER_ABNORMAL
+//------------------------------------------------------------------------------
 
 // Unused function.
 static void UnusedSetCurrentAbnormalWeather(u32 a0, u32 a1)
@@ -2514,19 +2516,19 @@ static const u8 sWeatherCycleRoute102_104[] = //and Petalburg City, Oldale Town
 };
 static const u8 sWeatherCycleRoute105[] =
 {
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SNOW,
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_RAIN,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_RAIN,
 };
 static const u8 sWeatherCycleRoute106_107[] = // and Dewford town
 {
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SNOW,
     WEATHER_SUNNY,
     WEATHER_RAIN,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
 };
@@ -2543,7 +2545,7 @@ static const u8 sWeatherCycleRoute103_110[] =
 {
     WEATHER_SUNNY,
     WEATHER_RAIN,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
     WEATHER_RAIN,
@@ -2552,7 +2554,7 @@ static const u8 sWeatherCycleTimelessForest[] =
 {
     WEATHER_SHADE,
     WEATHER_RAIN,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_DROUGHT,
     WEATHER_SHADE,
     WEATHER_SHADE,
     WEATHER_RAIN,
@@ -2579,7 +2581,7 @@ static const u8 sWeatherCycleRoute116_117[] = // and Verdanturf Town
 {
     WEATHER_SUNNY,
     WEATHER_RAIN,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_DROUGHT,
     WEATHER_RAIN,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
@@ -2606,18 +2608,18 @@ static const u8 sWeatherCycleRoute121_122[] =
 {
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_RAIN_THUNDERSTORM,
     WEATHER_SUNNY,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_DROUGHT,
     WEATHER_RAIN_THUNDERSTORM,
 };
 static const u8 sWeatherCycleRoute123[] = //and 118
 {
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_RAIN,
     WEATHER_SUNNY,
     WEATHER_RAIN,
     WEATHER_SUNNY,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_DROUGHT,
     WEATHER_RAIN_THUNDERSTORM,
 };
 static const u8 sWeatherCycleRoute124_125[] =
@@ -2625,7 +2627,7 @@ static const u8 sWeatherCycleRoute124_125[] =
     // Literally the only place where you can get ice types in Hoenn. Let it snow.
     WEATHER_SNOW,
     WEATHER_SNOW,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SNOW,
     WEATHER_SUNNY,
     WEATHER_SNOW,
     WEATHER_SNOW,
@@ -2633,7 +2635,7 @@ static const u8 sWeatherCycleRoute124_125[] =
 static const u8 sWeatherCycleRoute126_127_128[] =
 {
     WEATHER_SUNNY,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SNOW,
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
@@ -2641,9 +2643,9 @@ static const u8 sWeatherCycleRoute126_127_128[] =
 };
 static const u8 sWeatherCycleRoute129_130_131[] =
 {
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_RAIN,
     WEATHER_DOWNPOUR,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SNOW,
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
@@ -2654,7 +2656,7 @@ static const u8 sWeatherCycleRoute132_133_134[] =
     WEATHER_DOWNPOUR,
     WEATHER_SUNNY,
     WEATHER_DROUGHT,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SUNNY,
     WEATHER_RAIN,
 };
 static const u8 sWeatherCycleSlateport[] =
@@ -2662,17 +2664,17 @@ static const u8 sWeatherCycleSlateport[] =
     WEATHER_SUNNY,
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_DOWNPOUR,
     WEATHER_SUNNY,
-    WEATHER_FOG_HORIZONTAL,
     WEATHER_SUNNY,
 };
 static const u8 sWeatherCyclePacifidlog[] =
 {
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SNOW,
     WEATHER_DOWNPOUR,
     WEATHER_SUNNY,
     WEATHER_DROUGHT,
-    WEATHER_FOG_HORIZONTAL,
+    WEATHER_SNOW,
     WEATHER_SUNNY,
 };
 static const u8 sWeatherCycleLilycove[] =
@@ -2734,7 +2736,7 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_PACIFIDLOG_CYCLE:       return sWeatherCyclePacifidlog[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_LILYCOVE_CYCLE:         return sWeatherCycleLilycove[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_PETALBURGWOODS_CYCLE:   return sWeatherCyclePetalburgWoods[gSaveBlock1Ptr->weatherCycleStage];
-    case WEATHER_TIMELESS_FOREST:        return sWeatherCycleTimelessForest[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_TIMELESS_FOREST:    return sWeatherCycleTimelessForest[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;
     }
 }

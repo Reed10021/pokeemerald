@@ -540,3 +540,4 @@ gSpecials:: @ 81DBA64
 	def_special GetOutbreakMon
 	def_special CheckShinyRoamer
 	def_special CelebiRandomEgg
+	def_special GetSpeciesFromRoamer

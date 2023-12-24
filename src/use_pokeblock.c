@@ -1001,7 +1001,7 @@ static void AddPokeblockToConditions(struct Pokeblock *pokeblock, struct Pokemon
     s16 cstat;
     u8 data;
 
-    if (GetMonData(mon, MON_DATA_SHEEN) != 255)
+    //if (GetMonData(mon, MON_DATA_SHEEN) != 255)
     {
         CalculatePokeblockEffectiveness(pokeblock, mon);
         for (i = 0; i < FLAVOR_COUNT; i++)
@@ -1071,12 +1071,12 @@ static void CalculatePokeblockEffectiveness(struct Pokeblock *pokeblock, struct 
 
 static bool8 IsSheenMaxed(void)
 {
-    if (GetBoxOrPartyMonData(sMenu->party[sMenu->info.curSelection].boxId,
-                             sMenu->party[sMenu->info.curSelection].monId,
-                             MON_DATA_SHEEN,
-                             NULL) == 255)
-        return TRUE;
-    else
+    //if (GetBoxOrPartyMonData(sMenu->party[sMenu->info.curSelection].boxId,
+    //                         sMenu->party[sMenu->info.curSelection].monId,
+    //                         MON_DATA_SHEEN,
+    //                         NULL) == 255)
+    //    return TRUE;
+    //else
         return FALSE;
 }
 

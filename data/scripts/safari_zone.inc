@@ -122,12 +122,12 @@ Route121_SafariZoneEntrance_Text_FirstTimeInfo: @ 82A4EA1
 	.string "catching POKéMON.\p"
 	.string "The SAFARI Game is over when you run\n"
 	.string "out of SAFARI BALLS, or when you've\l"
-	.string "walked 500 steps.\p"
+	.string "walked 900 steps.\p"
 	.string "Come in and enjoy the SAFARI ZONE!$"
 
 Route121_SafariZoneEntrance_Text_WouldYouLikeToPlay: @ 82A4F74
 	.string "Welcome to the SAFARI ZONE!\p"
-	.string "All you can catch for just ¥500!\n"
+	.string "All you can catch for just ¥750!\n"
 	.string "Would you like to play a SAFARI Game?$"
 
 Route121_SafariZoneEntrance_Text_PlayAnotherTime: @ 82A4FD7
@@ -139,7 +139,7 @@ Route121_SafariZoneEntrance_Text_NotEnoughMoney: @ 82A4FF7
 	.string "Sorry.$"
 
 Route121_SafariZoneEntrance_Text_ThatWillBe500Please: @ 82A501B
-	.string "That will be ¥500, please.$"
+	.string "That will be ¥750, please.$"
 
 Route121_SafariZoneEntrance_Text_HereAreYourSafariBalls: @ 82A5036
 	.string "Here are your SAFARI BALLS.$"

@@ -514,6 +514,10 @@ PlayersHouse_1F_EventScript_GetSSTicketAndSeeLatiTV:: @ 8292AF2
 	addvar VAR_TEMP_D, SPECIES_LATIAS
 	playmoncry VAR_TEMP_D, 2
 	waitmoncry
+	playse SE_PIN
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
+	waitmovement 0
+	waitse
 	special CheckShinyRoamer
 	compare VAR_RESULT, FALSE
 	goto_if_eq Lati_NoShinyText

@@ -1201,6 +1201,7 @@ static void HallOfFame_PrintMonInfo(struct HallofFameMon* currMon, u8 unused1, u
 static void HallOfFame_PrintPlayerInfo(u8 unused1, u8 unused2)
 {
     u8 text[20];
+    u8 i;
     u32 width;
     u16 trainerId;
 
@@ -1224,19 +1225,43 @@ static void HallOfFame_PrintPlayerInfo(u8 unused1, u8 unused2)
     AddTextPrinterParameterized3(1, 1, width, 0x11, sPlayerInfoTextColors, -1, text);
 
     AddTextPrinterParameterized3(1, 1, 0, 0x21, sPlayerInfoTextColors, -1, gText_Time);
-    text[0] = (gSaveBlock2Ptr->playTimeHours / 100) + CHAR_0;
-    text[1] = (gSaveBlock2Ptr->playTimeHours % 100) / 10 + CHAR_0;
-    text[2] = (gSaveBlock2Ptr->playTimeHours % 10) + CHAR_0;
+    if (gSaveBlock2Ptr->playTimeHours > 999)
+    {
+        if (gSaveBlock2Ptr->playTimeHours > 9999)
+        {
+            text[0] = (gSaveBlock2Ptr->playTimeHours / 10000) + CHAR_0;
+            text[1] = (gSaveBlock2Ptr->playTimeHours % 10000) / 1000 + CHAR_0;
+            text[2] = (gSaveBlock2Ptr->playTimeHours % 1000) + CHAR_0;
+            text[3] = (gSaveBlock2Ptr->playTimeHours % 100) + CHAR_0;
+            text[4] = (gSaveBlock2Ptr->playTimeHours % 10) + CHAR_0;
+            i = 5;
+        }
+        else
+        {
+            text[0] = (gSaveBlock2Ptr->playTimeHours / 1000) + CHAR_0;
+            text[1] = (gSaveBlock2Ptr->playTimeHours % 1000) / 100 + CHAR_0;
+            text[2] = (gSaveBlock2Ptr->playTimeHours % 100) + CHAR_0;
+            text[3] = (gSaveBlock2Ptr->playTimeHours % 10) + CHAR_0;
+            i = 4;
+        }
+    }
+    else
+    {
+        text[0] = (gSaveBlock2Ptr->playTimeHours / 100) + CHAR_0;
+        text[1] = (gSaveBlock2Ptr->playTimeHours % 100) / 10 + CHAR_0;
+        text[2] = (gSaveBlock2Ptr->playTimeHours % 10) + CHAR_0;
+        i = 3;
+    }
 
     if (text[0] == CHAR_0)
         text[0] = CHAR_SPACE;
     if (text[0] == CHAR_SPACE && text[1] == CHAR_0)
-        text[8] = CHAR_SPACE;
+        text[1] = CHAR_SPACE;
 
-    text[3] = CHAR_COLON;
-    text[4] = (gSaveBlock2Ptr->playTimeMinutes % 100) / 10 + CHAR_0;
-    text[5] = (gSaveBlock2Ptr->playTimeMinutes % 10) + CHAR_0;
-    text[6] = EOS;
+    text[i++] = CHAR_COLON;
+    text[i++] = (gSaveBlock2Ptr->playTimeMinutes % 100) / 10 + CHAR_0;
+    text[i++] = (gSaveBlock2Ptr->playTimeMinutes % 10) + CHAR_0;
+    text[i++] = EOS;
 
     width = GetStringRightAlignXOffset(1, text, 0x70);
     AddTextPrinterParameterized3(1, 1, width, 0x21, sPlayerInfoTextColors, -1, text);
