@@ -22,6 +22,7 @@ static void InitTimeBasedEvents(void)
     gSaveBlock2Ptr->lastBerryTreeUpdate = gLocalTime;
     VarSet(VAR_DAYS, gLocalTime.days);
     // Set all the things.
+    ClearDailyFlags();
     UpdateDewfordTrendPerDay(0);
     UpdateTVShowsPerDay(0);
     UpdateWeatherPerDay(0);
