@@ -21,6 +21,17 @@ static void InitTimeBasedEvents(void)
     RtcCalcLocalTime();
     gSaveBlock2Ptr->lastBerryTreeUpdate = gLocalTime;
     VarSet(VAR_DAYS, gLocalTime.days);
+    // Set all the things.
+    UpdateDewfordTrendPerDay(0);
+    UpdateTVShowsPerDay(0);
+    UpdateWeatherPerDay(0);
+    UpdatePartyPokerusTime(0);
+    UpdateMirageRnd(0);
+    UpdateBirchState(0);
+    UpdateFrontierManiac(0);
+    UpdateFrontierGambler(0);
+    SetShoalItemFlag(0);
+    SetRandomLotteryNumber(0);
 }
 
 void DoTimeBasedEvents(void)
