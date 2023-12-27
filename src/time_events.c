@@ -8,6 +8,7 @@
 #include "rtc.h"
 #include "script.h"
 #include "task.h"
+#include "constants/species.h"
 
 static u32 GetMirageRnd(void)
 {
@@ -45,8 +46,27 @@ bool8 IsMirageIslandPresent(void)
     int i;
 
     for (i = 0; i < PARTY_SIZE; i++)
+    {
         if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) && (GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) & 0xFFFF) == rnd)
             return TRUE;
+        else if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_WYNAUT || GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_WOBBUFFET)
+        {
+            // If Wynaut or Wobbuffet are in the party, lower it from 0 - 65535 to 0 - 255 (16 bits -> 8 bits)
+            u8 rnd2 = rnd >> 8;
+            if ((GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) & 0xFF) == rnd2)
+                return TRUE;
+
+        }
+        else if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_ARTICUNO ||
+            GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_ZAPDOS ||
+            GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_MOLTRES)
+        {
+            // If the "winged mirages" are in the party, lower it from 0 - 65535 to 0 - 15 (16 bits -> 4 bits)
+            u8 rnd2 = rnd >> 4;
+            if ((GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) & 0xF) == rnd2)
+                return TRUE;
+        }
+    }
 
     return FALSE;
 }
