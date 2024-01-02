@@ -196,7 +196,7 @@ static const struct {
     {
         .species = SPECIES_TOGEPI,
         .moves = {MOVE_ANCIENT_POWER, MOVE_TRI_ATTACK, MOVE_FOLLOW_ME, MOVE_HELPING_HAND},
-        .level = 9,
+        .level = 8,
         .location = MAP_NUM(ROUTE101)
     },
     {
@@ -292,19 +292,19 @@ static const struct {
     {
         .species = SPECIES_PICHU,
         .moves = {MOVE_VOLT_TACKLE, MOVE_THUNDERBOLT, MOVE_SURF, MOVE_TAIL_GLOW},
-        .level = 12,
+        .level = 9,
         .location = MAP_NUM(ROUTE103)
     },
     {
         .species = SPECIES_FARFETCHD,
         .moves = {MOVE_SLASH, MOVE_FOCUS_ENERGY, MOVE_AIR_CUTTER, MOVE_DRAGON_DANCE},
-        .level = 15,
+        .level = 9,
         .location = MAP_NUM(WATER_PATH)
     },
     {
         .species = SPECIES_UNOWN,
         .moves = {MOVE_HIDDEN_POWER, MOVE_PSYCHIC},
-        .level = 30,
+        .level = 10,
         .location = MAP_NUM(GREEN_PATH)
     },
     {
@@ -346,7 +346,7 @@ static const struct {
     {
         .species = SPECIES_LARVITAR,
         .moves = {MOVE_DRAGON_DANCE, MOVE_EARTHQUAKE, MOVE_THIEF, MOVE_ROCK_SLIDE},
-        .level = 10,
+        .level = 7,
         .location = MAP_NUM(ROUTE101)
     },
     {
@@ -376,7 +376,7 @@ static const struct {
     {
         .species = SPECIES_AIPOM,
         .moves = {MOVE_DRAGON_DANCE, MOVE_FALSE_SWIPE, MOVE_YAWN, MOVE_THRASH},
-        .level = 14,
+        .level = 11,
         .location = MAP_NUM(WATER_PATH)
     },
     {
@@ -526,7 +526,7 @@ static const struct {
     {
         .species = SPECIES_EEVEE,
         .moves = {MOVE_DRAGON_DANCE, MOVE_THIEF, MOVE_SHADOW_BALL, MOVE_ACID_ARMOR},
-        .level = 13,
+        .level = 7,
         .location = MAP_NUM(WATER_PATH)
     },
     {
@@ -557,7 +557,7 @@ static const struct {
         // Gen 1 starters
         .species = SPECIES_SQUIRTLE,
         .moves = {MOVE_DRAGON_DANCE, MOVE_CURSE, MOVE_CROSS_CHOP, MOVE_HYDRO_CANNON},
-        .level = 15,
+        .level = 10,
         .location = MAP_NUM(ROUTE103)
     },
     {
@@ -575,7 +575,7 @@ static const struct {
     {
         .species = SPECIES_CHARMANDER,
         .moves = {MOVE_DRAGON_DANCE, MOVE_DRILL_PECK, MOVE_BLAST_BURN, MOVE_OUTRAGE},
-        .level = 25,
+        .level = 10,
         .location = MAP_NUM(GREEN_PATH)
     },
     {
@@ -587,7 +587,7 @@ static const struct {
     {
         .species = SPECIES_BULBASAUR,
         .moves = {MOVE_DRAGON_DANCE, MOVE_FRENZY_PLANT, MOVE_SLUDGE_BOMB, MOVE_SPORE},
-        .level = 25,
+        .level = 10,
         .location = MAP_NUM(GREEN_PATH)
     },
     {
@@ -606,19 +606,19 @@ static const struct {
     {
         .species = SPECIES_CYNDAQUIL,
         .moves = {MOVE_TAIL_GLOW, MOVE_HEAT_WAVE, MOVE_ICE_PUNCH, MOVE_HYPNOSIS},
-        .level = 15,
+        .level = 5,
         .location = MAP_NUM(ROUTE101)
     },
     {
         .species = SPECIES_CYNDAQUIL,
         .moves = {MOVE_DRAGON_DANCE, MOVE_BLAST_BURN, MOVE_FURY_CUTTER, MOVE_ICE_PUNCH},
-        .level = 25,
+        .level = 10,
         .location = MAP_NUM(GREEN_PATH)
     },
     {
         .species = SPECIES_TOTODILE,
         .moves = {MOVE_DRAGON_DANCE, MOVE_WATERFALL, MOVE_METEOR_MASH, MOVE_THRASH},
-        .level = 15,
+        .level = 5,
         .location = MAP_NUM(ROUTE101)
     },
     {
@@ -648,7 +648,7 @@ static const struct {
     {
         .species = SPECIES_EEVEE,
         .moves = {MOVE_TAIL_GLOW, MOVE_SURF, MOVE_FLAMETHROWER, MOVE_THUNDERBOLT},
-        .level = 10,
+        .level = 5,
         .location = MAP_NUM(ROUTE101)
     },
     {
@@ -660,7 +660,7 @@ static const struct {
     {
         .species = SPECIES_DUNSPARCE,
         .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_ROCK_SLIDE, MOVE_THRASH},
-        .level = 18,
+        .level = 8,
         .location = MAP_NUM(ROUTE103)
     },
     {
@@ -2200,7 +2200,9 @@ static void sub_80ED718(void)
     u32 i;
     u8 nBadges = 0;
     u16 outbreakIdx;
-    u16 oldOutbreak = VarGet(VAR_PREVIOUS_OUTBREAK);
+    u16 oldOutbreak = VarGet(VAR_YESTERDAYS_OUTBREAK);
+    u16 oldOldOutbreak = VarGet(VAR_TWO_DAYS_AGO_OUTBREAK);
+    u16 oldOldOldOutbreak = VarGet(VAR_THREE_DAYS_AGO_OUTBREAK);
     TVShow *show;
 
 
@@ -2242,7 +2244,6 @@ static void sub_80ED718(void)
 
         switch (nBadges)
         {
-            default:
             case 0:
             case 1:
             case 2:
@@ -2250,18 +2251,16 @@ static void sub_80ED718(void)
                 if (rbernoulli(3, 20)) // FFFF * (firstnum) / (secondnum) >= Random()
                     return;
                 break;
+            default:
             case 4:
             case 5:
             case 6:
-                if (rbernoulli(4, 10))
-                    return;
-                break;
             case 7:
             case 8:
                 // generate an outbreak every day.
                 break;
-
         }
+
         // We didn't return, so generate news.
         {
             sCurTVShowSlot = FindEmptyTVSlotWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
@@ -2270,7 +2269,13 @@ static void sub_80ED718(void)
                 do
                 {
                     outbreakIdx = Random() % ARRAY_COUNT(sPokeOutbreakSpeciesList);
-                } while (sPokeOutbreakSpeciesList[outbreakIdx].species == oldOutbreak);
+                } while (sPokeOutbreakSpeciesList[outbreakIdx].species == oldOutbreak ||
+                    sPokeOutbreakSpeciesList[outbreakIdx].species == oldOldOutbreak ||
+                    sPokeOutbreakSpeciesList[outbreakIdx].species == oldOldOldOutbreak);
+
+                VarSet(VAR_THREE_DAYS_AGO_OUTBREAK, oldOldOutbreak);
+                VarSet(VAR_TWO_DAYS_AGO_OUTBREAK, oldOutbreak);
+                VarSet(VAR_YESTERDAYS_OUTBREAK, sPokeOutbreakSpeciesList[outbreakIdx].species);
                 show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
                 show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
                 show->massOutbreak.active = TRUE;
@@ -2291,7 +2296,6 @@ static void sub_80ED718(void)
                 show->massOutbreak.daysLeft = 0; // How many days to delay before showing on tv.
                 tv_store_id_2x(show);
                 show->massOutbreak.language = gGameLanguage;
-                VarSet(VAR_PREVIOUS_OUTBREAK, sPokeOutbreakSpeciesList[outbreakIdx].species);
             }
         }
     }
@@ -3821,7 +3825,7 @@ static void sub_80EFA88(void)
 
 s8 FindEmptyTVSlotWithinFirstFiveShowsOfArray(TVShow *shows)
 {
-    u8 i;
+    s8 i;
 
     // Because the game persists show kind forever and never resets it to Off Air,
     // you are only ever allowed 5 shows in the first 5 slots. If the game tries
@@ -3873,7 +3877,24 @@ s8 FindEmptyTVSlotBeyondFirstFiveShowsOfArray(TVShow *shows)
 {
     s8 i;
 
+    // See long comment in FindEmptyTVSlotWithinFirstFiveShowsOfArray
     for (i = 5; i < LAST_TVSHOW_IDX; i ++)
+    {
+        if (shows[i].common.kind == TVSHOW_OFF_AIR)
+        {
+            return i;
+        }
+    }
+    // No more off air shows available - turn all inactive shows into off air shows.
+    for (i = 5; i < LAST_TVSHOW_IDX; i++)
+    {
+        if (shows[i].common.active == FALSE)
+        {
+            shows[i].common.kind = TVSHOW_OFF_AIR;
+        }
+    }
+    // Search again for an off air tv show
+    for (i = 5; i < LAST_TVSHOW_IDX; i++)
     {
         if (shows[i].common.kind == TVSHOW_OFF_AIR)
         {

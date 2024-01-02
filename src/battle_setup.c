@@ -715,6 +715,11 @@ static void CB2_EndWildBattle(void)
                     // if chain, increment chain and maybe show text
                     if (species == VarGet(VAR_SPECIESCHAINED))
                     {
+                        // If we caught a chained pokemon, increase the chain by 6 (5 here + the normal 1).
+                        // The ChainNumber script contains a check for 0xFFFF, so if we increase by 5 here it won't increase again.
+                        if (gBattleOutcome == B_OUTCOME_CAUGHT && chainCount >= 3 && chainCount <= 0xFFFA)
+                            VarSet(VAR_CHAIN, chainCount + 5);
+
                         GetSpeciesName(gStringVar2, species);
                         ScriptContext1_SetupScript(ChainNumber);
                     }
