@@ -10188,11 +10188,24 @@ static void Cmd_handleballthrow(void)
         else // mon may be caught, calculate shakes
         {
             u8 shakes;
-            u16 caughtCount = GetNationalPokedexCount(FLAG_GET_CAUGHT);
+            u32 caughtCount = GetNationalPokedexCount(FLAG_GET_CAUGHT);
+            u32 chainCount = VarGet(VAR_CHAIN);
             u32 crit = 0;
 
-            if (caughtCount > 379) {        // 380+
+            // Give better critical capture odds for higher chains.
+            if (chainCount >= 3 && VarGet(VAR_SPECIESCHAINED) == gBattleMons[gBattlerTarget].species)
+                caughtCount += chainCount / 2;
+            else if (chainCount >= 3)
+                caughtCount += chainCount / 4;
+
+            if (caughtCount > 499) {        // 500+
+                crit = (odds * 600) / 100;  // * 6.0
+            } else if (caughtCount > 449) { // 450+
+                crit = (odds * 555) / 100;  // * 5.55
+            } else if (caughtCount > 419) { // 420+
                 crit = (odds * 500) / 100;  // * 5.0
+            } else if (caughtCount > 379) { // 380+
+                crit = (odds * 455) / 100;  // * 4.55
             } else if (caughtCount > 319) { // 320+
                 crit = (odds * 400) / 100;  // * 4.0
             } else if (caughtCount > 249) { // 250+
@@ -10210,7 +10223,9 @@ static void Cmd_handleballthrow(void)
             } else {                        // 0-9
                 crit = (odds * 55) / 100;   // else * 0.55
             }
-
+            
+            // Let's assume catching charm, it's fun that way.
+            crit *= 2; // Catching Charm multiplier
             crit /= 6;
             odds = Sqrt(Sqrt(16711680 / odds));
             odds = 1048560 / odds;

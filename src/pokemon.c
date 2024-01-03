@@ -2202,11 +2202,13 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     u8 speciesName[POKEMON_NAME_LENGTH + 1];
     u32 personality;
     u32 value;
+    u32 ivValue1;
+    u32 ivValue2;
     u16 checksum;
-    u16 trueChainCount = VarGet(VAR_CHAIN);
+    u32 trueChainCount = VarGet(VAR_CHAIN);
     u32 adjustedChainCount = trueChainCount + 40; // Add some constant rerolls to the base chain rate because hard.
-    u16 eggChainCount = VarGet(VAR_EGG_CHAIN);
-    u8 legendaryCheck = 0;
+    u32 eggChainCount = VarGet(VAR_EGG_CHAIN);
+    u32 legendaryCheck = 0;
 
     ZeroBoxMonData(boxMon);
 
@@ -2229,7 +2231,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     }
     else //Player is the OT
     {
-        u8 i = 0;
+        u32 i = 0;
         if(otIdType == OT_ID_RANDOM_NO_SHINY)
             value = (Random() << 0x10) | Random();
         else
@@ -2353,11 +2355,24 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     }
     else
     {
-        u32 iv;
+        u32 iv1;
+        u32 iv2;
+        u32 iv3;
+        u32 iv4;
+        u32 iv5;
+        u32 iv6;
+
+        u32 iv1Best = 0;
+        u32 iv2Best = 0;
+        u32 iv3Best = 0;
+        u32 iv4Best = 0;
+        u32 iv5Best = 0;
+        u32 iv6Best = 0;
+
         u32 rolls = 1;
-        u8 ivFlag = 0;
+        u32 ivFlag = 0;
         if (legendaryCheck == 1 || (trueChainCount >= 3 && VarGet(VAR_SPECIESCHAINED) == species)) {
-            rolls += 2 + (adjustedChainCount / 2);
+            rolls += adjustedChainCount + (adjustedChainCount / 4);
             if (trueChainCount >= 200)
                 ivFlag = 5;
             else if (trueChainCount >= 120 || legendaryCheck == 1)
@@ -2369,7 +2384,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             else
                 ivFlag = 1;
         } else if (eggChainCount >= 3 && GetBoxMonData(boxMon, MON_DATA_IS_EGG, NULL)) {
-            rolls += 2 + (eggChainCount / 2);
+            rolls += eggChainCount + (eggChainCount / 4);
             if (eggChainCount >= 200)
                 ivFlag = 5;
             else if (eggChainCount >= 120)
@@ -2382,7 +2397,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
                 ivFlag = 1;
         }
         else if(trueChainCount >= 3) { // VarGet(VAR_SPECIESCHAINED) != species
-            rolls += 2 + (adjustedChainCount / 5);
+            rolls += (adjustedChainCount / 2) + (adjustedChainCount / 6);
             if (trueChainCount >= 200)
                 ivFlag = 5;
             else if (trueChainCount >= 120)
@@ -2397,78 +2412,89 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 
         do
         {
-			value = Random();
+            ivValue1 = Random();
+            ivValue2 = Random();
 
-			iv = value & 0x1F;
-			SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv);
-			iv = (value & 0x3E0) >> 5;
-			SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv);
-			iv = (value & 0x7C00) >> 10;
-			SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv);
+            iv1 = ivValue1 & 0x1F;
+            iv2 = (ivValue1 & 0x3E0) >> 5;
+            iv3 = (ivValue1 & 0x7C00) >> 10;
+            iv4 = ivValue2 & 0x1F;
+            iv5 = (ivValue2 & 0x3E0) >> 5;
+            iv6 = (ivValue2 & 0x7C00) >> 10;
 
-            value = Random();
+            if (iv1 > iv1Best && iv2 > iv2Best && iv3 > iv3Best &&
+                iv4 > iv4Best && iv5 > iv5Best && iv6 > iv6Best)
+            {
+                iv1Best = iv1;
+                iv2Best = iv2;
+                iv3Best = iv3;
+                iv4Best = iv4;
+                iv5Best = iv5;
+                iv6Best = iv6;
 
-            iv = value & 0x1F;
-            SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv);
-            iv = (value & 0x3E0) >> 5;
-            SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv);
-            iv = (value & 0x7C00) >> 10;
-            SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv);
-            if (ivFlag != 0) {
-                if (ivFlag == 1) {
-                    if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 10
-                        && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 10
-                        && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 10
-                        && GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 10
-                        && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 10
-                        && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 10) {
-                        break;
+                // Only do a check when we update best IVs.
+                if (ivFlag != 0) {
+                    if (ivFlag == 1) {
+                        if (iv1Best >= 10 &&
+                            iv2Best >= 10 &&
+                            iv3Best >= 10 &&
+                            iv4Best >= 10 &&
+                            iv5Best >= 10 &&
+                            iv6Best >= 10) {
+                            break;
+                        }
                     }
-                }
-                else if (ivFlag == 2) {
-                    if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 15
-                        && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 15
-                        && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 15
-                        && GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 15
-                        && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 15
-                        && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 15) {
-                        break;
+                    else if (ivFlag == 2) {
+                        if (iv1Best >= 15 &&
+                            iv2Best >= 15 &&
+                            iv3Best >= 15 &&
+                            iv4Best >= 15 &&
+                            iv5Best >= 15 &&
+                            iv6Best >= 15) {
+                            break;
+                        }
                     }
-                }
-                else if (ivFlag == 3) {
-                    if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 20
-                        && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 20
-                        && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 20
-                        && GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 20
-                        && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 20
-                        && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 20) {
-                        break;
+                    else if (ivFlag == 3) {
+                        if (iv1Best >= 20 &&
+                            iv2Best >= 20 &&
+                            iv3Best >= 20 &&
+                            iv4Best >= 20 &&
+                            iv5Best >= 20 &&
+                            iv6Best >= 20) {
+                            break;
+                        }
                     }
-                }
-                else if (ivFlag == 4) {
-                    if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 25
-                        && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 25
-                        && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 25
-                        && GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 25
-                        && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 25
-                        && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 25) {
-                        break;
+                    else if (ivFlag == 4) {
+                        if (iv1Best >= 25 &&
+                            iv2Best >= 25 &&
+                            iv3Best >= 25 &&
+                            iv4Best >= 25 &&
+                            iv5Best >= 25 &&
+                            iv6Best >= 25) {
+                            break;
+                        }
                     }
-                }
-                else if (ivFlag == 5) {
-                    if (GetBoxMonData(boxMon, MON_DATA_HP_IV, NULL) >= 30
-                        && GetBoxMonData(boxMon, MON_DATA_ATK_IV, NULL) >= 30
-                        && GetBoxMonData(boxMon, MON_DATA_DEF_IV, NULL) >= 30
-                        && GetBoxMonData(boxMon, MON_DATA_SPEED_IV, NULL) >= 30
-                        && GetBoxMonData(boxMon, MON_DATA_SPATK_IV, NULL) >= 30
-                        && GetBoxMonData(boxMon, MON_DATA_SPDEF_IV, NULL) >= 30) {
-                        break;
+                    else if (ivFlag == 5) {
+                        if (iv1Best >= 30 &&
+                            iv2Best >= 30 &&
+                            iv3Best >= 30 &&
+                            iv4Best >= 30 &&
+                            iv5Best >= 30 &&
+                            iv6Best >= 30) {
+                            break;
+                        }
                     }
                 }
             }
-
-			rolls--;
+            rolls--;
         } while (rolls > 0);
+
+        SetBoxMonData(boxMon, MON_DATA_HP_IV, &iv1Best);
+        SetBoxMonData(boxMon, MON_DATA_ATK_IV, &iv2Best);
+        SetBoxMonData(boxMon, MON_DATA_DEF_IV, &iv3Best);
+        SetBoxMonData(boxMon, MON_DATA_SPEED_IV, &iv4Best);
+        SetBoxMonData(boxMon, MON_DATA_SPATK_IV, &iv5Best);
+        SetBoxMonData(boxMon, MON_DATA_SPDEF_IV, &iv6Best);
     }
 
     if (gBaseStats[species].abilities[1])
@@ -2489,10 +2515,10 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
     bool8 shinyFlag = FALSE;
 
     {
-        u8 i = 0;
-        u16 trueChainCount = VarGet(VAR_CHAIN);
+        u32 i = 0;
+        u32 trueChainCount = VarGet(VAR_CHAIN);
         u32 adjustedChainCount = trueChainCount + 40; // Add some constant rerolls to the base chain rate because hard.
-        u8 legendaryCheck = 0;
+        u32 legendaryCheck = 0;
         if (!IsPersonalityShiny(personality, 0)) // If not already shiny, do the additional rolls. That way the first roll counts.
         {
             u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
@@ -2525,6 +2551,7 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
                 case SPECIES_DEOXYS_SPEED:
                     adjustedChainCount += 250; // Use the current chain and increment it by 250. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
                     legendaryCheck = 1;
+                    break;
             }
 
             // Reward long chains that haven't broken
@@ -2576,7 +2603,7 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
     {
         personality = Random32();
         if (shinyFlag)
-            ForceShiny(personality);
+            personality = ForceShiny(personality);
     }
 
     CreateMon(mon, species, level, fixedIV, 1, personality, OT_ID_PLAYER_ID, 0);
@@ -2588,13 +2615,13 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
     bool8 shinyFlag = FALSE;
 
     {
-        u16 trueChainCount = VarGet(VAR_CHAIN);
+        u32 trueChainCount = VarGet(VAR_CHAIN);
         u32 adjustedChainCount = trueChainCount + 40; // Add some constant rerolls to the base chain rate because hard.
-        u8 legendaryCheck = 0;
+        u32 legendaryCheck = 0;
 
         if (!IsPersonalityShiny(personality, 0)) // If not already shiny, do the additional rolls. That way the first roll counts.
         {
-            u8 i = 0;
+            u32 i = 0;
             u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
             // Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
             switch (species)
@@ -2625,6 +2652,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
                 case SPECIES_DEOXYS_SPEED:
                     adjustedChainCount += 250; // Use the current chain and increment it by 150. VAR_CHAIN is u16, chainCount is u32. So no overflow, as we don't save this value back into VAR_CHAIN.
                     legendaryCheck = 1;
+                    break;
             }
 
             // Reward long chains that haven't broken
@@ -2679,7 +2707,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
         {
             personality = Random32();
             if (shinyFlag)
-                ForceShiny(personality);
+                personality = ForceShiny(personality);
             actualLetter = ((((personality & 0x3000000) >> 18) | ((personality & 0x30000) >> 12) | ((personality & 0x300) >> 6) | (personality & 0x3)) % 28);
         }
     }
@@ -2690,7 +2718,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
         {
             personality = Random32();
             if (shinyFlag)
-                ForceShiny(personality);
+                personality = ForceShiny(personality);
         }
     }
 
