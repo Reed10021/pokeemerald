@@ -32,6 +32,7 @@ EverGrandeCity_HallOfFame_EventScript_ResetDefeatedEventLegendaries:: @ 8271829
 	clearflag FLAG_DEFEATED_DEOXYS
 	clearflag FLAG_DEFEATED_LUGIA
 	clearflag FLAG_DEFEATED_HO_OH
+	setvar VAR_MIRAGE_TOWER_STATE, 0 @ Make Mirage Tower visible again after hall of fame.
 	return
 
 EverGrandeCity_HallOfFame_EventScript_SetDesertUnderpassCommentReady:: @ 8271839

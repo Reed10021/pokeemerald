@@ -5780,10 +5780,14 @@ static void DoTVShowDummiedOut(void)
 
 static void DoTVShowPokemonNewsMassOutbreak(void)
 {
-    TVShow *show;
+    TVShow *show = &gSaveBlock1Ptr->tvShows[gSpecialVar_0x8004];
+    u16 waterGreenPathCorrection = show->massOutbreak.locationMapNum;
 
-    show = &gSaveBlock1Ptr->tvShows[gSpecialVar_0x8004];
-    GetMapName(gStringVar1, show->massOutbreak.locationMapNum, 0);
+    if (show->massOutbreak.locationMapNum == MAP_GREEN_PATH)
+        waterGreenPathCorrection = MAPSEC_GREEN_PATH;
+    else if (show->massOutbreak.locationMapNum == MAP_WATER_PATH)
+        waterGreenPathCorrection = MAPSEC_WATER_PATH;
+    GetMapName(gStringVar1, waterGreenPathCorrection, 0);
     StringCopy(gStringVar2, gSpeciesNames[show->massOutbreak.species]);
     TVShowDone();
     StartMassOutbreak();
