@@ -128,7 +128,7 @@ static void HandleEndTurn_BattleLost(void);
 static void HandleEndTurn_RanFromBattle(void);
 static void HandleEndTurn_MonFled(void);
 static void HandleEndTurn_FinishBattle(void);
-static bool8 partyMonHoldDoublePrizeEffect(void);
+static u32 partyMonHoldDoublePrizeEffect(void);
 
 
 // EWRAM vars
@@ -1925,8 +1925,8 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
 
     if (seenFlag) // If we've seen the base species, we have free reign to evolve it based on the scaledLevel
     {
-        u16 i;
-        u8 evoCount = 0;
+        u32 i;
+        u32 evoCount = 0;
 
         // First, count how many evos
         for (i = 0; i < EVOS_PER_MON; i++)
@@ -1937,8 +1937,8 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
 
         if (evoCount > 0) // If evoCount is zero, don't do any of this calculation and just return species.
         {
-            u16 validEvoArray[EVOS_PER_MON] = { 0,0,0,0,0 };
-            u8 validCount = 0;
+            u32 validEvoArray[EVOS_PER_MON] = { 0,0,0,0,0 };
+            u32 validCount = 0;
             
             // Second, collect all valid evolution species into an array.
             for (i = 0; i < evoCount; i++)
@@ -1972,7 +1972,8 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
             if (returnVal == 0) // If we have evolutions available but we don't have any valid evolutions (likely because of the +5), don't evolve.
                 return species;
             else
-                return returnVal;
+                return HasEvolution(returnVal, scaledLevel, normalLevel);
+            // If we can evolve, do recursion to see if we can evolve again.
         }
     }
     // If we haven't seen this species, or if this species has no evolutions, return the species.
@@ -3267,10 +3268,7 @@ static void BattleStartClearSetData(void)
     *(&gBattleStruct->safariCatchFactor) = gBaseStats[GetMonData(&gEnemyParty[0], MON_DATA_SPECIES)].catchRate * 100 / 1275;
     gBattleStruct->safariEscapeFactor = 3;
     gBattleStruct->wildVictorySong = 0;
-    if (partyMonHoldDoublePrizeEffect())
-        gBattleStruct->moneyMultiplier = 2;
-    else
-        gBattleStruct->moneyMultiplier = 1;
+    gBattleStruct->moneyMultiplier = partyMonHoldDoublePrizeEffect();
 
     for (i = 0; i < 8; i++)
     {
@@ -5393,18 +5391,22 @@ void RunBattleScriptCommands(void)
         gBattleScriptingCommandsTable[gBattlescriptCurrInstr[0]]();
 }
 
-static bool8 partyMonHoldDoublePrizeEffect(void)
+static u32 partyMonHoldDoublePrizeEffect(void)
 {
-    int i;
+    u32 i;
+    u32 retMultiplier = 1;
+    u16 item;
+
     for (i = 0; i < PARTY_SIZE; i++)
 	{
-        u8 item = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
+        item = GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM);
         if (ItemId_GetHoldEffect(item) == HOLD_EFFECT_DOUBLE_PRIZE)
 		{
-            return TRUE;
+            retMultiplier *= 2;
         }
     }
-    return FALSE;
+    // max multiplier = 1 * 2 * 2 * 2 * 2 * 2 * 2 = 64
+    return retMultiplier;
 }
 
 
