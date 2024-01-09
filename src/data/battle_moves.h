@@ -224,7 +224,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_WING_ATTACK] =
     {
         .effect = EFFECT_HIT,
-        .power = 60,
+        .power = 75,
         .type = TYPE_FLYING,
         .accuracy = 100,
         .pp = 35,
@@ -848,7 +848,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_DRILL_PECK] =
     {
         .effect = EFFECT_HIT,
-        .power = 80,
+        .power = 90,
         .type = TYPE_FLYING,
         .accuracy = 100,
         .pp = 20,
@@ -1680,7 +1680,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_SWIFT] =
     {
         .effect = EFFECT_ALWAYS_HIT,
-        .power = 60,
+        .power = 65,
         .type = TYPE_NORMAL,
         .accuracy = 0,
         .pp = 20,
@@ -2408,7 +2408,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_FAINT_ATTACK] =
     {
         .effect = EFFECT_ALWAYS_HIT,
-        .power = 60,
+        .power = 65,
         .type = TYPE_DARK,
         .accuracy = 0,
         .pp = 20,
@@ -2967,7 +2967,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_PURSUIT] =
     {
         .effect = EFFECT_PURSUIT,
-        .power = 40,
+        .power = 50,
         .type = TYPE_DARK,
         .accuracy = 100,
         .pp = 20,
@@ -4228,7 +4228,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_SHADOW_PUNCH] =
     {
         .effect = EFFECT_ALWAYS_HIT,
-        .power = 60,
+        .power = 65,
         .type = TYPE_GHOST,
         .accuracy = 0,
         .pp = 20,
@@ -4319,7 +4319,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_AERIAL_ACE] =
     {
         .effect = EFFECT_ALWAYS_HIT,
-        .power = 60,
+        .power = 65,
         .type = TYPE_FLYING,
         .accuracy = 0,
         .pp = 20,
@@ -4488,7 +4488,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_MAGICAL_LEAF] =
     {
         .effect = EFFECT_ALWAYS_HIT,
-        .power = 60,
+        .power = 65,
         .type = TYPE_GRASS,
         .accuracy = 0,
         .pp = 20,
@@ -4566,7 +4566,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
     [MOVE_SHOCK_WAVE] =
     {
         .effect = EFFECT_ALWAYS_HIT,
-        .power = 60,
+        .power = 65,
         .type = TYPE_ELECTRIC,
         .accuracy = 0,
         .pp = 20,

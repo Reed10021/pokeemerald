@@ -62,7 +62,7 @@ bool8 IsMirageIslandPresent(void)
             GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_MOLTRES)
         {
             // If the "winged mirages" are in the party, lower it from 0 - 65535 to 0 - 15 (16 bits -> 4 bits)
-            u8 rnd2 = rnd >> 4;
+            u8 rnd2 = rnd >> 12;
             if ((GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) & 0xF) == rnd2)
                 return TRUE;
         }

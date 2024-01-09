@@ -4011,7 +4011,9 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(TM44_REST)
                                         | TMHM(TM45_ATTRACT)
                                         | TMHM(TM46_THIEF)
-                                        | TMHM(HM05_FLASH)),
+                                        | TMHM(HM01_CUT)
+                                        | TMHM(HM05_FLASH)
+                                        | TMHM(HM06_ROCK_SMASH)),
 
     [SPECIES_LEDIAN]      = TMHM_LEARNSET(TMHM(TM01_FOCUS_PUNCH)
                                         | TMHM(TM06_TOXIC)
@@ -4035,7 +4037,10 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(TM44_REST)
                                         | TMHM(TM45_ATTRACT)
                                         | TMHM(TM46_THIEF)
-                                        | TMHM(HM05_FLASH)),
+                                        | TMHM(HM01_CUT)
+                                        | TMHM(HM02_FLY)
+                                        | TMHM(HM05_FLASH)
+                                        | TMHM(HM06_ROCK_SMASH)),
 
     [SPECIES_SPINARAK]    = TMHM_LEARNSET(TMHM(TM06_TOXIC)
                                         | TMHM(TM10_HIDDEN_POWER)
@@ -4611,7 +4616,8 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(HM01_CUT)
                                         | TMHM(HM05_FLASH)),
 
-    [SPECIES_SUNFLORA]    = TMHM_LEARNSET(TMHM(TM06_TOXIC)
+    [SPECIES_SUNFLORA]    = TMHM_LEARNSET(TMHM(TM04_CALM_MIND)
+                                        | TMHM(TM06_TOXIC)
                                         | TMHM(TM09_BULLET_SEED)
                                         | TMHM(TM10_HIDDEN_POWER)
                                         | TMHM(TM11_SUNNY_DAY)
@@ -4622,13 +4628,18 @@ const u32 gTMHMLearnsets[][2] =
                                         | TMHM(TM20_SAFEGUARD)
                                         | TMHM(TM21_FRUSTRATION)
                                         | TMHM(TM22_SOLARBEAM)
+                                        | TMHM(TM26_EARTHQUAKE)
                                         | TMHM(TM27_RETURN)
+                                        | TMHM(TM28_DIG)
                                         | TMHM(TM32_DOUBLE_TEAM)
+                                        | TMHM(TM35_FLAMETHROWER)
                                         | TMHM(TM36_SLUDGE_BOMB)
+                                        | TMHM(TM38_FIRE_BLAST)
                                         | TMHM(TM42_FACADE)
                                         | TMHM(TM43_SECRET_POWER)
                                         | TMHM(TM44_REST)
                                         | TMHM(TM45_ATTRACT)
+                                        | TMHM(TM50_OVERHEAT)
                                         | TMHM(HM01_CUT)
                                         | TMHM(HM05_FLASH)),
 
