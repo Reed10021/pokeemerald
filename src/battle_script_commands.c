@@ -5895,7 +5895,7 @@ static void Cmd_getmoneyreward(void)
             moneyReward += GetTrainerMoneyToGive(gTrainerBattleOpponent_B);
 
         AddMoney(&gSaveBlock1Ptr->money, moneyReward);
-        PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 6, moneyReward);
+        PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 7, moneyReward);
     }
     else
     {
@@ -5917,7 +5917,7 @@ static void Cmd_getmoneyreward(void)
         }
         money = sWhiteOutBadgeMoney[count] * sPartyLevel;
         RemoveMoney(&gSaveBlock1Ptr->money, money);
-        PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 6, money);
+        PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 7, money);
     }
 
     gBattlescriptCurrInstr++;
@@ -7668,7 +7668,7 @@ static void Cmd_givepaydaymoney(void)
         u32 bonusMoney = gPaydayMoney * gBattleStruct->moneyMultiplier;
         AddMoney(&gSaveBlock1Ptr->money, bonusMoney);
 
-        PREPARE_HWORD_NUMBER_BUFFER(gBattleTextBuff1, 5, bonusMoney)
+        PREPARE_WORD_NUMBER_BUFFER(gBattleTextBuff1, 7, bonusMoney)
 
         BattleScriptPush(gBattlescriptCurrInstr + 1);
         gBattlescriptCurrInstr = BattleScript_PrintPayDayMoneyString;
