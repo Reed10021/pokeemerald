@@ -2422,8 +2422,8 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             iv5 = (ivValue2 & 0x3E0) >> 5;
             iv6 = (ivValue2 & 0x7C00) >> 10;
 
-            if (iv1 > iv1Best && iv2 > iv2Best && iv3 > iv3Best &&
-                iv4 > iv4Best && iv5 > iv5Best && iv6 > iv6Best)
+            if (iv1 >= iv1Best && iv2 >= iv2Best && iv3 >= iv3Best &&
+                iv4 >= iv4Best && iv5 >= iv5Best && iv6 >= iv6Best)
             {
                 iv1Best = iv1;
                 iv2Best = iv2;
