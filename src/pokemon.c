@@ -2371,19 +2371,8 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
 
         u32 rolls = 1;
         u32 ivFlag = 0;
-        if (legendaryCheck == 1 || (trueChainCount >= 3 && VarGet(VAR_SPECIESCHAINED) == species)) {
-            rolls += adjustedChainCount + (adjustedChainCount / 4);
-            if (trueChainCount >= 200)
-                ivFlag = 5;
-            else if (trueChainCount >= 120 || legendaryCheck == 1)
-                ivFlag = 4;
-            else if (trueChainCount >= 60)
-                ivFlag = 3;
-            else if (trueChainCount >= 30)
-                ivFlag = 2;
-            else
-                ivFlag = 1;
-        } else if (eggChainCount >= 3 && GetBoxMonData(boxMon, MON_DATA_IS_EGG, NULL)) {
+        u32 initializedFlag = 0;
+        if (eggChainCount >= 3 && GetBoxMonData(boxMon, MON_DATA_IS_EGG, NULL)) {
             rolls += eggChainCount + (eggChainCount / 4);
             if (eggChainCount >= 200)
                 ivFlag = 5;
@@ -2392,6 +2381,19 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             else if (eggChainCount >= 60)
                 ivFlag = 3;
             else if (eggChainCount >= 30)
+                ivFlag = 2;
+            else
+                ivFlag = 1;
+        }
+        else if (legendaryCheck == 1 || (trueChainCount >= 3 && VarGet(VAR_SPECIESCHAINED) == species)) {
+            rolls += adjustedChainCount + (adjustedChainCount / 4);
+            if (trueChainCount >= 200)
+                ivFlag = 5;
+            else if (trueChainCount >= 120 || legendaryCheck == 1)
+                ivFlag = 4;
+            else if (trueChainCount >= 60)
+                ivFlag = 3;
+            else if (trueChainCount >= 30)
                 ivFlag = 2;
             else
                 ivFlag = 1;
@@ -2422,8 +2424,9 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             iv5 = (ivValue2 & 0x3E0) >> 5;
             iv6 = (ivValue2 & 0x7C00) >> 10;
 
-            if (iv1 >= iv1Best && iv2 >= iv2Best && iv3 >= iv3Best &&
-                iv4 >= iv4Best && iv5 >= iv5Best && iv6 >= iv6Best)
+            if ((iv1 >= iv1Best && iv2 >= iv2Best && iv3 >= iv3Best &&
+                 iv4 >= iv4Best && iv5 >= iv5Best && iv6 >= iv6Best) ||
+                initializedFlag == 0)
             {
                 iv1Best = iv1;
                 iv2Best = iv2;
@@ -2431,6 +2434,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
                 iv4Best = iv4;
                 iv5Best = iv5;
                 iv6Best = iv6;
+                initializedFlag = 1;
 
                 // Only do a check when we update best IVs.
                 if (ivFlag != 0) {

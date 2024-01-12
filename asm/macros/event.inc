@@ -1784,3 +1784,17 @@
 	setfieldeffectargument 2, \priority
 	dofieldeffect FLDEFF_SPARKLE
 	.endm
+
+	@ return current (posType = 0) or map (posType = 1) position of object to VAR_0x8007 (x), VAR_0x8008 (y)
+	.macro getobjectxy localId:req, posType:req
+	setvar VAR_0x8000, \localId
+	setvar VAR_0x8001, \posType
+	special GetObjectPosition
+	.endm
+
+	@ checks if there is any object at a given position
+	.macro checkobjectat x:req, y:req
+	setorcopyvar VAR_0x8005, \x
+	setorcopyvar VAR_0x8006, \y
+	specialvar VAR_RESULT, CheckObjectAtXY
+	.endm

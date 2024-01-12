@@ -1,4 +1,88 @@
 .set LOCALID_DAYCARE_LADY, 1
+.set LOCALID_DAYCARE_MAN, 3
+
+Route117_EventScript_DaycareMan_Movement::
+	goto_if_unset FLAG_PENDING_DAYCARE_EGG, Route117_EventScript_DaycareMan_Movement_MoveBack
+	getobjectxy LOCALID_DAYCARE_MAN, 0
+	compare VAR_0x8008, 6
+	goto_if_ge Route117_EventScript_DaycareMan_Movement_End
+	compare VAR_RESULT, FALSE
+	goto_if_eq Route117_EventScript_DaycareMan_Movement_OffMap
+	@ If Y is already >=6, dont move down (south).
+
+	checkobjectat 47, 5
+	compare VAR_RESULT, TRUE
+	goto_if_eq Route117_EventScript_DaycareMan_Movement_End
+	@ If an object is already at X = 47 Y = 5, dont move.
+	checkobjectat 47, 6
+	compare VAR_RESULT, TRUE
+	goto_if_eq Route117_EventScript_DaycareMan_Movement_MoveDownOne
+	@ If an object is already at X = 47 Y = 6, move only one.
+	applymovement LOCALID_DAYCARE_MAN, Route117_Movement_DaycareMan_WalkDownTwo
+	waitmovement LOCALID_DAYCARE_MAN
+	setobjectxyperm LOCALID_DAYCARE_MAN, 47, 6
+	goto Route117_EventScript_DaycareMan_Movement_End
+
+Route117_EventScript_DaycareMan_Movement_MoveDownOne:
+	applymovement LOCALID_DAYCARE_MAN, Route117_Movement_DaycareMan_WalkDownOne
+	waitmovement LOCALID_DAYCARE_MAN
+	setobjectxyperm LOCALID_DAYCARE_MAN, 47, 6
+
+Route117_EventScript_DaycareMan_Movement_OffMap:
+	setobjectxyperm LOCALID_DAYCARE_MAN, 47, 6
+	goto Route117_EventScript_DaycareMan_Movement_End
+
+Route117_EventScript_DaycareMan_Movement_MoveBack:
+	getobjectxy LOCALID_DAYCARE_MAN, 0
+	compare VAR_0x8008, 4
+	goto_if_le Route117_EventScript_DaycareMan_Movement_End
+	@ If Y is already <=4, dont move up (north).
+	compare VAR_RESULT, FALSE
+	goto_if_eq Route117_EventScript_DaycareMan_Movement_OffMap_MoveBack
+	getobjectxy LOCALID_DAYCARE_MAN, 0
+	compare VAR_0x8008, 5
+	goto_if_eq Route117_EventScript_DaycareMan_Movement_MoveBackOne
+	@ If Y is already ==5, dont move up (north).
+	checkobjectat 47, 4
+	compare VAR_RESULT, TRUE
+	goto_if_eq Route117_EventScript_DaycareMan_Movement_End
+	@ If an object is already at X = 47 Y = 4, dont move.
+	applymovement LOCALID_DAYCARE_MAN, Route117_Movement_DaycareMan_WalkUpTwo
+	waitmovement LOCALID_DAYCARE_MAN
+	setobjectxyperm LOCALID_DAYCARE_MAN, 47, 4
+	goto Route117_EventScript_DaycareMan_Movement_End
+
+Route117_EventScript_DaycareMan_Movement_MoveBackOne:
+	applymovement LOCALID_DAYCARE_MAN, Route117_Movement_DaycareMan_WalkUpOne
+	waitmovement LOCALID_DAYCARE_MAN
+	setobjectxyperm LOCALID_DAYCARE_MAN, 47, 4
+	goto Route117_EventScript_DaycareMan_Movement_End
+
+Route117_EventScript_DaycareMan_Movement_OffMap_MoveBack:
+	setobjectxyperm LOCALID_DAYCARE_MAN, 47, 4
+
+Route117_EventScript_DaycareMan_Movement_End:
+	return
+
+Route117_Movement_DaycareMan_WalkDownOne::
+	walk_down
+	step_end
+
+Route117_Movement_DaycareMan_WalkDownTwo::
+	walk_down
+	walk_down
+	step_end
+
+Route117_Movement_DaycareMan_WalkUpTwo::
+	walk_up
+	walk_up
+	walk_in_place_fastest_down
+	step_end
+
+Route117_Movement_DaycareMan_WalkUpOne::
+	walk_up
+	walk_in_place_fastest_down
+	step_end
 
 Route117_EventScript_DaycareMan:: @ 8291C18
 	lock
@@ -33,7 +117,7 @@ Route117_EventScript_DaycareEggWaiting:: @ 8291C4D
 	msgbox Route117_Text_IWillKeepDoYouWantIt, MSGBOX_YESNO
 	compare VAR_RESULT, YES
 	goto_if_eq Route117_EventScript_DaycareAcceptEgg
-	compare VAR_0x8006, 5
+	compare VAR_0x8009, 5
 	goto_if_ne NotShiny @ If equal, then prompt about special egg
 	msgbox Route117_Text_EggIsSpecialAreYouSure, MSGBOX_YESNO
 	compare VAR_RESULT, YES
@@ -50,6 +134,8 @@ NotShiny:
 	buffernumberstring 1, VAR_CHAIN
 	msgbox Route117_Text_NormalChainInfo, MSGBOX_DEFAULT
 NotChaining:
+	closemessage
+	call Route117_EventScript_DaycareMan_Movement
 	release
 	end
 
@@ -77,6 +163,8 @@ Route117_EventScript_DaycareReceiveEgg:: @ 8291C9D
 	buffernumberstring 1, VAR_CHAIN
 	msgbox Route117_Text_NormalChainInfo, MSGBOX_DEFAULT
 ZeroChaining:
+	closemessage
+	call Route117_EventScript_DaycareMan_Movement
 	release
 	end
 
@@ -388,8 +476,8 @@ Route117_Text_EggChainInfo:
 	.string "Chain count is {STR_VAR_1}.$"
 
 Route117_Text_NormalChainInfo:
-	.string "It also looks like you're chaining\n"
-	.string "wild {STR_VAR_1}. Your Chain Level\p"
+	.string "It looks like you're chaining\n"
+	.string "wild {STR_VAR_1}. Your Chain Level\l"
 	.string "for {STR_VAR_1} is {STR_VAR_2}.$"
 
 Route117_Text_FriendlyWithOtherTrainersMon: @ 82921E5
@@ -414,7 +502,7 @@ Route117_Text_IWillKeepDoYouWantIt: @ 82922C6
 
 Route117_Text_EggIsSpecialAreYouSure:
 	.string "I have a feeling this egg is special!\n"
-	.string "You really DO want this, right??$"
+	.string "You really DO want this, right??{PAUSE_UNTIL_PRESS}$"
 
 Route117_PokemonDayCare_Text_WouldYouLikeUsToRaiseAMon: @ 82922F4
 	.string "I'm the DAY-CARE LADY.\p"

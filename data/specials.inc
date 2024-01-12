@@ -541,3 +541,5 @@ gSpecials:: @ 81DBA64
 	def_special CheckShinyRoamer
 	def_special CelebiRandomEgg
 	def_special GetSpeciesFromRoamer
+	def_special GetObjectPosition
+	def_special CheckObjectAtXY

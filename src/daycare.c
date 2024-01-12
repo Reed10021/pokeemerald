@@ -23,6 +23,7 @@
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/region_map_sections.h"
+#include "constants/maps.h"
 #include "constants/species.h"
 
 // this file's functions
@@ -40,6 +41,8 @@ EWRAM_DATA static u16 sHatchedEggEggMoves[EGG_MOVES_ARRAY_COUNT] = {0};
 EWRAM_DATA static u16 sHatchedEggMotherMoves[MAX_MON_MOVES] = {0};
 
 #include "data/pokemon/egg_moves.h"
+
+extern const u8 Route117_EventScript_DaycareMan_Movement[];
 
 static const struct WindowTemplate sDaycareLevelMenuWindowTemplate =
 {
@@ -477,15 +480,18 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
         } while (natureTries <= 2400);
     }
     daycare->offspringPersonality = personality;
-
     FlagSet(FLAG_PENDING_DAYCARE_EGG);
+    if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(ROUTE117) &&
+        gSaveBlock1Ptr->location.mapNum == MAP_NUM(ROUTE117))
+        ScriptContext1_SetupScript(Route117_EventScript_DaycareMan_Movement);
 }
 
 static u32 RollEggChains(struct DayCare* daycare, u8 mode)
 {
-    u8 i = 0;
+    u32 i = 0;
     u32 personality;
     u32 eggChainCount = VarGet(VAR_EGG_CHAIN);
+    u32 randIncrease = Random() % 4;
     u32 rolls = 0; // We start rolls at 0. So a VAR_EGG_CHAIN of 24 = 24 additional rolls for shiny.
     {
         u16 eggChainParent1 = VarGet(VAR_EGG_CHAIN_PARENT_1);
@@ -496,13 +502,13 @@ static u32 RollEggChains(struct DayCare* daycare, u8 mode)
         {
             if (eggChainCount < 65535) // 65535 is the limit for u16, which is what the var is.
             {
-                eggChainCount++;
+                // Increase by random amount, 1 - 4
+                eggChainCount += randIncrease + 1;
+                if (eggChainCount > 65535)
+                    eggChainCount = 65535;
                 VarSet(VAR_EGG_CHAIN, eggChainCount);
             }
-            // Add 40 to the base shiny rate because this game is unforgivable. And slow.
-            // Compared to modern standards anyways.
-            eggChainCount += 40; // eggChainCount is u32, so we don't have to worry about overflow.
-
+            // eggChainCount is u32, so we don't have to worry about overflow.
             // Reward long chains that haven't broken
             if (eggChainCount >= 250)
                 eggChainCount += (eggChainCount * 4);
@@ -516,10 +522,14 @@ static u32 RollEggChains(struct DayCare* daycare, u8 mode)
                 eggChainCount += 40 + eggChainCount;
             else if (eggChainCount >= 10)
                 eggChainCount += eggChainCount;
+
+            // Add 40 to the base shiny rate because this game is unforgivable. And slow.
+            // Compared to modern standards anyways.
+            eggChainCount += 40; 
         }
         else {
             // Parents don't match species-wise, so reset the chain starting with this egg (0+1) and store the parents
-            eggChainCount = 1;
+            eggChainCount = randIncrease + 1;
             VarSet(VAR_EGG_CHAIN, eggChainCount);
             VarSet(VAR_EGG_CHAIN_PARENT_1, GetBoxMonData(&daycare->mons[0].mon, MON_DATA_SPECIES));
             VarSet(VAR_EGG_CHAIN_PARENT_2, GetBoxMonData(&daycare->mons[1].mon, MON_DATA_SPECIES));
@@ -602,10 +612,18 @@ static void RemoveIVIndexFromList(u8 *ivs, u8 selectedIv)
 static void InheritIVs(struct Pokemon *egg, struct DayCare *daycare)
 {
     u8 i;
-    u8 selectedIvs[INHERITED_IV_COUNT];
+    u8 selectedIvs[DESTINY_KNOT_INHERITED_IV_COUNT];
     u8 availableIVs[NUM_STATS];
-    u8 whichParents[INHERITED_IV_COUNT];
+    u8 whichParents[DESTINY_KNOT_INHERITED_IV_COUNT];
+    u8 inheritedIvCount = INHERITED_IV_COUNT;
     u8 iv;
+    u32 monItemOne = GetBoxMonData(&daycare->mons[0].mon, MON_DATA_HELD_ITEM);
+    u32 monItemTwo = GetBoxMonData(&daycare->mons[1].mon, MON_DATA_HELD_ITEM);
+
+    // If any of the parents hold a macho brace, emulate destiny knot behavior in later gens
+    if (monItemOne == ITEM_MACHO_BRACE || monItemTwo == ITEM_MACHO_BRACE) {
+        inheritedIvCount = DESTINY_KNOT_INHERITED_IV_COUNT;
+    }
 
     // Initialize a list of IV indices.
     for (i = 0; i < NUM_STATS; i++)
@@ -614,7 +632,7 @@ static void InheritIVs(struct Pokemon *egg, struct DayCare *daycare)
     }
 
     // Select the 3 IVs that will be inherited.
-    for (i = 0; i < INHERITED_IV_COUNT; i++)
+    for (i = 0; i < inheritedIvCount; i++)
     {
         // Randomly pick an IV from the available list and stop from being chosen again.
         // BUG: Instead of removing the IV that was just picked, this
@@ -630,13 +648,13 @@ static void InheritIVs(struct Pokemon *egg, struct DayCare *daycare)
     }
 
     // Determine which parent each of the selected IVs should inherit from.
-    for (i = 0; i < INHERITED_IV_COUNT; i++)
+    for (i = 0; i < inheritedIvCount; i++)
     {
         whichParents[i] = Random() % DAYCARE_MON_COUNT;
     }
 
     // Set each of inherited IVs on the egg mon.
-    for (i = 0; i < INHERITED_IV_COUNT; i++)
+    for (i = 0; i < inheritedIvCount; i++)
     {
         switch (selectedIvs[i])
         {
@@ -990,7 +1008,10 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
     }
 
     // Check if an egg should be produced
-    if (daycare->offspringPersonality == 0 && validEggs == DAYCARE_MON_COUNT && (daycare->mons[1].steps & 0xFF) == 0xFF)
+    if (!FlagGet(FLAG_PENDING_DAYCARE_EGG) && validEggs == DAYCARE_MON_COUNT &&
+        ((daycare->mons[1].steps & 0xFF) == 0x55 || 
+         (daycare->mons[1].steps & 0xFF) == 0xAA ||
+         (daycare->mons[1].steps & 0xFF) == 0xFF)) // 3 shots to make eggs (255 / 3 = 85)
     {
         u8 compatability = GetDaycareCompatibilityScore(daycare);
         if (compatability > (Random() * 100u) / USHRT_MAX)
@@ -1002,6 +1023,7 @@ static bool8 TryProduceOrHatchEgg(struct DayCare *daycare)
     {
         u32 eggCycles;
         u8 toSub = GetEggCyclesToSubtract();
+        daycare->stepCounter = 0;
 
         for (i = 0; i < gPlayerPartyCount; i++)
         {
@@ -1036,7 +1058,8 @@ bool8 ShouldEggHatch(void)
 
 static bool8 IsEggPending(struct DayCare *daycare)
 {
-    return (daycare->offspringPersonality != 0);
+    //return (daycare->offspringPersonality != 0);
+    return FlagGet(FLAG_PENDING_DAYCARE_EGG);
 }
 
 bool8 IsEggShiny(struct DayCare* daycare)
@@ -1127,9 +1150,9 @@ u8 GetDaycareState(void)
     if (IsEggPending(&gSaveBlock1Ptr->daycare))
     {
         if (IsEggShiny(&gSaveBlock1Ptr->daycare)) // Let player know the egg may be special
-            gSpecialVar_0x8006 = 5;
+            gSpecialVar_0x8009 = 5;
         else
-            gSpecialVar_0x8006 = 0;
+            gSpecialVar_0x8009 = 0;
         return DAYCARE_EGG_WAITING;
     }
 

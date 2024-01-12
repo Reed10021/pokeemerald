@@ -61,6 +61,7 @@ MauvilleCity_BikeShop_EventScript_ComeBackToSwitchBikes:: @ 820EC87
 	end
 
 MauvilleCity_BikeShop_EventScript_AskSwitchBikes:: @ 820EC94
+	goto_if_set FLAG_IS_CHAMPION, MauvilleCity_BikeShop_EventScript_GiveSecondBike
 	msgbox MauvilleCity_BikeShop_Text_WantToSwitchBikes, MSGBOX_YESNO
 	compare VAR_RESULT, YES
 	goto_if_eq MauvilleCity_BikeShop_EventScript_SwitchBikes
@@ -100,6 +101,33 @@ MauvilleCity_BikeShop_EventScript_SwitchMachForAcro:: @ 820ED10
 	removeitem ITEM_MACH_BIKE
 	giveitem ITEM_ACRO_BIKE
 	goto MauvilleCity_BikeShop_EventScript_ComeBackToSwitchBikes
+	end
+
+MauvilleCity_BikeShop_EventScript_GiveSecondBikeCalculation::
+	checkitem ITEM_ACRO_BIKE, 1
+	compare VAR_RESULT, FALSE
+	@ If result is false, we do not have the Acro bike. Jump to give acro bike and return.
+	goto_if_eq MauvilleCity_BikeShop_EventScript_GiveSecondBikeAcro
+	@ If result is true, then we can make the assumption that we do not have the Mach bike. Give mach bike and return.
+	giveitem ITEM_MACH_BIKE
+	return
+
+MauvilleCity_BikeShop_EventScript_GiveSecondBikeAcro:
+	giveitem ITEM_ACRO_BIKE
+	return
+
+MauvilleCity_BikeShop_EventScript_GiveSecondBike::
+	goto_if_set FLAG_GOT_BOTH_BIKES, MauvilleCity_BikeShop_EventScript_EndDialog
+	msgbox MauvilleCity_BikeShop_Text_SecondBike, MSGBOX_DEFAULT
+	call MauvilleCity_BikeShop_EventScript_GiveSecondBikeCalculation
+	setflag FLAG_GOT_BOTH_BIKES
+	msgbox MauvilleCity_BikeShop_Text_MayTheWind, MSGBOX_DEFAULT
+	release
+	end
+
+MauvilleCity_BikeShop_EventScript_EndDialog::
+	msgbox MauvilleCity_BikeShop_Text_HeyChampMayTheWind, MSGBOX_DEFAULT
+	release
 	end
 
 MauvilleCity_BikeShop_EventScript_Assistant:: @ 820ED31
@@ -260,6 +288,25 @@ MauvilleCity_BikeShop_Text_OhYourBikeIsInPC: @ 820F2F3
 	.string "and I'll be happy to exchange it!\p"
 	.string "May the wind always be at your back\n"
 	.string "on your adventure!$"
+
+MauvilleCity_BikeShop_Text_SecondBike:
+	.string "RYDEL: Oh, CHAMPION! It is you!\n"
+	.string "I've been waiting for you!\p"
+	.string "Many people have come to my shop saying\n"
+	.string "they saw you riding a Rydel's Bike.\p"
+	.string "They said they saw you here and there,\n"
+	.string "and they want to buy a Bike, too.\p"
+	.string "Thanks to you, my business is thriving!\p"
+	.string "As a token of my appreciation,\n"
+	.string "I'll give you another Bike!$"
+
+MauvilleCity_BikeShop_Text_MayTheWind: 
+	.string "RYDEL: May the wind always be\n"
+	.string "at your back on your adventures!$"
+
+MauvilleCity_BikeShop_Text_HeyChampMayTheWind: 
+	.string "RYDEL: Hey CHAMPION! May the wind always\n"
+	.string "be at your back on your adventures!$"
 
 MauvilleCity_BikeShop_Text_HandbooksAreInBack: @ 820F3C3
 	.string "I'm learning about BIKES while\n"
