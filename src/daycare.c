@@ -474,7 +474,7 @@ static void _TriggerPendingDaycareEgg(struct DayCare *daycare)
             {
                 personality = (Random2() << 16) | (Random());
                 if (isShiny)
-                    personality = ForceShiny(personality);
+                    personality = ForceShiny(personality, 0);
             }
             natureTries++;
         } while (natureTries <= 2400);
@@ -1092,13 +1092,20 @@ bool8 IsPersonalityShiny(u32 personality, u32 value)
     return shinyValue < SHINY_ODDS;
 }
 
-u32 ForceShiny(u32 personality)
+u32 ForceShiny(u32 personality, u32 value)
 {
-    u32 value = gSaveBlock2Ptr->playerTrainerId[0]
-        | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
-        | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
-        | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
-    personality = ((((Random() % SHINY_ODDS) ^ (HIHALF(value) ^ LOHALF(value))) ^ LOHALF(personality)) << 16) | LOHALF(personality);
+    if (value)
+    {
+        personality = ((((Random() % SHINY_ODDS) ^ (HIHALF(value) ^ LOHALF(value))) ^ LOHALF(personality)) << 16) | LOHALF(personality);
+    }
+    else
+    {
+        value = gSaveBlock2Ptr->playerTrainerId[0]
+            | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
+            | (gSaveBlock2Ptr->playerTrainerId[2] << 16)
+            | (gSaveBlock2Ptr->playerTrainerId[3] << 24);
+        personality = ((((Random() % SHINY_ODDS) ^ (HIHALF(value) ^ LOHALF(value))) ^ LOHALF(personality)) << 16) | LOHALF(personality);
+    }
     return personality;
 
     // Mathematical explaination of the above

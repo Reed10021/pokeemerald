@@ -25,7 +25,7 @@ void ShowDaycareLevelMenu(void);
 void ChooseSendDaycareMon(void);
 bool8 IsEggShiny(struct DayCare* daycare);
 bool8 IsPersonalityShiny(u32 personality, u32 value);
-u32 ForceShiny(u32 personality);
+u32 ForceShiny(u32 personality, u32 value);
 
 u8 GetEggMovesSpecies(u16 species, u16* eggMoves);
 

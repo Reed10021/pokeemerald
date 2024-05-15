@@ -2217,23 +2217,26 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
     else
         personality = Random32();
 
-    //SetBoxMonData(boxMon, MON_DATA_PERSONALITY, &personality);
-
     //Determine original trainer ID
     //if (otIdType == OT_ID_RANDOM_NO_SHINY) //Pokemon cannot be shiny (allegedly)
     //{
     //    value = (Random() << 0x10) | Random() % 65536;
 
-    //}
-    /*else*/ if (otIdType == OT_ID_PRESET) //Pokemon has a preset OT ID
+    //} else if
+
+    if (otIdType == OT_ID_PRESET) //Pokemon has a preset OT ID
     {
         value = fixedOtId;
     }
     else //Player is the OT
     {
         u32 i = 0;
-        if(otIdType == OT_ID_RANDOM_NO_SHINY)
+        if (otIdType == OT_ID_RANDOM_NO_SHINY)
+        {
             value = (Random() << 0x10) | Random();
+            trueChainCount = 110;
+            adjustedChainCount = trueChainCount + 290;
+        }
         else
             value = gSaveBlock2Ptr->playerTrainerId[0]
                   | (gSaveBlock2Ptr->playerTrainerId[1] << 8)
@@ -2313,7 +2316,7 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
                 u32 rolls = 0; // If we're chaining, we get rolls equal to chainCount. So a chainCount of 24 = 24 additional rolls for shiny.
                 // Hijack the chain system to make legendary pokemon have a higher shiny chance. In a non-randomizer you only get these once, so make it easier to reset.
 
-                if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1)
+                if (VarGet(VAR_SPECIESCHAINED) != species && legendaryCheck != 1 && otIdType != OT_ID_RANDOM_NO_SHINY)
                     rolls = adjustedChainCount / 2; // If this is a pokemon we're not chaining, we get rolls equal to chainCount divided by 2. So a chainCount of 20 = 10 additional rolls for shiny.
                 do
                 {
@@ -2323,6 +2326,15 @@ void CreateBoxMon(struct BoxPokemon *boxMon, u16 species, u8 level, u8 fixedIV, 
             }
         }
     }
+
+    if (otIdType == OT_ID_RANDOM_NO_SHINY)
+    {
+        if (IsPersonalityShiny(personality, value))
+        {
+            personality = ForceShiny(fixedPersonality, value);
+        }
+    }
+
     SetBoxMonData(boxMon, MON_DATA_PERSONALITY, &personality);
     SetBoxMonData(boxMon, MON_DATA_OT_ID, &value);
 
@@ -2607,7 +2619,7 @@ void CreateMonWithNature(struct Pokemon *mon, u16 species, u8 level, u8 fixedIV,
     {
         personality = Random32();
         if (shinyFlag)
-            personality = ForceShiny(personality);
+            personality = ForceShiny(personality, 0);
     }
 
     CreateMon(mon, species, level, fixedIV, 1, personality, OT_ID_PLAYER_ID, 0);
@@ -2711,7 +2723,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
         {
             personality = Random32();
             if (shinyFlag)
-                personality = ForceShiny(personality);
+                personality = ForceShiny(personality, 0);
             actualLetter = ((((personality & 0x3000000) >> 18) | ((personality & 0x30000) >> 12) | ((personality & 0x300) >> 6) | (personality & 0x3)) % 28);
         }
     }
@@ -2722,7 +2734,7 @@ void CreateMonWithGenderNatureLetter(struct Pokemon *mon, u16 species, u8 level,
         {
             personality = Random32();
             if (shinyFlag)
-                personality = ForceShiny(personality);
+                personality = ForceShiny(personality, 0);
         }
     }
 
