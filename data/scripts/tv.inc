@@ -7,6 +7,9 @@ EventScript_TV:: @ 827EE0B
 	goto_if_eq EventScript_PlayersHouseMovie
 	compare VAR_RESULT, 1
 	goto_if_eq EventScript_PlayersHouseLatiNewsFlash
+	compare VAR_TEMP_B, 5
+	goto_if_ne EventScript_DoShowActiveOutbreak
+EventScript_DoShowActiveOutbreak_Ret:
 	goto_if_unset FLAG_SYS_TV_START, EventScript_MomDadMightLikeThis1
 	goto_if_set FLAG_SYS_TV_WATCH, EventScript_MomDadMightLikeThis1
 	specialvar VAR_RESULT, IsTVShowInSearchOfTrainersAiring
@@ -49,6 +52,15 @@ EventScript_PlayersHouseLatiNewsFlash:: @ 827EEA4
 	clearflag FLAG_SYS_TV_LATIAS_LATIOS
 	setflag FLAG_LATIOS_OR_LATIAS_ROAMING
 	special TurnOffTVScreen
+	releaseall
+	end
+
+EventScript_DoShowActiveOutbreak::
+	setvar VAR_TEMP_B, 5
+	special GetOutbreakMon
+	compare VAR_RESULT, FALSE
+	goto_if_eq EventScript_DoShowActiveOutbreak_Ret
+	msgbox gTVMassOutbreakText00, MSGBOX_DEFAULT
 	releaseall
 	end
 

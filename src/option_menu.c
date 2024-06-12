@@ -623,7 +623,7 @@ static void ButtonMode_DrawChoices(u8 selection)
     DrawOptionMenuChoice(gText_ButtonTypeLEqualsA, GetStringRightAlignXOffset(1, gText_ButtonTypeLEqualsA, 198), YPOS_BUTTONMODE, styles[2]);
 }
 
-const u8 sText_Version[] = _("VERSION 1.2.3");
+const u8 sText_Version[] = _("VERSION 1.2.4");
 
 static void DrawTextOption(void)
 {
@@ -633,7 +633,7 @@ static void DrawTextOption(void)
     CopyWindowToVram(WIN_TEXT_OPTION, 3);
 }
 
-static void DrawOptionMenuTexts(void)   
+static void DrawOptionMenuTexts(void)
 {
     u8 i;
 

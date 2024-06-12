@@ -503,7 +503,7 @@ static bool8 DoMassOutbreakEncounterTest(void)
     if (chainCount >= 3 && gSaveBlock1Ptr->outbreakPokemonSpecies == VarGet(VAR_SPECIESCHAINED)) //If we're chaining.
         rerollCount += chainCount / 2;
 
-    if (gSaveBlock1Ptr->outbreakPokemonSpecies != 0
+    if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE
      && gSaveBlock1Ptr->location.mapNum == gSaveBlock1Ptr->outbreakLocationMapNum
      && gSaveBlock1Ptr->location.mapGroup == gSaveBlock1Ptr->outbreakLocationMapGroup)
     {

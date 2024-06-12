@@ -9,7 +9,9 @@
 #include "pokenav.h"
 #include "region_map.h"
 #include "strings.h"
+#include "tv.h"
 #include "constants/region_map_sections.h"
+#include "constants/maps.h"
 #include "constants/trainers.h"
 
 
@@ -953,12 +955,32 @@ void MatchCall_GetMessage(u32 idx, u8 *dest)
         return;
     if (idx == MC_HEADER_MOM)
     {
+
+        s8 temp = FindExistingOutbreak(gSaveBlock1Ptr->tvShows);
+        if (temp != -1 && gSaveBlock1Ptr->outbreakPokemonSpecies == SPECIES_NONE) {
+            gSpecialVar_0x8004 = temp;
+            TVShowDone();
+            StartMassOutbreak();
+        }
+
         if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE) {
-            GetMapName(gStringVar1, gSaveBlock1Ptr->outbreakLocationMapNum, 0);
-            StringCopy(gStringVar2, gSpeciesNames[gSaveBlock1Ptr->outbreakPokemonSpecies]);
-            ConvertIntToDecimalStringN(gStringVar3, gSaveBlock1Ptr->outbreakDaysLeft, STR_CONV_MODE_LEFT_ALIGN, 1);
-            StringExpandPlaceholders(dest, MatchCall_Text_Mom_Outbreak);
-            return;
+            if (gSpecialVar_0x8004 == temp || (VarGet(VAR_TEMP_A) != 5)) {
+                u16 waterGreenPathCorrection = gSaveBlock1Ptr->outbreakLocationMapNum;
+
+                if (gSaveBlock1Ptr->outbreakLocationMapNum == MAP_GREEN_PATH)
+                    waterGreenPathCorrection = MAPSEC_GREEN_PATH;
+                else if (gSaveBlock1Ptr->outbreakLocationMapNum == MAP_WATER_PATH)
+                    waterGreenPathCorrection = MAPSEC_WATER_PATH;
+                GetMapName(gStringVar1, waterGreenPathCorrection, 0);
+                StringCopy(gStringVar2, gSpeciesNames[gSaveBlock1Ptr->outbreakPokemonSpecies]);
+                ConvertIntToDecimalStringN(gStringVar3, gSaveBlock1Ptr->outbreakDaysLeft, STR_CONV_MODE_LEFT_ALIGN, 1);
+                StringExpandPlaceholders(dest, MatchCall_Text_Mom_Outbreak);
+                VarSet(VAR_TEMP_A, 5);
+                return;
+            }
+            if (VarGet(VAR_TEMP_A) == 5) {
+                VarSet(VAR_TEMP_A, 0);
+            }
         }
     }
     matchCall = sMatchCallHeaders[idx];

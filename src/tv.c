@@ -92,7 +92,6 @@ bool8 HasMixableShowAlreadyBeenSpawnedWithPlayerID(u8 kind, bool8 flag);
 void tv_store_id_3x(TVShow *show);
 void DeleteTVShowInArrayByIdx(TVShow *shows, u8 idx);
 s8 FindEmptyTVSlotWithinFirstFiveShowsOfArray(TVShow *shows);
-s8 FindExistingOutbreakWithinFirstFiveShowsOfArray(TVShow* shows);
 void FindActiveBroadcastByShowType_SetScriptResult(u8 kind);
 static void InterviewBefore_BravoTrainerPkmnProfile(void);
 static void InterviewBefore_NameRater(void);
@@ -121,7 +120,6 @@ static void sub_80F0EEC(void);
 static s8 sub_80F0ECC(PokeNews *pokeNews, u8 idx);
 static void sub_80F0E58(PokeNews *dest[], PokeNews *src[]);
 static bool8 sub_80F0E84(PokeNews *dest, PokeNews *src, s8 slot);
-void TVShowDone(void);
 static void InterviewAfter_FanClubLetter(void);
 static void InterviewAfter_RecentHappenings(void);
 static void InterviewAfter_PkmnFanClubOpinions(void);
@@ -2092,6 +2090,8 @@ void PutNameRaterShowOnTheAir(void)
 void StartMassOutbreak(void)
 {
     TVShow *show;
+    u16 oldOutbreak = VarGet(VAR_YESTERDAYS_OUTBREAK);
+    u16 oldOldOutbreak = VarGet(VAR_TWO_DAYS_AGO_OUTBREAK);
 
     show = &gSaveBlock1Ptr->tvShows[gSpecialVar_0x8004];
     gSaveBlock1Ptr->outbreakPokemonSpecies = show->massOutbreak.species;
@@ -2107,6 +2107,11 @@ void StartMassOutbreak(void)
     gSaveBlock1Ptr->outbreakUnk4 = show->massOutbreak.var03;
     gSaveBlock1Ptr->outbreakPokemonProbability = show->massOutbreak.probability;
     gSaveBlock1Ptr->outbreakDaysLeft = 1; // Days for the outbreak to last
+
+    // Only when the outbreak starts do we move the old outbreaks around and include this one in the outbreak history.
+    VarSet(VAR_THREE_DAYS_AGO_OUTBREAK, oldOldOutbreak);
+    VarSet(VAR_TWO_DAYS_AGO_OUTBREAK, oldOutbreak);
+    VarSet(VAR_YESTERDAYS_OUTBREAK, show->massOutbreak.species);
 }
 
 void PutLilycoveContestLadyShowOnTheAir(void)
@@ -2215,8 +2220,10 @@ static void sub_80ED718(void)
         //        return;
         //    }
         //}
+
         // Don't overwrite existing outbreak. Probably what the above code was meant to do, but they botched it.
-        existingOutbreak = FindExistingOutbreakWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);
+        // The function of this is to not generate an outbreak if we've 1. already generated one, or 2. received an outbreak from record mixing.
+        existingOutbreak = FindExistingOutbreak(gSaveBlock1Ptr->tvShows);
         // If we found an existing active outbreak show or if the saveblock outbreakSpecies is not SPECIES_NONE (active outbreak) don't create an outbreak.
         if (existingOutbreak != -1)
         {
@@ -2234,32 +2241,35 @@ static void sub_80ED718(void)
                 return;
         }
 
-        for (i = FLAG_BADGE01_GET, nBadges = 0; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
-        {
-            if (FlagGet(i))
-            {
-                nBadges++;
-            }
-        }
+        // Old code to generate an outbreak with different chances depending on badge count.
+        // It is now commented out to more closely match my FR/LG outbreaks (one always every day).
 
-        switch (nBadges)
-        {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                if (rbernoulli(3, 20)) // FFFF * (firstnum) / (secondnum) >= Random()
-                    return;
-                break;
-            default:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-                // generate an outbreak every day.
-                break;
-        }
+        //for (i = FLAG_BADGE01_GET, nBadges = 0; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
+        //{
+        //    if (FlagGet(i))
+        //    {
+        //        nBadges++;
+        //    }
+        //}
+
+        //switch (nBadges)
+        //{
+        //    case 0:
+        //    case 1:
+        //    case 2:
+        //    case 3:
+        //        if (rbernoulli(3, 20)) // FFFF * (firstnum) / (secondnum) >= Random()
+        //            return;
+        //        break;
+        //    default:
+        //    case 4:
+        //    case 5:
+        //    case 6:
+        //    case 7:
+        //    case 8:
+        //        // generate an outbreak every day.
+        //        break;
+        //}
 
         // We didn't return, so generate news.
         {
@@ -2273,9 +2283,6 @@ static void sub_80ED718(void)
                     sPokeOutbreakSpeciesList[outbreakIdx].species == oldOldOutbreak ||
                     sPokeOutbreakSpeciesList[outbreakIdx].species == oldOldOldOutbreak);
 
-                VarSet(VAR_THREE_DAYS_AGO_OUTBREAK, oldOldOutbreak);
-                VarSet(VAR_TWO_DAYS_AGO_OUTBREAK, oldOutbreak);
-                VarSet(VAR_YESTERDAYS_OUTBREAK, sPokeOutbreakSpeciesList[outbreakIdx].species);
                 show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
                 show->massOutbreak.kind = TVSHOW_MASS_OUTBREAK;
                 show->massOutbreak.active = TRUE;
@@ -3198,9 +3205,6 @@ static void sub_80EED88(void)
                 case 0:
                 case 1:
                 case 2:
-                    if (rbernoulli(2, 35))
-                        return;
-                    break;
                 case 3:
                 case 4:
                 case 5:
@@ -3825,7 +3829,7 @@ static void sub_80EFA88(void)
 
 s8 FindEmptyTVSlotWithinFirstFiveShowsOfArray(TVShow *shows)
 {
-    s8 i;
+    u8 i;
 
     // Because the game persists show kind forever and never resets it to Off Air,
     // you are only ever allowed 5 shows in the first 5 slots. If the game tries
@@ -3859,11 +3863,11 @@ s8 FindEmptyTVSlotWithinFirstFiveShowsOfArray(TVShow *shows)
     return -1;
 }
 
-s8 FindExistingOutbreakWithinFirstFiveShowsOfArray(TVShow* shows)
+s8 FindExistingOutbreak(TVShow* shows)
 {
     u8 i;
 
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < LAST_TVSHOW_IDX; i++)
     {
         if (shows[i].common.kind == TVSHOW_MASS_OUTBREAK && shows[i].common.active == TRUE)
         {

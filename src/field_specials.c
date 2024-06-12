@@ -55,6 +55,7 @@
 #include "constants/heal_locations.h"
 #include "constants/map_types.h"
 #include "constants/maps.h"
+#include "constants/region_map_sections.h"
 #include "constants/mevent.h"
 #include "constants/tv.h"
 #include "constants/script_menu.h"
@@ -4486,7 +4487,13 @@ bool16 TryChangeDeoxysForm(void)
 void GetOutbreakMon(void)
 {
     if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE) {
-        GetMapName(gStringVar1, gSaveBlock1Ptr->outbreakLocationMapNum, 0);
+        u16 waterGreenPathCorrection = gSaveBlock1Ptr->outbreakLocationMapNum;
+
+        if (gSaveBlock1Ptr->outbreakLocationMapNum == MAP_GREEN_PATH)
+            waterGreenPathCorrection = MAPSEC_GREEN_PATH;
+        else if (gSaveBlock1Ptr->outbreakLocationMapNum == MAP_WATER_PATH)
+            waterGreenPathCorrection = MAPSEC_WATER_PATH;
+        GetMapName(gStringVar1, waterGreenPathCorrection, 0);
         StringCopy(gStringVar2, gSpeciesNames[gSaveBlock1Ptr->outbreakPokemonSpecies]);
         ConvertIntToDecimalStringN(gStringVar3, gSaveBlock1Ptr->outbreakDaysLeft, STR_CONV_MODE_LEFT_ALIGN, 1);
         gSpecialVar_Result = TRUE;
