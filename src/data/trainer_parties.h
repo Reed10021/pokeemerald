@@ -3276,7 +3276,7 @@ static const struct TrainerMonItemCustomMoves sParty_Phoebe[] = {
     .iv = 250,
     .lvl = 50,
     .species = SPECIES_SABLEYE,
-    .heldItem = ITEM_NONE,
+    .heldItem = ITEM_LEFTOVERS,
     .moves = {MOVE_CONFUSE_RAY, MOVE_DOUBLE_TEAM, MOVE_PAIN_SPLIT, MOVE_FAINT_ATTACK}
     },
     {
@@ -3359,7 +3359,7 @@ static const struct TrainerMonItemCustomMoves sParty_Drake[] = {
     .iv = 250,
     .lvl = 54,
     .species = SPECIES_DRAGONITE,
-    .heldItem = ITEM_NONE,
+    .heldItem = ITEM_LEFTOVERS,
     .moves = {MOVE_FLAMETHROWER, MOVE_THUNDER_WAVE, MOVE_AEROBLAST, MOVE_DRAGON_DANCE}
     },
     {
@@ -3523,6 +3523,13 @@ static const struct TrainerMonItemCustomMoves sParty_Norman1[] = {
     .species = SPECIES_LINOONE,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_SLASH, MOVE_BELLY_DRUM, MOVE_FACADE, MOVE_IRON_TAIL}
+    },
+    {
+    .iv = 220,
+    .lvl = 29,
+    .species = SPECIES_URSARING,
+    .heldItem = ITEM_SITRUS_BERRY,
+    .moves = {MOVE_THRASH, MOVE_BELLY_DRUM, MOVE_FACADE, MOVE_EARTHQUAKE}
     },
     {
     .iv = 255,
@@ -4445,33 +4452,33 @@ static const struct TrainerMonItemCustomMoves sParty_Wallace[] = {
     .iv = 255,
     .lvl = 57,
     .species = SPECIES_WAILORD,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_BRIGHT_POWDER,
     .moves = {MOVE_RAIN_DANCE, MOVE_WATER_SPOUT, MOVE_DOUBLE_EDGE, MOVE_BLIZZARD}
     },
     {
     .iv = 255,
     .lvl = 56,
     .species = SPECIES_TENTACRUEL,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_KINGS_ROCK,
     .moves = {MOVE_TOXIC, MOVE_HYDRO_PUMP, MOVE_SLUDGE_BOMB, MOVE_ICE_BEAM}
     },
     {
     .iv = 255,
     .lvl = 56,
     .species = SPECIES_LUDICOLO,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_LEFTOVERS,
     .moves = {MOVE_GIGA_DRAIN, MOVE_SURF, MOVE_LEECH_SEED, MOVE_DOUBLE_TEAM}
     },
     {
     .iv = 255,
     .lvl = 56,
     .species = SPECIES_WHISCASH,
-    .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_EARTHQUAKE, MOVE_SURF, MOVE_AMNESIA, MOVE_HYPER_BEAM}
+    .heldItem = ITEM_CHOICE_BAND,
+    .moves = {MOVE_EARTHQUAKE, MOVE_SURF, MOVE_PSYCHIC, MOVE_HYPER_BEAM}
     },
     {
     .iv = 255,
-    .lvl = 56,
+    .lvl = 57,
     .species = SPECIES_GYARADOS,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_DRAGON_DANCE, MOVE_EARTHQUAKE, MOVE_HYPER_BEAM, MOVE_SURF}
@@ -4480,7 +4487,7 @@ static const struct TrainerMonItemCustomMoves sParty_Wallace[] = {
     .iv = 255,
     .lvl = 58,
     .species = SPECIES_MILOTIC,
-    .heldItem = ITEM_SITRUS_BERRY,
+    .heldItem = ITEM_LEFTOVERS,
     .moves = {MOVE_RECOVER, MOVE_SURF, MOVE_ICE_BEAM, MOVE_TOXIC}
     }
 };
