@@ -12,6 +12,7 @@ RustboroCity_MapScripts:: @ 81E06BD
 
 RustboroCity_OnTransition: @ 81E06C8
 	setflag FLAG_VISITED_RUSTBORO_CITY
+	setflag FLAG_SYS_TV_START @ Originally from Mauville
 	call Common_EventScript_SetupRivalGfxId
 	compare VAR_RUSTBORO_CITY_STATE, 6
 	call_if_eq RustboroCity_EventScript_HideMapNamePopup

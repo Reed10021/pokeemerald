@@ -1990,6 +1990,11 @@ u8 ScaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 t
     s16 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting it back to u8.
     currentMon += 1; // starts at zero, so increment to 1 for proper calcs
 
+    // Don't scale the first battle of the game; the player doesn't have pokeballs.
+    if (trainerNum == TRAINER_BRENDAN_ROUTE_103_MUDKIP || trainerNum == TRAINER_BRENDAN_ROUTE_103_TREECKO || trainerNum == TRAINER_BRENDAN_ROUTE_103_TORCHIC ||
+        trainerNum == TRAINER_MAY_ROUTE_103_MUDKIP || trainerNum == TRAINER_MAY_ROUTE_103_TREECKO || trainerNum == TRAINER_MAY_ROUTE_103_TORCHIC)
+        return pokeBaseLevel;
+
     // If the party composition is stronger pokemon with weaker pokemon, adjust avgLevel to compensate
     if (maxMonLevel - minMonLevel >= 25)
         avgLevel += (((maxMonLevel - minMonLevel) * 100) / (playerMonCount * 100));

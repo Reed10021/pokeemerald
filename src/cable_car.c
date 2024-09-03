@@ -887,10 +887,11 @@ static void CreateCableCarSprites(void)
     }
 
     // 1/64 chance for an NPC to appear hiking on the ground below the Cable Car
-    if ((rval % 64) == 0)
+    if ((rval % 16) == 0)
     {
+        u16 rval2 = Random();
         // Unclear if this was intentional, but the - 1 in the below ARRAY_COUNT means the Zigzagoon is never used
-        spriteId = AddPseudoObjectEvent(hikerGraphicsIds[rval % (ARRAY_COUNT(hikerGraphicsIds) - 1)], hikerCallbacks[GOING_DOWN], hikerCoords[GOING_DOWN][0], hikerCoords[GOING_DOWN][1], 106);
+        spriteId = AddPseudoObjectEvent(hikerGraphicsIds[rval2 % (ARRAY_COUNT(hikerGraphicsIds))], hikerCallbacks[GOING_DOWN], hikerCoords[GOING_DOWN][0], hikerCoords[GOING_DOWN][1], 106);
         if (spriteId != MAX_SPRITES)
         {
             gSprites[spriteId].oam.priority = 2;
@@ -900,7 +901,7 @@ static void CreateCableCarSprites(void)
             // Randomly choose which direction the NPC is going
             if (!GOING_DOWN)
             {
-                if (rval % 2)
+                if (rval2 % 2)
                 {
                     // Do walking west anim
                     StartSpriteAnim(&gSprites[spriteId], 6);
@@ -916,7 +917,7 @@ static void CreateCableCarSprites(void)
             }
             else
             {
-                if (rval % 2)
+                if (rval2 % 2)
                 {
                     // Do walking east anim
                     StartSpriteAnim(&gSprites[spriteId], 7);
@@ -930,7 +931,7 @@ static void CreateCableCarSprites(void)
                     gSprites[spriteId].sSameDir = FALSE;
                 }
             }
-            gSprites[spriteId].sDelay = hikerMovementDelayTable[rval % ARRAY_COUNT(hikerMovementDelayTable)];
+            gSprites[spriteId].sDelay = hikerMovementDelayTable[rval2 % ARRAY_COUNT(hikerMovementDelayTable)];
         }
     }
 }

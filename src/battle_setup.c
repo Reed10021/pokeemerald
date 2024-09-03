@@ -1909,7 +1909,8 @@ static bool8 WasSecondRematchWon(const struct RematchTrainer *table, u16 firstBa
     return TRUE;
 }
 
-static bool32 HasAtLeastFiveBadges(void)
+//static bool32 HasAtLeastFiveBadges(void)
+static bool32 HasAtLeastOneBadge(void)
 {
     s32 i, count;
 
@@ -1917,7 +1918,7 @@ static bool32 HasAtLeastFiveBadges(void)
     {
         if (FlagGet(sBadgeFlags[i]) == TRUE)
         {
-            if (++count >= 3) //5
+            if (++count >= 1) //5
                 return TRUE;
         }
     }
@@ -1929,7 +1930,7 @@ static bool32 HasAtLeastFiveBadges(void)
 
 void IncrementRematchStepCounter(void)
 {
-    if (HasAtLeastFiveBadges())
+    if (HasAtLeastOneBadge())
     {
         if (gSaveBlock1Ptr->trainerRematchStepCounter >= STEP_COUNTER_MAX)
             gSaveBlock1Ptr->trainerRematchStepCounter = STEP_COUNTER_MAX;
@@ -1940,7 +1941,7 @@ void IncrementRematchStepCounter(void)
 
 static bool32 IsRematchStepCounterMaxed(void)
 {
-    if (HasAtLeastFiveBadges() && gSaveBlock1Ptr->trainerRematchStepCounter >= STEP_COUNTER_MAX)
+    if (HasAtLeastOneBadge() && gSaveBlock1Ptr->trainerRematchStepCounter >= STEP_COUNTER_MAX)
         return TRUE;
     else
         return FALSE;

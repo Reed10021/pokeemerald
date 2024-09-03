@@ -1789,6 +1789,9 @@ u8 TypeCalc(u16 move, u8 attacker, u8 defender)
 
             else if (TYPE_EFFECT_ATK_TYPE(i) == moveType)
             {
+                // Part one of the Dual Non-Immunity Glitch.
+                // Because these flags are used, have data in them, and are returned from this function
+                // but are not stored in a variable anywhere, the data regarding type immunities is lost.
                 // check type1
                 if (TYPE_EFFECT_DEF_TYPE(i) == gBattleMons[defender].type1)
                     ModulateDmgByType2(TYPE_EFFECT_MULTIPLIER(i), move, &flags);

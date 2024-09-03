@@ -1516,6 +1516,12 @@ static void Cmd_if_type_effectiveness(void)
     gBattleMoveDamage = AI_EFFECTIVENESS_x1;
     gCurrentMove = AI_THINKING_STRUCT->moveConsidered;
 
+    // Part two of the Dual Non-Immunity Glitch.
+    // TypeCalc is called into and returns result flags regarding type immunities.
+    // Originally, these flags are not saved in any variable and thus weren't used
+    // in the calculations below.
+    // This is fixed here, since gMoveResultFlags is now storing the flags.
+
     gMoveResultFlags = TypeCalc(gCurrentMove, sBattler_AI, gBattlerTarget);
 
     if (gBattleMoveDamage == 120) // Super effective STAB.
@@ -1529,6 +1535,7 @@ static void Cmd_if_type_effectiveness(void)
 
     if (gMoveResultFlags & MOVE_RESULT_DOESNT_AFFECT_FOE)
         gBattleMoveDamage = AI_EFFECTIVENESS_x0;
+    // Added MOVE_RESULT_MISSED flag here since it can be returned by TypeCalc regarding Wonder Guard.
     if (gMoveResultFlags & MOVE_RESULT_MISSED)
         gBattleMoveDamage = AI_EFFECTIVENESS_x0;
 

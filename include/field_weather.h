@@ -4,6 +4,8 @@
 #include "sprite.h"
 #include "constants/field_weather.h"
 
+#define NUM_WEATHER_COLOR_MAPS 19
+
 struct Weather
 {
     union
@@ -24,8 +26,11 @@ struct Weather
             struct Sprite *sandstormSprites2[NUM_SWIRL_SANDSTORM_SPRITES];
         } s2;
     } sprites;
-    u8 gammaShifts[19][32];
-    u8 altGammaShifts[19][32];
+//    gammaShifts = darkenedContrastColorMaps
+//    altGammaShifts = contrastColorMaps
+
+//    u8 gammaShifts[NUM_WEATHER_COLOR_MAPS][32];
+//    u8 altGammaShifts[NUM_WEATHER_COLOR_MAPS][32];
     s8 gammaIndex;
     s8 gammaTargetIndex;
     u8 gammaStepDelay;

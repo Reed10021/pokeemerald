@@ -10,7 +10,7 @@ MauvilleCity_OnTransition: @ 81DF38B
 	setflag FLAG_VISITED_MAUVILLE_CITY
 	clearflag FLAG_FORCE_MIRAGE_TOWER_VISIBLE
 	clearflag FLAG_HIDE_SLATEPORT_MUSEUM_POPULATION
-	setflag FLAG_SYS_TV_START
+@	setflag FLAG_SYS_TV_START @ Moved to Rustboro
 	clearflag FLAG_MAUVILLE_GYM_BARRIERS_STATE
 	setvar VAR_MAUVILLE_GYM_STATE, 0
 	call_if_set FLAG_GOT_TM24_FROM_WATTSON, MauvilleCity_EventScript_MoveWattsonBackToGym
