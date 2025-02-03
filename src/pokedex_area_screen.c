@@ -14,6 +14,7 @@
 #include "roamer.h"
 #include "sound.h"
 #include "string_util.h"
+#include "time_events.h"
 #include "trig.h"
 #include "pokedex_area_region_map.h"
 #include "wild_encounter.h"
@@ -80,7 +81,7 @@ static void BuildAreaGlowTilemap(void);
 static void SetAreaHasMon(u16, u16);
 static void SetSpecialMapHasMon(u16, u16);
 static u16 GetRegionMapSectionId(u8, u8);
-static bool8 MapHasMon(const struct WildPokemonHeader *, u16);
+static u32 MapHasMon(const struct WildPokemonHeader *, u16);
 static bool8 MonListHasMon(const struct WildPokemonInfo *, u16, u16);
 static void DoAreaGlow(void);
 static void Task_ShowPokedexAreaScreen(u8);
@@ -93,8 +94,6 @@ static void DestroyAreaMarkerSprites(void);
 
 static const u32 sAreaGlow_Pal[] = INCBIN_U32("graphics/pokedex/area_glow.gbapal");
 static const u32 sAreaGlow_Gfx[] = INCBIN_U32("graphics/pokedex/area_glow.4bpp.lz");
-
-static const u16 sSpeciesHiddenFromAreaScreen[] = { SPECIES_WYNAUT };
 
 static const u16 sMovingRegionMapSections[3] =
 {
@@ -334,6 +333,7 @@ static bool8 DrawAreaGlow(void)
 static void FindMapsWithMon(u16 species)
 {
     u16 i;
+    u32 mapHasMon = 0;
     struct Roamer *roamer;
 
     sPokedexAreaScreen->unk6E2 = 0;
@@ -342,15 +342,10 @@ static void FindMapsWithMon(u16 species)
         sPokedexAreaScreen->unk6E4 = 0;
 
     roamer = &gSaveBlock1Ptr->roamer;
-    if (species != roamer->species)
+
     {
         sPokedexAreaScreen->numOverworldAreas = 0;
         sPokedexAreaScreen->numSpecialAreas = 0;
-        for (i = 0; i < ARRAY_COUNT(sSpeciesHiddenFromAreaScreen); i++)
-        {
-            if (sSpeciesHiddenFromAreaScreen[i] == species)
-                return;
-        }
 
         for (i = 0; sFeebasData[i][0] != NUM_SPECIES; i++)
         {
@@ -371,8 +366,17 @@ static void FindMapsWithMon(u16 species)
 
         for (i = 0; gWildMonHeaders[i].mapGroup != 0xFF; i++)
         {
-            if (MapHasMon(&gWildMonHeaders[i], species))
+            mapHasMon = MapHasMon(&gWildMonHeaders[i], species);
+            if (mapHasMon != 0)
             {
+                if(gWildMonHeaders[i].mapNum == MAP_NUM(ROUTE130) && gWildMonHeaders[i].mapGroup == MAP_GROUP(ROUTE130)) 
+                {
+                    if (mapHasMon == 0x01 && !IsMirageIslandPresent()) 
+                    {
+                        continue;
+                    }
+                }
+
                 switch (gWildMonHeaders[i].mapGroup)
                 {
                     case MAP_GROUP_OVERWORLD_MONS:
@@ -385,19 +389,18 @@ static void FindMapsWithMon(u16 species)
                 }
             }
         }
-    }
-    else
-    {
-        sPokedexAreaScreen->numSpecialAreas = 0;
-        if (roamer->active)
+
+        if (species == roamer->species)
         {
-            GetRoamerLocation(&sPokedexAreaScreen->overworldAreasWithMons[0].mapGroup, &sPokedexAreaScreen->overworldAreasWithMons[0].mapNum);
-            sPokedexAreaScreen->overworldAreasWithMons[0].regionMapSectionId = Overworld_GetMapHeaderByGroupAndId(sPokedexAreaScreen->overworldAreasWithMons[0].mapGroup, sPokedexAreaScreen->overworldAreasWithMons[0].mapNum)->regionMapSectionId;
-            sPokedexAreaScreen->numOverworldAreas = 1;
-        }
-        else
-        {
-            sPokedexAreaScreen->numOverworldAreas = 0;
+            if (roamer->active)
+            {
+                if (sPokedexAreaScreen->numOverworldAreas < 0x40)
+                {
+                    GetRoamerLocation(&sPokedexAreaScreen->overworldAreasWithMons[sPokedexAreaScreen->numOverworldAreas].mapGroup, &sPokedexAreaScreen->overworldAreasWithMons[sPokedexAreaScreen->numOverworldAreas].mapNum);
+                    sPokedexAreaScreen->overworldAreasWithMons[sPokedexAreaScreen->numOverworldAreas].regionMapSectionId = Overworld_GetMapHeaderByGroupAndId(sPokedexAreaScreen->overworldAreasWithMons[sPokedexAreaScreen->numOverworldAreas].mapGroup, sPokedexAreaScreen->overworldAreasWithMons[sPokedexAreaScreen->numOverworldAreas].mapNum)->regionMapSectionId;
+                    sPokedexAreaScreen->numOverworldAreas++;
+                }
+            }
         }
     }
 }
@@ -454,7 +457,7 @@ static u16 GetRegionMapSectionId(u8 mapGroup, u8 mapNum)
     return Overworld_GetMapHeaderByGroupAndId(mapGroup, mapNum)->regionMapSectionId;
 }
 
-static bool8 MapHasMon(const struct WildPokemonHeader *info, u16 species)
+static u32 MapHasMon(const struct WildPokemonHeader *info, u16 species)
 {
     // If this is a header for Altering Cave, skip it if it's not the current Altering Cave encounter set
     //if (GetRegionMapSectionId(info->mapGroup, info->mapNum) == MAPSEC_ALTERING_CAVE)
@@ -465,20 +468,20 @@ static bool8 MapHasMon(const struct WildPokemonHeader *info, u16 species)
     //}
 
     if (MonListHasMon(info->landMonsInfo, species, 12))
-        return TRUE;
+        return 0x01;
     if (MonListHasMon(info->waterMonsInfo, species, 5))
-        return TRUE;
+        return 0x02;
     // When searching the fishing encounters, this incorrectly uses the size of the land encounters.
     // As a result it's reading out of bounds of the fishing encounters tables.
     if (MonListHasMon(info->fishingMonsInfo, species, 10))
-        return TRUE;
+        return 0x04;
     if (MonListHasMon(info->rockSmashMonsInfo, species, 5))
-        return TRUE;
+        return 0x08;
     // If active outbreak
     if (gSaveBlock1Ptr->outbreakLocationMapNum == info->mapNum && 
         gSaveBlock1Ptr->outbreakLocationMapGroup == info->mapGroup && 
         gSaveBlock1Ptr->outbreakPokemonSpecies == species)
-        return TRUE;
+        return 0x10;
     return FALSE;
 }
 

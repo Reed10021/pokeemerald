@@ -1274,7 +1274,7 @@ static void SpriteCB_Ball_Wobble_Step(struct Sprite *sprite)
         break;
     case BALL_WAIT_NEXT_SHAKE:
     default:
-        if (++sprite->sTimer == 16) //31
+        if (++sprite->sTimer == 10) //31 //16
         {
             sprite->sTimer = 0;
             RESET_STATE(sprite->sState);
@@ -1301,7 +1301,7 @@ static void SpriteCB_Ball_Wobble_Step(struct Sprite *sprite)
 
 static void SpriteCB_Ball_Release(struct Sprite *sprite)
 {
-    if (++sprite->sTimer == 16) //31
+    if (++sprite->sTimer == 6) //31 // 16
     {
         sprite->data[5] = 0;
         sprite->callback = SpriteCB_Ball_Release_Step;
@@ -1450,7 +1450,7 @@ static void MakeCaptureStars(struct Sprite *sprite, u8 mode)
                 gSprites[spriteId].sTargetY = sprite->pos1.y + sCaptureStars[i].yOffset;
                 gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
                 InitAnimArcTranslation(&gSprites[spriteId]);
-                gSprites[spriteId].callback = SpriteCB_CaptureStar_Flicker;
+                gSprites[spriteId].callback = SpriteCB_CaptureStar_NoFlicker;
                 StartSpriteAnim(&gSprites[spriteId], sBallParticleAnimNums[BALL_MASTER]);
             }
         }
@@ -1458,7 +1458,7 @@ static void MakeCaptureStars(struct Sprite *sprite, u8 mode)
             u8 spriteId = CreateSprite(&sBallParticleSpriteTemplates[4], GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X), GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y) - 16, subpriority);
             if (spriteId != MAX_SPRITES)
             {
-                gSprites[spriteId].sDuration = 32;
+                gSprites[spriteId].sDuration = 40; //32
                 gSprites[spriteId].sTargetX = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X) + sCaptureStars[i].xOffset;
                 gSprites[spriteId].sTargetY = (GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y) - 16) + sCaptureStars[i].yOffset;
                 gSprites[spriteId].sAmplitude = sCaptureStars[i].amplitude;
