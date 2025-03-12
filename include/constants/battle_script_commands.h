@@ -30,6 +30,9 @@
 #define sMULTIPLAYER_ID gBattleScripting + 0x25
 #define sSPECIAL_TRAINER_BATTLE_TYPE gBattleScripting + 0x26
 
+#define sMON_CAUGHT                  (gBattleScripting + 0x27) // monCaught
+#define sEXP_ON_CATCH                (gBattleScripting + 0x28) // expOnCatch
+
 #define cEFFECT_CHOOSER gBattleCommunication + 3
 #define cMULTISTRING_CHOOSER gBattleCommunication + 5
 

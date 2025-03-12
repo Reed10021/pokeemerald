@@ -40,31 +40,42 @@ void UpdateMirageRnd(u16 days)
     SetMirageRnd(rnd);
 }
 
-bool8 IsMirageIslandPresent(void)
+bool32 IsMirageIslandPresent(void)
 {
-    u16 rnd = GetMirageRnd() >> 16;
+    u32 rnd = GetMirageRnd() >> 16;
+    u32 rnd2 = rnd;
+    u32 species = 0;
+    struct Pokemon* curMon;
     int i;
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) && (GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) & 0xFFFF) == rnd)
-            return TRUE;
-        else if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_WYNAUT || GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_WOBBUFFET)
-        {
-            // If Wynaut or Wobbuffet are in the party, lower it from 0 - 65535 to 0 - 255 (16 bits -> 8 bits)
-            u8 rnd2 = rnd >> 8;
-            if ((GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) & 0xFF) == rnd2)
-                return TRUE;
+        curMon = &gPlayerParty[i];
+        if (!curMon->box.hasSpecies)
+            break;
 
-        }
-        else if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_ARTICUNO ||
-            GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_ZAPDOS ||
-            GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) == SPECIES_MOLTRES)
+        //if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) && (GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) & 0xFFFF) == rnd)
+        //    return TRUE;
+        if ((curMon->box.personality & 0xFFFF) == rnd)
+            return TRUE;
+        else
         {
-            // If the "winged mirages" are in the party, lower it from 0 - 65535 to 0 - 15 (16 bits -> 4 bits)
-            u8 rnd2 = rnd >> 12;
-            if ((GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) & 0xF) == rnd2)
-                return TRUE;
+            species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+
+            if (species == SPECIES_WYNAUT || species == SPECIES_WOBBUFFET)
+            {
+                // If Wynaut or Wobbuffet are in the party, lower it from 0 - 65535 to 0 - 255 (16 bits -> 8 bits)
+                rnd2 = rnd >> 8;
+                if ((curMon->box.personality & 0xFF) == rnd2)
+                    return TRUE;
+            }
+            else if (species == SPECIES_ARTICUNO || species == SPECIES_ZAPDOS || species == SPECIES_MOLTRES)
+            {
+                // If the "winged mirages" are in the party, lower it from 0 - 65535 to 0 - 15 (16 bits -> 4 bits)
+                rnd2 = rnd >> 12;
+                if ((curMon->box.personality & 0xF) == rnd2)
+                    return TRUE;
+            }
         }
     }
 
