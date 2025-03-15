@@ -1239,7 +1239,7 @@ static void Phase2Task_Kyogre(u8 taskId)
     while (sPhase2_Kyogre_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
 }
 
-static void sub_814669C(struct Task *task)
+static void sub_814669C(struct Task *task) //InitPatternWeaveTransition(struct Task *task)
 {
     s32 i;
 
@@ -1256,6 +1256,7 @@ static void sub_814669C(struct Task *task)
     sTransitionStructPtr->WIN0V = 160;
     sTransitionStructPtr->BLDCNT = 0x3F41;
     sTransitionStructPtr->BLDALPHA = (task->tData1 << 8) | (task->tData2);
+    UpdateShadowColor(0x3DEF);
 
     for (i = 0; i < 160; i++)
     {
@@ -3601,6 +3602,8 @@ static void VBlankCB_Phase2_Shards(void)
 #define tData5      data[5]
 #define tData6      data[6]
 #define tData7      data[7]
+#define tBldCntSaved           data[8]
+#define tShadowColor           data[9]
 
 static void CreatePhase1Task(s16 a0, s16 a1, s16 a2, s16 a3, s16 a4)
 {
@@ -3626,33 +3629,52 @@ void TransitionPhase1_Task_RunFuncs(u8 taskId)
     while (sPhase1_TransitionAll_Funcs[gTasks[taskId].tState](&gTasks[taskId]));
 }
 
-static bool8 Phase1_TransitionAll_Func1(struct Task *task)
+static bool8 Phase1_TransitionAll_Func1(struct Task *task) //TransitionIntro_FadeToGray(struct Task *task)
 {
+    u8 paletteNum = IndexOfSpritePaletteTag(TAG_WEATHER_START);
+    u16 index = OBJ_PLTT_ID(paletteNum) + 9;
+
     if (task->tData6 == 0 || --task->tData6 == 0)
     {
         task->tData6 = task->tData1;
         task->tData7 += task->tData4;
         if (task->tData7 > 16)
             task->tData7 = 16;
+        if (paletteNum < 16)
+            task->tShadowColor = gPlttBufferFaded[index];
         BlendPalettes(-1, task->tData7, 0x2D6B);
+        if (paletteNum < 16)
+            gPlttBufferFaded[index] = task->tShadowColor;
     }
     if (task->tData7 > 15)
     {
+        task->tBldCntSaved = GetGpuReg(REG_OFFSET_BLDCNT);
+        SetGpuReg(REG_OFFSET_BLDCNT, task->tBldCntSaved & ~BLDCNT_TGT2_BG_ALL);
+        if (paletteNum < 16)
+            gPlttBufferFaded[index] = RGB(11, 11, 11);
+
         task->tState++;
         task->tData6 = task->tData2;
     }
     return FALSE;
 }
 
-static bool8 Phase1_TransitionAll_Func2(struct Task *task)
+static bool8 Phase1_TransitionAll_Func2(struct Task *task) //TransitionIntro_FadeFromGray(struct Task *task)
 {
     if (task->tData6 == 0 || --task->tData6 == 0)
     {
+        u8 paletteNum = IndexOfSpritePaletteTag(TAG_WEATHER_START);
         task->tData6 = task->tData2;
         task->tData7 -= task->tData5;
         if (task->tData7 < 0)
             task->tData7 = 0;
         BlendPalettes(-1, task->tData7, 0x2D6B);
+        SetGpuReg(REG_OFFSET_BLDCNT, task->tBldCntSaved);
+        if (paletteNum < 16)
+        {
+            u16 index = OBJ_PLTT_ID(paletteNum) + 9;
+            gPlttBufferFaded[index] = task->tShadowColor;
+        }
     }
     if (task->tData7 == 0)
     {
@@ -3907,6 +3929,7 @@ static bool8 Phase2_FrontierLogoWave_Func1(struct Task *task)
     LZ77UnCompVram(sFrontierLogo_Tileset, tileset);
     LoadPalette(sFrontierLogo_Palette, 0xF0, 0x20);
     sTransitionStructPtr->field_16 = 0;
+    UpdateShadowColor(0x3DEF);
 
     task->tState++;
     return FALSE;

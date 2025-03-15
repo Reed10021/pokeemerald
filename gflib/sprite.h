@@ -3,6 +3,10 @@
 
 #define MAX_SPRITES 64
 #define SPRITE_INVALID_TAG 0xFFFF
+// sprite.h -> from HGSS Pokedex
+// Since this is an older repository version, we'll need to import these to make some things easier.
+#define SPRITE_NONE 0xFF
+#define TAG_NONE 0xFFFF
 
 struct SpriteSheet
 {
@@ -319,5 +323,6 @@ void CopyFromSprites(u8 *dest);
 u8 SpriteTileAllocBitmapOp(u16 bit, u8 op);
 void ClearSpriteCopyRequests(void);
 void ResetAffineAnimData(void);
+u16 LoadSpriteSheetByTemplate(const struct SpriteTemplate* template, u8 frame);
 
 #endif //GUARD_SPRITE_H

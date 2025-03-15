@@ -14,6 +14,19 @@
 #define PALETTE_FADE_STATUS_DONE 0
 #define PALETTE_FADE_STATUS_LOADING 0xFF
 
+// palette.h -> from HGSS Pokedex
+// Since this is an older repository version, we'll need to import these to make some things easier.
+#define PALETTES_BG      0x0000FFFF
+#define PALETTES_OBJECTS 0xFFFF0000
+#define PALETTES_ALL     (PALETTES_BG | PALETTES_OBJECTS)
+
+#define PLTT_ID(n) ((n) * 16)
+#define BG_PLTT_OFFSET 0x000
+#define OBJ_PLTT_OFFSET 0x100
+#define BG_PLTT_ID(n) (BG_PLTT_OFFSET + PLTT_ID(n))
+#define OBJ_PLTT_ID(n) (OBJ_PLTT_OFFSET + PLTT_ID(n))
+#define OBJ_PLTT_ID2(n) (PLTT_ID((n) + 16))
+
 enum
 {
     FAST_FADE_IN_FROM_WHITE,
@@ -22,9 +35,19 @@ enum
     FAST_FADE_OUT_TO_BLACK,
 };
 
+struct BlendSettings
+{
+    u32 blendColor : 24;
+    u32 isTint : 1;
+    u32 coeff : 5;
+};
+
 struct PaletteFadeControl
 {
     u32 multipurpose1;
+    struct BlendSettings* bld0;
+    struct BlendSettings* bld1;
+    u16 weight : 9;
     u8 delayCounter:6;
     u16 y:5; // blend coefficient
     u16 targetY:5; // target blend coefficient
@@ -42,6 +65,7 @@ struct PaletteFadeControl
     u8 deltaY:4; // rate of change of blend coefficient
 };
 
+extern const struct BlendSettings gTimeOfDayBlend[];
 extern struct PaletteFadeControl gPaletteFade;
 extern u32 gPlttBufferTransferPending;
 extern u8 gPaletteDecompressionBuffer[];
@@ -50,6 +74,7 @@ extern u16 gPlttBufferFaded[];
 
 void LoadCompressedPalette(const u32 *, u16, u16);
 void LoadPalette(const void *, u16, u16);
+void LoadPaletteFast(const void* src, u16 offset, u16 size);
 void FillPalette(u16, u16, u16);
 void TransferPlttBuffer(void);
 u8 UpdatePaletteFade(void);
@@ -75,5 +100,9 @@ void TintPalette_GrayScale(u16 *palette, u16 count);
 void TintPalette_GrayScale2(u16 *palette, u16 count);
 void TintPalette_SepiaTone(u16 *palette, u16 count);
 void TintPalette_CustomTone(u16 *palette, u16 count, u16 rTone, u16 gTone, u16 bTone);
+bool8 BeginTimeOfDayPaletteFade(u32 selectedPalettes, s8 delay, u8 startY, u8 targetY, struct BlendSettings* bld0, struct BlendSettings* bld1, u16 weight, u16 color);
+void BlendPalettesFine(u32 palettes, u16* src, u16* dst, u32 coeff, u32 color);
+void TimeMixPalettes(u32 palettes, u16* src, u16* dst, struct BlendSettings* blend0, struct BlendSettings* blend1, u16 weight0);
+void AvgPaletteWeighted(u16* src0, u16* src1, u16* dst, u16 weight0);
 
 #endif // GUARD_PALETTE_H

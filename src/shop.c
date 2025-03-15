@@ -40,6 +40,8 @@
 #include "constants/songs.h"
 #include "constants/tv.h"
 
+#define TAG_ITEM_ICON_BASE 9110
+
 EWRAM_DATA struct MartInfo gMartInfo = {0};
 EWRAM_DATA struct ShopData *gShopDataPtr = NULL;
 EWRAM_DATA struct ListMenuItem *gUnknown_02039F74 = NULL;
@@ -624,7 +626,7 @@ static void BuyMenuAddItemIcon(u16 item, u8 iconSlot)
 
     if (gMartInfo.martType == MART_TYPE_NORMAL || item == 0xFFFF)
     {
-        spriteId = AddItemIconSprite(iconSlot + 2110, iconSlot + 2110, item);
+        spriteId = AddItemIconSprite(iconSlot + TAG_ITEM_ICON_BASE, iconSlot + TAG_ITEM_ICON_BASE, item);
         if (spriteId != MAX_SPRITES)
         {
             *spriteIdPtr = spriteId;
@@ -634,7 +636,7 @@ static void BuyMenuAddItemIcon(u16 item, u8 iconSlot)
     }
     else
     {
-        spriteId = AddDecorationIconObject(item, 20, 84, 1, iconSlot + 2110, iconSlot + 2110);
+        spriteId = AddDecorationIconObject(item, 20, 84, 1, iconSlot + TAG_ITEM_ICON_BASE, iconSlot + TAG_ITEM_ICON_BASE);
         if (spriteId != MAX_SPRITES)
             *spriteIdPtr = spriteId;
     }
@@ -646,8 +648,8 @@ static void BuyMenuRemoveItemIcon(u16 item, u8 iconSlot)
     if (*spriteIdPtr == 0xFF)
         return;
 
-    FreeSpriteTilesByTag(iconSlot + 2110);
-    FreeSpritePaletteByTag(iconSlot + 2110);
+    FreeSpriteTilesByTag(iconSlot + TAG_ITEM_ICON_BASE);
+    FreeSpritePaletteByTag(iconSlot + TAG_ITEM_ICON_BASE);
     DestroySprite(&gSprites[*spriteIdPtr]);
     *spriteIdPtr = 0xFF;
 }
@@ -843,6 +845,10 @@ static void BuyMenuDrawObjectEvents(void)
     u8 spriteId;
     const struct ObjectEventGraphicsInfo *graphicsInfo;
 
+    u8 weatherTemp = gWeatherPtr->palProcessingState;
+    if (weatherTemp == WEATHER_PAL_STATE_SCREEN_FADING_OUT)
+        gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_IDLE;
+
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         if (gShopDataPtr->viewportObjects[i][OBJ_EVENT_ID] == OBJECT_EVENTS_COUNT)
@@ -865,6 +871,8 @@ static void BuyMenuDrawObjectEvents(void)
 
         StartSpriteAnim(&gSprites[spriteId], gShopDataPtr->viewportObjects[i][ANIM_NUM]);
     }
+    gWeatherPtr->palProcessingState = weatherTemp;
+    CpuFastCopy(gPlttBufferFaded + PLTT_ID(16), gPlttBufferUnfaded + PLTT_ID(16), PLTT_BUFFER_SIZE);
 }
 
 static bool8 BuyMenuCheckIfObjectEventOverlapsMenuBg(s16 *object)

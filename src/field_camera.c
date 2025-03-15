@@ -32,7 +32,7 @@ static void RedrawMapSliceWest(struct FieldCameraOffset *cameraOffset, const str
 static s32 MapPosToBgTilemapOffset(struct FieldCameraOffset *a, s32 x, s32 y);
 static void DrawWholeMapViewInternal(int x, int y, const struct MapLayout *mapLayout);
 static void DrawMetatileAt(const struct MapLayout *mapLayout, u16, int, int);
-static void DrawMetatile(s32 a, u16 *b, u16 c);
+static void DrawMetatile(s32, const u16*, u16);
 static void CameraPanningCB_PanAhead(void);
 
 // IWRAM bss vars
@@ -230,7 +230,7 @@ void DrawDoorMetatileAt(int x, int y, u16 *arr)
 static void DrawMetatileAt(const struct MapLayout *mapLayout, u16 offset, int x, int y)
 {
     u16 metatileId = MapGridGetMetatileIdAt(x, y);
-    u16 *metatiles;
+    const u16* metatiles;
 
     if (metatileId > NUM_METATILES_TOTAL)
         metatileId = 0;
@@ -244,7 +244,7 @@ static void DrawMetatileAt(const struct MapLayout *mapLayout, u16 offset, int x,
     DrawMetatile(MapGridGetMetatileLayerTypeAt(x, y), metatiles + metatileId * 8, offset);
 }
 
-static void DrawMetatile(s32 metatileLayerType, u16 *metatiles, u16 offset)
+static void DrawMetatile(s32 metatileLayerType, const u16* metatiles, u16 offset)
 {
     switch (metatileLayerType)
     {

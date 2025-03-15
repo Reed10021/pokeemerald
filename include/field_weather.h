@@ -4,6 +4,22 @@
 #include "sprite.h"
 #include "constants/field_weather.h"
 
+#define TAG_WEATHER_START 0x1200
+enum {
+    GFXTAG_CLOUD = TAG_WEATHER_START,
+    GFXTAG_FOG_H,
+    GFXTAG_ASH,
+    GFXTAG_FOG_D,
+    GFXTAG_SANDSTORM,
+    GFXTAG_BUBBLE,
+    GFXTAG_RAIN,
+};
+enum {
+    PALTAG_WEATHER = TAG_WEATHER_START,
+    PALTAG_WEATHER_2
+};
+
+
 #define NUM_WEATHER_COLOR_MAPS 19
 
 struct Weather
@@ -35,7 +51,8 @@ struct Weather
     s8 gammaTargetIndex;
     u8 gammaStepDelay;
     u8 gammaStepFrameCounter;
-    u16 fadeDestColor;
+    u16 fadeDestColor : 15;
+    u16 noShadows : 1;
     /*0x6C6*/ u8 palProcessingState;
     /*0x6C7*/ u8 fadeScreenCounter;
     /*0x6C8*/ bool8 readyForInit;
@@ -135,8 +152,8 @@ void sub_80ABC48(s8 gammaIndex);
 void sub_80ABC7C(u8 gammaIndex, u8 gammaTargetIndex, u8 gammaStepDelay);
 void FadeScreen(u8 mode, s8 delay);
 bool8 IsWeatherNotFadingIn(void);
-void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex);
-void ApplyWeatherGammaShiftToPal(u8 paletteIndex);
+void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex, bool8 allowFog);
+void ApplyWeatherGammaShiftToPal(u8 paletteIndex, u8 numPalettes);
 u8 sub_80ABF20(void);
 void LoadCustomWeatherSpritePalette(const u16 *palette);
 void ResetDroughtWeatherPaletteLoading(void);
@@ -208,6 +225,7 @@ void Bubbles_InitVars(void);
 void Bubbles_Main(void);
 void Bubbles_InitAll(void);
 bool8 Bubbles_Finish(void);
+u8 UpdateShadowColor(u16 color);
 
 u8 GetSav1Weather(void);
 void SetSav1Weather(u32 weather);

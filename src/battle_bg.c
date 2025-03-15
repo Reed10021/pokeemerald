@@ -853,7 +853,12 @@ void DrawMainBattleBackground(void)
     {
         LZDecompressVram(gBattleTerrainTiles_Rayquaza, (void*)(BG_CHAR_ADDR(2)));
         LZDecompressVram(gBattleTerrainTilemap_Rayquaza, (void*)(BG_SCREEN_ADDR(26)));
-        LoadCompressedPalette(gBattleTerrainPalette_Rayquaza, 0x20, 0x60);
+        UpdateTimeOfDay();
+        if (gTimeOfDay == TIME_OF_DAY_NIGHT)
+            LoadCompressedPalette(gBattleTerrainPalette_Rayquaza_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+        else if (gTimeOfDay == TIME_OF_DAY_DAY)
+            LoadCompressedPalette(gBattleTerrainPalette_Rayquaza, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+
     }
     else
     {
@@ -880,9 +885,46 @@ void DrawMainBattleBackground(void)
         {
         default:
         case MAP_BATTLE_SCENE_NORMAL:
+            UpdateTimeOfDay();
             LZDecompressVram(gBattleTerrainTable[gBattleTerrain].tileset, (void*)(BG_CHAR_ADDR(2)));
             LZDecompressVram(gBattleTerrainTable[gBattleTerrain].tilemap, (void*)(BG_SCREEN_ADDR(26)));
-            LoadCompressedPalette(gBattleTerrainTable[gBattleTerrain].palette, 0x20, 0x60);
+            if (gTimeOfDay == TIME_OF_DAY_NIGHT)
+            {
+                switch (gBattleTerrain) 
+                {
+                    case BATTLE_TERRAIN_GRASS:
+                        LoadCompressedPalette(gBattleTerrainPalette_TallGrass_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        break;
+                    case BATTLE_TERRAIN_LONG_GRASS:
+                        LoadCompressedPalette(gBattleTerrainPalette_LongGrass_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        break;
+                    case BATTLE_TERRAIN_WATER:
+                        LoadCompressedPalette(gBattleTerrainPalette_Water_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        break;
+                    case BATTLE_TERRAIN_PLAIN:
+                        LoadCompressedPalette(gBattleTerrainPalette_Plain_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        break;
+                    case BATTLE_TERRAIN_MOUNTAIN:
+                        LoadCompressedPalette(gBattleTerrainPalette_Rock_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        break;
+                    case BATTLE_TERRAIN_SAND:
+                        LoadCompressedPalette(gBattleTerrainPalette_Sand_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        break;
+                    case BATTLE_TERRAIN_POND:
+                        if(gMapHeader.mapType == MAP_TYPE_UNDERGROUND)
+                            LoadCompressedPalette(gBattleTerrainPalette_PondWater_Cave, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        else
+                            LoadCompressedPalette(gBattleTerrainPalette_PondWater_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        break;
+                    default:
+                        LoadCompressedPalette(gBattleTerrainTable[gBattleTerrain].palette, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                        break;
+                }
+            }
+            else if (gMapHeader.mapType == MAP_TYPE_UNDERGROUND && gBattleTerrain == BATTLE_TERRAIN_POND)
+                LoadCompressedPalette(gBattleTerrainPalette_PondWater_Cave, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+            else
+                LoadCompressedPalette(gBattleTerrainTable[gBattleTerrain].palette, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
             break;
         case MAP_BATTLE_SCENE_GYM:
             LZDecompressVram(gBattleTerrainTiles_Building, (void*)(BG_CHAR_ADDR(2)));
@@ -1322,7 +1364,44 @@ bool8 LoadChosenBattleElement(u8 caseId)
             {
             default:
             case MAP_BATTLE_SCENE_NORMAL:
-                LZDecompressVram(gBattleTerrainTable[gBattleTerrain].tileset, (void*)(BG_CHAR_ADDR(2)));
+                UpdateTimeOfDay();
+                if (gTimeOfDay == TIME_OF_DAY_NIGHT)
+                {
+                    switch (gBattleTerrain)
+                    {
+                        case BATTLE_TERRAIN_GRASS:
+                            LoadCompressedPalette(gBattleTerrainPalette_TallGrass_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            break;
+                        case BATTLE_TERRAIN_LONG_GRASS:
+                            LoadCompressedPalette(gBattleTerrainPalette_LongGrass_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            break;
+                        case BATTLE_TERRAIN_WATER:
+                            LoadCompressedPalette(gBattleTerrainPalette_Water_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            break;
+                        case BATTLE_TERRAIN_PLAIN:
+                            LoadCompressedPalette(gBattleTerrainPalette_Plain_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            break;
+                        case BATTLE_TERRAIN_MOUNTAIN:
+                            LoadCompressedPalette(gBattleTerrainPalette_Rock_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            break;
+                        case BATTLE_TERRAIN_SAND:
+                            LoadCompressedPalette(gBattleTerrainPalette_Sand_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            break;
+                        case BATTLE_TERRAIN_POND:
+                            if (gMapHeader.mapType == MAP_TYPE_UNDERGROUND)
+                                LoadCompressedPalette(gBattleTerrainPalette_PondWater_Cave, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            else
+                                LoadCompressedPalette(gBattleTerrainPalette_PondWater_Night, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            break;
+                        default:
+                            LoadCompressedPalette(gBattleTerrainTable[gBattleTerrain].palette, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                            break;
+                    }
+                }
+                else if (gMapHeader.mapType == MAP_TYPE_UNDERGROUND && gBattleTerrain == BATTLE_TERRAIN_POND)
+                    LoadCompressedPalette(gBattleTerrainPalette_PondWater_Cave, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
+                else
+                    LoadCompressedPalette(gBattleTerrainTable[gBattleTerrain].palette, BG_PLTT_ID(2), 3 * PLTT_SIZE_4BPP);
                 break;
             case MAP_BATTLE_SCENE_GYM:
                 LZDecompressVram(gBattleTerrainTiles_Building, (void*)(BG_CHAR_ADDR(2)));

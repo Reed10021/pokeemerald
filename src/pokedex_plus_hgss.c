@@ -144,17 +144,6 @@ static const u8 sText_TenDashes2[] = _("----------");
 // Defines I don't have that this file needs
 // m4a_internal.h
 #define TRACKS_ALL 0xFFFF
-// palette.h
-#define PALETTES_BG      0x0000FFFF
-#define PALETTES_OBJECTS 0xFFFF0000
-#define PALETTES_ALL     (PALETTES_BG | PALETTES_OBJECTS)
-
-#define PLTT_ID(n) ((n) * 16)
-#define BG_PLTT_OFFSET 0x000
-#define OBJ_PLTT_OFFSET 0x100
-#define BG_PLTT_ID(n) (BG_PLTT_OFFSET + PLTT_ID(n))
-#define OBJ_PLTT_ID(n) (OBJ_PLTT_OFFSET + PLTT_ID(n))
-#define OBJ_PLTT_ID2(n) (PLTT_ID((n) + 16))
 // window.h
 #define COPYWIN_GFX 2
 #define COPYWIN_FULL 3
@@ -165,13 +154,6 @@ static const u8 sText_TenDashes2[] = _("----------");
 #define TEXT_SKIP_DRAW 0xFF
 #define FONT_NORMAL 1
 #define FONT_NARROW 7
-// include/gba/defines.h
-#define PLTT_SIZEOF(n) ((n) * sizeof(u16))
-#define PLTT_SIZE_4BPP PLTT_SIZEOF(16)
-#define PLTT_SIZE_8BPP PLTT_SIZEOF(256)
-// sprite.h
-#define SPRITE_NONE 0xFF
-#define TAG_NONE 0xFFFF
 // characters.h
 #define CHAR_DBL_QUOTE_LEFT    0xB1
 #define CHAR_DBL_QUOTE_RIGHT   0xB2

@@ -9,6 +9,14 @@
 #define NUM_PALS_TOTAL 13
 #define MAX_MAP_DATA_SIZE 0x2800
 
+// Map coordinates are offset by 7 when using the map
+// buffer because it needs to load sufficient border
+// metatiles to fill the player's view (the player has
+// 7 metatiles of view horizontally in either direction).
+#define MAP_OFFSET 7
+#define MAP_OFFSET_W (MAP_OFFSET * 2 + 1)
+#define MAP_OFFSET_H (MAP_OFFSET * 2)
+
 #include "main.h"
 
 extern struct BackupMapLayout gBackupMapLayout;
@@ -37,7 +45,7 @@ void InitTrainerHillMap(void);
 void InitBattlePyramidMap(bool8 setPlayerPosition);
 void CopyMapTilesetsToVram(struct MapLayout const *mapLayout);
 void LoadMapTilesetPalettes(struct MapLayout const *mapLayout);
-void LoadSecondaryTilesetPalette(struct MapLayout const *mapLayout);
+void LoadSecondaryTilesetPalette(struct MapLayout const *mapLayout, bool8 skipFaded);
 void CopySecondaryTilesetToVramUsingHeap(struct MapLayout const *mapLayout);
 void CopyPrimaryTilesetToVram(const struct MapLayout *);
 void CopySecondaryTilesetToVram(const struct MapLayout *);

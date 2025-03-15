@@ -5,7 +5,7 @@
 #include "event_data.h"
 #include "m4a.h"
 #include "main.h"
-#include "pokemon.h"
+#include "overworld.h"
 #include "random.h"
 #include "rtc.h"
 #include "constants/songs.h"
@@ -132,17 +132,10 @@ void PlayNewMapMusic(u16 songNum)
 {
     if (songNum == MUS_POKE_CENTER)
     {
-        // Alternate music depending on champion status & time of day
-        if (FlagGet(FLAG_IS_CHAMPION))
+        // Alternate music depending on time of day
+        if (gTimeOfDay != TIME_OF_DAY_DAY) // Night
         {
-            if (gLocalTime.hours >= DAY_START && gLocalTime.hours < NIGHT_START) //Daytime
-            {
-                //songNum = (Random() % 7) == 0 ? MUS_RG_NET_CENTER : MUS_POKE_CENTER; // no change
-            }
-            else // Nighttime
-            {
-                songNum = MUS_RG_NET_CENTER;
-            }
+            songNum = MUS_RG_NET_CENTER;
         }
     }
     sCurrentMapMusic = songNum;

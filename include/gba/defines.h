@@ -74,4 +74,10 @@
 
 #define TOTAL_OBJ_TILE_COUNT 1024
 
+// include/gba/defines.h -> from HGSS Pokedex
+// Since this is an older repository version, we'll need to import these to make some things easier.
+#define PLTT_SIZEOF(n) ((n) * sizeof(u16))
+#define PLTT_SIZE_4BPP PLTT_SIZEOF(16)
+#define PLTT_SIZE_8BPP PLTT_SIZEOF(256)
+
 #endif // GUARD_GBA_DEFINES

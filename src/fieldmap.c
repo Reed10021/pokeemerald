@@ -492,7 +492,7 @@ void MapGridSetMetatileEntryAt(int x, int y, u16 metatile)
 
 u16 GetBehaviorByMetatileId(u16 metatile)
 {
-    u16 *attributes;
+    const u16 *attributes;
     if (metatile < NUM_METATILES_IN_PRIMARY)
     {
         attributes = gMapHeader.mapLayout->primaryTileset->metatileAttributes;
@@ -974,37 +974,66 @@ static void CopyTilesetToVramUsingHeap(struct Tileset const *tileset, u16 numTil
     }
 }
 
-void nullsub_3(u16 a0, u16 a1)
+// Below two are dummied functions from FRLG, used to tint the overworld palettes for the Quest Log
+void nullsub_3(u16 a0, u16 a1) // ApplyGlobalTintToPaletteEntries
 {
 
 }
 
-void nullsub_90(void)
+void nullsub_90(void) // ApplyGlobalTintToPaletteSlot
 {
 
 }
 
-void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u16 size)
+void LoadTilesetPalette(struct Tileset const *tileset, u16 destOffset, u16 size, bool8 skipFaded)
 {
-    u16 black = RGB_BLACK;
+    u32 low = 0;
+    u32 high = 0;
 
     if (tileset)
     {
         if (tileset->isSecondary == FALSE)
         {
-            LoadPalette(&black, destOffset, 2);
-            LoadPalette(((u16*)tileset->palettes) + 1, destOffset + 1, size - 2);
+            if (skipFaded)
+                CpuFastCopy(tileset->palettes, &gPlttBufferUnfaded[destOffset], size);
+            else
+                LoadPaletteFast(tileset->palettes, destOffset, size);
+            gPlttBufferFaded[destOffset] = gPlttBufferUnfaded[destOffset] = RGB_BLACK;
             nullsub_3(destOffset + 1, (size - 2) >> 1);
+            low = 0;
+            high = NUM_PALS_IN_PRIMARY;
         }
         else if (tileset->isSecondary == TRUE)
         {
-            LoadPalette(((u16*)tileset->palettes) + (NUM_PALS_IN_PRIMARY * 16), destOffset, size);
-            nullsub_3(destOffset, size >> 1);
+            if (skipFaded)
+                CpuFastCopy((void*)tileset->palettes[NUM_PALS_IN_PRIMARY], &gPlttBufferUnfaded[destOffset], size);
+            else
+                LoadPaletteFast(tileset->palettes[NUM_PALS_IN_PRIMARY], destOffset, size);
+            low = NUM_PALS_IN_PRIMARY;
+            high = NUM_PALS_TOTAL;
         }
         else
         {
             LoadCompressedPalette((u32*)tileset->palettes, destOffset, size);
             nullsub_3(destOffset, size >> 1);
+        }
+
+        if (tileset->lightPalettes)
+        {
+            u32 i, j, color;
+            for (i = low; i < high; i++)
+            {
+                if (tileset->lightPalettes & (1 << (i - low)))
+                {
+                    for (j = 1, color = gPlttBufferUnfaded[PLTT_ID(i)]; j < 16 && color; j++, color >>= 1)
+                    {
+                        if (color & 1)
+                            gPlttBufferFaded[PLTT_ID(i) + j] = gPlttBufferUnfaded[PLTT_ID(i) + j] |= RGB_ALPHA;
+                    }
+                    if (tileset->customLightColor & (1 << (i - low)))
+                        gPlttBufferFaded[PLTT_ID(i)] = gPlttBufferUnfaded[PLTT_ID(i)] = gPlttBufferUnfaded[PLTT_ID(i) + 15] | RGB_ALPHA;
+                }
+            }
         }
     }
 }
@@ -1026,12 +1055,12 @@ void CopySecondaryTilesetToVramUsingHeap(struct MapLayout const *mapLayout)
 
 static void LoadPrimaryTilesetPalette(struct MapLayout const *mapLayout)
 {
-    LoadTilesetPalette(mapLayout->primaryTileset, 0, NUM_PALS_IN_PRIMARY * 16 * 2);
+    LoadTilesetPalette(mapLayout->primaryTileset, 0, NUM_PALS_IN_PRIMARY * PLTT_SIZE_4BPP, FALSE);
 }
 
-void LoadSecondaryTilesetPalette(struct MapLayout const *mapLayout)
+void LoadSecondaryTilesetPalette(struct MapLayout const* mapLayout, bool8 skipFaded)
 {
-    LoadTilesetPalette(mapLayout->secondaryTileset, NUM_PALS_IN_PRIMARY * 16, (NUM_PALS_TOTAL - NUM_PALS_IN_PRIMARY) * 16 * 2);
+    LoadTilesetPalette(mapLayout->secondaryTileset, PLTT_ID(NUM_PALS_IN_PRIMARY), (NUM_PALS_TOTAL - NUM_PALS_IN_PRIMARY) * PLTT_SIZE_4BPP, skipFaded);
 }
 
 void CopyMapTilesetsToVram(struct MapLayout const *mapLayout)
@@ -1048,6 +1077,6 @@ void LoadMapTilesetPalettes(struct MapLayout const *mapLayout)
     if (mapLayout)
     {
         LoadPrimaryTilesetPalette(mapLayout);
-        LoadSecondaryTilesetPalette(mapLayout);
+        LoadSecondaryTilesetPalette(mapLayout, FALSE);
     }
 }

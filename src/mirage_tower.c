@@ -18,6 +18,7 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 #include "constants/metatile_labels.h"
+#include "field_effect.h"
 
 struct MirageTowerPulseBlend {
     u8 taskId;
@@ -157,9 +158,11 @@ static const union AnimCmd *const gSpriteAnimTable_8617DFC[] =
     gSpriteAnim_8617DEC,
 };
 
+#define OBJ_EVENT_PAL_TAG_NPC_1 0x1103
+
 static const struct SpriteTemplate gUnknown_08617E00 =
 {
-    0xFFFF, 0xFFFF, &gOamData_8617DF4, gSpriteAnimTable_8617DFC, NULL, gDummySpriteAffineAnimTable, SpriteCallbackDummy
+    0xFFFF, OBJ_EVENT_PAL_TAG_NPC_1, &gOamData_8617DF4, gSpriteAnimTable_8617DFC, NULL, gDummySpriteAffineAnimTable, SpriteCallbackDummy
 };
 
 const struct PulseBlendSettings gMirageTowerPulseBlendSettings = {
@@ -665,6 +668,7 @@ static void DoFossilFallAndSink(u8 taskId)
             struct SpriteTemplate fossilTemplate;
 
             fossilTemplate = gUnknown_08617E00;
+            LoadObjectEventPalette(gUnknown_08617E00.paletteTag);
             fossilTemplate.images = (struct SpriteFrameImage *)(sUnknown_0203CF0C->frameImage);
             sUnknown_0203CF0C->spriteId = CreateSprite(&fossilTemplate, 128, -16, 1);
             gSprites[sUnknown_0203CF0C->spriteId].centerToCornerVecX = 0;
@@ -689,6 +693,11 @@ static void DoFossilFallAndSink(u8 taskId)
     case 7:
         if (gSprites[sUnknown_0203CF0C->spriteId].callback != SpriteCallbackDummy)
             return;
+
+        gSprites[sUnknown_0203CF0C->spriteId].inUse = FALSE;
+        FieldEffectFreePaletteIfUnused(gSprites[sUnknown_0203CF0C->spriteId].oam.paletteNum);
+        gSprites[sUnknown_0203CF0C->spriteId].inUse = TRUE;
+
         DestroySprite(&gSprites[sUnknown_0203CF0C->spriteId]);
         FREE_AND_SET_NULL(sUnknown_0203CF0C->unkC);
         FREE_AND_SET_NULL(sUnknown_0203CF0C->frameImage);
