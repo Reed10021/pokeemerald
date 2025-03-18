@@ -29,6 +29,13 @@
 #define TIME_OF_DAY_TWILIGHT 1
 #define TIME_OF_DAY_DAY 2
 
+#define TIME_NIGHT_BLEND             5
+#define TIME_NIGHT_END               7
+#define TIME_NIGHT_DAY_BLEND_END    10
+#define TIME_DAY_BLEND_START        16
+#define TIME_DAY_BLEND_END          19
+#define TIME_NIGHT_BLEND_END        20
+
 struct InitialPlayerAvatarState
 {
     u8 transitionFlags;
@@ -66,7 +73,7 @@ extern u8 gLocalLinkPlayerId;
 extern u8 gFieldLinkPlayerCount;
 extern bool8 gSysPcFromPokenav;
 extern u8 gTimeOfDay;
-extern u8 gTimeUpdateCounter;
+extern u16 gTimeUpdateCounter;
 extern struct TimeBlendSettings currentTimeBlend;
 
 // Exported ROM declarations

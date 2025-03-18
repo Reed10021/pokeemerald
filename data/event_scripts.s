@@ -724,11 +724,11 @@ Common_EventScript_PlayGymBadgeFanfare:: @ 827207E
 	return
 
 Common_EventScript_OutOfCenterPartyHeal:: @ 8272083
-	fadescreen FADE_TO_BLACK
+	fadescreenswapbuffers FADE_TO_BLACK
 	playfanfare MUS_HEAL
 	waitfanfare
 	special HealPlayerParty
-	fadescreen FADE_FROM_BLACK
+	fadescreenswapbuffers FADE_FROM_BLACK
 	return
 
 EventScript_RegionMap:: @ 827208F

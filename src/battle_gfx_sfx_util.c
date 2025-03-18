@@ -369,11 +369,12 @@ void sub_805D770(struct Sprite *sprite, bool8 arg1)
     AnimateSprite(sprite);
 }
 
-void sub_805D7AC(struct Sprite *sprite)
+void sub_805D7AC(struct Sprite *sprite) // SpriteCB_TrainerSlideIn
 {
     if (!(gIntroSlideFlags & 1))
     {
-        sprite->pos2.x += sprite->data[0];
+        // Speed is usually 2.
+        sprite->pos2.x += (sprite->data[0] * 2); // sprite->sSpeedX;
         if (sprite->pos2.x == 0)
         {
             if (sprite->pos2.y != 0)

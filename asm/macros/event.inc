@@ -1560,9 +1560,10 @@
 	.4byte \pointer
 	.endm
 
-	.macro fadescreenswapbuffers mode:req
+	.macro fadescreenswapbuffers mode:req, nowait=0
 	.byte 0xdc
 	.byte \mode
+	.byte \nowait
 	.endm
 
 	.macro buffertrainerclassname out:req, class:req
@@ -1619,6 +1620,12 @@
 	.macro waitanybuttonpress
 	.byte 0xe4
 	.endm
+
+  @ Like callnative, but function expects a ctx
+  .macro callfunc func:req
+  .byte 0xe3
+  .4byte \func
+  .endm
 
 @ Supplementary
 

@@ -1508,7 +1508,7 @@ void UpdateLightSprite(struct Sprite* sprite)
     {
         hours = gLocalTime.hours;
         minutes = gLocalTime.minutes;
-        if ((hours == 5 && minutes >= 30) || (hours > 5 && hours < 18) || (hours == 18 && minutes < 30))
+        if ((hours == (TIME_NIGHT_END-1) && minutes >= 30) || (hours > (TIME_NIGHT_END - 1) && hours < (TIME_NIGHT_BLEND_END - 1)) || (hours == (TIME_NIGHT_BLEND_END - 1) && minutes < 30))
         {
             Weather_SetBlendCoeffs(7, 12);
             sprite->invisible = TRUE;

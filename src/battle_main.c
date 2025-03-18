@@ -2851,7 +2851,8 @@ static void SpriteCb_MoveWildMonToRight(struct Sprite *sprite)
 {
     if ((gIntroSlideFlags & 1) == 0)
     {
-        sprite->pos2.x += 2;
+        // Speed
+        sprite->pos2.x += 4; // 2
         if (sprite->pos2.x == 0)
         {
             sprite->callback = SpriteCb_WildMonShowHealthbox;

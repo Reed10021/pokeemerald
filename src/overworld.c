@@ -191,7 +191,7 @@ u8 gFieldLinkPlayerCount;
 
 u8 gTimeOfDay;
 struct TimeBlendSettings currentTimeBlend;
-u8 gTimeUpdateCounter;
+u16 gTimeUpdateCounter;
 
 // EWRAM vars
 EWRAM_DATA static u8 sObjectEventLoadFlag = 0;
@@ -1537,46 +1537,46 @@ u8 UpdateTimeOfDay(void)
     hours = gLocalTime.hours;
     minutes = gLocalTime.minutes;
 
-    if (hours < 5) // 7PM - 7AM = night
+    if (hours < TIME_NIGHT_BLEND) // 7PM - 7AM = night
     { // night
         currentTimeBlend.weight = 256;
         currentTimeBlend.altWeight = 0;
         gTimeOfDay = currentTimeBlend.time0 = currentTimeBlend.time1 = TIME_OF_DAY_NIGHT;
     }
-    else if (hours < 7) // Blend starts at 5AM
+    else if (hours < TIME_NIGHT_END) // Blend starts at 5AM
     { // night->twilight
         currentTimeBlend.time0 = TIME_OF_DAY_NIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_TWILIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - 5) * 60 + minutes) / ((7 - 5) * 60);
+        currentTimeBlend.weight = 256 - 256 * ((hours - TIME_NIGHT_BLEND) * 60 + minutes) / ((TIME_NIGHT_END - TIME_NIGHT_BLEND) * 60);
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
     }
-    else if (hours < 10) // Day starts at 7AM, blend from 7-10AM
+    else if (hours < TIME_NIGHT_DAY_BLEND_END) // Day starts at 7AM, blend from 7-10AM
     { // twilight->day
         currentTimeBlend.time0 = TIME_OF_DAY_TWILIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_DAY;
-        currentTimeBlend.weight = 256 - 256 * ((hours - 7) * 60 + minutes) / ((10 - 7) * 60);
+        currentTimeBlend.weight = 256 - 256 * ((hours - TIME_NIGHT_END) * 60 + minutes) / ((TIME_NIGHT_DAY_BLEND_END - TIME_NIGHT_END) * 60);
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
     }
-    else if (hours < 16) // 7AM - 7PM = day
+    else if (hours < TIME_DAY_BLEND_START) // 7AM - 7PM = day
     { // day
         currentTimeBlend.weight = currentTimeBlend.altWeight = 256;
         gTimeOfDay = currentTimeBlend.time0 = currentTimeBlend.time1 = TIME_OF_DAY_DAY;
     }
-    else if (hours < 19) // Blend starts at 4PM to simulate sun moving across sky
+    else if (hours < TIME_DAY_BLEND_END) // Blend starts at 4PM to simulate sun moving across sky
     { // day->twilight
         currentTimeBlend.time0 = TIME_OF_DAY_DAY;
         currentTimeBlend.time1 = TIME_OF_DAY_TWILIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - 16) * 60 + minutes) / ((19 - 16) * 60);
+        currentTimeBlend.weight = 256 - 256 * ((hours - TIME_DAY_BLEND_START) * 60 + minutes) / ((TIME_DAY_BLEND_END - TIME_DAY_BLEND_START) * 60);
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
     }
-    else if (hours < 20) // Night starts at 20 / 8PM, blend from 7PM - 8PM.
+    else if (hours < TIME_NIGHT_BLEND_END) // Night starts at 20 / 8PM, blend from 7PM - 8PM.
     { // twilight->night
         currentTimeBlend.time0 = TIME_OF_DAY_TWILIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_NIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - 19) * 60 + minutes) / ((20 - 19) * 60);
+        currentTimeBlend.weight = 256 - 256 * ((hours - TIME_DAY_BLEND_END) * 60 + minutes) / ((TIME_NIGHT_BLEND_END - TIME_DAY_BLEND_END) * 60);
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
     }
@@ -1664,7 +1664,7 @@ static void OverworldBasic(void)
     UpdatePaletteFade();
     UpdateTilesetAnimations();
     DoScheduledBgTilemapCopiesToVram();
-    if (++gTimeUpdateCounter > 60)
+    if (!gPaletteFade.active && ++gTimeUpdateCounter >= 900) // Update blend every 15 seconds
     {
         struct TimeBlendSettings cachedBlend = {
             .time0 = currentTimeBlend.time0,
