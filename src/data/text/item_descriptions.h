@@ -408,7 +408,7 @@ static const u8 sBigMushroomDesc[] = _(
 static const u8 sPearlDesc[] = _(
     "A pretty pearl\n"
     "that would sell at a\n"
-    "cheap price.");
+    "decent price.");
 
 static const u8 sBigPearlDesc[] = _(
     "A lovely large pearl\n"
@@ -431,9 +431,9 @@ static const u8 sNuggetDesc[] = _(
     "a high price.");
 
 static const u8 sHeartScaleDesc[] = _(
-    "A lovely scale.\n"
-    "It is coveted by\n"
-    "collectors.");
+    "A lovely scale\n"
+    "that would sell at a\n"
+    "decent price.");
 
 // Mail
 static const u8 sOrangeMailDesc[] = _(

@@ -2106,7 +2106,7 @@ static const u16 sHMMoves[] =
 // ALTERING_CAVE
 static const struct SpeciesItem sAlteringCaveWildMonHeldItems[] =
 {
-    {SPECIES_NONE,      ITEM_NONE},
+    {SPECIES_ZUBAT,     ITEM_HEART_SCALE},
     {SPECIES_MAREEP,    ITEM_GANLON_BERRY},
     {SPECIES_PINECO,    ITEM_APICOT_BERRY},
     {SPECIES_HOUNDOUR,  ITEM_BIG_MUSHROOM},
@@ -7011,22 +7011,30 @@ void SetWildMonHeldItem(void)
     {
         u16 rnd = Random() % 100;
         u16 species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, 0);
-        u16 var1 = 45;
-        u16 var2 = 95;
+        u16 var1 = 45; // Chance of no item
+        u16 var2 = 95; // Chance of Common Item (Any % left over is chance for Rare Item)
         if (!GetMonData(&gPlayerParty[0], MON_DATA_SANITY_IS_EGG, 0)
             && GetMonAbility(&gPlayerParty[0]) == ABILITY_COMPOUND_EYES)
         {
             var1 = 20;
             var2 = 80;
         }
+
+        if (FlagGet(FLAG_SYS_ENC_UP_ITEM) == TRUE || FlagGet(FLAG_SYS_ENC_DOWN_ITEM) == TRUE) // Black Flute or White Flute
+        {
+            var1 -= 10; // Reduce chance of no item
+            var2 -= 10; // Reduce chance of common item (and increase chance of rare item)
+        }
+
         if (gMapHeader.mapLayoutId == LAYOUT_ALTERING_CAVE)
         {
             s32 alteringCaveId = GetWildMonTableIdInAlteringCave(species);
             if (alteringCaveId != 0)
             {
                 if (rnd < var2)
-                    return;
-                SetMonData(&gEnemyParty[0], MON_DATA_HELD_ITEM, &sAlteringCaveWildMonHeldItems[alteringCaveId].item);
+                    SetMonData(&gEnemyParty[0], MON_DATA_HELD_ITEM, &gBaseStats[species].item1);
+                else
+                    SetMonData(&gEnemyParty[0], MON_DATA_HELD_ITEM, &sAlteringCaveWildMonHeldItems[alteringCaveId].item);
             }
             else
             {

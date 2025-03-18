@@ -1537,51 +1537,51 @@ u8 UpdateTimeOfDay(void)
     hours = gLocalTime.hours;
     minutes = gLocalTime.minutes;
 
-    if (hours < 5)
+    if (hours < 5) // 7PM - 7AM = night
     { // night
         currentTimeBlend.weight = 256;
         currentTimeBlend.altWeight = 0;
         gTimeOfDay = currentTimeBlend.time0 = currentTimeBlend.time1 = TIME_OF_DAY_NIGHT;
     }
-    else if (hours < 6)
+    else if (hours < 7) // Blend starts at 5AM
     { // night->twilight
         currentTimeBlend.time0 = TIME_OF_DAY_NIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_TWILIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - 5) * 60 + minutes) / ((6 - 5) * 60);
+        currentTimeBlend.weight = 256 - 256 * ((hours - 5) * 60 + minutes) / ((7 - 5) * 60);
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
     }
-    else if (hours < 7)
+    else if (hours < 10) // Day starts at 7AM, blend from 7-10AM
     { // twilight->day
         currentTimeBlend.time0 = TIME_OF_DAY_TWILIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_DAY;
-        currentTimeBlend.weight = 256 - 256 * ((hours - 6) * 60 + minutes) / ((7 - 6) * 60);
+        currentTimeBlend.weight = 256 - 256 * ((hours - 7) * 60 + minutes) / ((10 - 7) * 60);
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
     }
-    else if (hours < 17)
+    else if (hours < 16) // 7AM - 7PM = day
     { // day
         currentTimeBlend.weight = currentTimeBlend.altWeight = 256;
         gTimeOfDay = currentTimeBlend.time0 = currentTimeBlend.time1 = TIME_OF_DAY_DAY;
     }
-    else if (hours < 18)
+    else if (hours < 19) // Blend starts at 4PM to simulate sun moving across sky
     { // day->twilight
         currentTimeBlend.time0 = TIME_OF_DAY_DAY;
         currentTimeBlend.time1 = TIME_OF_DAY_TWILIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - 17) * 60 + minutes) / ((18 - 17) * 60);
+        currentTimeBlend.weight = 256 - 256 * ((hours - 16) * 60 + minutes) / ((19 - 16) * 60);
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
     }
-    else if (hours < 19)
+    else if (hours < 20) // Night starts at 20 / 8PM, blend from 7PM - 8PM.
     { // twilight->night
         currentTimeBlend.time0 = TIME_OF_DAY_TWILIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_NIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - 18) * 60 + minutes) / ((19 - 18) * 60);
+        currentTimeBlend.weight = 256 - 256 * ((hours - 19) * 60 + minutes) / ((20 - 19) * 60);
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
     }
-    else
-    { // 19-24, night
+    else // By 20 / 8PM the sun has fully set
+    { // night
         currentTimeBlend.weight = 256;
         currentTimeBlend.altWeight = 0;
         gTimeOfDay = currentTimeBlend.time0 = currentTimeBlend.time1 = TIME_OF_DAY_NIGHT;

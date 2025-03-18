@@ -565,7 +565,7 @@ const struct Item gItems[] =
     {
         .name = _("BLUE FLUTE"),
         .itemId = ITEM_BLUE_FLUTE,
-        .price = 100,
+        .price = 14000,
         .description = sBlueFluteDesc,
         .pocket = POCKET_ITEMS,
         .type = 1,
@@ -579,7 +579,7 @@ const struct Item gItems[] =
     {
         .name = _("YELLOW FLUTE"),
         .itemId = ITEM_YELLOW_FLUTE,
-        .price = 200,
+        .price = 15000,
         .description = sYellowFluteDesc,
         .pocket = POCKET_ITEMS,
         .type = 1,
@@ -593,7 +593,7 @@ const struct Item gItems[] =
     {
         .name = _("RED FLUTE"),
         .itemId = ITEM_RED_FLUTE,
-        .price = 300,
+        .price = 15000,
         .description = sRedFluteDesc,
         .pocket = POCKET_ITEMS,
         .type = 1,
@@ -607,7 +607,7 @@ const struct Item gItems[] =
     {
         .name = _("BLACK FLUTE"),
         .itemId = ITEM_BLACK_FLUTE,
-        .price = 400,
+        .price = 16000,
         .holdEffectParam = 50,
         .description = sBlackFluteDesc,
         .pocket = POCKET_ITEMS,
@@ -620,7 +620,7 @@ const struct Item gItems[] =
     {
         .name = _("WHITE FLUTE"),
         .itemId = ITEM_WHITE_FLUTE,
-        .price = 500,
+        .price = 16000,
         .holdEffectParam = 150,
         .description = sWhiteFluteDesc,
         .pocket = POCKET_ITEMS,
@@ -1414,7 +1414,7 @@ const struct Item gItems[] =
     {
         .name = _("PEARL"),
         .itemId = ITEM_PEARL,
-        .price = 2100,
+        .price = 3000,
         .description = sPearlDesc,
         .pocket = POCKET_ITEMS,
         .type = 4,
@@ -1474,7 +1474,7 @@ const struct Item gItems[] =
     {
         .name = _("HEART SCALE"),
         .itemId = ITEM_HEART_SCALE,
-        .price = 100,
+        .price = 3000,
         .description = sHeartScaleDesc,
         .pocket = POCKET_ITEMS,
         .type = 4,

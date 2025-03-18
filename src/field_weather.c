@@ -167,7 +167,7 @@ void (*const gWeatherPalStateFuncs[])(void) =
 
 // This table specifies which of the gamma shift tables should be
 // applied to each of the background and sprite palettes.
-static const u8 sBasePaletteGammaTypes[32] =
+static const u8 ALIGNED(2) sBasePaletteGammaTypes[32] =
 {
     // background palettes
     GAMMA_NORMAL,

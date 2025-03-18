@@ -927,13 +927,13 @@ static void Task_EvolutionScene(u8 taskID)
                 else
                 {
                     u16 move = GetMonData(mon, var + MON_DATA_MOVE1);
-                    if (IsHMMove2(move))
-                    {
-                        BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_HMMOVESCANTBEFORGOTTEN - BATTLESTRINGS_ID_ADDER]);
-                        BattlePutTextOnWindow(gDisplayedStringBattle, 0);
-                        gTasks[taskID].tLearnMoveState = 12;
-                    }
-                    else
+                    //if (IsHMMove2(move))
+                    //{
+                    //    BattleStringExpandPlaceholdersToDisplayedString(gBattleStringsTable[STRINGID_HMMOVESCANTBEFORGOTTEN - BATTLESTRINGS_ID_ADDER]);
+                    //    BattlePutTextOnWindow(gDisplayedStringBattle, 0);
+                    //    gTasks[taskID].tLearnMoveState = 12;
+                    //}
+                    //else
                     {
                         PREPARE_MOVE_BUFFER(gBattleTextBuff2, move)
 
