@@ -26,6 +26,7 @@ struct LoadedSaveData
  /*0x0130*/ struct ItemSlot TMsHMs[BAG_TMHM_COUNT];
  /*0x0230*/ struct ItemSlot berries[BAG_BERRIES_COUNT];
  /*0x02E8*/ struct MailStruct mail[MAIL_COUNT];
+            struct ItemSlot medicine[BAG_MEDICINE_COUNT];
 };
 
 // EWRAM DATA
@@ -221,6 +222,44 @@ void LoadSerializedGame(void)
 {
     LoadPlayerParty();
     LoadObjectEvents();
+
+    // Maintain save compat for older save versions < 142.
+    // If there are no items in the medicine pocket, run a check through the items pocket to find any misplaced items.
+    if(gSaveBlock1Ptr->bagPocket_Medicine[0].itemId == 0) // ITEM_NONE
+    {
+        bool32 sortFlag = FALSE;
+        u32 pocket = 0;
+        u32 i, j, itemId, quantity = 0;
+        struct ItemSlot temp;
+        
+        for (i = 0; i < BAG_ITEMS_COUNT; i++)
+        {
+            if (gSaveBlock1Ptr->bagPocket_Items[i].itemId)
+            {
+                pocket = ItemId_GetPocket(gSaveBlock1Ptr->bagPocket_Items[i].itemId) - 1;
+                if (pocket == MEDICINE_POCKET)
+                {
+                    for (j = 0; j < BAG_MEDICINE_COUNT; j++)
+                    {
+                        if (gSaveBlock1Ptr->bagPocket_Medicine[j].itemId == 0) // ITEM_NONE
+                        {
+                            temp = gSaveBlock1Ptr->bagPocket_Medicine[j];
+                            gSaveBlock1Ptr->bagPocket_Medicine[j] = gSaveBlock1Ptr->bagPocket_Items[i];
+                            gSaveBlock1Ptr->bagPocket_Items[i] = temp;
+                            sortFlag = TRUE;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (sortFlag)
+        {
+            MergeSort(gSaveBlock1Ptr->bagPocket_Items, 0, BAG_ITEMS_COUNT - 1, CompareItemsByType);
+            MergeSort(gSaveBlock1Ptr->bagPocket_Medicine, 0, BAG_MEDICINE_COUNT - 1, CompareItemsByType);
+        }
+    }
 }
 
 void LoadPlayerBag(void)
@@ -250,6 +289,10 @@ void LoadPlayerBag(void)
     // load mail.
     for (i = 0; i < MAIL_COUNT; i++)
         gLoadedSaveData.mail[i] = gSaveBlock1Ptr->mail[i];
+
+    // load player medicine.
+    for (i = 0; i < BAG_MEDICINE_COUNT; i++)
+        gLoadedSaveData.medicine[i] = gSaveBlock1Ptr->bagPocket_Medicine[i];
 
     gLastEncryptionKey = gSaveBlock2Ptr->encryptionKey;
 }
@@ -282,6 +325,10 @@ void SavePlayerBag(void)
     // save mail.
     for (i = 0; i < MAIL_COUNT; i++)
         gSaveBlock1Ptr->mail[i] = gLoadedSaveData.mail[i];
+
+    // save player medicine.
+    for (i = 0; i < BAG_MEDICINE_COUNT; i++)
+        gSaveBlock1Ptr->bagPocket_Medicine[i] = gLoadedSaveData.medicine[i];
 
     encryptionKeyBackup = gSaveBlock2Ptr->encryptionKey;
     gSaveBlock2Ptr->encryptionKey = gLastEncryptionKey;

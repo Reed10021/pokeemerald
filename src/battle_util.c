@@ -1335,7 +1335,10 @@ u8 DoFieldEndTurnEffects(void)
                 }
                 else
                 {
-                    gBattlescriptCurrInstr = BattleScript_SunlightContinues;
+                    if (GetCurrentWeather() == WEATHER_EXTREME_HEAT)
+                        gBattlescriptCurrInstr = BattleScript_ExtremeHeatContinues;
+                    else
+                        gBattlescriptCurrInstr = BattleScript_SunlightContinues;
                 }
 
                 BattleScriptExecute(gBattlescriptCurrInstr);
@@ -2458,6 +2461,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                         }
                         break;
                     case WEATHER_DROUGHT:
+                    case WEATHER_EXTREME_HEAT:
                         if (!(gBattleWeather & WEATHER_SUN_ANY))
                         {
                             gBattleWeather = (WEATHER_SUN_PERMANENT | WEATHER_SUN_TEMPORARY);

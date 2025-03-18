@@ -84,6 +84,9 @@ void SetBagItemsPointers(void)
 
     gBagPockets[BERRIES_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_Berries;
     gBagPockets[BERRIES_POCKET].capacity = BAG_BERRIES_COUNT;
+
+    gBagPockets[MEDICINE_POCKET].itemSlots = gSaveBlock1Ptr->bagPocket_Medicine;
+    gBagPockets[MEDICINE_POCKET].capacity = BAG_MEDICINE_COUNT;
 }
 
 void CopyItemName(u16 itemId, u8 *dst)
@@ -355,10 +358,10 @@ bool8 AddBagItem(u16 itemId, u16 count)
     }
 }
 
-bool8 RemoveBagItem(u16 itemId, u16 count)
+bool8 RemoveBagItem(u32 itemId, u32 count)
 {
-    u8 i;
-    u16 totalQuantity = 0;
+    u32 i;
+    u32 totalQuantity = 0;
 
     if (ItemId_GetPocket(itemId) == POCKET_NONE || itemId == ITEM_NONE)
         return FALSE;
@@ -370,9 +373,9 @@ bool8 RemoveBagItem(u16 itemId, u16 count)
     }
     else
     {
-        u8 pocket;
-        u8 var;
-        u16 ownedCount;
+        u32 pocket;
+        u32 var;
+        u32 ownedCount;
         struct BagPocket *itemPocket;
 
         pocket = ItemId_GetPocket(itemId) - 1;
@@ -395,7 +398,7 @@ bool8 RemoveBagItem(u16 itemId, u16 count)
 
         var = GetItemListPosition(pocket);
         if (itemPocket->capacity > var
-         && itemPocket->itemSlots[var].itemId == itemId)
+            && itemPocket->itemSlots[var].itemId == itemId)
         {
             ownedCount = GetBagItemQuantity(&itemPocket->itemSlots[var].quantity);
             if (ownedCount >= count)

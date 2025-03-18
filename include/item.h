@@ -43,7 +43,7 @@ bool8 CheckBagHasItem(u16 itemId, u16 count);
 bool8 HasAtLeastOneBerry(void);
 bool8 CheckBagHasSpace(u16 itemId, u16 count);
 bool8 AddBagItem(u16 itemId, u16 count);
-bool8 RemoveBagItem(u16 itemId, u16 count);
+bool8 RemoveBagItem(u32 itemId, u32 count);
 u8 GetPocketByItemId(u16 itemId);
 void ClearItemSlots(struct ItemSlot *itemSlots, u8 itemCount);
 u8 CountUsedPCItemSlots(void);
@@ -77,5 +77,12 @@ ItemUseFunc ItemId_GetFieldFunc(u16 itemId);
 u8 ItemId_GetBattleUsage(u16 itemId);
 ItemUseFunc ItemId_GetBattleFunc(u16 itemId);
 u8 ItemId_GetSecondaryId(u16 itemId);
+
+void MergeSort(struct ItemSlot* array, u32 low, u32 high, s8(*comparator)(struct ItemSlot*, struct ItemSlot*));
+void Merge(struct ItemSlot* array, u32 low, u32 mid, u32 high, s8(*comparator)(struct ItemSlot*, struct ItemSlot*));
+s8 CompareItemsAlphabetically(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
+s8 CompareItemsByMost(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
+s8 CompareItemsByType(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
+s8 CompareItemsById(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
 
 #endif // GUARD_ITEM_H

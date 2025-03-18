@@ -155,6 +155,7 @@ static const struct WeatherCallbacks sWeatherFuncs[] =
     [WEATHER_DROUGHT]            = {Drought_InitVars,       Drought_Main,       Drought_InitAll,       Drought_Finish},
     [WEATHER_DOWNPOUR]           = {Downpour_InitVars,      Thunderstorm_Main,  Downpour_InitAll,      Thunderstorm_Finish},
     [WEATHER_UNDERWATER_BUBBLES] = {Bubbles_InitVars,       Bubbles_Main,       Bubbles_InitAll,       Bubbles_Finish},
+    [WEATHER_EXTREME_HEAT]       = {ExtremeHeat_InitVars,   ExtremeHeat_Main,   ExtremeHeat_InitAll,   ExtremeHeat_Finish},
 };
 
 void (*const gWeatherPalStateFuncs[])(void) =

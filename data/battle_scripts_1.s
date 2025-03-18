@@ -3287,6 +3287,12 @@ BattleScript_SunlightContinues::
 	playanimation BS_ATTACKER, B_ANIM_SUN_CONTINUES, NULL
 	end2
 
+BattleScript_ExtremeHeatContinues::
+	printstring STRINGID_ITISHOT
+	waitmessage 0x40
+	playanimation BS_ATTACKER, B_ANIM_SUN_CONTINUES, NULL
+	end2
+
 BattleScript_SunlightFaded::
 	printstring STRINGID_SUNLIGHTFADED
 	waitmessage 0x40

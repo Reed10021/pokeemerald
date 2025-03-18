@@ -230,7 +230,7 @@ static const u8 sUnused_082ED224[] = {0x00, 0xFF, 0xFE, 0xFF, 0x00};
 
 // .text
 
-bool8 IsWirelessAdapterConnected(void)
+bool32 IsWirelessAdapterConnected(void)
 {
     SetWirelessCommType1();
     InitRFUAPI();
