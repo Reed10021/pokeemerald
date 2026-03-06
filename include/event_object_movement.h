@@ -62,7 +62,7 @@ extern const struct OamData gObjectEventBaseOam_32x8;
 extern const struct OamData gObjectEventBaseOam_32x32;
 extern const struct SpriteTemplate *const gFieldEffectObjectTemplatePointers[];
 
-extern const u8 *const gBerryTreeObjectEventGraphicsIdTablePointers[];
+extern const u16 *const gBerryTreeObjectEventGraphicsIdTablePointers[];
 extern const struct SpriteFrameImage *const gBerryTreePicTablePointers[];
 extern const u8 *const gBerryTreePaletteSlotTablePointers[];
 
@@ -418,6 +418,6 @@ bool32 IsObjectEventSpriteInvisible(u8 var);
 void SetObjectEventSpriteGraphics(u8 var1, u16 graphicsId);
 void SetObjectEventSpriteAnim(u8 var1, u8 var2);
 bool32 IsObjectEventSpriteAnimating(u8 var);
-bool8 IsObjectEventPaletteIndex(u8 paletteIndex);
+//bool8 IsObjectEventPaletteIndex(u8 paletteIndex);
 
 #endif //GUARD_EVENT_OBJECT_MOVEMENT_H

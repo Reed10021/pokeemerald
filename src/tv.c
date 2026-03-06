@@ -672,6 +672,54 @@ static const struct {
         .moves = {MOVE_BELLY_DRUM, MOVE_FURY_CUTTER, MOVE_SPORE, MOVE_EXTREME_SPEED},
         .level = 50,
         .location = MAP_NUM(ROUTE120)
+    },
+    {
+        .species = SPECIES_LEDYBA,
+        .moves = {MOVE_CRUNCH, MOVE_SCREECH, MOVE_MEGA_PUNCH, MOVE_COSMIC_POWER},
+        .level = 15,
+        .location = MAP_NUM(ROUTE103)
+    },
+    {
+        .species = SPECIES_LEDIAN,
+        .moves = {MOVE_DRAGON_DANCE, MOVE_DRAIN_PUNCH, MOVE_MEGA_PUNCH, MOVE_SHADOW_PUNCH},
+        .level = 15,
+        .location = MAP_NUM(ROUTE113)
+    },
+    {
+        .species = SPECIES_KANGASKHAN,
+        .moves = {MOVE_NEEDLE_ARM, MOVE_DRAIN_PUNCH, MOVE_SWORDS_DANCE, MOVE_OUTRAGE},
+        .level = 31,
+        .location = MAP_NUM(ROUTE121)
+    },
+    {
+        .species = SPECIES_TANGELA,
+        .moves = {MOVE_SPORE, MOVE_ANCIENT_POWER, MOVE_LEAF_STORM, MOVE_TAIL_GLOW},
+        .level = 24,
+        .location = MAP_NUM(ROUTE119)
+    },
+    {
+        .species = SPECIES_ARBOK,
+        .moves = {MOVE_CRUNCH, MOVE_SLUDGE_BOMB, MOVE_DRAGON_DANCE, MOVE_FAINT_ATTACK},
+        .level = 21,
+        .location = MAP_NUM(ROUTE114)
+    },
+    {
+        .species = SPECIES_RATICATE,
+        .moves = {MOVE_BELLY_DRUM, MOVE_HYPER_FANG, MOVE_DRAGON_DANCE, MOVE_DRAIN_PUNCH},
+        .level = 23,
+        .location = MAP_NUM(ROUTE114)
+    },
+    {
+        .species = SPECIES_MEOWTH,
+        .moves = {MOVE_PAY_DAY, MOVE_COVET, MOVE_DRAGON_DANCE, MOVE_THUNDER_WAVE},
+        .level = 14,
+        .location = MAP_NUM(ROUTE116)
+    },
+    {
+        .species = SPECIES_MEOWTH,
+        .moves = {MOVE_PAY_DAY, MOVE_SHADOW_CLAW, MOVE_SWORDS_DANCE, MOVE_FLARE_BLITZ},
+        .level = 19,
+        .location = MAP_NUM(ROUTE117)
     }
 };
 
@@ -2051,7 +2099,7 @@ void SaveRecordedItemPurchasesForTVShow(void)
                     show->smartshopperShow.itemIds[i] = gMartPurchaseHistory[i].itemId;
                     show->smartshopperShow.itemAmounts[i] = gMartPurchaseHistory[i].quantity;
                 }
-                show->smartshopperShow.priceReduced = GetPriceReduction(POKENEWS_SLATEPORT);
+                show->smartshopperShow.priceReduced = (GetPriceReduction(POKENEWS_SLATEPORT) || GetPriceReduction(POKENEWS_LILYCOVE));
                 StringCopy(show->smartshopperShow.playerName, gSaveBlock2Ptr->playerName);
                 tv_store_id_3x(show);
                 show->smartshopperShow.language = gGameLanguage;
@@ -2830,7 +2878,7 @@ void TryPutLotteryWinnerReportOnAir(void)
         show->lottoWinner.kind = TVSHOW_LOTTO_WINNER;
         show->lottoWinner.active = FALSE;
         StringCopy(show->lottoWinner.playerName, gSaveBlock2Ptr->playerName);
-        show->lottoWinner.whichPrize = 4 - gSpecialVar_0x8004;
+        show->lottoWinner.whichPrize = 5 - gSpecialVar_0x8004;
         show->lottoWinner.item = gSpecialVar_0x8005;
         tv_store_id_3x(show);
         show->lottoWinner.language = gGameLanguage;
@@ -3207,26 +3255,29 @@ static void sub_80EED88(void)
                 case 2:
                 case 3:
                 case 4:
-                case 5:
-                    if (rbernoulli(2, 25))
+                    if (rbernoulli(1, 200))
                         return;
                     break;
+                case 5:
                 case 6:
+                    if (rbernoulli(1, 100))
+                        return;
+                    break;
                 case 7:
                 case 8:
                     if (FlagGet(FLAG_SYS_GAME_CLEAR))
                     {
-                        if (rbernoulli(4, 15))
+                        if (rbernoulli(1, 20))
                             return;
                     }
-                    else if (rbernoulli(3, 25))
+                    else if (rbernoulli(1, 50))
                             return;
                     break;
             }
             // We didn't return, so generate news.
             i = 0;
             do {
-                if (i > 100) // if we can't generate a news that we don't already have happening, return after 100 attempts.
+                if (i > 50) // if we can't generate a news that we don't already have happening, return after 100 attempts.
                     return;
                 newsKind = (Random() % 4) + POKENEWS_SLATEPORT;
                 i++;
@@ -3378,7 +3429,11 @@ bool8 IsPriceDiscounted(u8 newsKind)
             }
             return FALSE;
         case POKENEWS_LILYCOVE:
-            if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(LILYCOVE_CITY_DEPARTMENT_STORE_ROOFTOP) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(LILYCOVE_CITY_DEPARTMENT_STORE_ROOFTOP))
+            if ((gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(LILYCOVE_CITY_DEPARTMENT_STORE_ROOFTOP) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(LILYCOVE_CITY_DEPARTMENT_STORE_ROOFTOP)) ||
+                (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(LILYCOVE_CITY_DEPARTMENT_STORE_1F) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(LILYCOVE_CITY_DEPARTMENT_STORE_1F)) ||
+                (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(LILYCOVE_CITY_DEPARTMENT_STORE_2F) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(LILYCOVE_CITY_DEPARTMENT_STORE_2F)) ||
+                (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(LILYCOVE_CITY_DEPARTMENT_STORE_4F) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(LILYCOVE_CITY_DEPARTMENT_STORE_4F)) ||
+                (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(LILYCOVE_CITY_DEPARTMENT_STORE_5F) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(LILYCOVE_CITY_DEPARTMENT_STORE_5F)))
             {
                 return TRUE;
             }
@@ -7004,9 +7059,13 @@ static void DoTVShowPokemonLotteryWinnerFlashReport(void)
     {
         StringCopy(gStringVar2, gText_Second);
     }
-    else
+    else if (show->lottoWinner.whichPrize == 3)
     {
         StringCopy(gStringVar2, gText_Third);
+    }
+    else
+    {
+        StringCopy(gStringVar2, gText_FourthLotto);
     }
     StringCopy(gStringVar3, ItemId_GetName(show->lottoWinner.item));
     TVShowDone();

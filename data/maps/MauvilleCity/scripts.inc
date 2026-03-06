@@ -10,7 +10,7 @@ MauvilleCity_OnTransition: @ 81DF38B
 	setflag FLAG_VISITED_MAUVILLE_CITY
 	clearflag FLAG_FORCE_MIRAGE_TOWER_VISIBLE
 	clearflag FLAG_HIDE_SLATEPORT_MUSEUM_POPULATION
-@	setflag FLAG_SYS_TV_START @ Moved to Rustboro
+@	setflag FLAG_SYS_TV_START @ Moved to Petalburg
 	clearflag FLAG_MAUVILLE_GYM_BARRIERS_STATE
 	setvar VAR_MAUVILLE_GYM_STATE, 0
 	call_if_set FLAG_GOT_TM24_FROM_WATTSON, MauvilleCity_EventScript_MoveWattsonBackToGym
@@ -446,11 +446,26 @@ MauvilleCity_EventScript_CompletedNewMauville:: @ 81DF784
 	compare VAR_RESULT, FALSE
 	goto_if_eq Common_EventScript_ShowBagIsFull
 	setflag FLAG_GOT_TM24_FROM_WATTSON
+	checkitem ITEM_BASEMENT_KEY, 1
+	compare VAR_RESULT, FALSE
+	goto_if_eq MauvilleCity_EventScript_NoKey
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox MauvilleCity_Text_WattsonGiveBackKey, MSGBOX_DEFAULT
+	waitfanfare
+	removeitem ITEM_BASEMENT_KEY
 	msgbox MauvilleCity_Text_WattsonYoungTakeCharge, MSGBOX_DEFAULT
 	release
 	end
 
 MauvilleCity_EventScript_ReceivedThunderbolt:: @ 81DF7B0
+	checkitem ITEM_BASEMENT_KEY, 1
+	compare VAR_RESULT, FALSE
+	goto_if_eq MauvilleCity_EventScript_NoKey
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox MauvilleCity_Text_WattsonGiveBackKey, MSGBOX_DEFAULT
+	waitfanfare
+	removeitem ITEM_BASEMENT_KEY
+MauvilleCity_EventScript_NoKey:
 	msgbox MauvilleCity_Text_WattsonYoungTakeCharge, MSGBOX_DEFAULT
 	release
 	end
@@ -619,6 +634,10 @@ MauvilleCity_Text_WattsonYoungTakeCharge: @ 81E02AA
 	.string "WATTSON: Wahahahaha!\p"
 	.string "It pleases me to no end to see\n"
 	.string "the young step up and take charge!$"
+
+MauvilleCity_Text_WattsonGiveBackKey:
+	.string "{PLAYER} returned to WATTSON\n"
+	.string "the BASEMENT KEY.$"
 
 MauvilleCity_Text_NurseHurtMonBackToHealth: @ 81E0301
 	.string "You know, it's cool to have POKéMON\n"

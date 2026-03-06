@@ -6,6 +6,8 @@
 .set LOCALID_CAMPER, 14
 .set LOCALID_FISHERMAN_2, 18
 .set LOCALID_MAN_4, 23
+.set LOCALID_MAY, 28
+.set LOCALID_BRENDAN, 27
 
 BattleFrontier_OutsideWest_MapScripts:: @ 823D3E1
 	map_script MAP_SCRIPT_ON_TRANSITION, BattleFrontier_OutsideWest_OnTransition
@@ -319,6 +321,56 @@ BattleFrontier_OutsideWest_EventScript_PokefanF:: @ 823D6EE
 	msgbox BattleFrontier_OutsideWest_Text_MonWithLongTailInFrontier, MSGBOX_NPC
 	end
 
+BattleFrontier_OutsideWest_EventScript_Sapphyr::
+	lock
+	faceplayer
+	msgbox BattleFrontier_OutsideWest_Text_WouldYouLikeToBattle, MSGBOX_YESNO
+	closemessage
+	compare VAR_RESULT, NO
+	goto_if_eq BattleFrontier_OutsideWest_EventScript_Sapphyr_End
+	goto_if_defeated TRAINER_SAPPHYR_EMERALD, BattleFrontier_OutsideWest_EventScript_Sapphyr_Battle2
+	goto_if_defeated TRAINER_SAPPHYR_EMERALD2, BattleFrontier_OutsideWest_EventScript_Sapphyr_Battle1
+	goto BattleFrontier_OutsideWest_EventScript_Sapphyr_Battle1
+BattleFrontier_OutsideWest_EventScript_Sapphyr_End:
+	applymovement LOCALID_BRENDAN, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+BattleFrontier_OutsideWest_EventScript_Sapphyr_Battle1::
+	trainerbattle_single TRAINER_SAPPHYR_EMERALD, BattleFrontier_OutsideWest_Text_SilentIntro, BattleFrontier_OutsideWest_Text_SilentDefeated
+	msgbox BattleFrontier_OutsideWest_Text_SapphyrPostBattle1, MSGBOX_AUTOCLOSE
+	cleartrainerflag TRAINER_SAPPHYR_EMERALD2
+	applymovement LOCALID_BRENDAN, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+BattleFrontier_OutsideWest_EventScript_Sapphyr_Battle2::
+	trainerbattle_double TRAINER_SAPPHYR_EMERALD2, BattleFrontier_OutsideWest_Text_SilentIntro, BattleFrontier_OutsideWest_Text_SapphyrDefeated2, BattleFrontier_OutsideWest_Text_SapphyrNotEnoughMons
+	msgbox BattleFrontier_OutsideWest_Text_SapphyrPostBattle2, MSGBOX_AUTOCLOSE
+	cleartrainerflag TRAINER_SAPPHYR_EMERALD
+	applymovement LOCALID_BRENDAN, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
+BattleFrontier_OutsideWest_EventScript_Ruby::
+	lock
+	faceplayer
+	msgbox BattleFrontier_OutsideWest_Text_WouldYouLikeToBattle, MSGBOX_YESNO
+	closemessage
+	compare VAR_RESULT, NO
+	goto_if_eq BattleFrontier_OutsideWest_EventScript_Ruby_End
+	trainerbattle_single TRAINER_RUBY_EMERALD, BattleFrontier_OutsideWest_Text_SilentIntro, BattleFrontier_OutsideWest_Text_SilentDefeated
+	msgbox BattleFrontier_OutsideWest_Text_RubyPostBattle, MSGBOX_AUTOCLOSE
+	cleartrainerflag TRAINER_RUBY_EMERALD
+BattleFrontier_OutsideWest_EventScript_Ruby_End:
+	applymovement LOCALID_MAY, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
+	end
+
 BattleFrontier_OutsideWest_Text_BattleDomeSign: @ 823D6F7
 	.string "This is the BATTLE DOME!\n"
 	.string "Your path to the invincible superstar!$"
@@ -536,3 +588,34 @@ BattleFrontier_OutsideWest_Text_MonWithLongTailInFrontier: @ 823E5A5
 	.string "Oh, challenges can wait. I feel driven\n"
 	.string "to find the delightful creature!$"
 
+BattleFrontier_OutsideWest_Text_WouldYouLikeToBattle:
+	.string "Would you like to have a battle?$"
+
+BattleFrontier_OutsideWest_Text_SilentIntro:
+	.string "...$"
+
+BattleFrontier_OutsideWest_Text_SilentDefeated:
+	.string "...Wow!$"
+
+BattleFrontier_OutsideWest_Text_RubyPostBattle:
+	.string "...\n"
+	.string "...Nah, I don't have multiple\l"
+	.string "teams like Sapphyr over there.\p"
+	.string "Let's do that again sometime.$"
+
+BattleFrontier_OutsideWest_Text_SapphyrPostBattle1:
+	.string "...\n"
+	.string "...This is only my first form.\l"
+	.string "Let's do that again sometime.$"
+
+BattleFrontier_OutsideWest_Text_SapphyrNotEnoughMons:
+	.string "SAPPHYR: You don't have enough\n"
+	.string "POKéMON for a double battle.$"
+
+BattleFrontier_OutsideWest_Text_SapphyrDefeated2:
+	.string "......So I have an app idea......$"
+
+BattleFrontier_OutsideWest_Text_SapphyrPostBattle2:
+	.string "...!\n"
+	.string "...That was my second form.\l"
+	.string "Let's do that again sometime.$"

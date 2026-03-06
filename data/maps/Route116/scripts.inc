@@ -1,5 +1,6 @@
 .set LOCALID_BRINEY, 11
 .set LOCALID_WANDAS_BF_OUTSIDE, 21
+.set LOCALID_DROUGHT_SHARD, 29
 
 Route116_MapScripts:: @ 81F2C0C
 	map_script MAP_SCRIPT_ON_TRANSITION, Route116_OnTransition
@@ -15,10 +16,16 @@ Route116_OnTransition: @ 81F2C1C
 	call_if_eq AbnormalWeather_StartGroudonWeather
 	compare VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_116_SOUTH
 	call_if_eq AbnormalWeather_StartGroudonWeather
+	compare VAR_SOOTOPOLIS_CITY_STATE, 5
+	call_if_lt Route116_EventScript_HideDroughtShard
 	end
 
 Route116_EventScript_SetWandasBoyfriendPos:: @ 81F2C47
 	setobjectxyperm LOCALID_WANDAS_BF_OUTSIDE, 38, 10
+	return
+
+Route116_EventScript_HideDroughtShard::
+	setobjectxyperm LOCALID_DROUGHT_SHARD 69, 0
 	return
 
 Route116_OnLoad: @ 81F2C4F

@@ -633,6 +633,87 @@ $(MID_SUBDIR)/mus_vs_rayquaza.s: %.s: %.mid
 $(MID_SUBDIR)/mus_encounter_hiker.s: %.s: %.mid
 	$(MID) $< $@ -E -R$(STD_REVERB) -G097 -V076
 
+$(MID_SUBDIR)/mus_dp_vs_uxie_mesprit_azelf.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V078
+
+$(MID_SUBDIR)/mus_dp_vs_legend.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V092
+
+$(MID_SUBDIR)/mus_dp_vs_trainer.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V088
+
+$(MID_SUBDIR)/mus_dp_vs_wild.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V088
+
+$(MID_SUBDIR)/mus_dp_eterna_forest.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V088
+
+$(MID_SUBDIR)/mus_dp_lake_caverns.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V090
+
+$(MID_SUBDIR)/mus_dp_jubilife_day.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V096
+
+$(MID_SUBDIR)/mus_dp_jubilife_night.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V104
+
+$(MID_SUBDIR)/mus_dp_route209_day.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V086
+
+$(MID_SUBDIR)/mus_dp_route209_night.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V086
+
+$(MID_SUBDIR)/mus_dp_lake.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V088
+
+$(MID_SUBDIR)/mus_dp_oreburgh_mine.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V120
+
+$(MID_SUBDIR)/mus_dp_poke_center_night.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V127
+
+$(MID_SUBDIR)/mus_dp_route225_day.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V094
+
+$(MID_SUBDIR)/mus_dp_route225_night.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V094
+
+$(MID_SUBDIR)/mus_dp_hearthome_day.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V092
+
+$(MID_SUBDIR)/mus_dp_hearthome_night.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V100
+
+$(MID_SUBDIR)/mus_dp_cycling.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V115
+
+$(MID_SUBDIR)/mus_dp_poffins.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V090
+
+$(MID_SUBDIR)/mus_dp_vs_champion.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V090
+
+$(MID_SUBDIR)/mus_dp_vs_elite_four.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V094
+
+$(MID_SUBDIR)/mus_hg_vs_ho_oh.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G229 -V079
+
+$(MID_SUBDIR)/mus_hg_vs_lugia.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G229 -V102
+
+$(MID_SUBDIR)/mus_hg_route38.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G229 -V083
+
+$(MID_SUBDIR)/mus_hg_vs_champion.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G229 -V113
+
+$(MID_SUBDIR)/mus_hg_vs_gym_leader_kanto.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G229 -V075
+
+$(MID_SUBDIR)/mus_pl_lilycove_bossa_nova.s: %.s: %.mid
+	$(MID) $< $@ -E -R0 -G191 -V120
+
 $(MID_SUBDIR)/ph_choice_blend.s: %.s: %.mid
 	$(MID) $< $@ -E -G130 -P4
 

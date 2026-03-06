@@ -10,6 +10,8 @@ SeafloorCavern_Room9_MapScripts:: @ 8234DC8
 
 SeafloorCavern_Room9_EventScript_ArchieAwakenKyogre:: @ 8234DC9
 	lockall
+	setvar VAR_0x8002, SPECIES_KYOGRE
+	special MarkMonAsSeen
 	setvar VAR_0x8004, LOCALID_ARCHIE
 	setvar VAR_0x8005, LOCALID_MAXIE
 	setvar VAR_0x8006, LOCALID_GRUNT_1

@@ -37,4 +37,28 @@ void ItemUseOutOfBattle_Mints(u8 taskId);
 void ItemUseOutOfBattle_AbilityCapsule(u8 taskId);
 void ItemUseOutOfBattle_PokeBall(u8);
 
+void ItemUseOutOfBattle_CutTool(u8);
+void ItemUseOnFieldCB_CutTool(u8);
+void ItemUseOutOfBattle_FlyTool(u8);
+void ItemUseOutOfBattle_SurfTool(u8);
+void ItemUseOnFieldCB_SurfTool(u8);
+void ItemUseOutOfBattle_StrengthTool(u8);
+void ItemUseOnFieldCB_StrengthTool(u8);
+void ItemUseOutOfBattle_FlashTool(u8);
+void ItemUseOnFieldCB_FlashTool_Regi(u8 taskId);
+void ItemUseOnFieldCB_FlashTool(u8 taskId);
+void ItemUseOutOfBattle_RockSmashTool(u8);
+void ItemUseOnFieldCB_RockSmashTool_Regi(u8 taskId);
+void ItemUseOnFieldCB_RockSmashTool(u8 taskId);
+void ItemUseOutOfBattle_WaterfallTool(u8);
+void ItemUseOnFieldCB_WaterfallTool(u8);
+void ItemUseOutOfBattle_DiveTool(u8);
+void ItemUseOnFieldCB_DiveTool_Regi(u8);
+void ItemUseOnFieldCB_DiveTool(u8);
+void ItemUseOutOfBattle_TeleportTool(u8);
+void ItemUseOnFieldCB_TeleportTool(u8);
+void SetUpFieldAndUseTeleportTool(u8 taskId);
+void ItemUseOutOfBattle_SweetScentTool(u8);
+void ItemUseOnFieldCB_SweetScentTool(u8);
+
 #endif // GUARD_ITEM_USE_H

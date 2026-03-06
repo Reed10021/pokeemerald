@@ -138,10 +138,136 @@ Route119_WeatherInstitute_2F_EventScript_ExplainCastform:: @ 82700EA
 	end
 
 Route119_WeatherInstitute_2F_EventScript_ScientistMentionWeather:: @ 82700F7
+	call Route119_WeatherInstitute_2F_EventScript_WeatherShardsCheck
 	goto_if_set FLAG_SYS_GAME_CLEAR, Route119_WeatherInstitute_2F_EventScript_TryStartAbnormalWeather
 	msgbox Route119_WeatherInstitute_2F_Text_ChangingWeatherRidiculous, MSGBOX_DEFAULT
 	release
 	end
+
+Route119_WeatherInstitute_2F_EventScript_WeatherShardsCheck::
+	compare VAR_SOOTOPOLIS_CITY_STATE, 6
+	goto_if_ge Route119_WeatherInstitute_2F_EventScript_WeatherShards
+	checkitem ITEM_RAIN_SHARD, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq Route119_WeatherInstitute_2F_EventScript_WeatherShards
+	checkitem ITEM_DROUGHT_SHARD, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq Route119_WeatherInstitute_2F_EventScript_WeatherShards
+	checkitem ITEM_SANDSTORM_SHARD, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq Route119_WeatherInstitute_2F_EventScript_WeatherShards
+	checkitem ITEM_HAILSTORM_SHARD, 1
+	compare VAR_RESULT, TRUE
+	goto_if_eq Route119_WeatherInstitute_2F_EventScript_WeatherShards
+	return
+
+Route119_WeatherInstitute_2F_EventScript_WeatherShards::
+	goto_if_set FLAG_ITEM_WEATHER_INSTITUTE_WEATHER_ORB_AWARDED, Route119_WeatherInstitute_2F_EventScript_WeatherShards_Return
+	compare VAR_WEATHER_INSTITUTE_STATE, 16
+	call_if_ge Route119_WeatherInstitute_2F_EventScript_ResumeWeatherShards
+	compare VAR_WEATHER_INSTITUTE_STATE, 16
+	call_if_lt Route119_WeatherInstitute_2F_EventScript_StartWeatherShards
+Route119_WeatherInstitute_2F_EventScript_WeatherShards_Return:
+	return
+
+Route119_WeatherInstitute_2F_EventScript_StartWeatherShards::
+	setvar VAR_WEATHER_INSTITUTE_STATE, 16
+	msgbox Route119_WeatherInstitute_2F_Text_WeatherShards, MSGBOX_DEFAULT
+	return
+
+Route119_WeatherInstitute_2F_EventScript_ResumeWeatherShards::
+	copyvar VAR_TEMP_D, VAR_WEATHER_INSTITUTE_STATE
+	checkitem ITEM_RAIN_SHARD, 1
+	compare VAR_RESULT, TRUE
+	call_if_eq Route119_WeatherInstitute_2F_EventScript_TurnInRainShard
+	checkitem ITEM_DROUGHT_SHARD, 1
+	compare VAR_RESULT, TRUE
+	call_if_eq Route119_WeatherInstitute_2F_EventScript_TurnInDroughtShard
+	checkitem ITEM_SANDSTORM_SHARD, 1
+	compare VAR_RESULT, TRUE
+	call_if_eq Route119_WeatherInstitute_2F_EventScript_TurnInSandstormShard
+	checkitem ITEM_HAILSTORM_SHARD, 1
+	compare VAR_RESULT, TRUE
+	call_if_eq Route119_WeatherInstitute_2F_EventScript_TurnInHailStormShard
+	compare VAR_WEATHER_INSTITUTE_STATE, 31
+	goto_if_ne Route119_WeatherInstitute_2F_EventScript_WeatherShardAppraisal
+	msgbox Route119_WeatherInstitute_2F_Text_AssembleWeatherOrb, MSGBOX_DEFAULT
+	closemessage
+	delay 10
+	playse SE_CLICK
+	waitse
+	delay 25
+	playse SE_CLICK
+	waitse
+	delay 25
+	playse SE_PIN
+	applymovement LOCALID_SCIENTIST, Common_Movement_ExclamationMark
+	waitmovement 0
+	waitse
+	delay 10
+	msgbox Route119_WeatherInstitute_2F_Text_WeatherOrbDescription, MSGBOX_DEFAULT
+	giveitem ITEM_WEATHER_ORB
+	compare VAR_RESULT, FALSE
+	goto_if_eq Route119_WeatherInstitute_2F_EventScript_TooManyItems
+	setflag FLAG_ITEM_WEATHER_INSTITUTE_WEATHER_ORB_AWARDED
+	return
+Route119_WeatherInstitute_2F_EventScript_TooManyItems:
+	msgbox Route119_WeatherInstitute_2F_Text_BagFull, MSGBOX_DEFAULT
+	return
+Route119_WeatherInstitute_2F_EventScript_WeatherShardAppraisal:
+	compare VAR_TEMP_D, VAR_WEATHER_INSTITUTE_STATE @ If state changed, skip this dialog.
+	goto_if_ne Route119_WeatherInstitute_2F_EventScript_WeatherShardAppraisal_Return 
+	special GetWeatherInstituteShards
+	buffernumberstring 0, VAR_RESULT
+	msgbox Route119_WeatherInstitute_2F_Text_WeatherShardAppraisal, MSGBOX_DEFAULT
+	compare VAR_0x8004, TRUE
+	goto_if_ge Route119_WeatherInstitute_2F_EventScript_DroughtHint
+	msgbox Route119_WeatherInstitute_2F_Text_RainShardHint, MSGBOX_DEFAULT
+	goto Route119_WeatherInstitute_2F_EventScript_WeatherShardAppraisal_Return
+Route119_WeatherInstitute_2F_EventScript_DroughtHint:
+	compare VAR_0x8005, TRUE
+	goto_if_ge Route119_WeatherInstitute_2F_EventScript_SandstormHint
+	msgbox Route119_WeatherInstitute_2F_Text_DroughtShardHint, MSGBOX_DEFAULT
+	goto Route119_WeatherInstitute_2F_EventScript_WeatherShardAppraisal_Return
+Route119_WeatherInstitute_2F_EventScript_SandstormHint:
+	compare VAR_0x8006, TRUE
+	goto_if_ge Route119_WeatherInstitute_2F_EventScript_HailstormHint
+	msgbox Route119_WeatherInstitute_2F_Text_SandstormShardHint, MSGBOX_DEFAULT
+	goto Route119_WeatherInstitute_2F_EventScript_WeatherShardAppraisal_Return
+Route119_WeatherInstitute_2F_EventScript_HailstormHint:
+	compare VAR_0x8007, TRUE
+	goto_if_ge Route119_WeatherInstitute_2F_EventScript_WeatherShardAppraisal_Return
+	msgbox Route119_WeatherInstitute_2F_Text_HailstormShardHint, MSGBOX_DEFAULT
+Route119_WeatherInstitute_2F_EventScript_WeatherShardAppraisal_Return:
+	return
+
+Route119_WeatherInstitute_2F_EventScript_TurnInRainShard::
+	msgbox Route119_WeatherInstitute_2F_Text_TurnInRainShard, MSGBOX_DEFAULT
+	setvar VAR_0x8004, ITEM_RAIN_SHARD
+	call Common_EventScript_PlayerHandedOverTheItem
+	addvar VAR_WEATHER_INSTITUTE_STATE, 1
+	return
+
+Route119_WeatherInstitute_2F_EventScript_TurnInDroughtShard::
+	msgbox Route119_WeatherInstitute_2F_Text_TurnInDroughtShard, MSGBOX_DEFAULT
+	setvar VAR_0x8004, ITEM_DROUGHT_SHARD
+	call Common_EventScript_PlayerHandedOverTheItem
+	addvar VAR_WEATHER_INSTITUTE_STATE, 2
+	return
+
+Route119_WeatherInstitute_2F_EventScript_TurnInSandstormShard::
+	msgbox Route119_WeatherInstitute_2F_Text_TurnInSandstormShard, MSGBOX_DEFAULT
+	setvar VAR_0x8004, ITEM_SANDSTORM_SHARD
+	call Common_EventScript_PlayerHandedOverTheItem
+	addvar VAR_WEATHER_INSTITUTE_STATE, 4
+	return
+
+Route119_WeatherInstitute_2F_EventScript_TurnInHailStormShard::
+	msgbox Route119_WeatherInstitute_2F_Text_TurnInHailstormShard, MSGBOX_DEFAULT
+	setvar VAR_0x8004, ITEM_HAILSTORM_SHARD
+	call Common_EventScript_PlayerHandedOverTheItem
+	addvar VAR_WEATHER_INSTITUTE_STATE, 8
+	return
 
 Route119_WeatherInstitute_2F_EventScript_TryStartAbnormalWeather:: @ 827010A
 	setvar VAR_0x8004, 0
@@ -312,10 +438,119 @@ Route119_WeatherInstitute_2F_Text_PokemonChangesWithWeather: @ 82706FE
 	.string "There're plenty of them in the\n"
 	.string "INSTITUTE--go ahead and take it.$"
 
+Route119_WeatherInstitute_2F_Text_WeatherShards:
+	.string "It seems after KYOGRE and GROUDON's\n"
+	.string "battle, shards of crystallized weather\l"
+	.string "energy have scattered across HOENN.\p"
+	.string "If you happen to find any such\n"
+	.string "shards, you can bring them to me\l"
+	.string "and we can study them together.\p"
+	.string "My data seems to indicate that there\n"
+	.string "are four shards, one for each type of\l"
+	.string "weather.$"
+
+Route119_WeatherInstitute_2F_Text_WeatherShardAppraisal:
+	.string "Have you found any of the weather\n"
+	.string "shards lately? My data indicates that\l"
+	.string "there are 4 shards.\p"
+	.string "So far, you've found {STR_VAR_1}.$"
+
+Route119_WeatherInstitute_2F_Text_RainShardHint:
+	.string "My data indicates that the Rain Shard\n"
+	.string "is in an area that rains and storms\l"
+	.string "quite a lot.\p"
+	.string "The energy signature also looks to be\n"
+	.string "really close…$"
+
+Route119_WeatherInstitute_2F_Text_DroughtShardHint:
+	.string "My data indicates that the Sun Shard is\n"
+	.string "in a semi-mountainous, grassy area on\l"
+	.string "the mainland of HOENN.\p"
+	.string "GROUDON may have been near this\n"
+	.string "location at one point. Also, if you have\l"
+	.string "ROCK SMASH, it might come in handy.$"
+
+Route119_WeatherInstitute_2F_Text_SandstormShardHint:
+	.string "My data indicates that the Sand Shard\n"
+	.string "is somewhere in the desert of ROUTE\l"
+	.string "111.$"
+
+Route119_WeatherInstitute_2F_Text_HailstormShardHint:
+	.string "My data indicates that the Hail Shard\n"
+	.string "is somewhere north of Mossdeep City.\p"
+	.string "From my understanding, there's a cave\n"
+	.string "somewhere near that area that might be\l"
+	.string "worth a look.$"
+
+Route119_WeatherInstitute_2F_Text_TurnInRainShard:
+	.string "Oh! That's a Rain Shard!\n"
+	.string "It's the crystallized weather energies\l"
+	.string "of thunderstorms and downpours.\p"
+	.string "KYOGRE must have put out a tremendous\n"
+	.string "amount of energy into the atmosphere\l"
+	.string "for it to crystallize like this…$"
+
+Route119_WeatherInstitute_2F_Text_TurnInDroughtShard:
+	.string "Oh! That's a Sun Shard!\n"
+	.string "It's the crystallized weather energies\l"
+	.string "of droughts and heat.\p"
+	.string "GROUDON must have put out a\n"
+	.string "tremendous amount of energy into the\l"
+	.string "atmosphere for it to crystallize\l"
+	.string "like this…$"
+
+Route119_WeatherInstitute_2F_Text_TurnInSandstormShard:
+	.string "Oh! That's a Sand Shard!\n"
+	.string "It's the crystallized weather energies\l"
+	.string "of sandstorms.\p"
+	.string "Sandstorms are closely related to\n"
+	.string "droughts. If an area is in a prolonged\l"
+	.string "drought, the very soil can turn into\l"
+	.string "sand and be blown around!\p"
+	.string "GROUDON must have put out a\n"
+	.string "tremendous amount of energy into the\l"
+	.string "atmosphere for it to crystallize\l"
+	.string "like this…$"
+
+Route119_WeatherInstitute_2F_Text_TurnInHailstormShard:
+	.string "Oh! That's a Hail Shard!\n"
+	.string "It's the crystallized weather energies\l"
+	.string "of hailstorms and snow.\p"
+	.string "Hail and snow are closely related, as\n"
+	.string "both are made of water! Depending on\l"
+	.string "atmospheric and climate conditions,\l"
+	.string "you can get rain, snow, hail, or a mix.\p"
+	.string "KYOGRE must have put out a tremendous\n"
+	.string "amount of energy into the atmosphere\l"
+	.string "for it to crystallize like this…$"
+
+Route119_WeatherInstitute_2F_Text_AssembleWeatherOrb:
+	.string "It seems we have all four Weather\n"
+	.string "Shards. Rain, Sun, Sand, and Hail.\p"
+	.string "Now if I'm correct, they should all go\n"
+	.string "together like this…$"
+
+Route119_WeatherInstitute_2F_Text_WeatherOrbDescription:
+	.string "Aha! We've assembled a WEATHER ORB!\p"
+	.string "When held by a POKéMON, the WEATHER\n"
+	.string "ORB will set up a random weather when it\l"
+	.string "enters battle, provided a weather isn't\l"
+	.string "already present.\p"
+	.string "Also, the weather summoned by the\n"
+	.string "WEATHER ORB will last 3 turns.\l"
+	.string "After 3 turns, the WEATHER ORB will\l"
+	.string "summon another random weather effect.\p"
+	.string "Here, you've done all the legwork.\n"
+	.string "It is only fair that you have this.$"
+
 Route119_WeatherInstitute_2F_Text_ChangingWeatherRidiculous: @ 827077E
 	.string "I've been researching rain for many\n"
 	.string "years, but it's ridiculous to think that\l"
 	.string "humans can freely change the weather.$"
+
+Route119_WeatherInstitute_2F_Text_BagFull:
+	.string "Oh, it looks like your BAG is full.\n"
+	.string "Come back when you have space.$"
 
 Route119_WeatherInstitute_2F_Text_GroudonWeather: @ 82707F1
 	.string "I track weather patterns over\n"

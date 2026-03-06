@@ -8,10 +8,12 @@
 #include "palette.h"
 #include "random.h"
 #include "sprite.h"
+#include "sound.h"
 #include "task.h"
 #include "trig.h"
 #include "constants/battle_anim.h"
 #include "constants/rgb.h"
+#include "constants/songs.h"
 
 struct HailStruct {
     s32 x:10;
@@ -48,6 +50,12 @@ static void AnimTask_Haze2(u8);
 static void AnimTask_OverlayFogTiles(u8);
 static void AnimTask_Hail2(u8);
 static bool8 GenerateHailParticle(u8 hailStructId, u8 affineAnimNum, u8 taskId, u8 c);
+static void AvalancheAnim_Step(struct Sprite* sprite);
+static void AvalancheAnim_Step2(struct Sprite* sprite);
+static void AnimTask_DynamaxGrowthStep(u8 taskId);
+static void SpriteCB_MaxFlutterbyStep1(struct Sprite* sprite);
+static void SpriteCB_MaxFlutterbyStep2(struct Sprite* sprite);
+static void SpriteCB_MaxFlutterby(struct Sprite* sprite);
 
 static const union AnimCmd gUnknown_08595A48[] =
 {
@@ -522,6 +530,171 @@ const struct SpriteTemplate gIceBallImpactShardSpriteTemplate =
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = InitIceBallParticle,
 };
+
+const union AnimCmd gAvalancheAnimTable_1[] =
+{
+    ANIMCMD_FRAME(32, 1),
+    ANIMCMD_END,
+};
+
+const union AnimCmd gAvalancheAnimTable_2[] =
+{
+    ANIMCMD_FRAME(48, 1),
+    ANIMCMD_END,
+};
+
+const union AnimCmd gAvalancheAnimTable_3[] =
+{
+    ANIMCMD_FRAME(64, 1),
+    ANIMCMD_END,
+};
+
+const union AnimCmd* const gAvalancheAnimCmd[] =
+{
+    gAvalancheAnimTable_1,
+    gAvalancheAnimTable_2,
+    gAvalancheAnimTable_3,
+};
+
+const struct SpriteTemplate gAvalancheSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_ROCKS,
+    .paletteTag = ANIM_TAG_ICE_CHUNK,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAvalancheAnimCmd,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AvalancheAnim_Step,
+};
+
+static const union AffineAnimCmd sSpriteAffineAnim_FlutterbyPulsate[] = {
+    AFFINEANIMCMD_FRAME(16, 16, 0, 4),
+    AFFINEANIMCMD_FRAME(-16, -16, 0, 4),
+    AFFINEANIMCMD_JUMP(0),
+};
+static const union AffineAnimCmd sSpriteAffineAnim_FlutterbyGrow[] = {
+    AFFINEANIMCMD_FRAME(8, 8, 0, 16), //Double in size
+    AFFINEANIMCMD_END,
+};
+
+static const union AffineAnimCmd* const sSpriteAffineAnimTable_Flutterby[] = {
+    sSpriteAffineAnim_FlutterbyPulsate,
+    sSpriteAffineAnim_FlutterbyGrow,
+};
+
+const struct SpriteTemplate gIceShardSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_ICE_CRYSTALS,
+    .paletteTag = ANIM_TAG_ICE_CRYSTALS,
+    .oam = &gOamData_AffineDouble_ObjBlend_8x8,
+    .anims = sAnims_IceCrystalSmall,
+    .images = NULL,
+    .affineAnims = sSpriteAffineAnimTable_Flutterby,
+    .callback = SpriteCB_MaxFlutterby
+};
+
+static void AvalancheAnim_Step(struct Sprite* sprite)
+{
+    if (gBattleAnimArgs[3] != 0)
+        SetAverageBattlerPositions(gBattleAnimTarget, 0, &sprite->pos1.x, &sprite->pos1.y);
+
+    sprite->pos1.x += gBattleAnimArgs[0];
+    sprite->pos1.y += 14;
+
+    StartSpriteAnim(sprite, gBattleAnimArgs[1]);
+    AnimateSprite(sprite);
+
+    sprite->data[0] = 0;
+    sprite->data[1] = 0;
+    sprite->data[2] = 4;
+    sprite->data[3] = 16;
+    sprite->data[4] = -70;
+    sprite->data[5] = gBattleAnimArgs[2];
+
+    StoreSpriteCallbackInData6(sprite, AvalancheAnim_Step2);
+    sprite->callback = TranslateSpriteInEllipseOverDuration;
+    sprite->callback(sprite);
+}
+
+static void AvalancheAnim_Step2(struct Sprite* sprite)
+{
+    sprite->pos1.x += sprite->data[5];
+
+    sprite->data[0] = 192;
+    sprite->data[1] = sprite->data[5];
+    sprite->data[2] = 4;
+    sprite->data[3] = 32;
+    sprite->data[4] = -24;
+
+    StoreSpriteCallbackInData6(sprite, DestroySpriteAndMatrix);
+    sprite->callback = TranslateSpriteInEllipseOverDuration;
+    sprite->callback(sprite);
+}
+
+static void AnimTask_DynamaxGrowthStep(u8 taskId) // from CFRU
+{
+    struct Task* task = &gTasks[taskId];
+    if (!RunAffineAnimFromTaskData(task))
+        DestroyAnimVisualTask(taskId);
+}
+
+//Moves the butterflies created in Max Flutterby
+//arg 0: initial x pixel offset
+//arg 1: initial y pixel offset
+//arg 2: wave amplitude
+static void SpriteCB_MaxFlutterby(struct Sprite* sprite)
+{
+    s16 target_x;
+    s16 target_y;
+
+    // if (GetMoveTarget(gAnimMoveIndex) == MOVE_TARGET_BOTH)
+    if (IsDoubleBattle() == TRUE)
+    {
+        SetAverageBattlerPositions(gBattleAnimTarget, TRUE, &target_x, &target_y);
+    }
+    else
+    {
+        target_x = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X_2);
+        target_y = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y_PIC_OFFSET);
+    }
+
+    InitSpritePosToAnimAttacker(sprite, FALSE);
+
+    sprite->data[0] = 0x10; //Speed delay
+    sprite->data[2] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X_2); //Target X
+    sprite->data[4] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y_PIC_OFFSET); //Target Y
+    sprite->data[5] = gBattleAnimArgs[2]; //Wave amplitude
+
+    sprite->callback = SpriteCB_MaxFlutterbyStep1;
+}
+
+//The butterflies prepare to move towards the target
+static void SpriteCB_MaxFlutterbyStep1(struct Sprite* sprite)
+{
+    if (!FuncIsActiveTask(AnimTask_DynamaxGrowthStep))
+    {
+        //if (gAnimMoveIndex != MOVE_INFERNAL_PARADE
+        //    && gAnimMoveIndex != MOVE_ASTRAL_BARRAGE)
+            PlaySE(SE_M_SAND_ATTACK);
+
+        StartSpriteAffineAnim(sprite, 1);
+        InitAnimArcTranslation(sprite);
+        sprite->callback = SpriteCB_MaxFlutterbyStep2;
+    }
+}
+
+//Destroys the butterflies when they reach the target
+static void SpriteCB_MaxFlutterbyStep2(struct Sprite* sprite)
+{
+    sprite->invisible = FALSE;
+
+    if (TranslateAnimHorizontalArc(sprite))
+    {
+        //if (gAnimMoveIndex == MOVE_INFERNAL_PARADE)
+        //    PlaySE(SE_M_FLAME_WHEEL2);
+        DestroySpriteAndMatrix(sprite);
+    }
+}
 
 // Unused
 static void sub_810B6C4(struct Sprite *sprite)

@@ -418,6 +418,7 @@ const struct CompressedSpriteSheet gMonStillFrontPicTable[] =
     SPECIES_SPRITE(DEOXYS_ATTACK, gMonStillFrontPic_Deoxys_Attack),
     SPECIES_SPRITE(DEOXYS_DEFENSE,gMonStillFrontPic_Deoxys_Defense),
     SPECIES_SPRITE(DEOXYS_SPEED,  gMonStillFrontPic_Deoxys_Speed),
+    SPECIES_SPRITE(REGIGIGAS,     gMonStillFrontPic_Regigigas),
     SPECIES_SPRITE(EGG,           gMonStillFrontPic_Egg),
     SPECIES_SPRITE(UNOWN_B,       gMonStillFrontPic_UnownB),
     SPECIES_SPRITE(UNOWN_C,       gMonStillFrontPic_UnownC),

@@ -221,3 +221,16 @@ AncientTomb_Braille_ShineInTheMiddle: @ 82A6D06
 	.braille "INHERIT OUR\n"
 	.braille "WILL, SHINE\n"
 	.braille "IN THE MIDDLE.$"
+
+IslandCave_Braille_Regigigias:
+	.byte 5
+	.byte 0
+	.byte 25
+	.byte 19
+	.byte 8
+	.byte 3
+	.braille "BRING\n"
+	.braille "REGIROCK\n"
+	.braille "REGISTEEL\n"
+	.braille "AND REGICE\n"
+	.braille "THEN DIVE$"

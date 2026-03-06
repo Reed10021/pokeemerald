@@ -4,6 +4,13 @@
 #include "main.h"
 #include "task.h"
 
+enum {
+    CAN_LEARN_MOVE,
+    CANNOT_LEARN_MOVE,
+    ALREADY_KNOWS_MOVE,
+    CANNOT_LEARN_MOVE_IS_EGG
+};
+
 // seems like the last two fields may have been left as all-purpose vars
 // and the second of the two just happens to only be used in one case
 struct PartyMenu
@@ -93,7 +100,7 @@ void ItemUseCB_Mints(u8 taskId, TaskFunc task);
 void ItemUseCB_AbilityCapsule(u8 taskId, TaskFunc task);
 void ItemUseCB_PokeBall(u8 taskId, TaskFunc task);
 void CB2_ReturnToPartyMenuFromSummaryScreen(void);
-
+u8 CanMonLearnTMTutor(struct Pokemon* mon, u16 item, u8 tutor);
 bool8 CanLearnTutorMove(u16, u8);
 
 #endif // GUARD_PARTY_MENU_H

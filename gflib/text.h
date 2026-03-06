@@ -269,6 +269,10 @@
 
 #define TEXT_SPEED_FF 0xFF
 
+#define TEXT_SKIP_DRAW 0xFF
+#define FONT_NORMAL 1
+#define FONT_NARROW 7
+
 enum
 {
     COLOR_FOREGROUND,

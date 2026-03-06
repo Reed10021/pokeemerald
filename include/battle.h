@@ -417,7 +417,7 @@ struct BattleStruct
     u8 unused_6[3];
     u8 givenExpMons; // Bits for enemy party's pokemon that gave exp to player's party.
     u8 lastTakenMoveFrom[MAX_BATTLERS_COUNT * MAX_BATTLERS_COUNT * 2]; // a 3-D array [target][attacker][byte]
-    u16 castformPalette[MAX_BATTLERS_COUNT][16];
+    u16 castformPalette[MAX_CASTFORM_FORMS][16];
     u8 field_180; // weird field, used in battle_main.c, once accessed as an array of u32 overwriting the field below
     u8 field_181;
     u8 field_182;
@@ -447,8 +447,18 @@ struct BattleStruct
         typeArg = gBattleMoves[move].type;                  \
 }
 
-#define IS_TYPE_PHYSICAL(moveType)(moveType < TYPE_MYSTERY)
-#define IS_TYPE_SPECIAL(moveType)(moveType > TYPE_MYSTERY)
+#define IS_PHYSICAL_MOVE(move)(move == MOVE_CRABHAMMER || move == MOVE_SACRED_FIRE || move == MOVE_BLAZE_KICK || move == MOVE_FLARE_BLITZ || move == MOVE_OUTRAGE || move == MOVE_DRAGON_CLAW \
+                            || move == MOVE_WATERFALL || move == MOVE_BITE ||move == MOVE_CRUNCH || move == MOVE_NEEDLE_ARM || move == MOVE_BULLET_SEED || move == MOVE_KNOCK_OFF || move == MOVE_AVALANCHE \
+                            || move == MOVE_ICE_SHARD)
+#define IS_SPECIAL_MOVE(move)(move == MOVE_AEROBLAST || move == MOVE_SIGNAL_BEAM || move == MOVE_AIR_SLASH || move == MOVE_WEATHER_BALL || move == MOVE_TRI_ATTACK || move == MOVE_SHADOW_BALL)
+
+#define IS_TYPE_PHYSICAL(move, moveType)((moveType < TYPE_MYSTERY || IS_PHYSICAL_MOVE(move)) && !IS_SPECIAL_MOVE(move))
+#define IS_TYPE_SPECIAL(move, moveType)((moveType > TYPE_MYSTERY || IS_SPECIAL_MOVE(move)) && !IS_PHYSICAL_MOVE(move))
+
+#define IS_PUNCHING_MOVE(move)(move == MOVE_COMET_PUNCH || move == MOVE_DIZZY_PUNCH || move == MOVE_DYNAMIC_PUNCH || move == MOVE_FIRE_PUNCH || move == MOVE_FOCUS_PUNCH \
+                            || move == MOVE_ICE_PUNCH || move == MOVE_MACH_PUNCH || move == MOVE_MEGA_PUNCH || move == MOVE_SHADOW_PUNCH || move == MOVE_SKY_UPPERCUT \
+                            || move == MOVE_THUNDER_PUNCH || move == MOVE_METEOR_MASH || move == MOVE_NEEDLE_ARM || move == MOVE_BULLET_PUNCH || move == MOVE_DRAIN_PUNCH \
+                            || move == MOVE_ARM_THRUST || move == MOVE_ROCK_SMASH || move == MOVE_STRENGTH || move == MOVE_FAINT_ATTACK)
 
 #define TARGET_TURN_DAMAGED ((gSpecialStatuses[gBattlerTarget].physicalDmg != 0 || gSpecialStatuses[gBattlerTarget].specialDmg != 0))
 
@@ -586,9 +596,9 @@ struct BattleSpriteData
 struct MonSpritesGfx
 {
     void* firstDecompressed; // ptr to the decompressed sprite of the first pokemon
-    void* sprites[4];
-    struct SpriteTemplate templates[4];
-    struct SpriteFrameImage field_74[4][4];
+    void* sprites[MAX_BATTLERS_COUNT];
+    struct SpriteTemplate templates[MAX_BATTLERS_COUNT];
+    struct SpriteFrameImage field_74[MAX_BATTLERS_COUNT][MAX_MON_PIC_FRAMES];
     u8 field_F4[0x80];
     u8 *barFontGfx;
     void *field_178;
@@ -712,5 +722,10 @@ extern u8 gHealthboxSpriteIds[MAX_BATTLERS_COUNT];
 extern u8 gMultiUsePlayerCursor;
 extern u8 gNumberOfMovesToChoose;
 extern u8 gUnknown_03005D7C[MAX_BATTLERS_COUNT];
+
+static inline bool32 IsBattlerAtMaxHp(u32 battler)
+{
+    return gBattleMons[battler].hp == gBattleMons[battler].maxHP;
+}
 
 #endif // GUARD_BATTLE_H

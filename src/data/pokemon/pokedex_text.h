@@ -2319,3 +2319,9 @@ const u8 gDeoxysPokedexText[] = _(
     "extraterrestrial virus exposed to a laser\n"
     "beam. Its body is configured for superior\n"
     "agility and speed.");
+
+const u8 gRegigigasPokedexText[] = _(
+    "There is an enduring legend from the\n"
+    "Sinnoh region that states this Pokémon\n"
+    "shaped Regirock, Regice, and Registeel\n"
+    "out of clay, ice, and magma respectively.");

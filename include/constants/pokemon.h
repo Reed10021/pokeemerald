@@ -206,7 +206,7 @@
 #define LEVEL_UP_MOVE_LV   0xFE00
 #define LEVEL_UP_END       0xFFFF
 
-#define MAX_LEVEL_UP_MOVES       20
+#define MAX_LEVEL_UP_MOVES       25
 #define MAX_LEVEL_DIFF_PRE_EV    5
 
 #define MON_MALE       0x00
@@ -292,5 +292,19 @@
 
 #define NUM_MALE_LINK_FACILITY_CLASSES   8
 #define NUM_FEMALE_LINK_FACILITY_CLASSES 8
+
+#define MON_PIC_WIDTH 64
+#define MON_PIC_HEIGHT 64
+#define MON_PIC_SIZE (MON_PIC_WIDTH * MON_PIC_HEIGHT / 2)
+
+// Most Pokémon have 2 frames (a default and an alternate for their animation).
+// There are 4 exceptions:
+// - Castform has ~4~ 5 frames, 1 for each form
+// - Deoxys has 2 frames, 1 for each form
+// - Spinda has 1 frame, presumably to avoid the work of animating its spots
+// - Unown has 1 frame, presumably to avoid the work of animating all 28 of its forms
+#define MAX_MON_PIC_FRAMES 5
+
+#define MAX_CASTFORM_FORMS 5
 
 #endif // GUARD_CONSTANTS_POKEMON_H

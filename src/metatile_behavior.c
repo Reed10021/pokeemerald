@@ -39,7 +39,7 @@ static const u8 sTileBitAttributes[] =
     [MB_UNUSED_SOOTOPOLIS_DEEP_WATER_2] = TILE_ATTRIBUTES(FALSE, FALSE, FALSE),
     [MB_STAIRS_OUTSIDE_ABANDONED_SHIP] = TILE_ATTRIBUTES(TRUE, FALSE, FALSE),
     [MB_SHOAL_CAVE_ENTRANCE] = TILE_ATTRIBUTES(TRUE, FALSE, FALSE),
-    [MB_UNUSED_1D] = TILE_ATTRIBUTES(FALSE, FALSE, FALSE),
+    [MB_SHIP_ENCOUNTERS_NO_SURFACING] = TILE_ATTRIBUTES(TRUE, TRUE, TRUE),
     [MB_UNUSED_1E] = TILE_ATTRIBUTES(FALSE, FALSE, FALSE),
     [MB_UNUSED_1F] = TILE_ATTRIBUTES(FALSE, FALSE, FALSE),
     [MB_ICE] = TILE_ATTRIBUTES(TRUE, FALSE, FALSE),
@@ -974,7 +974,8 @@ bool8 MetatileBehavior_IsUnableToEmerge(u8 metatileBehavior)
     // change the metatile behavior of the narrower water door with porymaps tileset editor.
     if (metatileBehavior == MB_NO_SURFACING
      || metatileBehavior == MB_SEAWEED_NO_SURFACING
-     || metatileBehavior == MB_WATER_DOOR)
+     || metatileBehavior == MB_WATER_DOOR
+     || metatileBehavior == MB_SHIP_ENCOUNTERS_NO_SURFACING)
         return TRUE;
     else
         return FALSE;

@@ -132,6 +132,14 @@ MauvilleCity_Gym_EventScript_GiveShockWave:: @ 820DFB1
 	return
 
 MauvilleCity_Gym_EventScript_CompletedNewMauville:: @ 820DFD4
+	checkitem ITEM_BASEMENT_KEY, 1
+	compare VAR_RESULT, FALSE
+	goto_if_eq MauvilleCity_Gym_EventScript_NoKey
+	playfanfare MUS_OBTAIN_ITEM
+	msgbox MauvilleCity_Gym_Text_WattsonGiveBackKey, MSGBOX_DEFAULT
+	waitfanfare
+	removeitem ITEM_BASEMENT_KEY
+MauvilleCity_Gym_EventScript_NoKey:
 	msgbox MauvilleCity_Gym_Text_WattsonGoForthAndEndeavor, MSGBOX_DEFAULT
 	release
 	end
@@ -427,4 +435,8 @@ MauvilleCity_Gym_Text_WattsonRematchNeedTwoMons: @ 820EAFD
 	.string "You've only one POKéMON with you!\p"
 	.string "Come see me with two or more\n"
 	.string "POKéMON, all right?$"
+
+MauvilleCity_Gym_Text_WattsonGiveBackKey:
+	.string "{PLAYER} returned to WATTSON\n"
+	.string "the BASEMENT KEY.$"
 

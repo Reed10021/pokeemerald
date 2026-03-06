@@ -2,7 +2,7 @@
   "id": "MAP_WATER_PATH",
   "name": "WaterPath",
   "layout": "LAYOUT_WATER_PATH",
-  "music": "MUS_GSC_ROUTE38",
+  "music": "MUS_HG_ROUTE38",
   "region_map_section": "MAPSEC_WATER_PATH",
   "requires_flash": false,
   "weather": "WEATHER_ROUTE103_110_CYCLE",
@@ -224,6 +224,19 @@
       "trainer_sight_or_berry_tree_id": "117",
       "script": "BerryTreeScript",
       "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
+      "x": 15,
+      "y": 19,
+      "elevation": 19,
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_range_x": 1,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "WaterPath_EventScript_ItemQuietMint",
+      "flag": "FLAG_ITEM_WATER_PATH_QUIET_MINT"
     }
   ],
   "warp_events": [

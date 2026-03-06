@@ -4,12 +4,15 @@ WaterPath_MapScripts::
 
 WaterPath_OnLoad:
 	call_if_unset FLAG_JIRACHI_DOOR, WaterPath_CloseJirachiEntrance
+	call_if_unset FLAG_GOT_JOHTO_STARTER, WaterPath_CloseCelebiEntrance
 	end
 
 WaterPath_CloseJirachiEntrance::
 	setmetatile 16, 10, METATILE_General_RockWall_RockBase, 1
 	setmetatile 16, 11, METATILE_General_RockWall_SandBase, 1
+	return
 
+WaterPath_CloseCelebiEntrance::
 	setmetatile 22, 1, 0x15A, 1
 	setmetatile 23, 1, 0x15B, 1
 	setmetatile 22, 2, 0x158, 1
@@ -36,6 +39,6 @@ WaterPath_EventScript_Sign::
 	end
 
 WaterPath_Text_Sign:
-	.string "PATTERN BUSH\n"
+	.string "TIMELESS FOREST\n"
 	.string "One of Celebi's many homes.$"
 

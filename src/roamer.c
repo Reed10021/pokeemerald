@@ -62,12 +62,35 @@ void ClearRoamerLocationData(void)
     sRoamerLocation[MAP_NUM] = 0;
 }
 
-static void CreateInitialRoamerMon(bool16 createLatios)
+static void CreateInitialRoamerMon(u16 pokemonSelector)
 {
-    if (!createLatios)
-        (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIAS;
-    else
-        (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIOS;
+    switch (pokemonSelector)
+    {
+        case 0:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIAS;
+            break;
+        case 1:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIOS;
+            break;
+        case 2:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_ARTICUNO;
+            break;
+        case 3:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_ZAPDOS;
+            break;
+        case 4:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_MOLTRES;
+            break;
+        case 5:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_RAIKOU;
+            break;
+        case 6:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_ENTEI;
+            break;
+        case 7:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_SUICUNE;
+            break;
+    }
     (&gSaveBlock1Ptr->roamer)->active = TRUE;
 
     GetSetPokedexFlag(SpeciesToNationalPokedexNum((&gSaveBlock1Ptr->roamer)->species), FLAG_SET_SEEN);
@@ -101,7 +124,7 @@ bool16 CheckShinyRoamer(void)
     if (!(&gSaveBlock1Ptr->roamer)->active)
     {
         gSpecialVar_Result = FALSE;
-        return;
+        return FALSE;
     }
 
     {
@@ -112,7 +135,7 @@ bool16 CheckShinyRoamer(void)
         u32 shinyValue = (HIHALF(value) ^ LOHALF(value) ^ HIHALF((&gSaveBlock1Ptr->roamer)->personality) ^ LOHALF((&gSaveBlock1Ptr->roamer)->personality));
 
         gSpecialVar_Result = shinyValue < SHINY_ODDS;
-        return;
+        return shinyValue < SHINY_ODDS;
     }
 }
 
@@ -216,6 +239,7 @@ void CreateRoamerMonInstance(void)
     struct Pokemon *mon;
     struct Roamer *roamer;
     u8 soulDew = ITEM_SOUL_DEW;
+    u8 brightPowder = ITEM_BRIGHT_POWDER;
 
     mon = &gEnemyParty[0];
     ZeroEnemyPartyMons();
@@ -234,7 +258,11 @@ void CreateRoamerMonInstance(void)
     SetMonData(mon, MON_DATA_CUTE, &gSaveBlock1Ptr->roamer.cute);
     SetMonData(mon, MON_DATA_SMART, &gSaveBlock1Ptr->roamer.smart);
     SetMonData(mon, MON_DATA_TOUGH, &gSaveBlock1Ptr->roamer.tough);
-    SetMonData(mon, MON_DATA_HELD_ITEM, &soulDew);
+
+    if(roamer->species == SPECIES_LATIAS || roamer->species == SPECIES_LATIOS)
+        SetMonData(mon, MON_DATA_HELD_ITEM, &soulDew);
+    else
+        SetMonData(mon, MON_DATA_HELD_ITEM, &brightPowder);
 }
 
 bool8 TryStartRoamerEncounter(void)

@@ -81,6 +81,7 @@ BirthIsland_Exterior_EventScript_Deoxys:: @ 8267FC1
 	playmoncry SPECIES_DEOXYS, 2
 	delay 40
 	waitmoncry
+	setflag FLAG_FORCE_ANIMATIONS
 	setvar VAR_LAST_TALKED, LOCALID_DEOXYS
 	setvar VAR_0x8004, SPECIES_DEOXYS
 	setvar VAR_0x8005, 50 @ level
@@ -92,12 +93,14 @@ BirthIsland_Exterior_EventScript_Deoxys:: @ 8267FC1
 	clearflag FLAG_SYS_CTRL_OBJ_DELETE
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq BirthIsland_Exterior_EventScript_DefeatedDeoxys
+	goto_if_eq BirthIsland_Exterior_EventScript_RanFromDeoxys
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq BirthIsland_Exterior_EventScript_RanFromDeoxys
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq BirthIsland_Exterior_EventScript_RanFromDeoxys
 	setflag FLAG_BATTLED_DEOXYS
+	compare VAR_SPECIESCHAINED, SPECIES_DEOXYS
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
@@ -108,6 +111,9 @@ BirthIsland_Exterior_EventScript_DefeatedDeoxys:: @ 826803B
 	end
 
 BirthIsland_Exterior_EventScript_RanFromDeoxys:: @ 8268049
+	compare VAR_SPECIESCHAINED, SPECIES_DEOXYS
+	call_if_eq ChainNumberNoLock
+	closemessage
 	setvar VAR_0x8004, SPECIES_DEOXYS
 	goto Common_EventScript_LegendaryFlewAway
 	end

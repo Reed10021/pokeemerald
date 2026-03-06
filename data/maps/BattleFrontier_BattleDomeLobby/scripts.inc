@@ -508,7 +508,8 @@ BattleFrontier_BattleDomeLobby_Text_NotEnoughValidMonsLvOpen: @ 824A2AB
 	.string "You don't have three eligible POKéMON.\p"
 	.string "Also, the POKéMON must be holding\n"
 	.string "different kinds of items.\p"
-	.string "EGGS{STR_VAR_1} ineligible.\p"
+	.string "EGGS are ineligible.\p"
+	.string "{STR_VAR_1} limited to one per team.\p"
 	.string "Please come see me when you are ready.$"
 
 BattleFrontier_BattleDomeLobby_Text_NotEnoughValidMonsLv50: @ 824A353
@@ -518,7 +519,8 @@ BattleFrontier_BattleDomeLobby_Text_NotEnoughValidMonsLv50: @ 824A353
 	.string "of Level 50 or less to enter.\p"
 	.string "They also must be holding different\n"
 	.string "kinds of items.\p"
-	.string "EGGS{STR_VAR_1} ineligible.\p"
+	.string "EGGS are ineligible.\p"
+	.string "{STR_VAR_1} limited to one per team.\p"
 	.string "Please come see me when you are ready.$"
 
 BattleFrontier_BattleDomeLobby_Text_ShowYouToBattleDome: @ 824A437

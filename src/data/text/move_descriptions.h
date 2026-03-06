@@ -58,8 +58,8 @@ static const u8 sSwordsDanceDescription[] = _(
     "sharply raises ATTACK.");
 
 static const u8 sCutDescription[] = _(
-    "Cuts with sharp claws. Has a\n"
-    "high critical-hit ratio.");
+    "Cuts a noxious slice that\n"
+    "can poison the target.");
 
 static const u8 sGustDescription[] = _(
     "Strikes the foe with a gust\n"
@@ -366,8 +366,8 @@ static const u8 sDigDescription[] = _(
     "turn and strikes next turn.");
 
 static const u8 sToxicDescription[] = _(
-    "Poisons the foe with an\n"
-    "intensifying toxin.");
+    "Badly poisons the foe and\n"
+    "lowers their defenses.");
 
 static const u8 sConfusionDescription[] = _(
     "A psychic attack that may\n"
@@ -907,7 +907,7 @@ static const u8 sBatonPassDescription[] = _(
 
 static const u8 sEncoreDescription[] = _(
     "Makes the foe repeat its\n"
-    "last move over 2 to 6 turns.");
+    "last move over 3 turns.");
 
 static const u8 sPursuitDescription[] = _(
     "Inflicts bad damage if used\n"
@@ -967,7 +967,7 @@ static const u8 sSunnyDayDescription[] = _(
 
 static const u8 sCrunchDescription[] = _(
     "Crunches with sharp fangs.\n"
-    "May lower SP. DEF.");
+    "May lower foe's DEFENSE.");
 
 static const u8 sMirrorCoatDescription[] = _(
     "Counters the foe's special\n"
@@ -987,7 +987,7 @@ static const u8 sAncientPowerDescription[] = _(
 
 static const u8 sShadowBallDescription[] = _(
     "Hurls a black blob that may\n"
-    "lower the foe's DEFENSE.");
+    "lower the foe's SP. DEF.");
 
 static const u8 sFutureSightDescription[] = _(
     "Heightens inner power to\n"
@@ -995,7 +995,7 @@ static const u8 sFutureSightDescription[] = _(
 
 static const u8 sRockSmashDescription[] = _(
     "A rock-crushing attack\n"
-    "that may lower DEFENSE.");
+    "that lowers target DEFENSE.");
 
 static const u8 sWhirlpoolDescription[] = _(
     "Traps and hurts the foe in\n"
@@ -1206,8 +1206,8 @@ static const u8 sIceBallDescription[] = _(
     "power on successive hits.");
 
 static const u8 sNeedleArmDescription[] = _(
-    "Attacks with thorny arms.\n"
-    "May cause flinching.");
+    "Attacks with thorny punches.\n"
+    "May raise the user's ATTACK.");
 
 static const u8 sSlackOffDescription[] = _(
     "Slacks off and restores\n"
@@ -1416,6 +1416,38 @@ static const u8 sDoomDesireDescription[] = _(
 static const u8 sPsychoBoostDescription[] = _(
     "Allows a full-power attack,\n"
     "but sharply lowers SP. ATK.");
+
+static const u8 sFlareBlitzDescription[] = _(
+    "A life-risking fiery charge\n"
+    "that also hurts the user.");
+
+static const u8 sDarkPulseDescription[] = _(
+    "Attacks with a horrible\n"
+    "aura. May cause flinching.");
+
+static const u8 sAirSlashDescription[] = _(
+    "Attacks with a blade of\n"
+    "air. May cause flinching.");
+
+static const u8 sDragonPulseDescription[] = _(
+    "Generates a shock wave to\n"
+    "damage the foe.");
+
+static const u8 sBulletPunchDescription[] = _(
+    "Punches fast as a bullet.\n"
+    "It always hits first.");
+
+static const u8 sIceShardDescription[] = _(
+    "Hurls a chunk of ice that\n"
+    "always strikes first.");
+
+static const u8 sShadowClawDescription[] = _(
+    "Strikes with a shadow claw.\n"
+    "High critical-hit ratio.");
+
+static const u8 sCrushGripDescription[] = _(
+    "The higher the foe's HP is,\n"
+    "the more damage caused.");
 
 // MOVE_NONE is ignored in this table. Make sure to always subtract 1 before getting the right pointer.
 const u8 *const gMoveDescriptionPointers[MOVES_COUNT - 1] =
@@ -1774,4 +1806,22 @@ const u8 *const gMoveDescriptionPointers[MOVES_COUNT - 1] =
     [MOVE_WATER_PULSE - 1] = sWaterPulseDescription,
     [MOVE_DOOM_DESIRE - 1] = sDoomDesireDescription,
     [MOVE_PSYCHO_BOOST - 1] = sPsychoBoostDescription,
+    [MOVE_ROOST-1 ... MOVE_MAGNET_RISE-1] = sNullDescription,
+    [MOVE_FLARE_BLITZ - 1] = sFlareBlitzDescription,
+    [MOVE_FORCE_PALM-1 ... MOVE_POISON_JAB-1] = sNullDescription,
+    [MOVE_DARK_PULSE - 1] = sDarkPulseDescription,
+    [MOVE_NIGHT_SLASH-1 ... MOVE_SEED_BOMB-1] = sNullDescription,
+    [MOVE_AIR_SLASH - 1] = sAirSlashDescription,
+    [MOVE_X_SCISSOR-1 ... MOVE_BUG_BUZZ-1] = sNullDescription,
+    [MOVE_DRAGON_PULSE - 1] = sDragonPulseDescription,
+    [MOVE_DRAGON_RUSH-1 ... MOVE_POWER_GEM-1] = sNullDescription,
+    [MOVE_DRAIN_PUNCH - 1] = sMegaDrainDescription,
+    [MOVE_VACUUM_WAVE-1 ... MOVE_NASTY_PLOT-1] = sNullDescription,
+    [MOVE_BULLET_PUNCH - 1] = sBulletPunchDescription,
+    [MOVE_AVALANCHE - 1] = sRevengeDescription,
+    [MOVE_ICE_SHARD - 1] = sIceShardDescription,
+    [MOVE_SHADOW_CLAW - 1] = sShadowClawDescription,
+    [MOVE_THUNDER_FANG-1 ... MOVE_LUNAR_DANCE-1] = sNullDescription,
+    [MOVE_CRUSH_GRIP - 1] = sCrushGripDescription,
+    [MOVE_MAGMA_STORM-1 ... MOVE_SHADOW_FORCE-1] = sNullDescription,
 };

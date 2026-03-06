@@ -396,8 +396,23 @@ LittlerootTown_ProfessorBirchsLab_EventScript_CyndaquilTransferredToPC:: @ 81FA0
 
 LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedCyndaquil:: @ 81FA0FD
 	hidemonpic
+	delay 45
+	playse SE_M_ROCK_THROW
+	waitse
+	playse SE_M_ROCK_THROW
+	waitse
+	playse SE_DOOR
+	waitse
+	playse SE_DOOR
+	waitse
+	playse SE_PIN
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
+	playse SE_PIN
+	applymovement LOCALID_BIRCH, Common_Movement_ExclamationMark
+	delay 20
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_GrassyPatchWaiting, MSGBOX_DEFAULT
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 6
+	setflag FLAG_GOT_JOHTO_STARTER
 	releaseall
 	end
 
@@ -441,8 +456,20 @@ LittlerootTown_ProfessorBirchsLab_EventScript_TotodileTransferredToPC:: @ 81FA19
 
 LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedTotodile:: @ 81FA19E
 	hidemonpic
+	delay 45
+	playse SE_DOOR
+	waitse
+	playse SE_PIN
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
+	playse SE_PIN
+	applymovement LOCALID_BIRCH, Common_Movement_ExclamationMark
+	delay 20
+	playse SE_DOOR
+	waitse
+	delay 20
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_GrassyPatchWaiting, MSGBOX_DEFAULT
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 6
+	setflag FLAG_GOT_JOHTO_STARTER
 	releaseall
 	end
 
@@ -486,8 +513,20 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ChikoritaTransferredToPC:: @ 81FA2
 
 LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedChikorita:: @ 81FA23F
 	hidemonpic
+	delay 45
+	playse SE_DOOR
+	waitse
+	playse SE_PIN
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
+	playse SE_PIN
+	applymovement LOCALID_BIRCH, Common_Movement_ExclamationMark
+	delay 20
+	playse SE_DOOR
+	waitse
+	delay 20
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_GrassyPatchWaiting, MSGBOX_DEFAULT
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 6
+	setflag FLAG_GOT_JOHTO_STARTER
 	releaseall
 	end
 
@@ -993,6 +1032,11 @@ LittlerootTown_ProfessorBirchsLab_Text_NicknameJohtoStarter: @ 81FB9FC
 	.string "the {STR_VAR_1} you received?$"
 
 LittlerootTown_ProfessorBirchsLab_Text_GrassyPatchWaiting: @ 81FBA2C
+	.string "PROF. BIRCH: Huh! It sounds like HOENN\n"
+	.string "still has some secrets to be found!\p"
+	.string "PROF. BIRCH: Judging by the direction\n"
+	.string "of the sound, something happened near\l"
+	.string "the WATER PATH and in the ARTISAN CAVE.\p"
 	.string "PROF. BIRCH: Listen, {PLAYER}{KUN}.\n"
 	.string "You've completed the HOENN POKéDEX,\l"
 	.string "but your POKéMON journey isn't over.\p"

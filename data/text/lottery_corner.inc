@@ -40,31 +40,36 @@ LilycoveCity_DepartmentStore_1F_Text_NoNumbersMatched: @ 82A663C
 	.string "I'm sorry.\n"
 	.string "None of the numbers matched.$"
 
+LilycoveCity_DepartmentStore_1F_Text_SecondChance: @ 82A663C
+	.string "However, we do have a\n"
+	.string "Second Chance drawing!\l"
+	.string "Let me enter you in for it.$"
+
 LilycoveCity_DepartmentStore_1F_Text_OneDigitMatched:
 	.string "One digit matched, so you win the\n"
 	.string "fourth prize!\l"
-	.string "You've won the {STR_VAR_1}!$"
+	.string "You've won {STR_VAR_2} {STR_VAR_1}!$"
 
 LilycoveCity_DepartmentStore_1F_Text_TwoDigitsMatched: @ 82A6664
 	.string "Two digits matched, so you win the\n"
 	.string "third prize!\l"
-	.string "You've won the {STR_VAR_1}!$"
+	.string "You've won {STR_VAR_2} {STR_VAR_1}s!$"
 
 LilycoveCity_DepartmentStore_1F_Text_ThreeDigitsMatched: @ 82A66A7
 	.string "Three digits matched, so you win the\n"
 	.string "second prize!\l"
-	.string "You've won the {STR_VAR_1}!$"
+	.string "You've won {STR_VAR_2} {STR_VAR_1}!$"
 
 LilycoveCity_DepartmentStore_1F_Text_FourDigitsMatched: @ 82A66ED
 	.string "Four digits matched, so you win the\n"
 	.string "first prize!\l"
-	.string "You've won the {STR_VAR_1}!$"
+	.string "You've won {STR_VAR_2} {STR_VAR_1}s!$"
 
 LilycoveCity_DepartmentStore_1F_Text_AllFiveDigitsMatched: @ 82A6731
 	.string "Oh, my goodness, all five digits\n"
 	.string "matched!\p"
 	.string "You've won the jackpot prize!\n"
-	.string "You've won the {STR_VAR_1}!$"
+	.string "You've won {STR_VAR_2} {STR_VAR_1}s!$"
 
 LilycoveCity_DepartmentStore_1F_Text_NoRoomForThis: @ 82A678C
 	.string "Oh?\n"

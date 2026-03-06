@@ -511,6 +511,7 @@ PlayersHouse_1F_EventScript_GetSSTicketAndSeeLatiTV:: @ 8292AF2
 	special InitRoamer
 	copyvar VAR_ROAMER_POKEMON, VAR_RESULT
 	copyvar VAR_TEMP_D, VAR_ROAMER_POKEMON
+	setvar VAR_ROAMER_POKEMON_BIRDS_BEASTS, 0
 	addvar VAR_TEMP_D, SPECIES_LATIAS
 	playmoncry VAR_TEMP_D, 2
 	waitmoncry

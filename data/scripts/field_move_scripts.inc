@@ -27,6 +27,8 @@ EventScript_UseCut:: @ 8290705
 	end
 
 EventScript_CutTreeDown:: @ 8290710
+	setflag FLAG_SYS_USE_CUT
+    playse SE_M_CUT
 	applymovement VAR_LAST_TALKED, Movement_CutTreeDown
 	waitmovement 0
 	removeobject VAR_LAST_TALKED
@@ -38,6 +40,9 @@ Movement_CutTreeDown: @ 829071F
 	step_end
 
 EventScript_CheckTreeCantCut:: @ 8290721
+    checkitem ITEM_HM_AXE, 1
+	compare VAR_RESULT, TRUE
+    goto_if_eq EventScript_UseCutTool
 	msgbox Text_CantCut, MSGBOX_DEFAULT
 	releaseall
 	end
@@ -88,6 +93,8 @@ EventScript_UseRockSmash:: @ 82907F0
 	end
 
 EventScript_SmashRock:: @ 82907FB
+    setflag FLAG_SYS_USE_ROCK_SMASH
+    playse SE_M_ROCK_THROW
 	applymovement VAR_LAST_TALKED, Movement_SmashRock
 	waitmovement 0
 	removeobject VAR_LAST_TALKED
@@ -110,6 +117,12 @@ Movement_SmashRock: @ 829082B
 	step_end
 
 EventScript_CantSmashRock:: @ 829082D
+    checkitem ITEM_HM_PICKAXE, 1
+	compare VAR_RESULT, TRUE
+    goto_if_eq EventScript_UseRockSmashTool
+    checkitem ITEM_HM_POWER_GLOVE, 1
+	compare VAR_RESULT, TRUE
+    goto_if_eq EventScript_UseUpgradedRockSmashTool
 	msgbox Text_CantSmash, MSGBOX_DEFAULT
 	releaseall
 	end
@@ -158,11 +171,15 @@ EventScript_ActivateStrength:: @ 8290908
 	end
 
 EventScript_CantStrength:: @ 8290915
+    checkitem ITEM_HM_POWER_GLOVE, 1
+	compare VAR_RESULT, TRUE
+    goto_if_eq EventScript_UseStrengthTool
 	msgbox Text_CantStrength, MSGBOX_DEFAULT
 	releaseall
 	end
 
 EventScript_CheckActivatedBoulder:: @ 829091F
+    buffermovename 1, MOVE_STRENGTH
 	msgbox Text_StrengthActivated, MSGBOX_DEFAULT
 	releaseall
 	end
@@ -187,7 +204,7 @@ Text_CantStrength: @ 82909D6
 	.string "may be able to push it aside.$"
 
 Text_StrengthActivated: @ 8290A16
-	.string "STRENGTH made it possible to move\n"
+	.string "{STR_VAR_2} made it possible to move\n"
 	.string "boulders around.$"
 
 EventScript_UseWaterfall:: @ 8290A49
@@ -201,6 +218,8 @@ EventScript_UseWaterfall:: @ 8290A49
 	compare VAR_RESULT, NO
 	goto_if_eq EventScript_EndWaterfall
 	msgbox Text_MonUsedWaterfall, MSGBOX_DEFAULT
+EventScript_UseWaterfallMon::
+    setflag FLAG_SYS_USE_WATERFALL
 	dofieldeffect FLDEFF_USE_WATERFALL
 	goto EventScript_EndWaterfall
 
@@ -208,6 +227,9 @@ EventScript_CannotUseWaterfall:: @ 8290A83
 	lockall
 
 EventScript_CantWaterfall:: @ 8290A84
+    checkitem ITEM_HM_UPGRADED_SURFBOARD, 1
+	compare VAR_RESULT, TRUE
+    goto_if_eq EventScript_UseWaterfallTool
 	msgbox Text_CantWaterfall, MSGBOX_DEFAULT
 
 EventScript_EndWaterfall:: @ 8290A8C
@@ -242,6 +264,9 @@ EventScript_UseDive:: @ 8290B0F
 	end
 
 EventScript_CantDive:: @ 8290B4E
+    checkitem ITEM_HM_SCUBA_GEAR, 1
+	compare VAR_RESULT, TRUE
+    goto_if_eq EventScript_UseDiveTool
 	msgbox Text_CantDive, MSGBOX_DEFAULT
 	releaseall
 	end
@@ -267,6 +292,9 @@ EventScript_UseDiveUnderwater:: @ 8290B5A
 	end
 
 EventScript_CantSurface:: @ 8290B99
+    checkitem ITEM_HM_SCUBA_GEAR, 1
+	compare VAR_RESULT, TRUE
+    goto_if_eq EventScript_UseDiveTool
 	lockall
 	msgbox Text_CantSurface, MSGBOX_DEFAULT
 	goto EventScript_EndSurface

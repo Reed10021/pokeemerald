@@ -24,6 +24,7 @@ PetalburgCity_Mart_Pokemart_Basic: @ 8207D8C
 	.2byte ITEM_X_SPEED
 	.2byte ITEM_X_ATTACK
 	.2byte ITEM_X_DEFEND
+	.2byte ITEM_X_SP_DEF
 	.2byte ITEM_POKE_DOLL
 	.2byte ITEM_ORANGE_MAIL
 	.2byte ITEM_NONE
@@ -50,6 +51,7 @@ PetalburgCity_Mart_Pokemart_Expanded: @ 8207DB8
 	.2byte ITEM_X_SPEED
 	.2byte ITEM_X_ATTACK
 	.2byte ITEM_X_DEFEND
+	.2byte ITEM_X_SP_DEF
 	.2byte ITEM_POKE_DOLL
 	.2byte ITEM_ORANGE_MAIL
 	.2byte ITEM_NONE

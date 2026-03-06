@@ -58,23 +58,28 @@ NavelRock_Top_EventScript_HoOh:: @ 826916F
 	applymovement LOCALID_HO_OH, NavelRock_Top_Movement_HoOhApproach
 	waitmovement 0
 	special RemoveCameraObject
+	setflag FLAG_FORCE_ANIMATIONS
+	setflag FLAG_TRIGGER_SMART_WILD_AI
 	setvar VAR_0x8004, SPECIES_HO_OH
 	setvar VAR_0x8005, 70 @ level
-	setvar VAR_0x8006, ITEM_NONE
+	setvar VAR_0x8006, ITEM_CHARCOAL
 	special CreateObedientEnemyMon
 	setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special BattleSetup_StartLegendaryBattle
 	waitstate
 	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+	clearflag FLAG_TRIGGER_SMART_WILD_AI
 	setvar VAR_LAST_TALKED, LOCALID_HO_OH
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq NavelRock_Top_EventScript_DefeatedHoOh
+	goto_if_eq NavelRock_Top_EventScript_RanFromHoOh
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq NavelRock_Top_EventScript_RanFromHoOh
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq NavelRock_Top_EventScript_RanFromHoOh
 	setflag FLAG_CAUGHT_HO_OH
+	compare VAR_SPECIESCHAINED, SPECIES_HO_OH
+	call_if_eq ChainNumberNoLock
 	releaseall
 	end
 
@@ -85,6 +90,9 @@ NavelRock_Top_EventScript_DefeatedHoOh:: @ 8269217
 	end
 
 NavelRock_Top_EventScript_RanFromHoOh:: @ 8269225
+	compare VAR_SPECIESCHAINED, SPECIES_HO_OH
+	call_if_eq ChainNumberNoLock
+	closemessage
 	setvar VAR_0x8004, SPECIES_HO_OH
 	goto Common_EventScript_LegendaryFlewAway
 	end

@@ -166,7 +166,7 @@ static const struct PyramidWildMon sOpenLevelWildMons_Round4[] =
         .species = SPECIES_BANETTE,
         .lvl = 8,
         .abilityNum = ABILITY_RANDOM,
-        .moves = {MOVE_GRUDGE, MOVE_WILL_O_WISP, MOVE_NIGHT_SHADE, MOVE_NONE}
+        .moves = {MOVE_GRUDGE, MOVE_WILL_O_WISP, MOVE_NIGHT_SHADE, MOVE_PAIN_SPLIT}
     },
     {
         .species = SPECIES_MISDREAVUS,
@@ -248,7 +248,7 @@ static const struct PyramidWildMon sOpenLevelWildMons_Round5[] =
         .species = SPECIES_FLYGON,
         .lvl = 5,
         .abilityNum = ABILITY_RANDOM,
-        .moves = {MOVE_EARTHQUAKE, MOVE_CRUNCH, MOVE_DRAGON_CLAW, MOVE_DRAGON_BREATH}
+        .moves = {MOVE_EARTHQUAKE, MOVE_CRUNCH, MOVE_DRAGON_CLAW, MOVE_OUTRAGE}
     },
     {
         .species = SPECIES_GENGAR,
@@ -316,7 +316,7 @@ static const struct PyramidWildMon sOpenLevelWildMons_Round7[] =
         .species = SPECIES_GLALIE,
         .lvl = 10,
         .abilityNum = ABILITY_RANDOM,
-        .moves = {MOVE_ICE_BEAM, MOVE_CRUNCH, MOVE_PROTECT, MOVE_NONE}
+        .moves = {MOVE_ICE_BEAM, MOVE_DARK_PULSE, MOVE_PROTECT, MOVE_NONE}
     },
     {
         .species = SPECIES_SNEASEL,
@@ -716,7 +716,7 @@ static const struct PyramidWildMon sOpenLevelWildMons_Round14[] =
         .species = SPECIES_HOUNDOOM,
         .lvl = 5,
         .abilityNum = ABILITY_RANDOM,
-        .moves = {MOVE_OVERHEAT, MOVE_CRUNCH, MOVE_SHADOW_BALL, MOVE_PROTECT}
+        .moves = {MOVE_OVERHEAT, MOVE_DARK_PULSE, MOVE_SHADOW_BALL, MOVE_PROTECT}
     },
     {
         .species = SPECIES_UMBREON,
@@ -796,7 +796,7 @@ static const struct PyramidWildMon sOpenLevelWildMons_Round16[] =
         .species = SPECIES_BANETTE,
         .lvl = 8,
         .abilityNum = ABILITY_RANDOM,
-        .moves = {MOVE_SHADOW_BALL, MOVE_SPITE, MOVE_WILL_O_WISP, MOVE_NONE}
+        .moves = {MOVE_SHADOW_PUNCH, MOVE_SWORDS_DANCE, MOVE_WILL_O_WISP, MOVE_CRUNCH}
     },
     {
         .species = SPECIES_MISDREAVUS,
@@ -906,7 +906,7 @@ static const struct PyramidWildMon sOpenLevelWildMons_Round18[] =
         .species = SPECIES_FLYGON,
         .lvl = 8,
         .abilityNum = ABILITY_RANDOM,
-        .moves = {MOVE_EARTHQUAKE, MOVE_DRAGON_CLAW, MOVE_FIRE_BLAST, MOVE_NONE}
+        .moves = {MOVE_EARTHQUAKE, MOVE_DRAGON_CLAW, MOVE_FIRE_BLAST, MOVE_SUNNY_DAY}
     },
     {
         .species = SPECIES_AERODACTYL,

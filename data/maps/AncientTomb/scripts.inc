@@ -66,20 +66,24 @@ AncientTomb_EventScript_Registeel:: @ 823905A
 	playmoncry SPECIES_REGISTEEL, 2
 	delay 40
 	waitmoncry
+	setflag FLAG_FORCE_ANIMATIONS
 	setwildbattle SPECIES_REGISTEEL, 40, ITEM_METAL_COAT
-	setflag FLAG_SYS_CTRL_OBJ_DELETE
+@	setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special StartRegiBattle
 	waitstate
-	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+@	clearflag FLAG_SYS_CTRL_OBJ_DELETE
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq AncientTomb_EventScript_DefeatedRegisteel
+	goto_if_eq AncientTomb_EventScript_RanFromRegisteel
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq AncientTomb_EventScript_RanFromRegisteel
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq AncientTomb_EventScript_RanFromRegisteel
 	setflag FLAG_DEFEATED_REGISTEEL
-	release
+	compare VAR_SPECIESCHAINED, SPECIES_REGISTEEL
+	call_if_eq ChainNumberNoLock
+	closemessage
+	goto Common_EventScript_RemoveStaticPokemon
 	end
 
 AncientTomb_EventScript_DefeatedRegisteel:: @ 82390A1
@@ -88,7 +92,12 @@ AncientTomb_EventScript_DefeatedRegisteel:: @ 82390A1
 	end
 
 AncientTomb_EventScript_RanFromRegisteel:: @ 82390AA
-	setvar VAR_0x8004, SPECIES_REGISTEEL
-	goto Common_EventScript_LegendaryFlewAway
+	compare VAR_SPECIESCHAINED, SPECIES_REGISTEEL
+	call_if_eq ChainNumberNoLock
+	msgbox AncientTomb_Text_RegisteelWatchingYou, MSGBOX_DEFAULT
+	release
 	end
+
+AncientTomb_Text_RegisteelWatchingYou::
+	.string "Registeel is watching you!$"
 

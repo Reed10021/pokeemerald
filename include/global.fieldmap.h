@@ -10,6 +10,9 @@
 
 #define METATILE_ID(tileset, name) (METATILE_##tileset##_##name)
 
+#define CONNECTION_INVALID -1
+#define CONNECTION_NONE     0
+
 enum
 {
     CONNECTION_SOUTH = 1,
@@ -288,6 +291,9 @@ enum
     COLLISION_ISOLATED_HORIZONTAL_RAIL,
     COLLISION_VERTICAL_RAIL,
     COLLISION_HORIZONTAL_RAIL,
+    COLLISION_START_SURFING,
+    COLLISION_START_CUT,
+    COLLISION_START_ROCK_SMASH
 };
 
 // player running states

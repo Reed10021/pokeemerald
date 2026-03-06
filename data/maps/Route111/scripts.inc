@@ -4,6 +4,7 @@
 .set LOCALID_VICKY, 4
 .set LOCALID_PLAYER_FALLING, 45
 .set LOCALID_ROCK_SMASH_MAN, 46
+.set LOCALID_SANDSTORM_SHARD, 47
 
 Route111_MapScripts:: @ 81F0CA7
 	map_script MAP_SCRIPT_ON_LOAD, Route111_OnLoad
@@ -21,6 +22,10 @@ Route111_OnLoad: @ 81F0CBC
 Route111_EventScript_CloseDesertRuins:: @ 81F0CD1
 	setmetatile 29, 86, METATILE_General_RockWall_RockBase, 1
 	setmetatile 29, 87, METATILE_General_RockWall_SandBase, 1
+	return
+
+Route111_EventScript_HideSandstormShard::
+	setobjectxyperm LOCALID_SANDSTORM_SHARD 0, 100
 	return
 
 @ Show Mirage Tower just prior to disintegration. Mirage Tower is otherwise handled by the map layout
@@ -53,6 +58,8 @@ Route111_OnTransition: @ 81F0D87
 	call_if_eq Route111_EventScript_SetFallingPlayerGfx
 	compare VAR_MIRAGE_TOWER_STATE, 2
 	call_if_eq Route111_EventScript_SetMirageTowerGone
+	compare VAR_SOOTOPOLIS_CITY_STATE, 5
+	call_if_lt Route111_EventScript_HideSandstormShard
 	call Route111_EventScript_CheckSetSandstorm
 	call GabbyAndTy_EventScript_UpdateLocation
 	goto_if_not_defeated TRAINER_VICKY, Route111_EventScript_SetWinstratesNotDefeated

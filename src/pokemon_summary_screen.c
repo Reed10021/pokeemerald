@@ -179,6 +179,7 @@ static EWRAM_DATA struct PokemonSummaryScreenData
     s16 switchCounter; // Used for various switch statement cases that decompress/load graphics or pokemon data
     u8 unk_filler4[6];
     u8 splitIconSpriteId;
+    u16 castformPalette[MAX_CASTFORM_FORMS][16];
 } *sMonSummaryScreen = NULL;
 EWRAM_DATA u8 gLastViewedMonIndex = 0;
 static EWRAM_DATA u8 sMoveSlotToReplace = 0;
@@ -3277,7 +3278,16 @@ static void BufferMonTrainerMemo(void)
             if (sum->metLevel == 0)
                 text = (sum->metLocation >= MAPSEC_NONE) ? gText_XNatureHatchedSomewhereAt : gText_XNatureHatchedAtYZ;
             else
-                text = (sum->metLocation >= MAPSEC_NONE) ? gText_XNatureMetSomewhereAt : gText_XNatureMetAtYZ;
+            {
+                if (sum->metLocation == METLOC_FATEFUL_ENCOUNTER)
+                {
+                    text = gText_XNatureFatefulEncounter;
+                }
+                else
+                {
+                    text = (sum->metLocation >= MAPSEC_NONE) ? gText_XNatureMetSomewhereAt : gText_XNatureMetAtYZ;
+                }
+            }
         }
         else if (sum->metLocation == METLOC_FATEFUL_ENCOUNTER)
         {
@@ -3532,7 +3542,7 @@ static void BufferIvOrEvStats(u8 mode)
 {
     int stringXPos;
     int iconXPos;
-    u16 hp, hp2, atk, def, spA, spD, spe;
+    u16 hp, hp2, atk, def, spA, spD, spe = 0;
     u8 *currHPString = Alloc(20);
     const s8 *natureMod = gNatureStatTable[sMonSummaryScreen->summary.nature];
 
@@ -3552,9 +3562,9 @@ static void BufferIvOrEvStats(u8 mode)
         atk = sMonSummaryScreen->summary.atk;
         def = sMonSummaryScreen->summary.def;
 
+        spe = sMonSummaryScreen->summary.speed;
         spA = sMonSummaryScreen->summary.spatk;
         spD = sMonSummaryScreen->summary.spdef;
-        spe = sMonSummaryScreen->summary.speed;
         break;
     case 1: // iv mode
         FillWindowPixelBuffer(PSS_LABEL_WINDOW_POKEMON_SKILLS_TITLE, 0);
@@ -3563,13 +3573,13 @@ static void BufferIvOrEvStats(u8 mode)
         ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_IVS);
         PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_EVS);
         ScheduleBgCopyTilemapToVram(0);
-        hp = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_IV);
-        atk = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_IV);
-        def = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF_IV);
+        hp = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_IV, NULL);
+        atk = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_IV, NULL);
+        def = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF_IV, NULL);
 
-        spA = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK_IV);
-        spD = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_IV);
-        spe = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_IV);
+        spe = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_IV, NULL);
+        spA = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK_IV, NULL);
+        spD = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_IV, NULL);
         break;
     case 2: // ev mode
         FillWindowPixelBuffer(PSS_LABEL_WINDOW_POKEMON_SKILLS_TITLE, 0);
@@ -3578,13 +3588,13 @@ static void BufferIvOrEvStats(u8 mode)
         ClearWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_EVS);
         PutWindowTilemap(PSS_LABEL_WINDOW_PROMPT_INFO_STATS);
         ScheduleBgCopyTilemapToVram(0);
-        hp = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_EV);
-        atk = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_EV);
-        def = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF_EV);
+        hp = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_EV, NULL);
+        atk = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_EV, NULL);
+        def = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF_EV, NULL);
 
-        spA = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK_EV);
-        spD = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_EV);
-        spe = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_EV);
+        spe = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_EV, NULL);
+        spA = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK_EV, NULL);
+        spD = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_EV, NULL);
         break;
     }
 
@@ -3937,26 +3947,11 @@ static void PrintContestMoveDescription(u8 moveSlot)
 
 u8 GetBattleMoveSplit(u16 move)
 {
-    if (move == MOVE_WEATHER_BALL && gMain.inBattle) {
-        u8 type = gBattleMoves[move].type;
-        if (WEATHER_HAS_EFFECT)
-        {
-            if (gBattleWeather & WEATHER_RAIN_ANY)
-                type = TYPE_WATER;
-            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-                type = TYPE_ROCK;
-            else if (gBattleWeather & WEATHER_SUN_ANY)
-                type = TYPE_FIRE;
-            else if (gBattleWeather & WEATHER_HAIL_ANY)
-                type = TYPE_ICE;
-        }
-        return type > TYPE_MYSTERY;
-    }
-    else if (gBattleMoves[move].power == 0 || gBattleMoves[move].type == TYPE_MYSTERY) {
+    if (gBattleMoves[move].power == 0 || gBattleMoves[move].type == TYPE_MYSTERY) {
         return 2; // status move
     }
     else {
-        return gBattleMoves[move].type > TYPE_MYSTERY; //IS_TYPE_SPECIAL
+        return IS_TYPE_SPECIAL(move, gBattleMoves[move].type); //IS_TYPE_SPECIAL
         // If type is special, true, return 1. Else false, return 0.
     }
 }
@@ -3981,7 +3976,7 @@ static void PrintMoveDetails(u16 move)
                 u8 type = (15 * typeBits) / 63 + 1;
                 if (type >= TYPE_MYSTERY)
                     type++;
-                ShowSplitIcon(type > TYPE_MYSTERY);
+                ShowSplitIcon(IS_TYPE_SPECIAL(move, type));
             }
             else
                 ShowSplitIcon(GetBattleMoveSplit(move));
@@ -4148,8 +4143,8 @@ static void SetMonTypeIcons(void)
         {
             if (WEATHER_HAS_EFFECT && 
                 summary->species == SPECIES_CASTFORM && 
-                gBaseStats[summary->species].abilities[0] == ABILITY_FORECAST && 
-                summary->abilityNum == 0)
+                ((gBaseStats[summary->species].abilities[0] == ABILITY_FORECAST && summary->abilityNum == 0) ||
+                 (gBaseStats[summary->species].abilities[1] == ABILITY_FORECAST && summary->abilityNum == 1)))
             {
                 if (gBattleWeather & WEATHER_RAIN_ANY)
                     type1 = TYPE_WATER;
@@ -4341,6 +4336,46 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
         return 0xFF;
     case 1:
         pal = GetMonSpritePalStructFromOtIdPersonality(summary->species2, summary->OTID, summary->pid);
+        if (gMain.inBattle)
+        {
+            if (WEATHER_HAS_EFFECT &&
+                summary->species == SPECIES_CASTFORM &&
+                ((gBaseStats[summary->species].abilities[0] == ABILITY_FORECAST && summary->abilityNum == 0) ||
+                 (gBaseStats[summary->species].abilities[1] == ABILITY_FORECAST && summary->abilityNum == 1)))
+            {
+                const void* lzPaletteData = GetMonSpritePalFromSpeciesAndPersonality(summary->species2, summary->OTID, summary->pid);
+                struct SpritePalette pal2 = { 0 };
+                LZDecompressWram(lzPaletteData, sMonSummaryScreen->castformPalette[0]);
+
+                if (gBattleWeather & WEATHER_RAIN_ANY)
+                {
+                    pal2.data = sMonSummaryScreen->castformPalette[2];
+                }
+                else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                {
+                    pal2.data = sMonSummaryScreen->castformPalette[4];
+                }
+                else if (gBattleWeather & WEATHER_SUN_ANY)
+                {
+                    pal2.data = sMonSummaryScreen->castformPalette[1];
+                }
+                else if (gBattleWeather & WEATHER_HAIL_ANY)
+                {
+                    pal2.data = sMonSummaryScreen->castformPalette[3];
+                }
+                else
+                {
+                    pal2.data = sMonSummaryScreen->castformPalette[0];
+                }
+
+                pal2.tag = pal->tag;
+                LoadDynamicSpritePalette(&pal2);
+                SetMultiuseSpriteTemplateToPokemon(pal->tag, 1);
+                (*state)++;
+                return 0xFF;
+            }
+        }
+
         LoadCompressedSpritePalette(pal);
         SetMultiuseSpriteTemplateToPokemon(pal->tag, 1);
         (*state)++;
@@ -4375,6 +4410,31 @@ static u8 CreateMonSprite(struct Pokemon *unused)
         gSprites[spriteId].hFlip = TRUE;
     else
         gSprites[spriteId].hFlip = FALSE;
+
+    if (gMain.inBattle)
+    {
+        if (WEATHER_HAS_EFFECT && summary->species == SPECIES_CASTFORM &&
+            ((gBaseStats[summary->species].abilities[0] == ABILITY_FORECAST && summary->abilityNum == 0) ||
+             (gBaseStats[summary->species].abilities[1] == ABILITY_FORECAST && summary->abilityNum == 1)))
+        {
+            if (gBattleWeather & WEATHER_RAIN_ANY)
+            {
+                StartSpriteAnim(&gSprites[spriteId], 2);
+            }
+            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+            {
+                StartSpriteAnim(&gSprites[spriteId], 4);
+            }
+            else if (gBattleWeather & WEATHER_SUN_ANY)
+            {
+                StartSpriteAnim(&gSprites[spriteId], 1);
+            }
+            else if (gBattleWeather & WEATHER_HAIL_ANY)
+            {
+                StartSpriteAnim(&gSprites[spriteId], 3);
+            }
+        }
+    }
 
     return spriteId;
 }

@@ -303,34 +303,34 @@ static const u8 sGuardSpecDesc[] = _(
     "used in battle.");
 
 static const u8 sDireHitDesc[] = _(
-    "Raises the\n"
+    "Sharply boosts the\n"
     "critical-hit ratio\n"
     "during one battle.");
 
 static const u8 sXAttackDesc[] = _(
-    "Raises the stat\n"
-    "ATTACK during one\n"
-    "battle.");
+    "Sharply boosts the\n"
+    "ATTACK stat during\n"
+    "one battle.");
 
 static const u8 sXDefendDesc[] = _(
-    "Raises the stat\n"
-    "DEFENSE during one\n"
-    "battle.");
+    "Sharply boosts the\n"
+    "DEFENSE stat during\n"
+    "one battle.");
 
 static const u8 sXSpeedDesc[] = _(
-    "Raises the stat\n"
-    "SPEED during one\n"
-    "battle.");
+    "Sharply boosts the\n"
+    "SPEED stat during\n"
+    "one battle.");
 
 static const u8 sXAccuracyDesc[] = _(
-    "Raises accuracy\n"
-    "of attack moves\n"
-    "during one battle.");
+    "Sharply boosts move\n"
+    "accuracy during\n"
+    "one battle.");
 
 static const u8 sXSpecialDesc[] = _(
-    "Raises the stat\n"
-    "SP. ATK during one\n"
-    "battle.");
+    "Sharply boosts the\n"
+    "SP. ATK stat during\n"
+    "one battle.");
 
 static const u8 sPokeDollDesc[] = _(
     "Hold to avoid\n"
@@ -341,6 +341,11 @@ static const u8 sFluffyTailDesc[] = _(
     "Use to flee from\n"
     "any battle with\n"
     "a wild POKéMON.");
+
+static const u8 sXSpecialDefDesc[] = _(
+    "Sharply boosts the\n"
+    "SP. DEF stat during\n"
+    "one battle.");
 
 // Field items
 static const u8 sSuperRepelDesc[] = _(
@@ -434,6 +439,11 @@ static const u8 sHeartScaleDesc[] = _(
     "A lovely scale\n"
     "that would sell at a\n"
     "decent price.");
+
+static const u8 sWeatherInstituteShardDesc[] = _(
+    "A shard that might\n"
+    "be useful to the\n"
+    "WEATHER INSTITUTE.");
 
 // Mail
 static const u8 sOrangeMailDesc[] = _(
@@ -544,8 +554,8 @@ static const u8 sLumBerryDesc[] = _(
 
 static const u8 sSitrusBerryDesc[] = _(
     "A hold item that\n"
-    "restores 90 HP in\n"
-    "battle.");
+    "restores 33% of\n"
+    "max HP in battle.");
 
 static const u8 sFigyBerryDesc[] = _(
     "A hold item that\n"
@@ -749,9 +759,9 @@ static const u8 sMentalHerbDesc[] = _(
     "of infatuation.");
 
 static const u8 sChoiceBandDesc[] = _(
-    "Raises a move's\n"
-    "power, but permits\n"
-    "only that move.");
+    "Boosts ATTACK, but\n"
+    "allows the use of\n"
+    "only one move.");
 
 static const u8 sKingsRockDesc[] = _(
     "A hold item that\n"
@@ -946,6 +956,91 @@ static const u8 sStickDesc[] = _(
     "A hold item that\n"
     "raises FARFETCH'D's\n"
     "critical-hit ratio.");
+
+static const u8 sWeatherOrbDesc[] = _(
+    "A hold item that\n"
+    "summons random\n"
+    "weather in battle.");
+
+static const u8 sPunchingGloveDesc[] = _(
+    "Powers up punching\n"
+    "moves and removes\n"
+    "their contact.");
+
+static const u8 sFocusSashDesc[] = _(
+    "If the holder has\n"
+    "full HP, it endures\n"
+    "KO hits with 1 HP.");
+
+static const u8 sChoiceSpecsDesc[] = _(
+    "Boosts SP. ATK, but\n"
+    "allows the use of\n"
+    "only one move.");
+
+static const u8 sChoiceScarfDesc[] = _(
+    "Boosts SPEED, but\n"
+    "allows the use of\n"
+    "only one move.");
+
+static const u8 sMuscleBandDesc[] = _(
+    "A headband that\n"
+    "boosts the power\n"
+    "of physical moves.");
+
+static const u8 sWiseGlassesDesc[] = _(
+    "A pair of glasses\n"
+    "that ups the power\n"
+    "of special moves.");
+
+static const u8 sAxeDesc[] = _(
+    "A tool that can\n"
+    "be used to cut\n"
+    "down trees.");
+
+static const u8 sTaxiFluteDesc[] = _(
+    "A flute that can\n"
+    "be used to call a\n"
+    "Fly Taxi to you.");
+
+static const u8 sSurfboardDesc[] = _(
+    "An item that can\n"
+    "be used to surf\n"
+    "on top of water.");
+
+static const u8 sPowerGloveDesc[] = _(
+    "An upgraded item.\n"
+    "It can crush rocks\n"
+    "and move boulders.");
+
+static const u8 sLanternDesc[] = _(
+    "An item that can\n"
+    "be used to light\n"
+    "up dark caves.");
+
+static const u8 sPickaxeDesc[] = _(
+    "A tool that can\n"
+    "be used to smash\n"
+    "large rocks.");
+
+static const u8 sSuperBoardDesc[] = _(
+    "An upgraded item.\n"
+    "It can surf and\n"
+    "climb waterfalls.");
+
+static const u8 sScubaGearDesc[] = _(
+    "An item that can\n"
+    "be used to\n"
+    "dive underwater.");
+
+static const u8 sCrystalBallDesc[] = _(
+    "An item that can\n"
+    "transport you to\n"
+    "a safe place.");
+
+static const u8 sSweetScentToolDesc[] = _(
+    "This tool\n"
+    "is used for\n"
+    "luring POKéMON.");
 
 static const u8 sRedScarfDesc[] = _(
     "A hold item that\n"
@@ -1143,9 +1238,9 @@ static const u8 sTM05Desc[] = _(
     "to end the battle.");
 
 static const u8 sTM06Desc[] = _(
-    "Poisons the foe\n"
-    "with a toxin that\n"
-    "gradually worsens.");
+    "Badly poisons the\n"
+    "foe and lowers\n"
+    "their defenses.");
 
 static const u8 sTM07Desc[] = _(
     "Creates a hailstorm\n"
@@ -1370,8 +1465,8 @@ static const u8 sTM50Desc[] = _(
 
 static const u8 sHM01Desc[] = _(
     "Attacks the foe\n"
-    "with sharp blades.\n"
-    "High critical ratio.");
+    "with a noxious stab.\n"
+    "Can poison target.");
 
 static const u8 sHM02Desc[] = _(
     "Flies up, and\n"
@@ -1396,7 +1491,7 @@ static const u8 sHM05Desc[] = _(
 static const u8 sHM06Desc[] = _(
     "A rock-crushingly\n"
     "tough attack that\n"
-    "may lower DEFENSE.");
+    "lowers DEFENSE.");
 
 static const u8 sHM07Desc[] = _(
     "Attacks the foe\n"

@@ -84,10 +84,15 @@ EventScript_BattleKecleon:: @ 8272365
 	goto_if_eq EventScript_RemoveKecleon
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq EventScript_RemoveKecleon
+	compare VAR_SPECIESCHAINED, SPECIES_KECLEON
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
 EventScript_RemoveKecleon:: @ 82723C1
+	compare VAR_SPECIESCHAINED, SPECIES_KECLEON
+	call_if_eq ChainNumberNoLock
+	closemessage
 	goto Common_EventScript_RemoveStaticPokemon
 	end
 

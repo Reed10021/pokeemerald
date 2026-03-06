@@ -35,16 +35,19 @@ TerraCave_End_EventScript_Groudon:: @ 823B0EC
 	playmoncry SPECIES_GROUDON, 2
 	delay 40
 	waitmoncry
+	setflag FLAG_FORCE_ANIMATIONS
+	setflag FLAG_TRIGGER_TOTEM_POWER
 	setvar VAR_LAST_TALKED, LOCALID_GROUDON
-	setwildbattle SPECIES_GROUDON, 70, ITEM_CHARCOAL
-	setflag FLAG_SYS_CTRL_OBJ_DELETE
+	setwildbattle SPECIES_GROUDON, 70, ITEM_SOFT_SAND
+	@ setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special BattleSetup_StartLegendaryBattle
 	waitstate
-	clearflag FLAG_SYS_CTRL_OBJ_DELETE
-	setvar VAR_TEMP_1, 0
+	@ clearflag FLAG_SYS_CTRL_OBJ_DELETE
+	clearflag FLAG_TRIGGER_TOTEM_POWER
+	@ setvar VAR_TEMP_1, 0
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq TerraCave_End_EventScript_DefeatedGroudon
+	goto_if_eq TerraCave_End_EventScript_RanFromGroudon
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq TerraCave_End_EventScript_RanFromGroudon
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
@@ -61,6 +64,9 @@ TerraCave_End_EventScript_DefeatedGroudon:: @ 823B155
 	end
 
 TerraCave_End_EventScript_DefeatedGroudon2::
+	compare VAR_SPECIESCHAINED, SPECIES_GROUDON
+	call_if_eq ChainNumberNoLock
+	closemessage
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject VAR_LAST_TALKED
 	fadescreenswapbuffers FADE_FROM_BLACK
@@ -75,8 +81,21 @@ TerraCave_End_EventScript_DefeatedGroudon2_Return:
 	end
 
 TerraCave_End_EventScript_RanFromGroudon:: @ 823B163
-	setvar VAR_0x8004, SPECIES_GROUDON
-	goto Common_EventScript_LegendaryFlewAway
+	@ Because the script is still running after returning from battle, chain messages are normally lost.
+	@ Calling ChainNumberNoLock here prevents that loss.
+	@ If there is a chain, it is displayed. If there is not a chain, nothing is displayed.
+	compare VAR_SPECIESCHAINED, SPECIES_GROUDON
+	call_if_eq ChainNumberNoLock
+	closemessage
+	@ setvar VAR_0x8004, SPECIES_GROUDON
+	@ goto Common_EventScript_LegendaryFlewAway
+	applymovement OBJ_EVENT_ID_PLAYER, TerraCave_End_Movement_PushPlayerBack
+	applymovement LOCALID_GROUDON, TerraCave_End_Movement_GroudonApproachReset
+	playmoncry SPECIES_GROUDON, 2
+	delay 40
+	waitmoncry
+	msgbox TerraCave_End_Text_GroudonWatchingYou, MSGBOX_DEFAULT
+	release
 	end
 
 TerraCave_End_Movement_GroudonApproach: @ 823B16E
@@ -89,6 +108,23 @@ TerraCave_End_Movement_GroudonApproach: @ 823B16E
 	delay_16
 	walk_down_affine
 	step_end
+
+TerraCave_End_Movement_GroudonApproachReset:
+	lock_facing_direction
+	walk_fast_up
+	walk_fast_up
+	walk_fast_up
+	unlock_facing_direction
+	step_end
+
+TerraCave_End_Movement_PushPlayerBack:
+	lock_facing_direction
+	walk_down
+	unlock_facing_direction
+	step_end
+
+TerraCave_End_Text_GroudonWatchingYou:
+	.string "Groudon roars in defiance!$"
 
 TerraCave_End_Text_DefeatedGroudon_SomethingOnTheGround:
 	.string "... \n"

@@ -12,8 +12,8 @@ PurityCave_SmallStone::
 
 PurityCave_EventScript_JirachiSurprise::
 	lock
-	msgbox PurityCave_Text_StoneShimmers, MSGBOX_DEFAULT
 	goto_if_set FLAG_JIRACHI_BATTLE, jirachiDaily
+	msgbox PurityCave_Text_StoneShimmers, MSGBOX_DEFAULT
 	closemessage
 	playmoncry SPECIES_JIRACHI, 2
 	waitmoncry
@@ -21,26 +21,29 @@ PurityCave_EventScript_JirachiSurprise::
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
 	delay 25
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestLeft
-	delay 35
+	delay 20
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestRight
-	delay 35
+	delay 20
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestDown
-	delay 35
+	delay 20
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestUp
 	playmoncry SPECIES_JIRACHI, 2
 	waitmoncry
-	delay 25
+	delay 20
 	playse SE_PIN
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
-	delay 50
+	delay 20
 	msgbox PurityCave_Text_JirachiAttacks, MSGBOX_DEFAULT
 	closemessage
+	setflag FLAG_FORCE_ANIMATIONS
+	setflag FLAG_TRIGGER_SMART_WILD_AI
 	setvar VAR_0x8004, SPECIES_JIRACHI
-	setvar VAR_0x8005, 60  @ level
+	setvar VAR_0x8005, 65  @ level
 	setvar VAR_0x8006, ITEM_STAR_PIECE
-	special CreateObedientEnemyMon
+	special CreateObedientFatefulEncounterEnemyMon
 	special BattleSetup_StartLegendaryBattle
 	waitstate
+	clearflag FLAG_TRIGGER_SMART_WILD_AI
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
 	goto_if_eq PurityCave_EventScript_RanFromJirachi
@@ -49,14 +52,19 @@ PurityCave_EventScript_JirachiSurprise::
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq PurityCave_EventScript_RanFromJirachi
 	setflag FLAG_JIRACHI_BATTLE
+	compare VAR_SPECIESCHAINED, SPECIES_JIRACHI
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
 jirachiDaily:
+	msgbox PurityCave_Text_StoneShimmersShort, MSGBOX_DEFAULT
 	goto_if_set FLAG_DAILY_JIRACHI_STAR_PIECE, jirachiEnd
+	closemessage
+	delay 15
 	msgbox PurityCave_Text_SomethingElseHere, MSGBOX_DEFAULT
-	giveitem ITEM_RARE_CANDY, 3
-	giveitem ITEM_STAR_PIECE, 1
+	giveitem ITEM_RARE_CANDY, 2
+	giveitem ITEM_STAR_PIECE, 2
 	setflag FLAG_DAILY_JIRACHI_STAR_PIECE
 	call PurityCave_SmallStone
 	special DrawWholeMapView
@@ -64,10 +72,14 @@ jirachiDaily:
 	end
 
 jirachiEnd:
+	msgbox PurityCave_Text_JirachiGift, MSGBOX_DEFAULT
 	release
 	end
 
 PurityCave_EventScript_RanFromJirachi::
+	compare VAR_SPECIESCHAINED, SPECIES_JIRACHI
+	call_if_eq ChainNumberNoLock
+	closemessage
 	setvar VAR_0x8004, SPECIES_JIRACHI
 	bufferspeciesname 0, VAR_0x8004
 	msgbox PurityCave_Text_JirachiHid, MSGBOX_DEFAULT
@@ -77,13 +89,17 @@ PurityCave_EventScript_RanFromJirachi::
 PurityCave_Text_StoneShimmers:
 	.string "The brilliant gem twinkles.\n"
 	.string "Looking closer, there's something\l"
-	.string "engraved on the gem:\p"
+	.string "engraved on the gem.\p"
 	.string "LET THE JIRACHI SLUMBERING HERE\n"
 	.string "FIND A DESERVING PARTNER WHOM IT\l"
 	.string "CAN CALL FRIEND.$"
 
+PurityCave_Text_StoneShimmersShort:
+	.string "The brilliant gem twinkles.$"
+
 PurityCave_Text_SomethingElseHere:
-	.string "Oh? There's something else here.$"
+	.string "Oh?\p"
+	.string "There's something else here.$"
 
 PurityCave_Text_JirachiAttacks:
 	.string "A POKéMON came out from the shadows\n"
@@ -92,3 +108,7 @@ PurityCave_Text_JirachiAttacks:
 PurityCave_Text_JirachiHid::
 	.string "{STR_VAR_1} went back into\n"
 	.string "the shadows!$"
+
+PurityCave_Text_JirachiGift::
+	.string "You've already received Jirachi's\n"
+	.string "gift today, check back tomorrow.$"

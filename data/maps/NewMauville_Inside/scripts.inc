@@ -25,6 +25,8 @@ NewMauville_Inside_OnTransition: @ 823741B
 	call_if_unset FLAG_DEFEATED_VOLTORB_1_NEW_MAUVILLE, NewMauville_Inside_EventScript_ShowVoltorb1
 	call_if_unset FLAG_DEFEATED_VOLTORB_2_NEW_MAUVILLE, NewMauville_Inside_EventScript_ShowVoltorb2
 	call_if_unset FLAG_DEFEATED_VOLTORB_3_NEW_MAUVILLE, NewMauville_Inside_EventScript_ShowVoltorb3
+	setvar VAR_TEMP_5, 0
+	goto_if_set FLAG_NEW_MAUVILLE_ENCOUNTER, NewMauville_Inside_EventScript_ForcedEncounter_End
 	end
 
 NewMauville_Inside_EventScript_ShowVoltorb1:: @ 8237441
@@ -197,11 +199,16 @@ NewMauville_Inside_EventScript_Voltorb1:: @ 82377AF
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq NewMauville_Inside_EventScript_DefeatedVoltorb1
 	setflag FLAG_DEFEATED_VOLTORB_1_NEW_MAUVILLE
+	compare VAR_SPECIESCHAINED, SPECIES_VOLTORB
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
 NewMauville_Inside_EventScript_DefeatedVoltorb1:: @ 82377F3
 	setflag FLAG_DEFEATED_VOLTORB_1_NEW_MAUVILLE
+	compare VAR_SPECIESCHAINED, SPECIES_VOLTORB
+	call_if_eq ChainNumberNoLock
+	closemessage
 	goto Common_EventScript_RemoveStaticPokemon
 	end
 
@@ -224,11 +231,16 @@ NewMauville_Inside_EventScript_Voltorb2:: @ 82377FC
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq NewMauville_Inside_EventScript_DefeatedVoltorb2
 	setflag FLAG_DEFEATED_VOLTORB_2_NEW_MAUVILLE
+	compare VAR_SPECIESCHAINED, SPECIES_VOLTORB
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
 NewMauville_Inside_EventScript_DefeatedVoltorb2:: @ 8237840
 	setflag FLAG_DEFEATED_VOLTORB_2_NEW_MAUVILLE
+	compare VAR_SPECIESCHAINED, SPECIES_VOLTORB
+	call_if_eq ChainNumberNoLock
+	closemessage
 	goto Common_EventScript_RemoveStaticPokemon
 	end
 
@@ -251,13 +263,61 @@ NewMauville_Inside_EventScript_Voltorb3:: @ 8237849
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq NewMauville_Inside_EventScript_DefeatedVoltorb3
 	setflag FLAG_DEFEATED_VOLTORB_3_NEW_MAUVILLE
+	compare VAR_SPECIESCHAINED, SPECIES_VOLTORB
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
 NewMauville_Inside_EventScript_DefeatedVoltorb3:: @ 823788D
 	setflag FLAG_DEFEATED_VOLTORB_3_NEW_MAUVILLE
+	compare VAR_SPECIESCHAINED, SPECIES_VOLTORB
+	call_if_eq ChainNumberNoLock
+	closemessage
 	goto Common_EventScript_RemoveStaticPokemon
 	end
+
+NewMauville_Inside_EventScript_ForcedEncounter::
+	goto_if_set FLAG_NEW_MAUVILLE_ENCOUNTER, NewMauville_Inside_EventScript_ForcedEncounter_End
+	lock
+	playmoncry SPECIES_AMPHAROS, 2
+	waitmoncry
+	playse SE_PIN
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
+	delay 25
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestLeft
+	delay 20
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestRight
+	delay 20
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestDown
+	delay 20
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestUp
+	playmoncry SPECIES_AMPHAROS, 2
+	waitmoncry
+	delay 25
+	msgbox NewMauville_Inside_Text_AmpharosAttacks, MSGBOX_DEFAULT
+	closemessage
+	setflag FLAG_CANNOT_RUN_AWAY
+	setflag FLAG_TRIGGER_SMART_WILD_AI
+	setflag FLAG_TRIGGER_TOTEM_POWER
+	setflag FLAG_FORCE_ANIMATIONS
+	setwildbattlescaled SPECIES_AMPHAROS, 40, ITEM_SITRUS_BERRY
+	special BattleSetup_StartLegendaryBattle
+	waitstate
+	specialvar VAR_RESULT, GetBattleOutcome
+	setflag FLAG_NEW_MAUVILLE_ENCOUNTER
+	clearflag FLAG_CANNOT_RUN_AWAY
+	clearflag FLAG_TRIGGER_SMART_WILD_AI
+	clearflag FLAG_TRIGGER_TOTEM_POWER
+	compare VAR_SPECIESCHAINED, SPECIES_AMPHAROS
+	call_if_eq ChainNumberNoLock
+	release
+NewMauville_Inside_EventScript_ForcedEncounter_End:
+	setvar VAR_TEMP_5, 1
+	end
+
+NewMauville_Inside_Text_AmpharosAttacks:
+	.string "Ampharos came out from the shadows\n"
+	.string "and attacked!$"
 
 NewMauville_Inside_Text_GeneratorRadiatingHeat: @ 8237896
 	.string "The generator is radiating heat that\n"

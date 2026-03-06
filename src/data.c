@@ -284,12 +284,19 @@ static const union AnimCmd gUnknown_082FF704[] =
     ANIMCMD_END,
 };
 
-const union AnimCmd *const gUnknown_082FF70C[] =
+static const union AnimCmd sAnim_MonPic_4[] =
+{
+    ANIMCMD_FRAME(4, 0),
+    ANIMCMD_END,
+};
+
+const union AnimCmd *const gUnknown_082FF70C[MAX_MON_PIC_FRAMES] =
 {
     gUnknown_082FF6EC,
     gUnknown_082FF6F4,
     gUnknown_082FF6FC,
     gUnknown_082FF704,
+    sAnim_MonPic_4,
 };
 
 #define SPECIES_SPRITE(species, sprite) [SPECIES_##species] = {sprite, 0x800, SPECIES_##species}

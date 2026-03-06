@@ -836,7 +836,7 @@ u32 sub_8020C0C(MainCallback callback)
     if (callback == CB2_ReturnToField)
     {
         gTextFlags.autoScroll = TRUE;
-        PlayNewMapMusic(MUS_POKE_CENTER);
+        PlayNewMapMusic(DoTimeBasedMusic(MUS_POKE_CENTER));
         SetMainCallback1(CB1_Overworld);
     }
 

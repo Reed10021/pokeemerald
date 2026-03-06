@@ -1,5 +1,10 @@
 Route123_MapScripts:: @ 81F6147
+	map_script MAP_SCRIPT_ON_TRANSITION, Route123_OnTransition
 	.byte 0
+
+Route123_OnTransition::
+	setflag FLAG_LANDMARK_BERRY_MASTER
+	end
 
 Route123_EventScript_GigaDrainGirl:: @ 81F6151
 	lock

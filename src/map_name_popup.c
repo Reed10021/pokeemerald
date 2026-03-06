@@ -131,7 +131,7 @@ static const u8 gRegionMapSectionId_To_PopUpThemeIdMapping[] =
     [MAPSEC_BATTLE_FRONTIER] = MAPPOPUP_THEME_MARBLE,
     [MAPSEC_PETALBURG_WOODS] = MAPPOPUP_THEME_WOOD,
     [MAPSEC_RUSTURF_TUNNEL] = MAPPOPUP_THEME_STONE,
-    [MAPSEC_ABANDONED_SHIP] = MAPPOPUP_THEME_WOOD,
+    [MAPSEC_ABANDONED_SHIP] = MAPPOPUP_THEME_UNDERWATER,
     [MAPSEC_NEW_MAUVILLE] = MAPPOPUP_THEME_MARBLE,
     [MAPSEC_METEOR_FALLS] = MAPPOPUP_THEME_STONE,
     [MAPSEC_METEOR_FALLS2] = MAPPOPUP_THEME_STONE,
@@ -184,6 +184,16 @@ static const u8 gText_PyramidFloor5[] = _("PYRAMID FLOOR 5");
 static const u8 gText_PyramidFloor6[] = _("PYRAMID FLOOR 6");
 static const u8 gText_PyramidFloor7[] = _("PYRAMID FLOOR 7");
 static const u8 gText_Pyramid[] = _("PYRAMID");
+
+static const u8 sMapName_SafariZoneNorthWest[] = _("SAFARI ZONE NW");
+static const u8 sMapName_SafariZoneSouthWest[] = _("SAFARI ZONE SW");
+static const u8 sMapName_SafariZoneSouth[] = _("SAFARI ZONE SOUTH");
+static const u8 sMapName_SafariZoneNorth[] = _("SAFARI ZONE NORTH");
+static const u8 sMapName_SafariZoneNorthEast[] = _("SAFARI ZONE NE");
+static const u8 sMapName_SafariZoneSouthEast[] = _("SAFARI ZONE SE");
+
+static const u8 sMapName_PurityCave[] = _("PURITY CAVE");
+static const u8 sMapName_TimelessForest[] = _("TIMELESS FOREST");
 
 static const u8 * const gBattlePyramid_MapHeaderStrings[] =
 {
@@ -321,7 +331,44 @@ static void ShowMapNamePopUpWindow(void)
     else
     {
         withoutPrefixPtr = &(mapDisplayHeader[3]);
-        GetMapName(withoutPrefixPtr, gMapHeader.regionMapSectionId, 0);
+        switch (gMapHeader.mapLayoutId)
+        {
+            case LAYOUT_SAFARI_ZONE_NORTHWEST:
+                mapDisplayHeaderSource = sMapName_SafariZoneNorthWest;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            case LAYOUT_SAFARI_ZONE_NORTH:
+                mapDisplayHeaderSource = sMapName_SafariZoneNorth;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            case LAYOUT_SAFARI_ZONE_SOUTHWEST:
+                mapDisplayHeaderSource = sMapName_SafariZoneSouthWest;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            case LAYOUT_SAFARI_ZONE_SOUTH:
+                mapDisplayHeaderSource = sMapName_SafariZoneSouth;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            case LAYOUT_SAFARI_ZONE_NORTHEAST:
+                mapDisplayHeaderSource = sMapName_SafariZoneNorthEast;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            case LAYOUT_SAFARI_ZONE_SOUTHEAST:
+                mapDisplayHeaderSource = sMapName_SafariZoneSouthEast;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            case LAYOUT_PURITY_CAVE:
+                mapDisplayHeaderSource = sMapName_PurityCave;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            case LAYOUT_TIMELESS_FOREST:
+                mapDisplayHeaderSource = sMapName_TimelessForest;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            default:
+                GetMapName(withoutPrefixPtr, gMapHeader.regionMapSectionId, 0);
+                break;
+        }
     }
     AddMapNamePopUpWindow();
     LoadMapNamePopUpWindowBg();

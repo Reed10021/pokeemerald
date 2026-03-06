@@ -81,8 +81,12 @@ u8 ItemId_GetSecondaryId(u16 itemId);
 void MergeSort(struct ItemSlot* array, u32 low, u32 high, s8(*comparator)(struct ItemSlot*, struct ItemSlot*));
 void Merge(struct ItemSlot* array, u32 low, u32 mid, u32 high, s8(*comparator)(struct ItemSlot*, struct ItemSlot*));
 s8 CompareItemsAlphabetically(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
+s8 CompareItemsAlphabeticallyReverse(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
 s8 CompareItemsByMost(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
+s8 CompareItemsByMostReverse(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
 s8 CompareItemsByType(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
+s8 CompareItemsByTypeReverse(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
 s8 CompareItemsById(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
+s8 CompareItemsByIdReverse(struct ItemSlot* itemSlot1, struct ItemSlot* itemSlot2);
 
 #endif // GUARD_ITEM_H

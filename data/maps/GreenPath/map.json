@@ -2,7 +2,7 @@
   "id": "MAP_GREEN_PATH",
   "name": "GreenPath",
   "layout": "LAYOUT_GREEN_PATH",
-  "music": "MUS_GSC_ROUTE38",
+  "music": "MUS_HG_ROUTE38",
   "region_map_section": "MAPSEC_GREEN_PATH",
   "requires_flash": false,
   "weather": "WEATHER_ROUTE103_110_CYCLE",

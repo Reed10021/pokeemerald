@@ -13,6 +13,7 @@
 #include "field_control_avatar.h"
 #include "field_effect.h"
 #include "field_message_box.h"
+#include "field_move_items.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
 #include "field_special_scene.h"
@@ -190,8 +191,9 @@ u8 gLocalLinkPlayerId; // This is our player id in a multiplayer mode.
 u8 gFieldLinkPlayerCount;
 
 u8 gTimeOfDay;
+u8 gTimeUpdateCounter;
 struct TimeBlendSettings currentTimeBlend;
-u16 gTimeUpdateCounter;
+struct TimeBlendSettings cachedBlend;
 
 // EWRAM vars
 EWRAM_DATA static u8 sObjectEventLoadFlag = 0;
@@ -200,6 +202,7 @@ EWRAM_DATA static struct WarpData sWarpDestination = {0};  // new warp position
 EWRAM_DATA static struct WarpData sFixedDiveWarp = {0};
 EWRAM_DATA static struct WarpData sFixedHoleWarp = {0};
 EWRAM_DATA static u16 sLastMapSectionId = 0;
+EWRAM_DATA static u16 sLastMapLayoutId = 0;
 EWRAM_DATA static struct InitialPlayerAvatarState sInitialPlayerAvatarState = {0};
 EWRAM_DATA static u16 sAmbientCrySpecies = 0;
 EWRAM_DATA static bool8 sIsAmbientCryWaterMon = FALSE;
@@ -379,6 +382,7 @@ void Overworld_ResetStateAfterFly(void)
     FlagClear(FLAG_SYS_SAFARI_MODE);
     FlagClear(FLAG_SYS_USE_STRENGTH);
     FlagClear(FLAG_SYS_USE_FLASH);
+    ClearFieldMoveFlags();
 }
 
 void Overworld_ResetStateAfterTeleport(void)
@@ -389,6 +393,7 @@ void Overworld_ResetStateAfterTeleport(void)
     FlagClear(FLAG_SYS_SAFARI_MODE);
     FlagClear(FLAG_SYS_USE_STRENGTH);
     FlagClear(FLAG_SYS_USE_FLASH);
+    ClearFieldMoveFlags();
     ScriptContext2_RunNewScript(EventScript_ResetMrBriney);
 }
 
@@ -400,6 +405,7 @@ void Overworld_ResetStateAfterDigEscRope(void)
     FlagClear(FLAG_SYS_SAFARI_MODE);
     FlagClear(FLAG_SYS_USE_STRENGTH);
     FlagClear(FLAG_SYS_USE_FLASH);
+    ClearFieldMoveFlags();
 }
 
 static void Overworld_ResetStateAfterWhiteOut(void)
@@ -410,6 +416,11 @@ static void Overworld_ResetStateAfterWhiteOut(void)
     FlagClear(FLAG_SYS_SAFARI_MODE);
     FlagClear(FLAG_SYS_USE_STRENGTH);
     FlagClear(FLAG_SYS_USE_FLASH);
+    FlagClear(FLAG_CANNOT_RUN_AWAY);
+    FlagClear(FLAG_FORCE_ANIMATIONS);
+    FlagClear(FLAG_TRIGGER_SMART_WILD_AI);
+    FlagClear(FLAG_TRIGGER_TOTEM_POWER);
+    ClearFieldMoveFlags();
     // If you were defeated by Kyogre/Groudon and the step counter has
     // maxed out, end the abnormal weather.
     if (VarGet(VAR_SHOULD_END_ABNORMAL_WEATHER) == 1)
@@ -422,6 +433,10 @@ static void Overworld_ResetStateAfterWhiteOut(void)
 static void sub_8084788(void)
 {
     FlagClear(FLAG_SYS_SAFARI_MODE);
+    FlagClear(FLAG_CANNOT_RUN_AWAY);
+    FlagClear(FLAG_FORCE_ANIMATIONS);
+    FlagClear(FLAG_TRIGGER_SMART_WILD_AI);
+    FlagClear(FLAG_TRIGGER_TOTEM_POWER);
     ChooseAmbientCrySpecies();
     ResetCyclingRoadChallengeData();
     UpdateLocationHistoryForRoamer();
@@ -595,6 +610,7 @@ struct MapHeader const *const GetDestinationWarpMapHeader(void)
 static void LoadCurrentMapData(void)
 {
     sLastMapSectionId = gMapHeader.regionMapSectionId;
+    sLastMapLayoutId = gMapHeader.mapLayoutId;
     gMapHeader = *Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->location.mapGroup, gSaveBlock1Ptr->location.mapNum);
     gSaveBlock1Ptr->mapLayoutId = gMapHeader.mapLayoutId;
     gMapHeader.mapLayout = GetMapLayout();
@@ -785,6 +801,7 @@ bool8 SetDiveWarpDive(u16 x, u16 y)
 
 void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
 {
+    u32 safariFlag = 0;
     s32 paletteIndex;
 
     SetWarpDestination(mapGroup, mapNum, -1, -1, -1);
@@ -820,8 +837,20 @@ void LoadMapFromCameraTransition(u8 mapGroup, u8 mapNum)
     ResetFieldTasksArgs();
     RunOnResumeMapScript();
 
-    if (gMapHeader.regionMapSectionId != sLastMapSectionId)
+    if (gMapHeader.mapLayoutId == LAYOUT_SAFARI_ZONE_NORTH ||
+        gMapHeader.mapLayoutId == LAYOUT_SAFARI_ZONE_NORTHEAST ||
+        gMapHeader.mapLayoutId == LAYOUT_SAFARI_ZONE_NORTHWEST ||
+        gMapHeader.mapLayoutId == LAYOUT_SAFARI_ZONE_SOUTH ||
+        gMapHeader.mapLayoutId == LAYOUT_SAFARI_ZONE_SOUTHEAST ||
+        gMapHeader.mapLayoutId == LAYOUT_SAFARI_ZONE_SOUTHWEST)
+    {
+        if (gMapHeader.mapLayoutId != sLastMapLayoutId)
+            safariFlag = 1;
+    }
+
+    if (gMapHeader.regionMapSectionId != sLastMapSectionId || safariFlag == 1)
         ShowMapNamePopup();
+
 }
 
 static void LoadMapFromWarp(bool32 a1)
@@ -972,6 +1001,7 @@ void SetDefaultFlashLevel(void)
         gSaveBlock1Ptr->flashLevel = 1;
     else
         gSaveBlock1Ptr->flashLevel = gMaxFlashLevel - 1;
+    TryUseFlash();
 }
 
 void Overworld_SetFlashLevel(s32 flashLevel)
@@ -1145,7 +1175,8 @@ u16 GetCurrLocationDefaultMusic(void)
      && GetSav1Weather() == WEATHER_SANDSTORM)
         return MUS_ROUTE111;
 
-    music = GetLocationMusic(&gSaveBlock1Ptr->location);
+    music = DoTimeBasedMusic(GetLocationMusic(&gSaveBlock1Ptr->location));
+
     if (music != MUS_ROUTE118)
     {
         return music;
@@ -1161,7 +1192,8 @@ u16 GetCurrLocationDefaultMusic(void)
 
 u16 GetWarpDestinationMusic(void)
 {
-    u16 music = GetLocationMusic(&sWarpDestination);
+    u16 music = DoTimeBasedMusic(GetLocationMusic(&sWarpDestination));
+
     if (music != MUS_ROUTE118)
     {
         return music;
@@ -1187,19 +1219,14 @@ void Overworld_PlaySpecialMapMusic(void)
 
     if (music != MUS_WEATHER_GROUDON && music != MUS_ABNORMAL_WEATHER && music != 0xFFFF)
     {
+        u16 surfSong = DoTimeBasedMusic(MUS_SURF);
+
         if (gSaveBlock1Ptr->savedMusic)
             music = gSaveBlock1Ptr->savedMusic;
         else if (GetCurrentMapType() == MAP_TYPE_UNDERWATER)
             music = MUS_UNDERWATER;
-        else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-            music = MUS_SURF;
-    }
-
-    if (music == MUS_POKE_CENTER)
-    {
-        u16 currentMusic = GetCurrentMapMusic();
-        if (currentMusic == MUS_RG_NET_CENTER || currentMusic == MUS_C_COMM_CENTER || currentMusic == MUS_RG_POKE_CENTER)
-            return;
+        else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING) && Overworld_MusicCanOverrideMapMusic(surfSong))
+            music = surfSong;
     }
 
     if (music != GetCurrentMapMusic())
@@ -1224,16 +1251,21 @@ static void TransitionMapMusic(void)
         u16 currentMusic = GetCurrentMapMusic();
         if (newMusic != MUS_WEATHER_GROUDON && newMusic != MUS_ABNORMAL_WEATHER && newMusic != 0xFFFF)
         {
-            if (currentMusic == MUS_UNDERWATER || currentMusic == MUS_SURF)
+            if (currentMusic == MUS_UNDERWATER)
                 return;
+
             if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
-                newMusic = MUS_SURF;
+            {
+                u16 surfSong = DoTimeBasedMusic(MUS_SURF);
+                if (Overworld_MusicCanOverrideWarpMapMusic(surfSong))
+                {
+                    newMusic = surfSong;
+                }
+            }
         }
         if (newMusic != currentMusic)
         {
-            if (newMusic == MUS_POKE_CENTER && (currentMusic == MUS_RG_NET_CENTER || currentMusic == MUS_C_COMM_CENTER || currentMusic == MUS_RG_POKE_CENTER))
-                return;
-            else if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE) || TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+            if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_MACH_BIKE | PLAYER_AVATAR_FLAG_ACRO_BIKE) || TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
                 FadeOutAndFadeInNewMapMusic(newMusic, 4, 4);
             else
                 FadeOutAndPlayNewMapMusic(newMusic, 8);
@@ -1268,12 +1300,11 @@ void TryFadeOutOldMapMusic(void)
 {
     u16 currentMusic = GetCurrentMapMusic();
     u16 warpMusic = GetWarpDestinationMusic();
-    if (warpMusic == MUS_POKE_CENTER && (currentMusic == MUS_RG_NET_CENTER || currentMusic == MUS_C_COMM_CENTER || currentMusic == MUS_RG_POKE_CENTER))
-        return;
 
     if (FlagGet(FLAG_DONT_TRANSITION_MUSIC) != TRUE && warpMusic != GetCurrentMapMusic())
     {
-        if (currentMusic == MUS_SURF
+        u16 surfSong = DoTimeBasedMusic(MUS_SURF);
+        if (currentMusic == surfSong
             && VarGet(VAR_SKY_PILLAR_STATE) == 2
             && gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(SOOTOPOLIS_CITY)
             && gSaveBlock1Ptr->location.mapNum == MAP_NUM(SOOTOPOLIS_CITY)
@@ -1282,6 +1313,15 @@ void TryFadeOutOldMapMusic(void)
             && sWarpDestination.x == 29
             && sWarpDestination.y == 53)
             return;
+
+        if (TestPlayerAvatarFlags(PLAYER_AVATAR_FLAG_SURFING))
+        {
+            if (Overworld_MusicCanOverrideWarpMapMusic(surfSong) && currentMusic == surfSong)
+            {
+                return;
+            }
+        }
+
         FadeOutMapMusic(GetMapMusicFadeoutSpeed());
     }
 }
@@ -1324,7 +1364,7 @@ void UpdateAmbientCry(s16 *state, u16 *delayCounter)
             *state = 1;
         break;
     case 1:
-        *delayCounter = (Random() % 2400) + 1200;
+        *delayCounter = (Random() % 1200) + 600;
         *state = 3;
         break;
     case 2:
@@ -1347,6 +1387,8 @@ void UpdateAmbientCry(s16 *state, u16 *delayCounter)
         if (*delayCounter == 0)
         {
             PlayAmbientCry();
+            if(Random() % 4 != 0) // 75% chance to trigger a possible change in ambient cry
+                ChooseAmbientCrySpecies();
             *state = 2;
         }
         break;
@@ -1374,14 +1416,63 @@ static void ChooseAmbientCrySpecies(void)
 
 bool32 Overworld_MusicCanOverrideMapMusic(u16 music)
 {
-    if (music == MUS_CYCLING || music == MUS_SURF)
+    if (music == MUS_SURF || music == MUS_DP_LAKE)
     {
         if (gMapHeader.regionMapSectionId == MAPSEC_WATER_PATH 
             || gMapHeader.regionMapSectionId == MAPSEC_GREEN_PATH 
             || gMapHeader.regionMapSectionId == MAPSEC_PATTERN_BUSH
             || gMapHeader.regionMapSectionId == MAPSEC_LOST_CAVE
+            || gMapHeader.regionMapSectionId == MAPSEC_ROUTE_124
+            || gMapHeader.regionMapSectionId == MAPSEC_ROUTE_125
+            || gMapHeader.regionMapSectionId == MAPSEC_MOSSDEEP_CITY
             || gMapHeader.regionMapSectionId == MAPSEC_EVER_GRANDE_CITY
-            || gMapHeader.regionMapSectionId == MAPSEC_BATTLE_FRONTIER)
+            || gMapHeader.regionMapSectionId == MAPSEC_BATTLE_FRONTIER
+            || gMapHeader.regionMapSectionId == MAPSEC_ARTISAN_CAVE)
+            return FALSE;
+    }
+    else if(music == MUS_CYCLING || music == MUS_DP_CYCLING)
+    {
+        if (gMapHeader.regionMapSectionId == MAPSEC_WATER_PATH
+            || gMapHeader.regionMapSectionId == MAPSEC_GREEN_PATH
+            || gMapHeader.regionMapSectionId == MAPSEC_PATTERN_BUSH
+            || gMapHeader.regionMapSectionId == MAPSEC_LOST_CAVE
+            || gMapHeader.regionMapSectionId == MAPSEC_ROUTE_130
+            || gMapHeader.regionMapSectionId == MAPSEC_EVER_GRANDE_CITY
+            || gMapHeader.regionMapSectionId == MAPSEC_BATTLE_FRONTIER
+            || gMapHeader.regionMapSectionId == MAPSEC_ARTISAN_CAVE)
+            return FALSE;
+    }
+    return TRUE;
+}
+
+bool32 Overworld_MusicCanOverrideWarpMapMusic(u16 music)
+{
+    const struct MapHeader* mapHeader = GetDestinationWarpMapHeader();
+
+    if (music == MUS_SURF || music == MUS_DP_LAKE)
+    {
+        if (mapHeader->regionMapSectionId == MAPSEC_WATER_PATH
+            || mapHeader->regionMapSectionId == MAPSEC_GREEN_PATH
+            || mapHeader->regionMapSectionId == MAPSEC_PATTERN_BUSH
+            || mapHeader->regionMapSectionId == MAPSEC_LOST_CAVE
+            || mapHeader->regionMapSectionId == MAPSEC_ROUTE_124
+            || mapHeader->regionMapSectionId == MAPSEC_ROUTE_125
+            || mapHeader->regionMapSectionId == MAPSEC_MOSSDEEP_CITY
+            || mapHeader->regionMapSectionId == MAPSEC_EVER_GRANDE_CITY
+            || mapHeader->regionMapSectionId == MAPSEC_BATTLE_FRONTIER
+            || gMapHeader.regionMapSectionId == MAPSEC_ARTISAN_CAVE)
+            return FALSE;
+    }
+    else if (music == MUS_CYCLING || music == MUS_DP_CYCLING)
+    {
+        if (mapHeader->regionMapSectionId == MAPSEC_WATER_PATH
+            || mapHeader->regionMapSectionId == MAPSEC_GREEN_PATH
+            || mapHeader->regionMapSectionId == MAPSEC_PATTERN_BUSH
+            || mapHeader->regionMapSectionId == MAPSEC_LOST_CAVE
+            || mapHeader->regionMapSectionId == MAPSEC_ROUTE_130
+            || mapHeader->regionMapSectionId == MAPSEC_EVER_GRANDE_CITY
+            || mapHeader->regionMapSectionId == MAPSEC_BATTLE_FRONTIER
+            || gMapHeader.regionMapSectionId == MAPSEC_ARTISAN_CAVE)
             return FALSE;
     }
     return TRUE;
@@ -1592,7 +1683,10 @@ u8 UpdateTimeOfDay(void)
 
 bool8 MapHasNaturalLight(u8 mapType)
 {
-    return mapType == MAP_TYPE_TOWN || mapType == MAP_TYPE_CITY || mapType == MAP_TYPE_ROUTE || mapType == MAP_TYPE_OCEAN_ROUTE;
+    return mapType == MAP_TYPE_TOWN || 
+           mapType == MAP_TYPE_CITY ||
+           mapType == MAP_TYPE_ROUTE || 
+           mapType == MAP_TYPE_OCEAN_ROUTE;
 }
 
 void UpdateAltBgPalettes(u16 palettes)
@@ -1664,19 +1758,21 @@ static void OverworldBasic(void)
     UpdatePaletteFade();
     UpdateTilesetAnimations();
     DoScheduledBgTilemapCopiesToVram();
-    if (++gTimeUpdateCounter >= 900 && !gPaletteFade.active) // Update blend every 15 seconds
+    if (++gTimeUpdateCounter >= 230 && !gPaletteFade.active) // Update blend every ~3 seconds
     {
-        struct TimeBlendSettings cachedBlend = {
-            .time0 = currentTimeBlend.time0,
-            .time1 = currentTimeBlend.time1,
-            .weight = currentTimeBlend.weight,
-        };
         gTimeUpdateCounter = 0;
         UpdateTimeOfDay();
         if (cachedBlend.time0 != currentTimeBlend.time0 || cachedBlend.time1 != currentTimeBlend.time1 || cachedBlend.weight != currentTimeBlend.weight)
         {
-            UpdateAltBgPalettes(PALETTES_BG);
-            UpdatePalettesWithTime(PALETTES_ALL);
+            ApplyGammaShift(0, 32, gWeatherPtr->gammaIndex);
+            // Update cache only after we update the current blend.
+            cachedBlend.time0 = currentTimeBlend.time0;
+            cachedBlend.time1 = currentTimeBlend.time1;
+            cachedBlend.weight = currentTimeBlend.weight;
+            // Old method below. These two calls are already baked in to ApplyGammaShift, 
+            // and ApplyGammaShift plays better with weather.
+            //UpdateAltBgPalettes(PALETTES_BG);
+            //UpdatePalettesWithTime(PALETTES_ALL);
         }
     }
 }

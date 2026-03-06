@@ -87,7 +87,7 @@ struct UsePokeblockMenu
 {
     u32 unused;
     u16 partyPalettes[PARTY_SIZE][0x40];
-    u8 partySheets[NUM_SELECTIONS_LOADED][0x2000];
+    u8 partySheets[NUM_SELECTIONS_LOADED][MON_PIC_SIZE * MAX_MON_PIC_FRAMES];
     u8 unusedBuffer[0x1000];
     u8 tilemapBuffer[BG_SCREEN_SIZE + 2];
     u8 selectionIconSpriteIds[PARTY_SIZE + 1];
@@ -1016,11 +1016,11 @@ static void AddPokeblockToConditions(struct Pokeblock *pokeblock, struct Pokemon
             SetMonData(mon, sMonDataConditions[i], &data);
         }
 
-        cstat = (u8)(GetMonData(mon, MON_DATA_SHEEN)) + pokeblock->feel;
+        cstat = GetMonData(mon, MON_DATA_SHEEN) + pokeblock->feel;
         if (cstat > 255)
             cstat = 255;
 
-        data = cstat;
+        data = (u8)cstat;
         SetMonData(mon, MON_DATA_SHEEN, &data);
     }
 }

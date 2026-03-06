@@ -15,6 +15,7 @@
 #include "berry.h"
 #include "bg.h"
 #include "data.h"
+#include "daycare.h"
 #include "decompress.h"
 #include "dma3.h"
 #include "event_data.h"
@@ -40,6 +41,7 @@
 #include "roamer.h"
 #include "safari_zone.h"
 #include "scanline_effect.h"
+#include "script.h"
 #include "sound.h"
 #include "sprite.h"
 #include "string_util.h"
@@ -323,7 +325,7 @@ static const s8 gUnknown_0831ACE0[] ={-32, -16, -16, -32, -32, 0, 0, 0};
 // 10 is ×1.0 TYPE_MUL_NORMAL
 // 05 is ×0.5 TYPE_MUL_NOT_EFFECTIVE
 // 00 is ×0.0 TYPE_MUL_NO_EFFECT
-const u8 gTypeEffectiveness[336] =
+const u8 gTypeEffectiveness[TYPE_EFFECT_ARRAY_MAX_SIZE] =
 {
     TYPE_NORMAL, TYPE_ROCK, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_NORMAL, TYPE_STEEL, TYPE_MUL_NOT_EFFECTIVE,
@@ -341,7 +343,7 @@ const u8 gTypeEffectiveness[336] =
     TYPE_WATER, TYPE_GROUND, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_WATER, TYPE_ROCK, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_WATER, TYPE_DRAGON, TYPE_MUL_NOT_EFFECTIVE,
-	TYPE_WATER, TYPE_ICE, TYPE_MUL_NOT_EFFECTIVE,
+    TYPE_WATER, TYPE_ICE, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ELECTRIC, TYPE_WATER, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_ELECTRIC, TYPE_ELECTRIC, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ELECTRIC, TYPE_GRASS, TYPE_MUL_NOT_EFFECTIVE,
@@ -389,6 +391,7 @@ const u8 gTypeEffectiveness[336] =
     TYPE_GROUND, TYPE_ROCK, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_GROUND, TYPE_STEEL, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_FLYING, TYPE_ELECTRIC, TYPE_MUL_NOT_EFFECTIVE,
+    TYPE_FLYING, TYPE_ICE, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_FLYING, TYPE_GRASS, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_FLYING, TYPE_FIGHTING, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_FLYING, TYPE_BUG, TYPE_MUL_SUPER_EFFECTIVE,
@@ -409,7 +412,7 @@ const u8 gTypeEffectiveness[336] =
     TYPE_BUG, TYPE_DARK, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_BUG, TYPE_STEEL, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ROCK, TYPE_FIRE, TYPE_MUL_SUPER_EFFECTIVE,
-    TYPE_ROCK, TYPE_ICE, TYPE_MUL_NOT_EFFECTIVE,
+    TYPE_ROCK, TYPE_ICE, TYPE_MUL_SUPER_EFFECTIVE,
     TYPE_ROCK, TYPE_FIGHTING, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ROCK, TYPE_GROUND, TYPE_MUL_NOT_EFFECTIVE,
     TYPE_ROCK, TYPE_FLYING, TYPE_MUL_SUPER_EFFECTIVE,
@@ -464,6 +467,8 @@ const u8 gTypeNames[NUMBER_OF_MON_TYPES][TYPE_NAME_LENGTH + 1] =
 // This is a factor in how much money you get for beating a trainer.
 const struct TrainerMoney gTrainerMoneyTable[] =
 {
+    {TRAINER_CLASS_PKMN_TRAINER_1, 200},
+    {TRAINER_CLASS_PKMN_TRAINER_2, 200},
     {TRAINER_CLASS_TEAM_AQUA, 10},
     {TRAINER_CLASS_AQUA_ADMIN, 20},
     {TRAINER_CLASS_AQUA_LEADER, 40},
@@ -519,8 +524,7 @@ const struct TrainerMoney gTrainerMoneyTable[] =
     {TRAINER_CLASS_HIKER, 20},
     {TRAINER_CLASS_YOUNG_COUPLE, 16},
     {TRAINER_CLASS_WINSTRATE, 30},
-	{TRAINER_CLASS_PKMN_TRAINER_1, 200},
-	{TRAINER_CLASS_PKMN_TRAINER_2, 200},
+    {TRAINER_CLASS_PKMN_TRAINER_4, 200},
     {0xFF, 5},
 };
 
@@ -1982,12 +1986,12 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
 
 // If the player's average party level is lower than the opponents, don't do anything (+0).
 // If the player's average party level is higher than the opponents, scale the level using non-random scale steps, capping at +15 (or +difference if the game is beaten).
-// If the opponent is a leader, elite 4, champion, or rival ("bosses") and the average party level is higher than the opponents, increase by either difference + 3 or max mon level difference + 3.
-u8 ScaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 totalMons, u8 maxMonLevel, u8 minMonLevel, u8 playerMonCount)
+// If the opponent is a leader, elite 4, champion, or rival ("bosses") and the average party level is higher than the opponents, increase by the difference.
+u8 ScaleLevel(u32 pokeBaseLevel, u32 trainerNum, u32 avgLevel, u32 currentMon, u32 totalMons, u32 maxMonLevel)
 {
-    s8 difference;
-    s8 scale;
-    s16 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting it back to u8.
+    s32 difference;
+    s32 scale;
+    s32 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting it back to u8.
     currentMon += 1; // starts at zero, so increment to 1 for proper calcs
 
     // Don't scale the first battle of the game; the player doesn't have pokeballs.
@@ -1995,17 +1999,13 @@ u8 ScaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 t
         trainerNum == TRAINER_MAY_ROUTE_103_MUDKIP || trainerNum == TRAINER_MAY_ROUTE_103_TREECKO || trainerNum == TRAINER_MAY_ROUTE_103_TORCHIC)
         return pokeBaseLevel;
 
-    // If the party composition is stronger pokemon with weaker pokemon, adjust avgLevel to compensate
-    if (maxMonLevel - minMonLevel >= 25)
-        avgLevel += (((maxMonLevel - minMonLevel) * 100) / (playerMonCount * 100));
-
     if (pokeBaseLevel >= avgLevel)
     {
         scale = 0;
     }
     else // <
     {
-        if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rivals & Steven
+        if (gTrainers[trainerNum].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival, Wally, & Steven
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_MAGMA_ADMIN || // Magma
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_MAGMA_LEADER ||
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_AQUA_ADMIN || // Aqua
@@ -2014,10 +2014,7 @@ u8 ScaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 t
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
         {
-            if(maxMonLevel - avgLevel > 10)
-                scale = (maxMonLevel - pokeBaseLevel) + 3;
-            else
-                scale = (avgLevel - pokeBaseLevel) + 3;
+            scale = (avgLevel - pokeBaseLevel);
         }
         else
         {
@@ -2037,11 +2034,11 @@ u8 ScaleLevel(u8 pokeBaseLevel, u16 trainerNum, u8 avgLevel, u8 currentMon, u8 t
             else {
                 // If the game is beaten, continue scaling.
                 if (FlagGet(FLAG_SYS_GAME_CLEAR)) {
-                    scale = difference - (totalMons- currentMon);
+                    scale = difference - (totalMons - currentMon);
                 }
                 else {
-                    // Otherwise, if the game is not beaten, cap scaling at 18.
-                    scale = 18;
+                    // Otherwise, if the game is not beaten, cap scaling at 16.
+                    scale = 16;
                 }
             }
         }
@@ -2065,33 +2062,35 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
     u32 personalityValue;
     u8 fixedIV;
     s32 i, j;
-    u8 monsCount;
-    u16 avgLevel = 0;
-    u8 playerMonCount = 0;
-    u8 monCount = 0;
-    u8 minMon = 100;
-    u8 maxMon = 0;
+    u32 monsCount;
+    u32 avgLevel = 0;
+    u32 playerMonCount = 0;
+    u32 maxMon = 0;
     u8 badEvs = 35;
     u8 mediumEvs = 85;
     u8 goodEvs = 175;
+    u32 levelArray[6] = { 0 };
 
     if (trainerNum == TRAINER_SECRET_BASE)
         return 0;
 
-    for (i = 0; i < PARTY_SIZE; i++)
     {
-        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES) != SPECIES_NONE)
+        struct Pokemon* curMon;
+        u32 temp = 0;
+        for (i = 0; i < PARTY_SIZE; i++)
         {
-            u8 temp = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
-            avgLevel += temp;
+            curMon = &gPlayerParty[i];
+            if (!curMon->box.hasSpecies)
+                break;
+
+            temp = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
+            levelArray[i] = temp;
             if (maxMon < temp)
                 maxMon = temp;
-            if (minMon > temp)
-                minMon = temp;
             playerMonCount++;
         }
     }
-    avgLevel = (avgLevel * 100) / (playerMonCount * 100);
+    avgLevel = CalcGeneralizedMean(levelArray, playerMonCount);
 
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER && !(gBattleTypeFlags & (BATTLE_TYPE_FRONTIER
                                                                         | BATTLE_TYPE_EREADER_TRAINER
@@ -2139,7 +2138,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, playerMonCount);
+                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
                     if (scaledLevel > partyData[i].lvl)
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
@@ -2161,7 +2160,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, playerMonCount);
+                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
                     if (scaledLevel > partyData[i].lvl)
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
@@ -2188,7 +2187,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, playerMonCount);
+                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
                     if (scaledLevel > partyData[i].lvl)
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
@@ -2203,6 +2202,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 }
                 case F_TRAINER_PARTY_CUSTOM_MOVESET | F_TRAINER_PARTY_HELD_ITEM:
                 {
+                    u32 forceShinyTrainerId = 0;
                     const struct TrainerMonItemCustomMoves *partyData = gTrainers[trainerNum].party.ItemCustomMoves;
 
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
@@ -2211,12 +2211,39 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, (u8)i, monsCount, maxMon, minMon, playerMonCount);
+                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
                     if (scaledLevel > partyData[i].lvl)
                         evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
-                    CreateMon(&party[i], evolution, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
+                    switch (trainerNum)
+                    {
+                        // Force special trainer's pokemon to always be shiny.
+                        case TRAINER_KIRBY:
+                        case TRAINER_REED_YELLOW:
+                        case TRAINER_CHRIS_CRYSTAL:
+                        case TRAINER_KRIS:
+                        case TRAINER_SAPPHYR_EMERALD:
+                        case TRAINER_SAPPHYR_EMERALD2:
+                        case TRAINER_RUBY_EMERALD:
+                            forceShinyTrainerId = (Random() << 0x10) | Random();
+                            personalityValue = ForceShiny(personalityValue, forceShinyTrainerId);
+                            break;
+                    }
+
+                    if(forceShinyTrainerId != 0)
+                        CreateMon(&party[i], evolution, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_PRESET, forceShinyTrainerId);
+                    else
+                        CreateMon(&party[i], evolution, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
                     SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
+                    if (gBaseStats[evolution].abilities[1] && (partyData[i].abilityNum == 0 || partyData[i].abilityNum == 1)) // Check valid ranges
+                    {
+                        SetMonData(&party[i], MON_DATA_ABILITY_NUM, &partyData[i].abilityNum);
+                    }
+                    else if (trainerNum == TRAINER_RUBY_EMERALD && partyData[i].species == SPECIES_SLAKING)
+                    {
+                        //Allow ABILITY_NONE for this specific slaking.
+                        SetMonData(&party[i], MON_DATA_ABILITY_NUM, &partyData[i].abilityNum);
+                    }
 
                     for (j = 0; j < MAX_MON_MOVES; j++)
                     {
@@ -3243,7 +3270,7 @@ static void BattleStartClearSetData(void)
 
     if (!(gBattleTypeFlags & BATTLE_TYPE_RECORDED))
     {
-        if (!(gBattleTypeFlags & BATTLE_TYPE_LINK) && gSaveBlock2Ptr->optionsBattleSceneOff == TRUE)
+        if (!(gBattleTypeFlags & BATTLE_TYPE_LINK) && gSaveBlock2Ptr->optionsBattleSceneOff == TRUE && FlagGet(FLAG_FORCE_ANIMATIONS) != TRUE)
             gHitMarker |= HITMARKER_NO_ANIMATIONS;
     }
     else if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_x2000000)) && GetBattleSceneInRecordedBattle())
@@ -3983,6 +4010,14 @@ static void TryDoEventsBeforeFirstTurn(void)
     if (gBattleControllerExecFlags)
         return;
 
+    if (FlagGet(FLAG_TRIGGER_TOTEM_POWER))
+    {
+        FlagClear(FLAG_TRIGGER_TOTEM_POWER);
+        gBattlerAttacker = B_POSITION_OPPONENT_LEFT;
+        BattleScriptExecute(BattleScript_TotemFlaredToLife);
+        return;
+    }
+
     if (gBattleStruct->switchInAbilitiesCounter == 0)
     {
         for (i = 0; i < gBattlersCount; i++)
@@ -4022,6 +4057,10 @@ static void TryDoEventsBeforeFirstTurn(void)
     {
         if (ItemBattleEffects(ITEMEFFECT_ON_SWITCH_IN, gBattlerByTurnOrder[gBattleStruct->switchInItemsCounter], FALSE))
             effect++;
+        else if (ItemBattleEffects(ITEMEFFECT_BATTLE_START, gBattlerByTurnOrder[gBattleStruct->switchInItemsCounter], FALSE))
+            effect++;
+        // ITEMEFFECT_BATTLE_START is a bit of a band-aid fix for the Weather Orb so it doesn't interfere with ITEMEFFECT_ON_SWITCH_IN in battle_script_commands.c
+        // ITEMEFFECT_BATTLE_START's function is to call items only once at the start of a battle. So Weather Orb has an entry in ITEMEFFECT_BATTLE_START and another in ITEMEFFECT_NORMAL to handle switches.
 
         gBattleStruct->switchInItemsCounter++;
 
@@ -4159,6 +4198,12 @@ u8 IsRunningFromBattleImpossible(void)
     u8 holdEffect;
     u8 side;
     s32 i;
+
+    if (FlagGet(FLAG_CANNOT_RUN_AWAY))
+    {
+        gBattleCommunication[MULTISTRING_CHOOSER] = 0;
+        return 1;
+    }
 
     if (gBattleMons[gActiveBattler].item == ITEM_ENIGMA_BERRY)
         holdEffect = gEnigmaBerries[gActiveBattler].holdEffect;
@@ -4782,6 +4827,12 @@ u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
         speedBattler1 = (speedBattler1 * 110) / 100;
     }
 
+    if (holdEffect == HOLD_EFFECT_CHOICE_SCARF)
+        speedBattler1 = (speedBattler1 * 150) / 100;
+
+    if (gBattleMons[battler1].ability == ABILITY_TITANIC)
+        speedBattler1 = (speedBattler1 * 80) / 100;
+
     if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
         speedBattler1 /= 2;
 
@@ -4815,6 +4866,12 @@ u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
     {
         speedBattler2 = (speedBattler2 * 110) / 100;
     }
+
+    if (holdEffect == HOLD_EFFECT_CHOICE_SCARF)
+        speedBattler2 = (speedBattler2 * 150) / 100;
+
+    if (gBattleMons[battler2].ability == ABILITY_TITANIC)
+        speedBattler2 = (speedBattler2 * 80) / 100;
 
     if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
         speedBattler2 /= 2;
@@ -5224,6 +5281,7 @@ static void HandleEndTurn_MonFled(void)
 
 static void HandleEndTurn_FinishBattle(void)
 {
+    FlagClear(FLAG_FORCE_ANIMATIONS);
     if (gCurrentActionFuncId == B_ACTION_TRY_FINISH || gCurrentActionFuncId == B_ACTION_FINISHED)
     {
         if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK
@@ -5340,6 +5398,21 @@ static void WaitForEvoSceneToFinish(void)
 
 static void ReturnFromBattleToOverworld(void)
 {
+    bool32 noScriptMode = FALSE;
+
+    if (gMain.savedCallback == CB2_EndScriptedWildBattle)
+        noScriptMode = TRUE;
+
+    if (gBattleTypeFlags & (BATTLE_TYPE_LINK
+        | BATTLE_TYPE_x2000000
+        | BATTLE_TYPE_TRAINER
+        | BATTLE_TYPE_FIRST_BATTLE
+        | BATTLE_TYPE_SAFARI
+        | BATTLE_TYPE_FRONTIER
+        | BATTLE_TYPE_EREADER_TRAINER
+        | BATTLE_TYPE_WALLY_TUTORIAL))
+        noScriptMode = TRUE;
+
     if (!(gBattleTypeFlags & BATTLE_TYPE_LINK))
     {
         RandomlyGivePartyPokerus(gPlayerParty);
@@ -5358,22 +5431,65 @@ static void ReturnFromBattleToOverworld(void)
         UpdateRoamerHPStatus(&gEnemyParty[0]);
         //if ((gBattleOutcome & B_OUTCOME_WON) || gBattleOutcome == B_OUTCOME_CAUGHT)
         if (gBattleOutcome == B_OUTCOME_CAUGHT) // Bug: (fixed) When Roar is used by roamer, gBattleOutcome is B_OUTCOME_PLAYER_TELEPORTED (5).
-            SetRoamerInactive();                                                     // & with B_OUTCOME_WON (1) will return TRUE and deactivates the roamer.
-        else if (gBattleOutcome == B_OUTCOME_WON) // If player defeated Lati@s, respawn it until they catch it.
-        {
+        {                                       // & with B_OUTCOME_WON (1) will return TRUE and deactivates the roamer.
+            u32 roamerBirds = VarGet(VAR_ROAMER_POKEMON_BIRDS_BEASTS);
             SetRoamerInactive();
-            gSpecialVar_0x8004 = VarGet(VAR_ROAMER_POKEMON);
-            InitRoamer();
-            CheckShinyRoamer();
-            if (gSpecialVar_Result == TRUE) {
-                PlaySE(SE_SHINY);
-                ShowFieldMessage(gText_ShinyRoamer);
+
+            switch (roamerBirds)
+            {
+                default:
+                case 0:
+                    VarSet(VAR_ROAMER_POKEMON_BIRDS_BEASTS, 2); // Articuno
+                    break;
+                case 2:
+                    VarSet(VAR_ROAMER_POKEMON_BIRDS_BEASTS, 3); // Zapdos
+                    break;
+                case 3:
+                    VarSet(VAR_ROAMER_POKEMON_BIRDS_BEASTS, 4); // Moltres
+                    break;
+                case 4:
+                    VarSet(VAR_ROAMER_POKEMON_BIRDS_BEASTS, 5); // Raikou
+                    break;
+                case 5:
+                    VarSet(VAR_ROAMER_POKEMON_BIRDS_BEASTS, 6); // Entei
+                    break;
+                case 6:
+                    VarSet(VAR_ROAMER_POKEMON_BIRDS_BEASTS, 7); // Suicune
+                    break;
+                case 7:
+                    roamerBirds = 8;
+                    break;
             }
-            else {
-                ShowFieldMessage(gText_Roamer);
+
+            if (roamerBirds != 8)
+            {
+                gSpecialVar_0x8004 = VarGet(VAR_ROAMER_POKEMON_BIRDS_BEASTS);
+                InitRoamer();
             }
         }
+        else if (gBattleOutcome == B_OUTCOME_WON) // If player defeated the roamer, respawn it until they catch it.
+        {
+            SetRoamerInactive();
+            if(VarGet(VAR_ROAMER_POKEMON_BIRDS_BEASTS) == 0)
+                gSpecialVar_0x8004 = VarGet(VAR_ROAMER_POKEMON);
+            else
+                gSpecialVar_0x8004 = VarGet(VAR_ROAMER_POKEMON_BIRDS_BEASTS);
+            InitRoamer();
+        }
     }
+    else if (FlagGet(FLAG_LATIOS_OR_LATIAS_ROAMING) &&
+            (&gSaveBlock1Ptr->roamer)->active == FALSE && 
+            VarGet(VAR_ROAMER_POKEMON_BIRDS_BEASTS) == 0 &&
+            !noScriptMode)
+    {
+        // If the lati roaming flag is set, the roamer is not active, and we haven't set VAR_ROAMER_POKEMON_BIRDS_BEASTS, then trigger Articuno.
+        VarSet(VAR_ROAMER_POKEMON_BIRDS_BEASTS, 2); // Articuno
+        gSpecialVar_0x8004 = VarGet(VAR_ROAMER_POKEMON_BIRDS_BEASTS);
+        InitRoamer();
+        ScriptContext1_SetupScript(RoamerTextScriptNoChain);
+        gSpecialVar_0x8003 = 5;
+    }
+
     gSpecialVar_Result = gBattleOutcome;
     m4aSongNumStop(SE_LOW_HEALTH);
     SetMainCallback2(gMain.savedCallback);
@@ -5417,5 +5533,3 @@ static u32 partyMonHoldDoublePrizeEffect(void)
     // max multiplier = 1 * 2 * 2 * 2 * 2 * 2 * 2 = 64
     return retMultiplier;
 }
-
-

@@ -404,6 +404,9 @@
 #define MAP_METEOR_FALLS_STEVENS_CAVE                (107 | (24 << 8))
 #define MAP_PURITY_CAVE                              (108 | (24 << 8))
 #define MAP_TIMELESS_FOREST                          (109 | (24 << 8))
+#define MAP_SCORCHED_SLAB_B1F                        (110 | (24 << 8))
+#define MAP_SCORCHED_SLAB_B2F                        (111 | (24 << 8))
+#define MAP_ARTISAN_CAVE_B2F                         (112 | (24 << 8))
 
 // Map Group 25
 #define MAP_SECRET_BASE_RED_CAVE1           (0 | (25 << 8))

@@ -28,6 +28,7 @@ static const u16 sFrontierExchangeCorner_Decor2[] =
 
 static const u16 sFrontierExchangeCorner_Vitamins[] =
 { 
+    ITEM_RARE_CANDY,
     ITEM_PROTEIN, 
     ITEM_CALCIUM, 
     ITEM_IRON, 
@@ -60,17 +61,23 @@ static const u16 sFrontierExchangeCorner_Vitamins[] =
 
 static const u16 sFrontierExchangeCorner_HoldItems[] =
 { 
-    ITEM_RARE_CANDY,
+    ITEM_FOCUS_SASH,
     ITEM_ABILITY_CAPSULE,
+    ITEM_WEATHER_ORB,
+    ITEM_PUNCHING_GLOVE,
+    ITEM_MUSCLE_BAND,
+    ITEM_WISE_GLASSES,
     ITEM_LEFTOVERS, 
     ITEM_WHITE_HERB, 
     ITEM_QUICK_CLAW, 
     ITEM_MENTAL_HERB, 
-    ITEM_BRIGHT_POWDER, 
-    ITEM_CHOICE_BAND, 
+    ITEM_BRIGHT_POWDER,  
     ITEM_KINGS_ROCK, 
     ITEM_FOCUS_BAND, 
     ITEM_SCOPE_LENS, 
+    ITEM_CHOICE_BAND,
+    ITEM_CHOICE_SPECS,
+    ITEM_CHOICE_SCARF,
     0xFFFF 
 };
 
@@ -104,6 +111,7 @@ static const u8 *const sFrontierExchangeCorner_Decor2Descriptions[] =
 
 static const u8 *const sFrontierExchangeCorner_VitaminsDescriptions[] = 
 {
+    BattleFrontier_ExchangeServiceCorner_Text_RareCandyDesc,
     BattleFrontier_ExchangeServiceCorner_Text_ProteinDesc,
     BattleFrontier_ExchangeServiceCorner_Text_CalciumDesc,
     BattleFrontier_ExchangeServiceCorner_Text_IronDesc,
@@ -136,16 +144,22 @@ static const u8 *const sFrontierExchangeCorner_VitaminsDescriptions[] =
 
 static const u8 *const sFrontierExchangeCorner_HoldItemsDescriptions[] = 
 {
-    BattleFrontier_ExchangeServiceCorner_Text_RareCandyDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_FocusSashDesc,
     BattleFrontier_ExchangeServiceCorner_Text_AbilityCapsuleDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_WeatherOrbDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_PunchingGloveDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_MuscleBandDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_WiseGlassesDesc,
     BattleFrontier_ExchangeServiceCorner_Text_LeftoversDesc,
     BattleFrontier_ExchangeServiceCorner_Text_WhiteHerbDesc,
     BattleFrontier_ExchangeServiceCorner_Text_QuickClawDesc,
     BattleFrontier_ExchangeServiceCorner_Text_MentalHerbDesc,
     BattleFrontier_ExchangeServiceCorner_Text_BrightpowderDesc,
-    BattleFrontier_ExchangeServiceCorner_Text_ChoiceBandDesc,
     BattleFrontier_ExchangeServiceCorner_Text_KingsRockDesc,
     BattleFrontier_ExchangeServiceCorner_Text_FocusBandDesc,
     BattleFrontier_ExchangeServiceCorner_Text_ScopeLensDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_ChoiceBandDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_ChoiceSpecsDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_ChoiceScarfDesc,
     gText_Exit
 };

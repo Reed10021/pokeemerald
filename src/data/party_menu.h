@@ -655,7 +655,7 @@ static const u8 *const sActionStringTable[] =
 static const u8 *const sDescriptionStringTable[] =
 {
     [PARTYBOX_DESC_NO_USE]     = gText_NoUse,
-    [PARTYBOX_DESC_ABLE_3]     = gText_Able,
+    [PARTYBOX_DESC_RESTRICTED] = gText_Restricted,
     [PARTYBOX_DESC_FIRST]      = gText_First_PM,
     [PARTYBOX_DESC_SECOND]     = gText_Second_PM,
     [PARTYBOX_DESC_THIRD]      = gText_Third_PM,
@@ -1175,16 +1175,16 @@ static const struct SpriteTemplate sSpriteTemplate_StatusIcons =
 // Mask for the partners party in a multi battle. TRUE if in the partners party, FALSE otherwise
 // The 7th slot is Cancel, and the 8th slot is unreachable
 // Used only to determine whether or not to show the Deoxys form icon sprite
-static const bool8 sMultiBattlePartnersPartyMask[PARTY_SIZE + 2] = 
-{
-    FALSE, 
-    TRUE, 
-    FALSE, 
-    FALSE, 
-    TRUE, 
-    TRUE, 
-    FALSE
-};
+//static const bool8 sMultiBattlePartnersPartyMask[PARTY_SIZE + 2] = 
+//{
+//    FALSE, 
+//    TRUE, 
+//    FALSE, 
+//    FALSE, 
+//    TRUE, 
+//    TRUE, 
+//    FALSE
+//};
 
 static const u8 *const sUnused_StatStrings[] =
 {

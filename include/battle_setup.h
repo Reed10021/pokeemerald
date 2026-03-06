@@ -18,6 +18,13 @@ extern u16 gTrainerBattleOpponent_A;
 extern u16 gTrainerBattleOpponent_B;
 extern u16 gPartnerTrainerId;
 
+extern const u8 ChainNumber[];
+extern const u8 DeleteChain[];
+extern const u8 RoamerTextScript[];
+extern const u8 RoamerTextScriptNoChain[];
+
+u32 CalcGeneralizedMean(const u32* levels, u32 count);
+
 void BattleSetup_StartWildBattle(void);
 void BattleSetup_StartBattlePikeWildBattle(void);
 void BattleSetup_StartRoamerBattle(void);
@@ -27,6 +34,8 @@ void BattleSetup_StartLatiBattle(void);
 void BattleSetup_StartLegendaryBattle(void);
 void StartGroudonKyogreBattle(void);
 void StartRegiBattle(void);
+void CB2_EndWildBattle(void);
+void CB2_EndScriptedWildBattle(void);
 u8 BattleSetup_GetTerrainId(void);
 u8 GetSpecialBattleTransition(s32 arg0);
 void ChooseStarter(void);
@@ -63,5 +72,6 @@ bool8 ShouldTryRematchBattle(void);
 bool8 IsTrainerReadyForRematch(void);
 void ShouldTryGetTrainerScript(void);
 u16 CountBattledRematchTeams(u16 trainerId);
+void DoBattleChain(u32 species, bool32 safariMode, bool32 noScriptMode);
 
 #endif // GUARD_BATTLE_SETUP_H

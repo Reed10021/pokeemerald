@@ -4716,7 +4716,7 @@ static void sub_811E7F8(void)
 
 static void sub_811E828(void)
 {
-    int graphicsId;
+    u16 graphicsId;
     u8 spriteId;
 
     switch (GetDisplayedPersonType())

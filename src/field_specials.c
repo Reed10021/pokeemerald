@@ -27,6 +27,7 @@
 #include "overworld.h"
 #include "party_menu.h"
 #include "pokeblock.h"
+#include "pokedex.h"
 #include "pokemon.h"
 #include "pokemon_storage_system.h"
 #include "random.h"
@@ -543,7 +544,7 @@ void SpawnLinkPartnerObjectEvent(void)
     };
     u8 myLinkPlayerNumber;
     u8 playerFacingDirection;
-    u8 linkSpriteId;
+    u16 linkSpriteId;
     u8 i;
 
     myLinkPlayerNumber = GetMultiplayerId();
@@ -2368,7 +2369,7 @@ void ShowScrollableMultichoice(void)
             break;
         case SCROLL_MULTI_BF_EXCHANGE_CORNER_VITAMIN_VENDOR:
             task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
-            task->tNumItems = 28;
+            task->tNumItems = 29;
             task->tLeft = 14;
             task->tTop = 1;
             task->tWidth = 15;
@@ -2378,7 +2379,7 @@ void ShowScrollableMultichoice(void)
             break;
         case SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR:
             task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
-            task->tNumItems = 12;
+            task->tNumItems = 18;
             task->tLeft = 14;
             task->tTop = 1;
             task->tWidth = 15;
@@ -2504,6 +2505,7 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
     },
     [SCROLL_MULTI_BF_EXCHANGE_CORNER_VITAMIN_VENDOR] =
     {
+        gText_RareCandy2BP,
         gText_Protein1BP,
         gText_Calcium1BP,
         gText_Iron1BP,
@@ -2535,17 +2537,23 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
     },
     [SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR] =
     {
-        gText_RareCandy2BP,
-        gText_AbilityCapsule25BP,
+        gText_FocusSash2BP,
+        gText_AbilityCapsule12BP,
+        gText_WeatherOrb48BP,
+        gText_PunchingGlove48BP,
+        gText_MuscleBand48BP,
+        gText_WiseGlasses48BP,
         gText_Leftovers48BP,
         gText_WhiteHerb48BP,
         gText_QuickClaw48BP,
         gText_MentalHerb48BP,
         gText_BrightPowder64BP,
-        gText_ChoiceBand64BP,
         gText_KingsRock64BP,
         gText_FocusBand64BP,
         gText_ScopeLens64BP,
+        gText_ChoiceBand64BP,
+        gText_ChoiceSpecs64BP,
+        gText_ChoiceScarf64BP,
         gText_Exit
     },
     [SCROLL_MULTI_BERRY_POWDER_VENDOR] =
@@ -4435,11 +4443,11 @@ void IsDeoxysInParty(void)
 // -gSpecialVar_0x8004 is currently hosting a Deoxys form.
 // -The metatile behavior of the tile in front of the Player is MB_UNUSED_2C, MB_UNUSED_2D, MB_UNUSED_2E or MB_UNUSED_2F.
 // If these conditions aren't met, gSpecialVar_Result is set to FALSE meaning Deoxys' form didn't change.
-bool16 TryChangeDeoxysForm(void)
+void TryChangeDeoxysForm(void)
 {
-    u16 baseSpecies = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPECIES);
+    u32 baseSpecies = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPECIES);
     u16 targetSpecies;
-    u8 metatileBehavior;
+    u32 metatileBehavior;
 
     if (baseSpecies == SPECIES_DEOXYS
         || baseSpecies == SPECIES_DEOXYS_ATTACK
@@ -4513,5 +4521,65 @@ void CelebiRandomEgg(void)
     // and less than or equal to SPECIES_OLD_UNOWN_Z, then re-roll species so we don't use those.
     do {
         gSpecialVar_0x8004 = Random() % NUM_SPECIES;
-    } while (gSpecialVar_0x8004 >= SPECIES_OLD_UNOWN_B && gSpecialVar_0x8004 <= SPECIES_OLD_UNOWN_Z);
+    } while ((gSpecialVar_0x8004 >= SPECIES_OLD_UNOWN_B && gSpecialVar_0x8004 <= SPECIES_OLD_UNOWN_Z) &&
+             (gSpecialVar_0x8004 >= SPECIES_EGG && gSpecialVar_0x8004 <= SPECIES_UNOWN_QMARK));
 }
+
+void MarkMonAsSeen(void)
+{
+    GetSetPokedexFlag(SpeciesToNationalPokedexNum(gSpecialVar_0x8002), FLAG_SET_SEEN);
+}
+
+void GetWeatherInstituteShards(void)
+{
+    u32 varWeatherInstitute = VarGet(VAR_WEATHER_INSTITUTE_STATE);
+    u32 count = 0;
+    gSpecialVar_0x8004 = varWeatherInstitute & 0x01;
+    gSpecialVar_0x8005 = varWeatherInstitute & 0x02;
+    gSpecialVar_0x8006 = varWeatherInstitute & 0x04;
+    gSpecialVar_0x8007 = varWeatherInstitute & 0x08;
+
+    if (gSpecialVar_0x8004)
+        count++;
+    if (gSpecialVar_0x8005)
+        count++;
+    if (gSpecialVar_0x8006)
+        count++;
+    if (gSpecialVar_0x8007)
+        count++;
+
+    gSpecialVar_Result = count;
+}
+
+void ResetEvs(void)
+{
+    u8 oldHhp, oldAtk, oldDef, oldSpatk, oldSpdef, oldSpd = 0;
+
+    oldHhp = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_HP_EV, NULL);
+    oldAtk = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_ATK_EV, NULL);
+    oldDef = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_DEF_EV, NULL);
+    oldSpd = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPEED_EV, NULL);
+    oldSpatk = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPATK_EV, NULL);
+    oldSpdef = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPDEF_EV, NULL);
+
+    if (!oldHhp && !oldAtk && !oldDef && !oldSpatk && !oldSpdef && !oldSpd)
+    {
+        gSpecialVar_0x8005 = 255;
+        return;
+    }
+    else
+    {
+        u8 zero = 0;
+
+        // clear variable
+        gSpecialVar_0x8005 = 0;
+        SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_HP_EV, &zero);
+        SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_ATK_EV, &zero);
+        SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_DEF_EV, &zero);
+        SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPEED_EV, &zero);
+        SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPATK_EV, &zero);
+        SetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPDEF_EV, &zero);
+        CalculateMonStats(&gPlayerParty[gSpecialVar_0x8004]);
+    }
+}
+

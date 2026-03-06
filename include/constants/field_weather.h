@@ -2,12 +2,14 @@
 #define GUARD_CONSTANTS_FIELD_WEATHER_H
 
 #define MAX_RAIN_SPRITES             24
+#define MAX_SNOW_SPRITES             30
 #define NUM_CLOUD_SPRITES            3
 #define NUM_FOG_HORIZONTAL_SPRITES   20
 #define NUM_ASH_SPRITES              20
 #define NUM_FOG_DIAGONAL_SPRITES     20
 #define NUM_SANDSTORM_SPRITES        20
 #define NUM_SWIRL_SANDSTORM_SPRITES  5
+#define NUM_SNOWFLAKE_SPRITES        25
 
 // Controls how the weather should be changing the screen palettes.
 #define WEATHER_PAL_STATE_CHANGING_WEATHER   0

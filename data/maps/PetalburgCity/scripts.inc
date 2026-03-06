@@ -11,6 +11,7 @@ PetalburgCity_MapScripts::
 
 PetalburgCity_OnTransition: @ 81DC2D7
 	setflag FLAG_VISITED_PETALBURG_CITY
+	setflag FLAG_SYS_TV_START @ Originally from Mauville
 	compare VAR_PETALBURG_CITY_STATE, 0
 	call_if_eq PetalburgCity_EventScript_MoveGymBoyToWestEntrance
 	compare VAR_PETALBURG_CITY_STATE, 2
@@ -238,6 +239,9 @@ PetalburgCity_EventScript_CitySign:: @ 81DC47F
 
 PetalburgCity_EventScript_Gentleman:: @ 81DC488
 	goto_if_set FLAG_DEFEATED_PETALBURG_GYM, PetalburgCity_EventScript_Gentleman_StarterTwo
+	msgbox PetalburgCity_Text_FullPartyExplanationNotGivenEggYet, MSGBOX_NPC
+	closemessage
+	delay 10
 PetalburgCity_EventScript_Gentleman_StarterTwo_Received:
 	msgbox PetalburgCity_Text_FullPartyExplanation, MSGBOX_NPC
 	end
@@ -263,7 +267,7 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Treecko::
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_TORCHIC
+	giveegg SPECIES_TORCHIC, 0
 	closemessage
 	releaseall
 	end
@@ -280,7 +284,7 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Torchic::
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_MUDKIP
+	giveegg SPECIES_MUDKIP, 0
 	closemessage
 	releaseall
 	end
@@ -297,7 +301,7 @@ PetalburgCity_EventScript_Gentleman_StarterTwo_Mudkip::
 	playfanfare MUS_OBTAIN_ITEM
 	message PetalburgCity_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_TREECKO
+	giveegg SPECIES_TREECKO, 0
 	closemessage
 	releaseall
 	end
@@ -824,6 +828,11 @@ PetalburgCity_Text_FullPartyExplanation: @ 81DCA30
 	.string "If you catch another one…\p"
 	.string "It is automatically sent to a STORAGE\n"
 	.string "BOX over a PC connection.$"
+
+PetalburgCity_Text_FullPartyExplanationNotGivenEggYet:
+	.string "I'm looking for a capable trainer. Hmm…\p"
+	.string "Sorry, you're not ready for my EGG yet.\p"
+	.string "Let me tell you about the PC though.$"
 
 PetalburgCity_Text_GymSign: @ 81DCAAA
 	.string "PETALBURG CITY POKéMON GYM\n"

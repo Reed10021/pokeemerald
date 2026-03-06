@@ -78,6 +78,7 @@ SouthernIsland_Interior_EventScript_Lati:: @ 8242AD0
 	waitmovement 0
 	delay 50
 	special RemoveCameraObject
+	setflag FLAG_FORCE_ANIMATIONS
 	setvar VAR_LAST_TALKED, LOCALID_LATI
 	compare VAR_ROAMER_POKEMON, 0
 	call_if_eq SouthernIsland_Interior_EventScript_SetLatiosBattleVars
@@ -89,7 +90,7 @@ SouthernIsland_Interior_EventScript_Lati:: @ 8242AD0
 	clearflag FLAG_SYS_CTRL_OBJ_DELETE
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq SouthernIsland_Interior_EventScript_LatiDefeated
+	goto_if_eq SouthernIsland_Interior_EventScript_RanFromLati
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq SouthernIsland_Interior_EventScript_RanFromLati
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED

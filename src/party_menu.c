@@ -8,6 +8,7 @@
 #include "battle_pike.h"
 #include "battle_pyramid.h"
 #include "battle_pyramid_bag.h"
+#include "braille_puzzles.h"
 #include "bg.h"
 #include "contest.h"
 #include "data.h"
@@ -95,14 +96,6 @@
 #define MENU_DIR_UP      -1
 #define MENU_DIR_RIGHT    2
 #define MENU_DIR_LEFT    -2
-
-enum
-{
-    CAN_LEARN_MOVE,
-    CANNOT_LEARN_MOVE,
-    ALREADY_KNOWS_MOVE,
-    CANNOT_LEARN_MOVE_IS_EGG
-};
 
 struct PartyMenuBoxInfoRects
 {
@@ -201,7 +194,7 @@ static void DisplayPartyPokemonHPBarCheck(struct Pokemon *, struct PartyMenuBox 
 static void DisplayPartyPokemonDescriptionText(u8, struct PartyMenuBox *, u8);
 static bool8 IsMonAllowedInMinigame(u8);
 static void DisplayPartyPokemonDataToTeachMove(u8, u16, u8);
-static u8 CanMonLearnTMTutor(struct Pokemon *, u16, u8);
+//static u8 CanMonLearnTMTutor(struct Pokemon *, u16, u8);
 static void DisplayPartyPokemonBarDetail(u8, const u8*, u8, const u8*);
 static void DisplayPartyPokemonLevel(u8, struct PartyMenuBox *);
 static void DisplayPartyPokemonGender(u8, u16, u8*, struct PartyMenuBox *);
@@ -845,15 +838,83 @@ static void DisplayPartyPokemonDescriptionData(u8 slot, u8 stringID)
     DisplayPartyPokemonDescriptionText(stringID, &sPartyMenuBoxes[slot], 0);
 }
 
-static void DisplayPartyPokemonDataForChooseHalf(u8 slot)
+static bool32 PartyMenuHasRestrictedSelected(s8 excludeSlot)
 {
-    u8 i;
-    struct Pokemon *mon = &gPlayerParty[slot];
-    u8 *order = gSelectedOrderFromParty;
+    u32 i;
+    for (i = 0; i < GetMaxBattleEntries(); i++)
+    {
+        if (gSelectedOrderFromParty[i] != 0)
+        {
+            u32 slot = gSelectedOrderFromParty[i] - 1;
+            u32 sp;
+
+            if (slot == excludeSlot)
+                continue;
+
+            sp = GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES);
+            if (IsFrontierRestrictedSpecies(sp))
+                return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+static s32 CanSelectBattleEntrySlot(u8 slot)
+{
+    struct Pokemon* mon = &gPlayerParty[slot];
+    u32 species = GetMonData(mon, MON_DATA_SPECIES);
 
     if (!GetBattleEntryEligibility(mon))
+        return 0;
+
+    if (IsFrontierRestrictedSpecies(species) && PartyMenuHasRestrictedSelected(slot))
+        return -1;
+
+    return 1;
+}
+
+static void RefreshChooseHalfRestrictedNonSelectedSlots(s8 skipSlot)
+{
+    u32 slot;
+    u32 species;
+    struct Pokemon* curMon;
+
+    for (slot = 0; slot < PARTY_SIZE; slot++)
+    {
+        curMon = &gPlayerParty[slot];
+        if (!curMon->box.hasSpecies)
+            break;
+
+        if (slot == skipSlot)
+            continue;
+
+        // Skip selected slots; their label set already.
+        if (HasPartySlotAlreadyBeenSelected(slot + 1))
+            continue;
+
+        species = GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES);
+        if (!IsFrontierRestrictedSpecies(species))
+            continue;
+
+        // Recompute text for this slot
+        DisplayPartyPokemonDataForChooseHalf(slot);
+    }
+}
+
+static void DisplayPartyPokemonDataForChooseHalf(u8 slot)
+{
+    u32 i;
+    u8 *order = gSelectedOrderFromParty;
+    s32 slotDenyType = CanSelectBattleEntrySlot(slot);
+
+    if (slotDenyType == 0)
     {
         DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_NOT_ABLE);
+        return;
+    }
+    else if (slotDenyType == -1)
+    {
+        DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_RESTRICTED);
         return;
     }
     else
@@ -866,7 +927,7 @@ static void DisplayPartyPokemonDataForChooseHalf(u8 slot)
                 return;
             }
         }
-        DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE_3);
+        DisplayPartyPokemonDescriptionData(slot, PARTYBOX_DESC_ABLE);
     }
 }
 
@@ -1973,7 +2034,7 @@ static void Task_HandleCancelParticipationYesNoInput(u8 taskId)
     }
 }
 
-static u8 CanMonLearnTMTutor(struct Pokemon *mon, u16 item, u8 tutor)
+u8 CanMonLearnTMTutor(struct Pokemon *mon, u16 item, u8 tutor)
 {
     u16 move;
 
@@ -2008,7 +2069,7 @@ static u16 GetTutorMove(u8 tutor)
     return gTutorMoves[tutor];
 }
 
-/*static*/ bool8 CanLearnTutorMove(u16 species, u8 tutor)
+bool8 CanLearnTutorMove(u16 species, u8 tutor)
 {
     if (sTutorLearnsets[species] & (1 << tutor))
         return TRUE;
@@ -3507,6 +3568,9 @@ static void CursorCb_Enter(u8 taskId)
 {
     u8 maxBattlers;
     u8 i;
+    bool32 hadRestricted = PartyMenuHasRestrictedSelected(-1);
+    u32 pickedSpecies = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_SPECIES);
+    bool32 pickedIsRestricted = IsFrontierRestrictedSpecies(pickedSpecies);
 
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
@@ -3518,6 +3582,9 @@ static void CursorCb_Enter(u8 taskId)
             PlaySE(SE_SELECT);
             gSelectedOrderFromParty[i] = gPartyMenu.slotId + 1;
             DisplayPartyPokemonDescriptionText(i + PARTYBOX_DESC_FIRST, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
+            // If we just added the first restricted mon, other restricted mons become Not able
+            if (!hadRestricted && pickedIsRestricted)
+                RefreshChooseHalfRestrictedNonSelectedSlots(-1);
             if (i == (maxBattlers - 1))
                 MoveCursorToConfirm();
             DisplayPartyMenuStdMessage(PARTY_MSG_CHOOSE_MON);
@@ -3543,6 +3610,12 @@ static void CursorCb_NoEntry(u8 taskId)
 {
     u8 maxBattlers;
     u8 i, j;
+    s32 removedIndex = -1;
+    bool32 hadRestricted = PartyMenuHasRestrictedSelected(-1);
+    bool32 removedWasRestricted = IsFrontierRestrictedSpecies(
+        GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_SPECIES)
+    );
+    bool32 hasRestrictedAfter;
 
     PlaySE(SE_SELECT);
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
@@ -3552,18 +3625,25 @@ static void CursorCb_NoEntry(u8 taskId)
     {
         if (gSelectedOrderFromParty[i] == (gPartyMenu.slotId + 1))
         {
+            removedIndex = i;
             for (j = i; j < (maxBattlers - 1); j++)
                 gSelectedOrderFromParty[j] = gSelectedOrderFromParty[j + 1];
             gSelectedOrderFromParty[j] = 0;
             break;
         }
     }
-    DisplayPartyPokemonDescriptionText(PARTYBOX_DESC_ABLE_3, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
-    for (i = 0; i < (maxBattlers - 1); i++)
+    DisplayPartyPokemonDescriptionText(PARTYBOX_DESC_ABLE, &sPartyMenuBoxes[gPartyMenu.slotId], 1);
+    if (removedIndex < 0)
+        removedIndex = 0;
+    for (i = removedIndex; i < (maxBattlers - 1); i++)
     {
         if (gSelectedOrderFromParty[i] != 0)
             DisplayPartyPokemonDescriptionText(i + PARTYBOX_DESC_FIRST, &sPartyMenuBoxes[gSelectedOrderFromParty[i] - 1], 1);
     }
+    hasRestrictedAfter = PartyMenuHasRestrictedSelected(-1);
+    // If we removed the last restricted mon (1 -> 0), other restricted mons may become Able
+    if (hadRestricted && removedWasRestricted && !hasRestrictedAfter)
+        RefreshChooseHalfRestrictedNonSelectedSlots(gPartyMenu.slotId);
     DisplayPartyMenuStdMessage(PARTY_MSG_CHOOSE_MON);
     gTasks[taskId].func = Task_HandleChooseMonInput;
 }
@@ -3899,12 +3979,22 @@ static void FieldCallback_Dive(void)
 
 static bool8 SetUpFieldMove_Dive(void)
 {
-    gFieldEffectArguments[1] = TrySetDiveWarp();
-    if (gFieldEffectArguments[1] != 0)
+    if (ShouldDoBrailleRegigigasEffect())
     {
+        gSpecialVar_Result = GetCursorSelectionMonId();
         gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
-        gPostMenuFieldCallback = FieldCallback_Dive;
+        gPostMenuFieldCallback = SetUpPuzzleEffectRegigigas;
         return TRUE;
+    }
+    else
+    {
+        gFieldEffectArguments[1] = TrySetDiveWarp();
+        if (gFieldEffectArguments[1] != 0)
+        {
+            gFieldCallback2 = FieldCallback_PrepareFadeInFromMenu;
+            gPostMenuFieldCallback = FieldCallback_Dive;
+            return TRUE;
+        }
     }
     return FALSE;
 }
@@ -3915,8 +4005,8 @@ static void CreatePartyMonIconSprite(struct Pokemon *mon, struct PartyMenuBox *m
     u16 species2;
 
     // If in a multi battle, show partners Deoxys icon as Normal forme
-    if (IsMultiBattle() == TRUE && gMain.inBattle)
-        handleDeoxys = (sMultiBattlePartnersPartyMask[slot] ^ handleDeoxys) ? TRUE : FALSE;
+    //if (IsMultiBattle() == TRUE && gMain.inBattle)
+    //    handleDeoxys = (sMultiBattlePartnersPartyMask[slot] ^ handleDeoxys) ? TRUE : FALSE;
 
     species2 = GetMonData(mon, MON_DATA_SPECIES2);
     CreatePartyMonIconSpriteParameterized(species2, GetMonData(mon, MON_DATA_PERSONALITY), menuBox, 1, handleDeoxys);
@@ -4712,7 +4802,7 @@ bool8 IsMoveHm(u16 move)
 
 bool8 MonKnowsMove(struct Pokemon *mon, u16 move)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
@@ -5281,7 +5371,7 @@ u8 GetItemEffectType(u16 item)
     else
         itemEffect = gItemEffectTable[item - ITEM_POTION];
 
-    if ((itemEffect[0] & (ITEM0_DIRE_HIT | ITEM0_X_ATTACK)) || itemEffect[1] || itemEffect[2] || (itemEffect[3] & ITEM3_GUARD_SPEC))
+    if ((itemEffect[0] & ITEM0_DIRE_HIT) || itemEffect[1] || (itemEffect[3] & ITEM3_GUARD_SPEC))
         return ITEM_EFFECT_X_ITEM;
     else if (itemEffect[0] & ITEM0_SACRED_ASH)
         return ITEM_EFFECT_SACRED_ASH;
@@ -5597,7 +5687,7 @@ void ClearSelectedPartyOrder(void)
 
 static u8 GetPartySlotEntryStatus(s8 slot)
 {
-    if (GetBattleEntryEligibility(&gPlayerParty[slot]) == FALSE)
+    if (CanSelectBattleEntrySlot(slot) < 1)
         return 2;
     if (HasPartySlotAlreadyBeenSelected(slot + 1) == TRUE)
         return 1;
@@ -5627,12 +5717,12 @@ static bool8 GetBattleEntryEligibility(struct Pokemon *mon)
     case FACILITY_UNION_ROOM:
         return TRUE;
     default: // Battle Frontier
-        species = GetMonData(mon, MON_DATA_SPECIES);
-        for (; gFrontierBannedSpecies[i] != 0xFFFF; i++)
-        {
-            if (gFrontierBannedSpecies[i] == species)
-                return FALSE;
-        }
+        //species = GetMonData(mon, MON_DATA_SPECIES);
+        //for (; gFrontierBannedSpecies[i] != 0xFFFF; i++)
+        //{
+        //    if (gFrontierBannedSpecies[i] == species)
+        //        return FALSE;
+        //}
         return TRUE;
     }
 }

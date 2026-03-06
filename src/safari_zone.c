@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle.h"
+#include "battle_setup.h"
 #include "event_data.h"
 #include "field_player_avatar.h"
 #include "overworld.h"
@@ -29,11 +30,8 @@ extern const u8 SafariZone_EventScript_RetirePrompt[];
 extern const u8 SafariZone_EventScript_OutOfBallsMidBattle[];
 extern const u8 SafariZone_EventScript_OutOfBalls[];
 
-extern const u8 ChainNumber[];
-extern const u8 DeleteChain[];
-
 EWRAM_DATA u8 gNumSafariBalls = 0;
-EWRAM_DATA static u16 sSafariZoneStepCounter = 0;
+EWRAM_DATA u16 sSafariZoneStepCounter = 0;
 EWRAM_DATA static u8 sSafariZoneCaughtMons = 0;
 EWRAM_DATA static u8 sSafariZonePkblkUses = 0;
 EWRAM_DATA static struct PokeblockFeeder sPokeblockFeeders[NUM_POKEBLOCK_FEEDERS] = {0};
@@ -100,71 +98,11 @@ void SafariZoneRetirePrompt(void)
 
 void CB2_EndSafariBattle(void)
 {
-    u16 species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES);
-    u16 chainCount = VarGet(VAR_CHAIN);
     sSafariZonePkblkUses += gBattleResults.pokeblockThrows;
     if (gBattleOutcome == B_OUTCOME_CAUGHT)
         sSafariZoneCaughtMons++;
 
-    // If in the safari zone, be a little more generous with chaining.
-    // We can chain with a successful catch or a 'mon fleeing.
-    // We do not reset the chain on running out of balls, but do on the trainer running away
-    if(gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_MON_FLED)
-    {
-        // if we have a species, the species wasn't correct, and the chain is not zero, yeet.
-        if (species != VarGet(VAR_SPECIESCHAINED) && chainCount != 0)
-        {
-            // If the chain was 3, show textbox showing you messed up.
-            if(chainCount >= 3)
-            {
-                u8 numDigits = CountDigits(chainCount);
-                ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
-                GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
-                ScriptContext1_SetupScript(DeleteChain);
-                // Cleanup
-                VarSet(VAR_CHAIN, 0);
-                VarSet(VAR_SPECIESCHAINED, 0);
-            }
-            else // if the chain wasn't +3, then act like we've started chaining this new species and are incrementing the counter.
-            {
-                VarSet(VAR_SPECIESCHAINED, species);
-                VarSet(VAR_CHAIN, 1);
-            }
-        }
-        else
-        {
-            // if no chain, start chaining
-            if(VarGet(VAR_SPECIESCHAINED) == 0)
-                VarSet(VAR_SPECIESCHAINED, species);
-            // if chain, increment chain and maybe show text
-            if(species == VarGet(VAR_SPECIESCHAINED))
-            {
-                // If we caught a chained pokemon, increase the chain by 6 (5 here + the normal 1).
-                // The ChainNumber script contains a check for 0xFFFF, so if we increase by 5 here it won't increase again.
-                if (gBattleOutcome == B_OUTCOME_CAUGHT && chainCount >= 1 && chainCount <= 0xFFFA)
-                    VarSet(VAR_CHAIN, chainCount + 5);
-
-                GetSpeciesName(gStringVar2 , species);
-                ScriptContext1_SetupScript(ChainNumber);
-            }
-        }
-    }
-    else if (gBattleOutcome == B_OUTCOME_RAN)
-    {
-        // If we had a chain and the species was correct but we ran from it.
-        if (chainCount != 0 && species == VarGet(VAR_SPECIESCHAINED))
-        {
-            if (chainCount >= 3)
-            {
-                u8 numDigits = CountDigits(chainCount);
-                ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
-                GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
-                ScriptContext1_SetupScript(DeleteChain);
-            }
-            VarSet(VAR_CHAIN,0);
-            VarSet(VAR_SPECIESCHAINED,0);
-        }
-    }
+    DoBattleChain(GetMonData(&gEnemyParty[0], MON_DATA_SPECIES), TRUE, FALSE);
 
     if (gNumSafariBalls != 0)
     {

@@ -576,6 +576,9 @@ gStdScripts_End:: @ 81DC2CC
 	.include "data/maps/PurityCave/scripts.inc"
 	.include "data/maps/GreenPath/scripts.inc"
 	.include "data/maps/TimelessForest/scripts.inc"
+	.include "data/maps/ScorchedSlab_B1F/scripts.inc"
+	.include "data/maps/ScorchedSlab_B2F/scripts.inc"
+	.include "data/maps/ArtisanCave_B2F/scripts.inc"
 
 	.include "data/scripts/std_msgbox.inc"
 	.include "data/scripts/trainer_battle.inc"
@@ -1076,3 +1079,86 @@ Common_EventScript_LegendaryFlewAway:: @ 8273776
 	.include "data/text/birch_speech.inc"
 	.include "data/scripts/chain.inc"
 	.include "data/scripts/change_deoxys_form.inc"
+	.include "data/scripts/field_move_item_scripts.inc"
+
+Common_EventScript_EVResetter::
+	lock
+	faceplayer
+	showmoneybox 0, 0, 0
+	msgbox gText_EVResetter_IllResetEvsIfYouWant, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq Common_EventScript_EVResetter_Decline
+	checkmoney 100000, 0
+	compare VAR_RESULT, 0
+	goto_if_eq Common_EventScript_EVResetter_NotEnoughMoney
+	hidemoneybox
+	special ChoosePartyMon
+	waitstate
+	compare VAR_0x8004, 255
+	goto_if_eq Common_EventScript_EVResetter_Decline_NoHideMoneyBox
+	showmoneybox 0, 0, 0
+	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
+	compare VAR_RESULT, SPECIES_EGG
+	goto_if_eq Common_EventScript_EVResetter_HandleEgg
+	special ResetEvs
+	compare VAR_0x8005, 255
+	goto_if_eq Common_EventScript_EVResetter_AlreadyClean
+	removemoney 100000, 0
+	updatemoneybox 0, 0
+	playse SE_SHOP
+	waitse
+	playfanfare MUS_HEAL
+	waitfanfare
+	msgbox gText_EVResetter_DoneComeBack, MSGBOX_DEFAULT
+	hidemoneybox
+	release
+	end
+
+Common_EventScript_EVResetter_Decline:
+	hidemoneybox
+Common_EventScript_EVResetter_Decline_NoHideMoneyBox:
+	msgbox gText_EVResetter_YouDontWantToThatsOkay, MSGBOX_DEFAULT
+	release
+	end
+
+Common_EventScript_EVResetter_HandleEgg:
+	msgbox gText_EVResetter_CantDoEgg, MSGBOX_DEFAULT
+	hidemoneybox
+	release
+	end
+
+Common_EventScript_EVResetter_AlreadyClean:
+	msgbox gText_EVResetter_AlreadyClean, MSGBOX_DEFAULT
+	hidemoneybox
+	release
+	end
+
+Common_EventScript_EVResetter_NotEnoughMoney:
+	msgbox gText_EVResetter_NotEnoughMoney, MSGBOX_DEFAULT
+	hidemoneybox
+	release
+	end
+
+gText_EVResetter_IllResetEvsIfYouWant:
+	.string "Hi! I'm a DEVON employee and I can\n"
+	.string "help give your POKéMON a clean slate!\p"
+	.string "Do you want me to clear away a\n"
+	.string "POKéMON's base points for ¥100000?$"
+
+gText_EVResetter_YouDontWantToThatsOkay:
+	.string "You don't want to?\n"
+    .string "Okay, come back anytime.$"
+
+gText_EVResetter_CantDoEgg:
+	.string "Sorry, I can't clear the\n"
+    .string "stats of an EGG.$"
+
+gText_EVResetter_AlreadyClean:
+	.string "This POKéMON is already as clean\n"
+    .string "as can be!$"
+
+gText_EVResetter_NotEnoughMoney:
+	.string "Whoops, you don't have enough money!$"
+
+gText_EVResetter_DoneComeBack:
+	.string "Done! Come back anytime.$"

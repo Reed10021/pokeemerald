@@ -2,7 +2,7 @@
   "id": "MAP_ROUTE129",
   "name": "Route129",
   "layout": "LAYOUT_ROUTE129",
-  "music": "MUS_ROUTE119",
+  "music": "MUS_DP_ROUTE225_DAY",
   "region_map_section": "MAPSEC_ROUTE_129",
   "requires_flash": false,
   "weather": "WEATHER_ROUTE129_130_131_CYCLE",

@@ -433,7 +433,10 @@
     "AlteringCave",
     "MeteorFalls_StevensCave",
     "PurityCave",
-    "TimelessForest"
+    "TimelessForest",
+    "ScorchedSlab_B1F",
+    "ScorchedSlab_B2F",
+    "ArtisanCave_B2F"
   ],
   "gMapGroup25": [
     "SecretBase_RedCave1",

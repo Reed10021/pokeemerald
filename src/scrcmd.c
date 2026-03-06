@@ -139,6 +139,12 @@ bool8 ScrCmd_callnative(struct ScriptContext *ctx)
     return FALSE;
 }
 
+bool8 ScrCmd_callfunc(struct ScriptContext* ctx)
+{
+    u32 func = ScriptReadWord(ctx);
+    return ((ScrCmdFunc)func)(ctx);
+}
+
 bool8 ScrCmd_waitstate(struct ScriptContext *ctx)
 {
     ScriptContext1_Stop();
@@ -1198,7 +1204,7 @@ bool8 ScrCmd_setobjectmovementtype(struct ScriptContext *ctx)
 
 bool8 ScrCmd_createvobject(struct ScriptContext *ctx)
 {
-    u16 graphicsId = ScriptReadByte(ctx);
+    u16 graphicsId = ScriptReadHalfword(ctx);
     u8 objectEventId = ScriptReadByte(ctx);
     u16 x = VarGet(ScriptReadHalfword(ctx));
     u32 y = VarGet(ScriptReadHalfword(ctx));
@@ -1731,8 +1737,9 @@ bool8 ScrCmd_givemon(struct ScriptContext *ctx)
 bool8 ScrCmd_giveegg(struct ScriptContext *ctx)
 {
     u16 species = VarGet(ScriptReadHalfword(ctx));
+    bool16 hotspingsFlag = ScriptReadHalfword(ctx);
 
-    gSpecialVar_Result = ScriptGiveEgg(species);
+    gSpecialVar_Result = ScriptGiveEgg(species, hotspingsFlag);
     return FALSE;
 }
 
@@ -1748,7 +1755,7 @@ bool8 ScrCmd_setmonmove(struct ScriptContext *ctx)
 
 bool8 ScrCmd_checkpartymove(struct ScriptContext *ctx)
 {
-    u8 i;
+    u32 i;
     u16 moveId = ScriptReadHalfword(ctx);
 
     gSpecialVar_Result = PARTY_SIZE;
@@ -1903,7 +1910,69 @@ bool8 ScrCmd_cleartrainerflag(struct ScriptContext *ctx)
     return FALSE;
 }
 
-bool8 ScrCmd_setwildbattle(struct ScriptContext *ctx)
+bool8 ScrCmd_setwildbattlescaled(struct ScriptContext *ctx)
+{
+    u16 species = ScriptReadHalfword(ctx);
+    u8 baseLevel = ScriptReadByte(ctx);
+    u16 item = ScriptReadHalfword(ctx);
+    u32 avgLevel = 0;
+    u32 playerMonCount = 0;
+    u32 minMon = 100;
+    u32 maxMon = 0;
+    s32 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting.
+    u32 levelArray[6] = { 0 };
+
+    {
+        struct Pokemon* curMon;
+        u32 temp, i = 0;
+        for (i = 0; i < PARTY_SIZE; i++)
+        {
+            curMon = &gPlayerParty[i];
+            if (!curMon->box.hasSpecies)
+                break;
+
+            temp = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
+            levelArray[i] = temp;
+            if (maxMon < temp)
+                maxMon = temp;
+            if (minMon > temp)
+                minMon = temp;
+            playerMonCount++;
+        }
+    }
+    avgLevel = CalcGeneralizedMean(levelArray, playerMonCount);
+
+    if ((baseLevel-5) > avgLevel)
+    {
+        CreateScriptedWildMon(species, baseLevel, item);
+        return FALSE;
+    }
+    else
+    {
+        s32 scale;
+
+        if (maxMon - avgLevel > 12) // scale failsafe to help facilitate boss battles.
+            scale = (maxMon - baseLevel) + 3;
+        else
+            scale = (avgLevel - baseLevel) + 8;
+
+        if (scale < 0)
+            scale = 3;
+
+        scaledLevel = baseLevel + scale;
+        if (scaledLevel < 0) {
+            scaledLevel = 5;
+        }
+        else if (scaledLevel > 100) {
+            scaledLevel = 100;
+        }
+    }
+
+    CreateScriptedWildMon(species, (u8)scaledLevel, item);
+    return FALSE;
+}
+
+bool8 ScrCmd_setwildbattle(struct ScriptContext* ctx)
 {
     u16 species = ScriptReadHalfword(ctx);
     u8 level = ScriptReadByte(ctx);

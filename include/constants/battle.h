@@ -49,7 +49,7 @@
 #define BATTLE_TYPE_IS_MASTER       (1 << 2) // In not-link battles, it's always set.
 #define BATTLE_TYPE_TRAINER         (1 << 3)
 #define BATTLE_TYPE_FIRST_BATTLE    (1 << 4)
-#define BATTLE_TYPE_20              (1 << 5)
+#define BATTLE_TYPE_20              (1 << 5) // BATTLE_TYPE_LINK_IN_BATTLE // Set on battle entry, cleared on exit. Checked rarely
 #define BATTLE_TYPE_MULTI           (1 << 6)
 #define BATTLE_TYPE_SAFARI          (1 << 7)
 #define BATTLE_TYPE_BATTLE_TOWER    (1 << 8)
@@ -67,15 +67,15 @@
 #define BATTLE_TYPE_PIKE            (1 << 20)
 #define BATTLE_TYPE_PYRAMID         (1 << 21)
 #define BATTLE_TYPE_INGAME_PARTNER  (1 << 22)
-#define BATTLE_TYPE_x800000         (1 << 23)
+#define BATTLE_TYPE_x800000         (1 << 23) // BATTLE_TYPE_TOWER_LINK_MULTI
 #define BATTLE_TYPE_RECORDED        (1 << 24)
-#define BATTLE_TYPE_x2000000        (1 << 25)
+#define BATTLE_TYPE_x2000000        (1 << 25) // BATTLE_TYPE_RECORDED_LINK
 #define BATTLE_TYPE_TRAINER_HILL    (1 << 26)
 #define BATTLE_TYPE_SECRET_BASE     (1 << 27)
 #define BATTLE_TYPE_GROUDON         (1 << 28)
 #define BATTLE_TYPE_KYOGRE          (1 << 29)
 #define BATTLE_TYPE_RAYQUAZA        (1 << 30)
-#define BATTLE_TYPE_x80000000       (1 << 31)
+#define BATTLE_TYPE_x80000000       (1 << 31) // BATTLE_TYPE_RECORDED_IS_MASTER
 #define BATTLE_TYPE_FRONTIER                (BATTLE_TYPE_BATTLE_TOWER | BATTLE_TYPE_DOME | BATTLE_TYPE_PALACE | BATTLE_TYPE_ARENA | BATTLE_TYPE_FACTORY | BATTLE_TYPE_PIKE | BATTLE_TYPE_PYRAMID)
 #define BATTLE_TYPE_FRONTIER_NO_PYRAMID     (BATTLE_TYPE_BATTLE_TOWER | BATTLE_TYPE_DOME | BATTLE_TYPE_PALACE | BATTLE_TYPE_ARENA | BATTLE_TYPE_FACTORY | BATTLE_TYPE_PIKE)
 
@@ -220,8 +220,9 @@
 #define WEATHER_SUN_TEMPORARY       (1 << 5)
 #define WEATHER_SUN_PERMANENT       (1 << 6)
 #define WEATHER_SUN_ANY             (WEATHER_SUN_TEMPORARY | WEATHER_SUN_PERMANENT)
-#define WEATHER_HAIL                (1 << 7)
-#define WEATHER_HAIL_ANY            (WEATHER_HAIL)
+#define WEATHER_HAIL_TEMPORARY      (1 << 7)
+#define WEATHER_HAIL_PERMANENT      (1 << 8)
+#define WEATHER_HAIL_ANY            (WEATHER_HAIL_TEMPORARY | WEATHER_HAIL_PERMANENT)
 #define WEATHER_ANY                 (WEATHER_RAIN_ANY | WEATHER_SANDSTORM_ANY | WEATHER_SUN_ANY | WEATHER_HAIL_ANY)
 
 // Move Effects

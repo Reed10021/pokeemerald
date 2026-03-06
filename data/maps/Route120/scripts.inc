@@ -225,10 +225,16 @@ Route120_EventScript_StevenBattleKecleon:: @ 81F568B
 	goto_if_eq Route120_EventScript_RemoveBridgeKecleonPostBattle
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq Route120_EventScript_RemoveBridgeKecleonPostBattle
+	compare VAR_SPECIESCHAINED, SPECIES_KECLEON
+	call_if_eq ChainNumberNoLock
+	closemessage
 	goto Route120_EventScript_StevenGiveDeconScope
 	end
 
 Route120_EventScript_RemoveBridgeKecleonPostBattle:: @ 81F571C
+	compare VAR_SPECIESCHAINED, SPECIES_KECLEON
+	call_if_eq ChainNumberNoLock
+	closemessage
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject LOCALID_INVISIBLE_BRIDGE_KECLEON
 	removeobject LOCALID_VISIBLE_BRIDGE_KECLEON

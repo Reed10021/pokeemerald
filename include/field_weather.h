@@ -29,12 +29,11 @@ struct Weather
         struct
         {
             struct Sprite *rainSprites[MAX_RAIN_SPRITES];
-            struct Sprite *snowflakeSprites[101];
+            struct Sprite *snowflakeSprites[MAX_SNOW_SPRITES];
             struct Sprite *cloudSprites[NUM_CLOUD_SPRITES];
         } s1;
         struct
         {
-            u8 filler0[0xA0];
             struct Sprite *fogHSprites[NUM_FOG_HORIZONTAL_SPRITES];
             struct Sprite *ashSprites[NUM_ASH_SPRITES];
             struct Sprite *fogDSprites[NUM_FOG_DIAGONAL_SPRITES];
@@ -67,6 +66,7 @@ struct Weather
     bool8 weatherChangeComplete;
     u8 weatherPicSpritePalIndex;
     u8 altGammaSpritePalIndex;
+    // Rain
     u16 rainSpriteVisibleCounter;
     u8 curRainSpriteIndex;
     u8 targetRainSpriteCount;
@@ -75,17 +75,20 @@ struct Weather
     u8 isDownpour;
     u8 rainStrength;
     /*0x6DE*/ u8 cloudSpritesCreated;
-    u8 filler_6DF[1];
+    // Snow
     u16 snowflakeVisibleCounter;
-    u16 unknown_6E2;
+    u16 snowflakeTimer;
     u8 snowflakeSpriteCount;
     u8 targetSnowflakeSpriteCount;
-    u16 unknown_6E6;
-    u16 thunderCounter;
-    u8 unknown_6EA;
-    u8 unknown_6EB;
-    u8 unknown_6EC;
+    u8 snowflakeCounterTimer;
+    // Thunderstorm
+    u16 thunderTimer;
+    u16 thunderSETimer;
+    u8 thunderAllowEnd;
+    u8 thunderLongBolt;
+    u8 thunderShortBolts;
     u8 thunderTriggered;
+    // Horizontal fog
     u16 fogHScrollPosX;
     u16 fogHScrollCounter;
     u16 fogHScrollOffset;
@@ -118,7 +121,7 @@ struct Weather
     u16 bubblesCoordsIndex;
     u16 bubblesSpriteCount;
     u8 bubblesSpritesCreated;
-    u8 filler_72F;
+    u8 thunderSkipCounter;
     u16 currBlendEVA;
     u16 currBlendEVB;
     u16 targetBlendEVA;
@@ -126,12 +129,13 @@ struct Weather
     u8 blendUpdateCounter;
     u8 blendFrameCounter;
     u8 blendDelay;
-    u8 filler_73B[0x3C-0x3B];
-    s16 unknown_73C;
-    s16 unknown_73E;
-    s16 unknown_740;
-    s16 unknown_742;
-    u8 filler_744[0xD-4];
+    u8 filler_73B[1];
+    // Drought
+    s16 droughtBrightnessStage;
+    s16 droughtLastBrightnessStage;
+    s16 droughtTimer;
+    s16 droughtState;
+    u8 droughtUnused[9];
     s8 loadDroughtPalsIndex;
     u8 loadDroughtPalsOffset;
 };
@@ -148,8 +152,8 @@ void StartWeather(void);
 void SetNextWeather(u8 weather);
 void SetCurrentAndNextWeather(u8 weather);
 void SetCurrentAndNextWeatherNoDelay(u8 weather);
-void sub_80ABC48(s8 gammaIndex);
-void sub_80ABC7C(u8 gammaIndex, u8 gammaTargetIndex, u8 gammaStepDelay);
+void ApplyWeatherColorMapIfIdle(s8 gammaIndex);
+void ApplyWeatherColorMapIfIdle_Gradual(u8 gammaIndex, s8 gammaTargetIndex, u8 gammaStepDelay);
 void FadeScreen(u8 mode, s8 delay);
 bool8 IsWeatherNotFadingIn(void);
 void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex, bool8 allowFog);
@@ -158,9 +162,9 @@ u8 sub_80ABF20(void);
 void LoadCustomWeatherSpritePalette(const u16 *palette);
 void ResetDroughtWeatherPaletteLoading(void);
 bool8 LoadDroughtWeatherPalettes(void);
-void sub_80ABFE0(s8 gammaIndex);
-void sub_80ABFF0(void);
-void sub_80AC01C(void);
+void SetDroughtColorMap(s8 gammaIndex);
+void DroughtStateInit(void);
+void DroughtStateRun(void);
 void Weather_SetBlendCoeffs(u8 eva, u8 evb);
 void Weather_SetTargetBlendCoeffs(u8 eva, u8 evb, int delay);
 bool8 Weather_UpdateBlend(void);
@@ -173,6 +177,7 @@ void SetWeatherScreenFadeOut(void);
 void sub_80AC3E4(void);
 void PreservePaletteInWeather(u8 preservedPalIndex);
 void ResetPreservedPalettesInWeather(void);
+void ApplyGammaShift(u8 startPalIndex, u8 numPalettes, s8 gammaIndex);
 
 // field_weather_effect.c
 void Clouds_InitVars(void);
@@ -215,10 +220,6 @@ void Shade_InitVars(void);
 void Shade_Main(void);
 void Shade_InitAll(void);
 bool8 Shade_Finish(void);
-void ExtremeHeat_InitVars(void);
-void ExtremeHeat_Main(void);
-void ExtremeHeat_InitAll(void);
-bool8 ExtremeHeat_Finish(void);
 void Drought_InitVars(void);
 void Drought_Main(void);
 void Drought_InitAll(void);
@@ -229,6 +230,12 @@ void Bubbles_InitVars(void);
 void Bubbles_Main(void);
 void Bubbles_InitAll(void);
 bool8 Bubbles_Finish(void);
+void ExtremeHeat_InitVars(void);
+void ExtremeHeat_Main(void);
+void ExtremeHeat_InitAll(void);
+bool8 ExtremeHeat_Finish(void);
+void Thunder_InitVars(void);
+void Thunder_InitAll(void);
 u8 UpdateShadowColor(u16 color);
 
 u8 GetSav1Weather(void);

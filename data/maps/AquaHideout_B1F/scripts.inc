@@ -46,11 +46,16 @@ AquaHideout_B1F_EventScript_Electrode1:: @ 82339EB
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq AquaHideout_B1F_EventScript_DefeatedElectrode1
 	setflag FLAG_DEFEATED_ELECTRODE_1_AQUA_HIDEOUT
+	compare VAR_SPECIESCHAINED, SPECIES_ELECTRODE
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
 AquaHideout_B1F_EventScript_DefeatedElectrode1:: @ 8233A2F
 	setflag FLAG_DEFEATED_ELECTRODE_1_AQUA_HIDEOUT
+	compare VAR_SPECIESCHAINED, SPECIES_ELECTRODE
+	call_if_eq ChainNumberNoLock
+	closemessage
 	goto Common_EventScript_RemoveStaticPokemon
 	end
 
@@ -73,11 +78,16 @@ AquaHideout_B1F_EventScript_Electrode2:: @ 8233A38
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq AquaHideout_B1F_EventScript_DefeatedElectrode2
 	setflag FLAG_DEFEATED_ELECTRODE_2_AQUA_HIDEOUT
+	compare VAR_SPECIESCHAINED, SPECIES_ELECTRODE
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
 AquaHideout_B1F_EventScript_DefeatedElectrode2:: @ 8233A7C
 	setflag FLAG_DEFEATED_ELECTRODE_2_AQUA_HIDEOUT
+	compare VAR_SPECIESCHAINED, SPECIES_ELECTRODE
+	call_if_eq ChainNumberNoLock
+	closemessage
 	goto Common_EventScript_RemoveStaticPokemon
 	end
 

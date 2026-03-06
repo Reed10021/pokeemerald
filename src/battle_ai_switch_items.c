@@ -119,6 +119,7 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
 {
     u8 battlerIn1, battlerIn2;
     u8 absorbingTypeAbility;
+    u8 absorbingTypeAbility2 = ABILITIES_COUNT;
     s32 firstId;
     s32 lastId; // + 1
     struct Pokemon *party;
@@ -152,11 +153,14 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
     else if (gBattleMoves[gLastLandedMoves[gActiveBattler]].type == TYPE_WATER)
         absorbingTypeAbility = ABILITY_WATER_ABSORB;
     else if (gBattleMoves[gLastLandedMoves[gActiveBattler]].type == TYPE_ELECTRIC)
+    {
         absorbingTypeAbility = ABILITY_VOLT_ABSORB;
+        absorbingTypeAbility2 = ABILITY_LIGHTNING_ROD;
+    }
     else
         return FALSE;
 
-    if (gBattleMons[gActiveBattler].ability == absorbingTypeAbility)
+    if (gBattleMons[gActiveBattler].ability == absorbingTypeAbility || gBattleMons[gActiveBattler].ability == absorbingTypeAbility2)
         return FALSE;
 
     if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_x800000))
@@ -202,7 +206,7 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
         else
             monAbility = gBaseStats[species].abilities[0];
 
-        if (absorbingTypeAbility == monAbility && Random() & 1)
+        if ((absorbingTypeAbility == monAbility || absorbingTypeAbility2 == monAbility) && Random() & 1)
         {
             // we found a mon.
             *(gBattleStruct->AI_monToSwitchIntoId + gActiveBattler) = i;
@@ -216,8 +220,8 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
 
 static bool8 ShouldSwitchIfNaturalCure(void)
 {
-    if (!(gBattleMons[gActiveBattler].status1 & STATUS1_SLEEP))
-        return FALSE;
+    //if (!(gBattleMons[gActiveBattler].status1 & STATUS1_SLEEP))
+    //    return FALSE;
     if (gBattleMons[gActiveBattler].ability != ABILITY_NATURAL_CURE)
         return FALSE;
     if (gBattleMons[gActiveBattler].hp < gBattleMons[gActiveBattler].maxHP / 2)
@@ -793,7 +797,7 @@ static u8 GetAI_ItemType(u8 itemId, const u8 *itemEffect) // NOTE: should take u
         return AI_ITEM_HEAL_HP;
     else if (itemEffect[3] & ITEM3_STATUS_ALL)
         return AI_ITEM_CURE_CONDITION;
-    else if (itemEffect[0] & (ITEM0_DIRE_HIT | ITEM0_X_ATTACK) || itemEffect[1] != 0 || itemEffect[2] != 0)
+    else if ((itemEffect[0] & ITEM0_DIRE_HIT) || itemEffect[1])
         return AI_ITEM_X_STAT;
     else if (itemEffect[3] & ITEM3_GUARD_SPEC)
         return AI_ITEM_GUARD_SPECS;
@@ -899,24 +903,47 @@ static bool8 ShouldUseItem(void)
                 shouldUse = TRUE;
             }
             break;
+        //case AI_ITEM_X_STAT:
+        //    *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) = 0;
+        //    if (gDisableStructs[gActiveBattler].isFirstTurn == 0)
+        //        break;
+        //    if (itemEffects[0] & ITEM0_X_ATTACK)
+        //        *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x1;
+        //    if (itemEffects[1] & ITEM1_X_DEFEND)
+        //        *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x2;
+        //    if (itemEffects[1] & ITEM1_X_SPEED)
+        //        *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x4;
+        //    if (itemEffects[2] & ITEM2_X_SPATK)
+        //        *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x8;
+        //    if (itemEffects[2] & ITEM2_X_ACCURACY)
+        //        *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x20;
+        //    if (itemEffects[0] & ITEM0_DIRE_HIT)
+        //        *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x80;
+        //    shouldUse = TRUE;
+        //    break;
         case AI_ITEM_X_STAT:
-            *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) = 0;
+        {
+            u8 *flags = gBattleStruct->AI_itemFlags + gActiveBattler / 2;
+            *flags = 0;
+
             if (gDisableStructs[gActiveBattler].isFirstTurn == 0)
                 break;
-            if (itemEffects[0] & ITEM0_X_ATTACK)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x1;
-            if (itemEffects[1] & ITEM1_X_DEFEND)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x2;
-            if (itemEffects[1] & ITEM1_X_SPEED)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x4;
-            if (itemEffects[2] & ITEM2_X_SPATK)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x8;
-            if (itemEffects[2] & ITEM2_X_ACCURACY)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x20;
+
             if (itemEffects[0] & ITEM0_DIRE_HIT)
-                *(gBattleStruct->AI_itemFlags + gActiveBattler / 2) |= 0x80;
+            {
+                *flags |= 0x80;
+            }
+            else
+            {
+                u8 stat = itemEffects[1]; // now a STAT_* value
+
+                if (stat >= STAT_ATK && stat <= STAT_ACC)
+                    *flags |= 1 << (stat - STAT_ATK); // ATK->0x01, DEF->0x02, ... ACC->0x20
+            }
+
             shouldUse = TRUE;
             break;
+        }
         case AI_ITEM_GUARD_SPECS:
             battlerSide = GetBattlerSide(gActiveBattler);
             if (gDisableStructs[gActiveBattler].isFirstTurn != 0 && gSideTimers[battlerSide].mistTimer == 0)

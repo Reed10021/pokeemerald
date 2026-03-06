@@ -23,7 +23,6 @@
 static void Task_DoFieldMove_Init(u8 taskId);
 static void Task_DoFieldMove_ShowMonAfterPose(u8 taskId);
 static void Task_DoFieldMove_WaitForMon(u8 taskId);
-static void Task_DoFieldMove_RunFunc(u8 taskId);
 
 static void FieldCallback_RockSmash(void);
 static void FieldMove_RockSmash(void);
@@ -108,7 +107,7 @@ static void Task_DoFieldMove_WaitForMon(u8 taskId)
     }
 }
 
-static void Task_DoFieldMove_RunFunc(u8 taskId)
+void Task_DoFieldMove_RunFunc(u8 taskId)
 {
     // The function for the field move to do is stored in halves across data[8] and data[9]
     void (*fieldMoveFunc)(void) = (void (*)(void))(((u16)gTasks[taskId].data[8] << 16) | (u16)gTasks[taskId].data[9]);
@@ -162,7 +161,7 @@ bool8 FldEff_UseRockSmash(void)
 // The actual rock smashing is handled by EventScript_SmashRock, so this function does very little
 static void FieldMove_RockSmash(void)
 {
-    PlaySE(SE_M_ROCK_THROW);
+    //PlaySE(SE_M_ROCK_THROW);
     FieldEffectActiveListRemove(FLDEFF_USE_ROCK_SMASH);
     EnableBothScriptContexts();
 }

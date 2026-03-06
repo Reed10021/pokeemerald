@@ -275,6 +275,7 @@ static const u8 sText_PkmnsXMadeYUseless[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DE
 static const u8 sText_PkmnChangedTypeWith[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nmade it the {B_BUFF1} type!");
 static const u8 sText_PkmnPreventsParalysisWith[] = _("{B_EFF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nprevents paralysis!");
 static const u8 sText_PkmnPreventsRomanceWith[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nprevents romance!");
+static const u8 sText_PkmnProtectsAgainstTaunts[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nprotects against taunts!");
 static const u8 sText_PkmnPreventsPoisoningWith[] = _("{B_EFF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nprevents poisoning!");
 static const u8 sText_PkmnPreventsConfusionWith[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nprevents confusion!");
 static const u8 sText_PkmnRaisedFirePowerWith[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nraised its FIRE power!");
@@ -304,6 +305,7 @@ static const u8 sText_PkmnsXPreventsYsZ[] = _("{B_ATK_NAME_WITH_PREFIX}'s {B_ATK
 static const u8 sText_PkmnsXCuredItsYProblem[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\ncured its {B_BUFF1} problem!");
 static const u8 sText_PkmnsXHadNoEffectOnY[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nhad no effect on {B_EFF_NAME_WITH_PREFIX}!");
 static const u8 sText_StatSharply[] = _("sharply ");
+const u8 gText_StatSharply[] = _("sharply ");
 const u8 gText_StatRose[] = _("rose!");
 static const u8 sText_StatHarshly[] = _("harshly ");
 static const u8 sText_StatFell[] = _("fell!");
@@ -430,6 +432,14 @@ static const u8 sText_AttackerUsedX[] = _("{B_ATK_NAME_WITH_PREFIX} used\n{B_BUF
 //static const u8 sText_ExclamationMark3[] = _("!");
 //static const u8 sText_ExclamationMark4[] = _("!");
 //static const u8 sText_ExclamationMark5[] = _("!");
+static const u8 sText_AuraFlaredToLife[] = _("{B_ATK_NAME_WITH_PREFIX}'s aura flared to life!");
+static const u8 sText_GoingAllOut[] = _("{B_ATK_NAME_WITH_PREFIX} is going all out!");
+static const u8 sText_PkmnsXWhippedUpHailstorm[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nwhipped up a hailstorm!");
+static const u8 sText_PkmnsItemMadeItRain[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_LAST_ITEM}\nmade it rain!");
+static const u8 sText_PkmnsItemIntensifiedSun[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_LAST_ITEM}\nintensified the sun's rays!");
+static const u8 sText_PkmnsItemWhippedUpSandstorm[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_LAST_ITEM}\nwhipped up a sandstorm!");
+static const u8 sText_PkmnsItemWhippedUpHailstorm[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_LAST_ITEM}\nwhipped up a hailstorm!");
+
 static const u8 sText_HP2[] = _("HP");
 static const u8 sText_Attack2[] = _("ATTACK");
 static const u8 sText_Defense2[] = _("DEFENSE");
@@ -503,6 +513,7 @@ static const u8 sText_PkmnsItemRestoredStatus[] = _("{B_SCR_ACTIVE_NAME_WITH_PRE
 static const u8 sText_PkmnsItemRestoredHPALittle[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_LAST_ITEM}\nrestored its HP a little!");
 static const u8 sText_ItemAllowsOnlyYMove[] = _("{B_LAST_ITEM} allows the\nuse of only {B_CURRENT_MOVE}!\p");
 static const u8 sText_PkmnHungOnWithX[] = _("{B_DEF_NAME_WITH_PREFIX} hung on\nusing its {B_LAST_ITEM}!");
+static const u8 sText_PkmnEnduredSturdy[] = _("{B_DEF_NAME_WITH_PREFIX} endured the hit\nusing {B_DEF_ABILITY}!");
 const u8 gText_EmptyString3[] = _("");
 static const u8 sText_YouThrowABallNowRight[] = _("You throw a BALL now, right?\nI… I'll do my best!");
 static const u8 sText_PlayerLostToEnemyTrainer[] = _("{B_PLAYER_NAME} is out of\nusable POKéMON!\pYou lost against\n{B_TRAINER1_CLASS} {B_TRAINER1_NAME}!{PAUSE_UNTIL_PRESS}");
@@ -898,6 +909,15 @@ const u8 * const gBattleStringsTable[BATTLESTRINGS_COUNT] =
     [STRINGID_PLAYERLOSTTOENEMYTRAINER - 12] = sText_PlayerLostToEnemyTrainer,
     [STRINGID_PLAYERPAIDPRIZEMONEY - 12] = sText_PlayerPaidPrizeMoney,
     [STRINGID_ITISHOT - 12] = sText_ItIsHot,
+    [STRINGID_AURAFLAREDTOLIFE - 12] = sText_AuraFlaredToLife,
+    [STRINGID_GOINGALLOUT - 12] = sText_GoingAllOut,
+    [STRINGID_PKMNSXWHIPPEDUPHAILSTORM - 12] = sText_PkmnsXWhippedUpHailstorm,
+    [STRINGID_PKMNSITEMMADEITRAIN - 12] = sText_PkmnsItemMadeItRain,
+    [STRINGID_PKMNSITEMINTENSIFIEDSUN - 12] = sText_PkmnsItemIntensifiedSun,
+    [STRINGID_PKMNSITEMWHIPPEDUPSANDSTORM - 12] = sText_PkmnsItemWhippedUpSandstorm,
+    [STRINGID_PKMNSITEMWHIPPEDUPHAILSTORM - 12] = sText_PkmnsItemWhippedUpHailstorm,
+    [STRINGID_ENDUREDSTURDY - 12] = sText_PkmnEnduredSturdy,
+    [STRINGID_PKMNPROTECTSAGAINSTTAUNTS - 12] = sText_PkmnProtectsAgainstTaunts,
 };
 
 const u16 gMissStringIds[] =
@@ -1127,7 +1147,8 @@ const u16 gWeatherStartsStringIds[] =
     [WEATHER_DOWNPOUR]           = STRINGID_ITISRAINING,
     [WEATHER_UNDERWATER_BUBBLES] = STRINGID_ITISRAINING,
     [WEATHER_ABNORMAL]           = STRINGID_ITISRAINING,
-    [WEATHER_EXTREME_HEAT]       = STRINGID_ITISHOT
+    [WEATHER_EXTREME_HEAT]       = STRINGID_ITISHOT,
+    [WEATHER_THUNDER_LIGHTNING]  = STRINGID_ITISRAINING
 };
 
 const u16 gInobedientStringIds[] =
@@ -1248,6 +1269,8 @@ const u8 gText_LineBreak[] = _("\l");
 const u8 gText_NewLine[] = _("\n");
 const u8 gText_Are[] = _("are");
 const u8 gText_Are2[] = _("are");
+const u8 gText_RestrictedPkmn[] = _("Restricted POKéMON");
+const u8 gText_SpaceLikeSpace[] = _(" like ");
 const u8 gText_BadEgg[] = _("Bad EGG");
 const u8 gText_BattleWallyName[] = _("WALLY");
 const u8 gText_BattleStevenName[] = _("STEVEN");
@@ -2851,7 +2874,7 @@ u32 BattleStringExpandPlaceholders(const u8 *src, u8 *dst)
             }
 
             // missing if (toCpy != NULL) check
-            while (*toCpy != EOS)
+            while (toCpy != NULL && *toCpy != EOS)
             {
                 dst[dstID] = *toCpy;
                 dstID++;

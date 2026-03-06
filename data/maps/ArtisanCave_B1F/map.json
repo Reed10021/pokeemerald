@@ -78,6 +78,19 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "ArtisanCave_B1F_EventScript_ItemIron",
       "flag": "FLAG_DAILY_ARTISAN_CAVE_B1F_IRON"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_SPECIAL_ITEM_BALL",
+      "x": 10,
+      "y": 27,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_range_x": 1,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "ArtisanCave_B1F_EventScript_ItemRareCandy",
+      "flag": "FLAG_DAILY_ARTISAN_CAVE_B1F_RARE_CANDY"
     }
   ],
   "warp_events": [
@@ -94,6 +107,13 @@
       "elevation": 0,
       "dest_map": "MAP_ARTISAN_CAVE_1F",
       "dest_warp_id": 1
+    },
+    {
+      "x": 26,
+      "y": 17,
+      "elevation": 0,
+      "dest_map": "MAP_ARTISAN_CAVE_B2F",
+      "dest_warp_id": 0
     }
   ],
   "coord_events": [],

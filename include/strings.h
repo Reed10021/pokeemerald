@@ -111,6 +111,7 @@ extern const u8 gText_ReelTimeHelp[];
 extern const u8 gText_First[];
 extern const u8 gText_Second[];
 extern const u8 gText_Third[];
+extern const u8 gText_FourthLotto[];
 
 extern const u8 gText_NoDecorations[];
 extern const u8 gText_NoDecorationsInUse[];
@@ -841,18 +842,25 @@ extern const u8 gText_SassyMint10BP[];
 extern const u8 gText_SeriousMint10BP[];
 extern const u8 gText_TimidMint10BP[];
 
-extern const u8 gText_AbilityCapsule25BP[];
+extern const u8 gText_AbilityCapsule12BP[];
+extern const u8 gText_WeatherOrb48BP[];
+extern const u8 gText_PunchingGlove48BP[];
+extern const u8 gText_FocusSash2BP[];
 extern const u8 gText_RareCandy2BP[];
+extern const u8 gText_MuscleBand48BP[];
+extern const u8 gText_WiseGlasses48BP[];
 
 extern const u8 gText_Leftovers48BP[];
 extern const u8 gText_WhiteHerb48BP[];
 extern const u8 gText_QuickClaw48BP[];
 extern const u8 gText_MentalHerb48BP[];
 extern const u8 gText_BrightPowder64BP[];
-extern const u8 gText_ChoiceBand64BP[];
 extern const u8 gText_KingsRock64BP[];
 extern const u8 gText_FocusBand64BP[];
 extern const u8 gText_ScopeLens64BP[];
+extern const u8 gText_ChoiceBand64BP[];
+extern const u8 gText_ChoiceSpecs64BP[];
+extern const u8 gText_ChoiceScarf64BP[];
 
 extern const u8 gText_EnergyPowder50[];
 extern const u8 gText_EnergyRoot80[];
@@ -1035,16 +1043,23 @@ extern const u8 BattleFrontier_ExchangeServiceCorner_Text_TimidMintDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_AbilityCapsuleDesc[];
 
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_RareCandyDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_WeatherOrbDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_PunchingGloveDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_MuscleBandDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_WiseGlassesDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_FocusSashDesc[];
 
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_LeftoversDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_WhiteHerbDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_QuickClawDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_MentalHerbDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_BrightpowderDesc[];
-extern const u8 BattleFrontier_ExchangeServiceCorner_Text_ChoiceBandDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_KingsRockDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_FocusBandDesc[];
 extern const u8 BattleFrontier_ExchangeServiceCorner_Text_ScopeLensDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_ChoiceBandDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_ChoiceSpecsDesc[];
+extern const u8 BattleFrontier_ExchangeServiceCorner_Text_ChoiceScarfDesc[];
 
 // Battle Frontier Move Tutors
 extern const u8 BattleFrontier_Lounge7_Text_SoftboiledDesc[];
@@ -1542,6 +1557,8 @@ extern const u8 gText_Space[];
 extern const u8 gText_Space2[];
 extern const u8 gText_Are[];
 extern const u8 gText_Are2[];
+extern const u8 gText_RestrictedPkmn[];
+extern const u8 gText_SpaceLikeSpace[];
 extern const u8 gText_123Dot[][3];
 
 // Frontier util.
@@ -2312,7 +2329,7 @@ extern const u8 gText_DoWhatWithItem[];
 extern const u8 gText_DoWhatWithMail[];
 extern const u8 gText_AlreadyHoldingOne[];
 extern const u8 gText_NoUse[];
-extern const u8 gText_Able[];
+extern const u8 gText_Restricted[];
 extern const u8 gText_First_PM[];
 extern const u8 gText_Second_PM[];
 extern const u8 gText_Third_PM[];

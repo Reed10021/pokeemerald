@@ -1,6 +1,7 @@
 .set LOCALID_RIVAL, 16
 .set LOCALID_RIVAL_ON_BIKE, 25
 .set LOCALID_SCOTT, 43
+.set LOCALID_RAIN_SHARD, 53
 
 Route119_MapScripts:: @ 81F4424
 	map_script MAP_SCRIPT_ON_RESUME, Route119_OnResume
@@ -23,6 +24,8 @@ Route119_OnTransition: @ 81F444D
 	call Common_EventScript_SetupRivalOnBikeGfxId
 	compare VAR_WEATHER_INSTITUTE_STATE, 1
 	call_if_eq Route119_EventScript_MoveInstituteWorkersDownstairs
+	compare VAR_SOOTOPOLIS_CITY_STATE, 5
+	call_if_lt Route119_EventScript_HideRainShard
 	special SetRoute119Weather
 	end
 
@@ -30,6 +33,10 @@ Route119_EventScript_MoveInstituteWorkersDownstairs:: @ 81F4466
 	setflag FLAG_HIDE_WEATHER_INSTITUTE_2F_WORKERS
 	clearflag FLAG_HIDE_WEATHER_INSTITUTE_1F_WORKERS
 	setvar VAR_WEATHER_INSTITUTE_STATE, 2
+	return
+
+Route119_EventScript_HideRainShard::
+	setobjectxyperm LOCALID_RAIN_SHARD 0, 115
 	return
 
 Route119_EventScript_RivalTrigger1:: @ 81F4472

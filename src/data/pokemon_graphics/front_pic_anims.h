@@ -4220,6 +4220,12 @@ static const union AnimCmd sAnim_CASTFORM_3[] =
     ANIMCMD_END,
 };
 
+static const union AnimCmd sAnim_CASTFORM_4[] =
+{
+    ANIMCMD_FRAME(4, 1),
+    ANIMCMD_END,
+};
+
 static const union AnimCmd sAnim_VOLBEAT_1[] =
 {
     ANIMCMD_FRAME(0, 11),
@@ -4635,6 +4641,13 @@ static const union AnimCmd sAnim_DEOXYS_SPEED_2[] =
     ANIMCMD_FRAME(2, 20),
     ANIMCMD_FRAME(0, 20),
     ANIMCMD_FRAME(2, 20),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd sAnim_REGIGIGAS_1[] =
+{
+    ANIMCMD_FRAME(1, 40),
+    ANIMCMD_FRAME(0, 5),
     ANIMCMD_END,
 };
 
@@ -6722,6 +6735,7 @@ static const union AnimCmd *const sAnims_CASTFORM[] ={
     sAnim_CASTFORM_1,
     sAnim_CASTFORM_2,
     sAnim_CASTFORM_3,
+    sAnim_CASTFORM_4,
 };
 
 static const union AnimCmd *const sAnims_VOLBEAT[] ={
@@ -6879,6 +6893,11 @@ static const union AnimCmd *const sAnims_DEOXYS_SPEED[] = {
     sAnim_GeneralFrame0,
     sAnim_DEOXYS_SPEED_1,
     sAnim_DEOXYS_SPEED_2,
+};
+
+static const union AnimCmd* const sAnims_REGIGIGAS[] = {
+    sAnim_GeneralFrame0,
+    sAnim_REGIGIGAS_1,
 };
 
 static const union AnimCmd *const sAnims_EGG[] ={
@@ -7441,6 +7460,7 @@ const union AnimCmd *const *const gMonFrontAnimsPtrTable[] =
     ANIM_CMD(DEOXYS_ATTACK),
     ANIM_CMD(DEOXYS_DEFENSE),
     ANIM_CMD(DEOXYS_SPEED),
+    ANIM_CMD(REGIGIGAS),
     ANIM_CMD(EGG),
     ANIM_CMD(UNOWN_B),
     ANIM_CMD(UNOWN_C),

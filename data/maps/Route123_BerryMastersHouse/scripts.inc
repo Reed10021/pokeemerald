@@ -27,11 +27,24 @@ Route123_BerryMastersHouse_EventScript_BerryMaster:: @ 826F845
 	compare VAR_RESULT, FALSE
 	goto_if_eq Common_EventScript_ShowBagIsFull
 	msgbox Route123_BerryMastersHouse_Text_VisitPrettyPetalFlowerShop, MSGBOX_DEFAULT
+	msgbox Route123_BerryMastersHouse_Text_HealPrompt, MSGBOX_YESNO
+	compare VAR_RESULT, YES
+	goto_if_eq Route123_BerryMastersHouse_EventScript_BerryMaster_Heal
 	release
 	end
 
+Route123_BerryMastersHouse_EventScript_BerryMaster_Heal::
+	closemessage
+	call Common_EventScript_OutOfCenterPartyHeal
+	release
+	end
+
+
 Route123_BerryMastersHouse_EventScript_ReceivedBerryToday:: @ 826F8B6
 	msgbox Route123_BerryMastersHouse_Text_DoneForToday, MSGBOX_DEFAULT
+	msgbox Route123_BerryMastersHouse_Text_HealPrompt, MSGBOX_YESNO
+	compare VAR_RESULT, YES
+	goto_if_eq Route123_BerryMastersHouse_EventScript_BerryMaster_Heal
 	release
 	end
 
@@ -143,4 +156,8 @@ Route123_BerryMastersHouse_EventScript_GaveBerry:: @ 826FA79
 	msgbox Route123_BerryMastersHouse_Text_JoyNeverGoesOutOfMyLife, MSGBOX_DEFAULT
 	release
 	end
+
+Route123_BerryMastersHouse_Text_HealPrompt:
+	.string "While you're here, did you\n"
+	.string "need to rest a while?$"
 

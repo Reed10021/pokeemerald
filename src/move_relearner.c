@@ -26,6 +26,7 @@
 #include "task.h"
 #include "constants/rgb.h"
 #include "constants/songs.h"
+#include "daycare.h"
 
 /*
  * Move relearner state machine
@@ -152,7 +153,7 @@
 #define JAM_HEART_EMPTY 2
 #define JAM_HEART_FULL 3
 
-#define MAX_RELEARNER_MOVES (MAX_LEVEL_UP_MOVES > 25 ? MAX_LEVEL_UP_MOVES : 25)
+#define MAX_RELEARNER_MOVES (MAX_LEVEL_UP_MOVES * 3) // Can hold up to MAX_LEVEL_UP_MOVES x 3 move sets.
 
 static EWRAM_DATA struct
 {
@@ -555,12 +556,12 @@ static void DoMoveRelearnerMain(void)
         {
             s8 selection = Menu_ProcessInputNoWrapClearOnChoose();
 
-            if (selection == 0)
+            if (selection == -1 || selection == 0)
             {
                 gSpecialVar_0x8004 = FALSE;
                 sMoveRelearnerStruct->state = MENU_STATE_FADE_AND_RETURN;
             }
-            else if (selection == -1 || selection == 1)
+            else if (selection == 1)
             {
                 if (sMoveRelearnerMenuSate.showContestInfo == FALSE)
                 {
@@ -776,7 +777,10 @@ static void HideHeartSpritesAndShowTeachMoveText(bool8 onlyHideSprites)
     {
         gSprites[sMoveRelearnerStruct->heartSpriteIds[i]].invisible = TRUE;
     }
-    gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = FALSE;
+    if(GetCurrentSelectedMove() == LIST_CANCEL)
+        gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = TRUE;
+    else
+        gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = FALSE;
 
     if (!onlyHideSprites)
     {
@@ -922,7 +926,10 @@ static void CreateLearnableMovesList(void)
     s32 i;
     u8 nickname[POKEMON_NAME_LENGTH + 1];
 
-    sMoveRelearnerStruct->numMenuChoices = GetMoveRelearnerMoves(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    if (FlagGet(FLAG_EGG_MOVES_TUTOR))
+        sMoveRelearnerStruct->numMenuChoices = GetEggMoves(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
+    else
+        sMoveRelearnerStruct->numMenuChoices = GetMoveRelearnerMoves(&gPlayerParty[sMoveRelearnerStruct->partyMon], sMoveRelearnerStruct->movesToLearn);
 
     for (i = 0; i < sMoveRelearnerStruct->numMenuChoices; i++)
     {

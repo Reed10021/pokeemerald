@@ -1472,11 +1472,11 @@ static void CB2_StartBlenderLink(void)
         sBerryBlender->speed = MIN_ARROW_SPEED;
         sBerryBlender->gameFrameTime = 0;
         SetMainCallback2(CB2_PlayBlender);
-        if (GetCurrentMapMusic() != MUS_CYCLING)
+        if (GetCurrentMapMusic() != MUS_DP_POFFINS)
         {
             sBerryBlender->savedMusic = GetCurrentMapMusic();
         }
-        PlayBGM(MUS_CYCLING);
+        PlayBGM(MUS_DP_POFFINS);
         break;
     }
 
@@ -1523,7 +1523,7 @@ static u8 GetArrowProximity(u16 arrowPos, u8 playerId)
 
     if (pos >= hitRangeStart && pos < hitRangeStart + 48)
     {
-        if (pos >= hitRangeStart + 20 && pos < hitRangeStart + 28)
+        if (pos >= hitRangeStart + 12 && pos < hitRangeStart + 33)
             return PROXIMITY_BEST;
         else
             return PROXIMITY_GOOD;
@@ -1780,10 +1780,10 @@ static void CB2_StartBlenderLocal(void)
                 sBerryBlender->opponentTaskIds[i] = CreateTask(sLocalOpponentTasks[i], 10 + i);
         }
 
-        if (GetCurrentMapMusic() != MUS_CYCLING)
+        if (GetCurrentMapMusic() != MUS_DP_POFFINS)
             sBerryBlender->savedMusic = GetCurrentMapMusic();
 
-        PlayBGM(MUS_CYCLING);
+        PlayBGM(MUS_DP_POFFINS);
         PlaySE(SE_BERRY_BLENDER);
         UpdateHitPitch();
         break;
@@ -2298,11 +2298,11 @@ static u32 CalculatePokeblockColor(struct BlenderBerry* berries, s16* _flavors, 
     if (numFlavors == 3)
         return PBLOCK_CLR_GRAY;
 
-    for (i = 0; i < FLAVOR_COUNT; i++)
-    {
-        if (flavors[i] > 50)
-            return PBLOCK_CLR_GOLD;
-    }
+    //for (i = 0; i < FLAVOR_COUNT; i++)
+    //{
+    //    if (flavors[i] > 50)
+    //        return PBLOCK_CLR_GOLD;
+    //}
 
     // Only 1 flavor present, return corresponding color
     if (numFlavors == 1 && flavors[FLAVOR_SPICY] > 0)
@@ -2463,7 +2463,7 @@ static void CalculatePokeblock(struct BlenderBerry *berries, struct Pokeblock *p
         for (i = 0; i < FLAVOR_COUNT; i++)
         {
             if ((sBlackPokeblockFlavorFlags[multiuseVar] >> i) & 1)
-                sPokeblockFlavors[i] = 2;
+                sPokeblockFlavors[i] = 4; // 2
             else
                 sPokeblockFlavors[i] = 0;
         }

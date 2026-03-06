@@ -6,6 +6,7 @@
 #include "berry.h"
 #include "berry_powder.h"
 #include "bike.h"
+#include "braille_puzzles.h"
 #include "coins.h"
 #include "data.h"
 #include "event_data.h"
@@ -36,6 +37,10 @@
 #include "string_util.h"
 #include "task.h"
 #include "text.h"
+#include "field_move_items.h"
+#include "field_control_avatar.h"
+#include "region_map.h"
+#include "fldeff.h"
 #include "constants/event_bg.h"
 #include "constants/event_objects.h"
 #include "constants/item_effects.h"
@@ -71,6 +76,11 @@ void Task_UseRepelsCycle(void);
 static void Task_CloseCantUseKeyItemMessage(u8 taskId);
 static void SetDistanceOfClosestHiddenItem(u8 taskId, s16 x, s16 y);
 static void CB2_OpenPokeblockCaseOnField(void);
+
+static void UseTeleportToolYesNo(u8 taskId);
+static void AskPlayerTeleportTool(u8 taskId);
+static void CB2_OpenFlyToolFromBag(void);
+static void Task_OpenRegisteredFlyTool(u8 taskId);
 
 // EWRAM variables
 EWRAM_DATA static void(*sItemUseOnFieldCB)(u8 taskId) = NULL;
@@ -1053,18 +1063,24 @@ void ItemUseInBattle_PPRecovery(u8 taskId)
 // Fluffy Tail / Poke Doll
 void ItemUseInBattle_Escape(u8 taskId)
 {
-
-    if((gBattleTypeFlags & BATTLE_TYPE_TRAINER) == FALSE)
+    if (FlagGet(FLAG_CANNOT_RUN_AWAY))
     {
-        RemoveUsedItem();
-        if (!InBattlePyramid())
-            DisplayItemMessage(taskId, 1, gStringVar4, Task_FadeAndCloseBagMenu);
-        else
-            DisplayItemMessageInBattlePyramid(taskId, gStringVar4, CloseBattlePyramidBagAndSetCallback);
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
     }
     else
     {
-        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+        if((gBattleTypeFlags & BATTLE_TYPE_TRAINER) == FALSE)
+        {
+            RemoveUsedItem();
+            if (!InBattlePyramid())
+                DisplayItemMessage(taskId, 1, gStringVar4, Task_FadeAndCloseBagMenu);
+            else
+                DisplayItemMessageInBattlePyramid(taskId, gStringVar4, CloseBattlePyramidBagAndSetCallback);
+        }
+        else
+        {
+            DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+        }
     }
 }
 
@@ -1156,11 +1172,277 @@ void ItemUseOutOfBattle_CannotUse(u8 taskId)
     DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
 }
 
-#undef tUsingRegisteredKeyItem
-
 void ItemUseOutOfBattle_PokeBall(u8 taskId)
 {
     gItemUseCB = ItemUseCB_PokeBall;
     gBagMenu->exitCallback = CB2_ShowPartyMenuForItemUse;
     Task_FadeAndCloseBagMenu(taskId);
 }
+
+void ItemUseOutOfBattle_CutTool(u8 taskId)
+{
+    if (CheckObjectGraphicsInFrontOfPlayer(OBJ_EVENT_GFX_CUTTABLE_TREE))
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_CutTool;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+}
+
+void ItemUseOnFieldCB_CutTool(u8 taskId)
+{
+    ScriptContext2_Enable();
+    ScriptContext1_SetupScript(EventScript_UseCutTool);
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_FlyTool(u8 taskId)
+{
+    if (MenuHelpers_LinkSomething() == TRUE || Overworld_MapTypeAllowsTeleportAndFly(gMapHeader.mapType) == FALSE)
+    {
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+    }
+    else if (gTasks[taskId].tUsingRegisteredKeyItem != TRUE)
+    {
+        gBagMenu->exitCallback = CB2_OpenFlyToolFromBag;
+        Task_FadeAndCloseBagMenu(taskId);
+    }
+    else
+    {
+        FadeScreen(FADE_TO_BLACK, 0);
+        gTasks[taskId].func = Task_OpenRegisteredFlyTool;
+    }
+}
+
+static void CB2_OpenFlyToolFromBag(void)
+{
+    VarSet(VAR_FLY_TOOL_SOURCE, FLY_SOURCE_BAG);
+    CB2_OpenFlyMap();
+}
+
+static void Task_OpenRegisteredFlyTool(u8 taskId)
+{
+    VarSet(VAR_FLY_TOOL_SOURCE, FLY_SOURCE_FIELD);
+    if (!gPaletteFade.active)
+    {
+        CleanupOverworldWindowsAndTilemaps();
+        SetMainCallback2(CB2_OpenFlyMap);
+        DestroyTask(taskId);
+    }
+}
+
+void ItemUseOutOfBattle_SurfTool(u8 taskId)
+{
+    if (IsPlayerFacingSurfableFishableWater())
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_SurfTool;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+}
+
+void ItemUseOnFieldCB_SurfTool(u8 taskId)
+{
+    ScriptContext1_SetupScript(EventScript_UseSurfTool);
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_StrengthTool(u8 taskId)
+{
+    if (ShouldDoBrailleRegirockEffect())
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_RockSmashTool_Regi;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else if (CheckObjectGraphicsInFrontOfPlayer(OBJ_EVENT_GFX_BREAKABLE_ROCK))
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_RockSmashTool;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_StrengthTool;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+}
+
+void ItemUseOnFieldCB_StrengthTool(u8 taskId)
+{
+    ScriptContext2_Enable();
+    ScriptContext1_SetupScript(EventScript_UseStrengthTool);
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_FlashTool(u8 taskId)
+{
+    if (ShouldDoBrailleRegisteelEffect())
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_FlashTool_Regi;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else if (CanUseFlash())
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_FlashTool;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+}
+
+void ItemUseOnFieldCB_FlashTool_Regi(u8 taskId)
+{
+    ScriptContext2_Enable();
+    PlaySE(SE_M_REFLECT);
+    ScriptContext1_SetupScript(EventScript_UseFlashToolText);
+    DoBrailleRegisteelEffect();
+    DestroyTask(taskId);
+}
+
+void ItemUseOnFieldCB_FlashTool(u8 taskId)
+{
+    ScriptContext2_Enable();
+    FldEff_UseFlashTool();
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_RockSmashTool(u8 taskId)
+{
+    if (ShouldDoBrailleRegirockEffect())
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_RockSmashTool_Regi;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else if (CheckObjectGraphicsInFrontOfPlayer(OBJ_EVENT_GFX_BREAKABLE_ROCK))
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_RockSmashTool;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+}
+void ItemUseOnFieldCB_RockSmashTool_Regi(u8 taskId)
+{
+    ScriptContext2_Enable();
+    PlaySE(SE_M_ROCK_THROW);
+    ScriptContext1_SetupScript(EventScript_UseRockSmashToolText);
+    DoBrailleRegirockEffect();
+    DestroyTask(taskId);
+}
+
+void ItemUseOnFieldCB_RockSmashTool(u8 taskId)
+{
+    ScriptContext2_Enable();
+    ScriptContext1_SetupScript(EventScript_UseRockSmashTool);
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_WaterfallTool(u8 taskId)
+{
+    if (CanUseWaterfallTool())
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_WaterfallTool;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+}
+
+void ItemUseOnFieldCB_WaterfallTool(u8 taskId)
+{
+    ScriptContext2_Enable();
+    ScriptContext1_SetupScript(EventScript_UseWaterfallTool);
+    DestroyTask(taskId);
+}
+
+void ItemUseOutOfBattle_DiveTool(u8 taskId)
+{
+    if (ShouldDoBrailleRegigigasEffect())
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_DiveTool_Regi;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else if (TrySetDiveWarp())
+    {
+        sItemUseOnFieldCB = ItemUseOnFieldCB_DiveTool;
+        SetUpItemUseOnFieldCallback(taskId);
+    }
+    else
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+}
+
+void ItemUseOnFieldCB_DiveTool_Regi(u8 taskId)
+{
+    ScriptContext2_Enable();
+    PlaySE(SE_M_DIVE);
+    ScriptContext1_SetupScript(EventScript_UseDiveToolText);
+    DoBrailleRegigigasEffect();
+    DestroyTask(taskId);
+}
+
+void ItemUseOnFieldCB_DiveTool(u8 taskId)
+{
+    ScriptContext2_Enable();
+    ScriptContext1_SetupScript(EventScript_UseDiveTool);
+    DestroyTask(taskId);
+}
+
+static const struct YesNoFuncTable sUseTeleportToolFuncTable =
+{
+    .yesFunc = SetUpFieldAndUseTeleportTool,
+    .noFunc = BagMenu_InitListsMenu,
+};
+
+void ItemUseOutOfBattle_TeleportTool(u8 taskId)
+{
+    if (Overworld_MapTypeAllowsTeleportAndFly(gMapHeader.mapType) == TRUE)
+        AskPlayerTeleportTool(taskId);
+    else
+        DisplayDadsAdviceCannotUseItemMessage(taskId, gTasks[taskId].tUsingRegisteredKeyItem);
+}
+static void AskPlayerTeleportTool(u8 taskId)
+{
+    const struct MapHeader* mapHeader;
+    mapHeader = Overworld_GetMapHeaderByGroupAndId(gSaveBlock1Ptr->lastHealLocation.mapGroup, gSaveBlock1Ptr->lastHealLocation.mapNum);
+    GetMapNameGeneric(gStringVar1, mapHeader->regionMapSectionId);
+    StringExpandPlaceholders(gStringVar4, gText_ReturnToHealingSpot);
+
+    if (gTasks[taskId].tUsingRegisteredKeyItem != TRUE)
+        DisplayItemMessage(taskId, FONT_NORMAL, gStringVar4, UseTeleportToolYesNo);
+    else
+        ItemUseOnFieldCB_TeleportTool(taskId);
+}
+static void UseTeleportToolYesNo(u8 taskId)
+{
+    BagMenu_YesNo(taskId, 6, &sUseTeleportToolFuncTable);
+}
+void SetUpFieldAndUseTeleportTool(u8 taskId)
+{
+    sItemUseOnFieldCB = ItemUseOnFieldCB_TeleportTool;
+    SetUpItemUseOnFieldCallback(taskId);
+}
+void ItemUseOnFieldCB_TeleportTool(u8 taskId)
+{
+    ScriptContext2_Enable();
+
+    if (gTasks[taskId].tUsingRegisteredKeyItem != TRUE)
+        FldEff_UseTeleportTool();
+    else
+        ScriptContext1_SetupScript(EventScript_AskTeleportTool);
+
+    DestroyTask(taskId);
+}
+void ItemUseOutOfBattle_SweetScentTool(u8 taskId)
+{
+    sItemUseOnFieldCB = ItemUseOnFieldCB_SweetScentTool;
+    SetUpItemUseOnFieldCallback(taskId);
+}
+void ItemUseOnFieldCB_SweetScentTool(u8 taskId)
+{
+    ScriptContext2_Enable();
+    FldEff_SweetScentTool();
+    DestroyTask(taskId);
+}
+
+#undef tUsingRegisteredKeyItem

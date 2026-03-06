@@ -2585,6 +2585,8 @@ static void DecideReelTurns_NoBiasTag_Reel3_Bet1(void)
             u8 tag3;
             if (!(tag1 == (tag3 = GetTag(RIGHT_REEL, 2 - i)) || (tag1 == GFXTAG_7_RED && tag3 == GFXTAG_7_BLUE) || (tag1 == GFXTAG_7_BLUE && tag3 == GFXTAG_7_RED)))
                 break;
+            else if (Random() % 20 == 0) // 1 in 20 chance to allow it
+                break;
             i++;
         }
     }
@@ -4807,18 +4809,18 @@ static const s16 sInitialReelPositions[NUM_REELS][2] = {
 };
 
 static const u8 sLuckyRoundProbabilities[][3] = {
-    {1, 1, 12},
-    {1, 1, 14},
-    {2, 2, 16},
-    {2, 2, 16},
-    {2, 3, 20},
-    {3, 3, 20}
+    {1, 1, 22},
+    {1, 1, 24},
+    {2, 2, 26},
+    {2, 2, 26},
+    {2, 3, 30},
+    {3, 3, 30}
 };
 
 static const u8 sLuckyFlagProbabilities_Top3[][6] = {
-    {25, 25, 30, 40, 40, 50},
-    {25, 25, 30, 30, 35, 35},
-    {25, 25, 30, 25, 25, 30}
+    {35, 35, 35, 50, 50, 60},
+    {35, 35, 35, 40, 45, 45},
+    {35, 35, 35, 25, 25, 40}
 };
 
 static const u8 sLuckyFlagProbabilities_NotTop3[][6] = {

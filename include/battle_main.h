@@ -25,6 +25,7 @@ struct UnknownPokemonStruct4
 #define ABILITY_NAME_LENGTH 12
 
 // defines for the u8 array gTypeEffectiveness
+#define TYPE_EFFECT_ARRAY_MAX_SIZE 339 // 3 * 113
 #define TYPE_EFFECT_ATK_TYPE(i)((gTypeEffectiveness[i + 0]))
 #define TYPE_EFFECT_DEF_TYPE(i)((gTypeEffectiveness[i + 1]))
 #define TYPE_EFFECT_MULTIPLIER(i)((gTypeEffectiveness[i + 2]))
@@ -88,7 +89,7 @@ extern struct UnknownPokemonStruct4 gMultiPartnerParty[MULTI_PARTY_SIZE];
 extern const struct SpriteTemplate gUnknown_0831AC88;
 extern const struct OamData gOamData_831ACA8;
 extern const struct OamData gOamData_831ACB0;
-extern const u8 gTypeEffectiveness[336];
+extern const u8 gTypeEffectiveness[TYPE_EFFECT_ARRAY_MAX_SIZE];
 extern const u8 gTypeNames[NUMBER_OF_MON_TYPES][TYPE_NAME_LENGTH + 1];
 extern const struct TrainerMoney gTrainerMoneyTable[];
 extern const u8 gAbilityNames[][ABILITY_NAME_LENGTH + 1];

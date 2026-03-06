@@ -1,7 +1,9 @@
 #ifndef GUARD_BATTLE_MESSAGE_H
 #define GUARD_BATTLE_MESSAGE_H
 
-#define TEXT_BUFF_ARRAY_COUNT   16
+#define TEXT_BUFF_ARRAY_COUNT   max(17, \
+                                max(MOVE_NAME_LENGTH + 2, /* +2 to hold the "!" and EOS. */ \
+                                    POKEMON_NAME_LENGTH + 1))
 
 // for 0xFD
 #define B_TXT_BUFF1 0x0
@@ -263,6 +265,8 @@ extern const u8 gText_LineBreak[];
 extern const u8 gText_NewLine[];
 extern const u8 gText_Are[];
 extern const u8 gText_Are2[];
+extern const u8 gText_RestrictedPkmn[];
+extern const u8 gText_SpaceLikeSpace[];
 extern const u8 gText_BadEgg[];
 extern const u8 gText_BattleWallyName[];
 extern const u8 gText_BattleStevenName[];
@@ -270,6 +274,7 @@ extern const u8 gText_Win[];
 extern const u8 gText_Loss[];
 extern const u8 gText_Draw[];
 extern const u8 gText_StatRose[];
+extern const u8 gText_StatSharply[];
 extern const u8 gText_PkmnsStatChanged2[];
 extern const u8 gText_PkmnGettingPumped[];
 extern const u8 gText_PkmnShroudedInMist[];

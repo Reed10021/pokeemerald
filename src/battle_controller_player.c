@@ -33,6 +33,7 @@
 #include "window.h"
 #include "constants/abilities.h"
 #include "constants/battle_anim.h"
+#include "constants/hold_effects.h"
 #include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/party_menu.h"
@@ -1483,6 +1484,7 @@ static void MoveSelectionDisplayMoveDescription(void)
     u16 pwr = gBattleMoves[move].power;
     u16 acc = gBattleMoves[move].accuracy;
     u16 pri = gBattleMoves[move].priority;
+    u32 type = gBattleMoves[move].type;
     u8 pwr_num[3], acc_num[3], pri_num[3], i;
     u8 acc_flag = 0;
     u8 prw_flag = 0;
@@ -1495,14 +1497,36 @@ static void MoveSelectionDisplayMoveDescription(void)
     LoadMessageBoxAndBorderGfx();
     DrawStdWindowFrame(27, FALSE);
     if (move == MOVE_HIDDEN_POWER) {
+        u8 typeBits = ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_HP_IV) & 1) << 0)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_ATK_IV) & 1) << 1)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_DEF_IV) & 1) << 2)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPEED_IV) & 1) << 3)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPATK_IV) & 1) << 4)
+            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPDEF_IV) & 1) << 5);
+
+        type = (15 * typeBits) / 63 + 1;
+        if (type >= TYPE_MYSTERY)
+            type++;
         pwr = 80;
     } else if (move == MOVE_RETURN) {
         pwr = (10 * GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP)) / 25;
     } else if (move == MOVE_FRUSTRATION) {
         pwr = (10 * (MAX_FRIENDSHIP - GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP))) / 25;
     } else if (move == MOVE_WEATHER_BALL) {
-        if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_ANY))
-            pwr *= 2;
+        if (WEATHER_HAS_EFFECT)
+        {
+            if(gBattleWeather & WEATHER_ANY)
+                pwr *= 2;
+
+            if (gBattleWeather & WEATHER_RAIN_ANY)
+                type = TYPE_WATER;
+            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                type = TYPE_ROCK;
+            else if (gBattleWeather & WEATHER_SUN_ANY)
+                type = TYPE_FIRE;
+            else if (gBattleWeather & WEATHER_HAIL_ANY)
+                type = TYPE_ICE;
+        }
     } else if (move == MOVE_FURY_CUTTER) {
         for (i = 0; i < gDisableStructs[gActiveBattler].furyCutterCounter; i++)
         {
@@ -1516,6 +1540,32 @@ static void MoveSelectionDisplayMoveDescription(void)
         StringCopy(pwr_num, gText_BattleSwitchWhich5);
     else
         prw_flag = 1;
+
+    if (type == TYPE_GRASS && gBattleMons[gActiveBattler].ability == ABILITY_OVERGROW && gBattleMons[gActiveBattler].hp <= (gBattleMons[gActiveBattler].maxHP / 3))
+        pwr = (150 * pwr) / 100;
+    if (type == TYPE_FIRE && gBattleMons[gActiveBattler].ability == ABILITY_BLAZE && gBattleMons[gActiveBattler].hp <= (gBattleMons[gActiveBattler].maxHP / 3))
+        pwr = (150 * pwr) / 100;
+    if (type == TYPE_WATER && gBattleMons[gActiveBattler].ability == ABILITY_TORRENT && gBattleMons[gActiveBattler].hp <= (gBattleMons[gActiveBattler].maxHP / 3))
+        pwr = (150 * pwr) / 100;
+    if (type == TYPE_BUG && gBattleMons[gActiveBattler].ability == ABILITY_SWARM && gBattleMons[gActiveBattler].hp <= (gBattleMons[gActiveBattler].maxHP / 3))
+        pwr = (150 * pwr) / 100;
+    if (gBattleMons[gActiveBattler].ability == ABILITY_IRON_FIST && IS_PUNCHING_MOVE(move))
+        pwr = (120 * pwr) / 100;
+    if (gBattleMons[gActiveBattler].ability == ABILITY_TECHNICIAN && pwr <= 65)
+        pwr = (150 * pwr) / 100;
+    if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_PUNCHING_GLOVE && IS_PUNCHING_MOVE(move))
+        pwr = (115 * pwr) / 100;
+    if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_MUSCLE_BAND && IS_TYPE_PHYSICAL(move, type))
+        pwr = (110 * pwr) / 100;
+    if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_WISE_GLASSES && IS_TYPE_SPECIAL(move, type))
+        pwr = (110 * pwr) / 100;
+    //if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_CHOICE_BAND)
+    //    pwr = (150 * pwr) / 100;
+
+    if (type == TYPE_ELECTRIC && AbilityBattleEffects(ABILITYEFFECT_FIELD_SPORT, 0, 0, 0xFD, 0))
+        pwr /= 2;
+    if (type == TYPE_FIRE && AbilityBattleEffects(ABILITYEFFECT_FIELD_SPORT, 0, 0, 0xFE, 0))
+        pwr /= 2;
 
     if (acc < 2 ||
         move == MOVE_ASSIST || move == MOVE_BLOCK || move == MOVE_CAMOUFLAGE || move == MOVE_CHARGE ||
@@ -1547,7 +1597,7 @@ static void MoveSelectionDisplayMoveDescription(void)
         }
 
         if (gBattleWeather & WEATHER_SUN_ANY) {
-            switch (gBattleMoves[move].type)
+            switch (type)
             {
             case TYPE_FIRE:
                 pwr = (15 * pwr) / 10;
@@ -1558,7 +1608,7 @@ static void MoveSelectionDisplayMoveDescription(void)
             }
         }
         else if (gBattleWeather & WEATHER_RAIN_ANY) {
-            switch (gBattleMoves[move].type)
+            switch (type)
             {
             case TYPE_FIRE:
                 pwr /= 2;
@@ -1572,7 +1622,7 @@ static void MoveSelectionDisplayMoveDescription(void)
 
     if (gBattleMons[gActiveBattler].ability == ABILITY_COMPOUND_EYES)
         acc = (acc * 130) / 100; // 1.3 compound eyes boost
-    if (gBattleMons[gActiveBattler].ability == ABILITY_HUSTLE && IS_TYPE_PHYSICAL(gBattleMoves[move].type))
+    if (gBattleMons[gActiveBattler].ability == ABILITY_HUSTLE && IS_TYPE_PHYSICAL(move, type))
         acc = (acc * 80) / 100; // 1.2 hustle loss
 
     if (acc > 100)
@@ -1785,7 +1835,7 @@ static void MoveSelectionDisplaySplitIcon(void) {
         u8 type = (15 * typeBits) / 63 + 1;
         if (type >= TYPE_MYSTERY)
             type++;
-        moveCategory = type > TYPE_MYSTERY;
+        moveCategory = IS_TYPE_SPECIAL(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]], type);
     }
     else
         moveCategory = GetBattleMoveSplit(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]);

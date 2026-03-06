@@ -264,7 +264,7 @@ static u8 ChooseWildMonLevel(const struct WildPokemon *wildPokemon)
 
 static u16 GetCurrentMapWildMonHeaderId(void)
 {
-    u16 i;
+    u32 i;
 
     for (i = 0; ; i++)
     {
@@ -278,7 +278,7 @@ static u16 GetCurrentMapWildMonHeaderId(void)
             if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(ALTERING_CAVE) &&
                 gSaveBlock1Ptr->location.mapNum == MAP_NUM(ALTERING_CAVE))
             {
-                u16 alteringCaveId = VarGet(VAR_ALTERING_CAVE_WILD_SET);
+                u32 alteringCaveId = VarGet(VAR_ALTERING_CAVE_WILD_SET);
                 if (alteringCaveId > 8)
                     alteringCaveId = 0;
 
@@ -294,34 +294,44 @@ static u16 GetCurrentMapWildMonHeaderId(void)
 
 static u8 PickWildMonNature(void)
 {
-    u8 i;
-    u8 j;
+    u32 i = 0;
+    u32 j = 0;
     struct Pokeblock *safariPokeblock;
     u8 natures[NUM_NATURES];
 
-    if (GetSafariZoneFlag() == TRUE && Random() % 100 < 80)
+    if (GetSafariZoneFlag() == TRUE /*&& Random() % 100 < 80*/)
     {
         safariPokeblock = SafariZoneGetActivePokeblock();
         if (safariPokeblock != NULL)
         {
+            //for (i = 0; i < NUM_NATURES; i++)
+            //    natures[i] = i;
+            //for (i = 0; i < NUM_NATURES - 1; i++)
+            //{
+            //    for (j = i + 1; j < NUM_NATURES; j++)
+            //    {
+            //        if (Random() & 1)
+            //        {
+            //            u8 temp;
+            //            SWAP(natures[i], natures[j], temp);
+            //        }
+            //    }
+            //}
+            //for (i = 0; i < NUM_NATURES; i++)
+            //{
+            //    if (PokeblockGetGain(natures[i], safariPokeblock) > 0)
+            //        return natures[i];
+            //}
             for (i = 0; i < NUM_NATURES; i++)
-                natures[i] = i;
-            for (i = 0; i < NUM_NATURES - 1; i++)
             {
-                for (j = i + 1; j < NUM_NATURES; j++)
+                if (PokeblockGetGain(i, safariPokeblock) > 0)
                 {
-                    if (Random() & 1)
-                    {
-                        u8 temp;
-                        SWAP(natures[i], natures[j], temp);
-                    }
+                    natures[j] = i;
+                    j++;
                 }
             }
-            for (i = 0; i < NUM_NATURES; i++)
-            {
-                if (PokeblockGetGain(natures[i], safariPokeblock) > 0)
-                    return natures[i];
-            }
+            if (j)
+                return natures[Random() % j];
         }
     }
     // check synchronize for a pokemon with the same ability

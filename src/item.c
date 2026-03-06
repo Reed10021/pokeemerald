@@ -94,21 +94,29 @@ void CopyItemName(u16 itemId, u8 *dst)
     StringCopy(dst, ItemId_GetName(itemId));
 }
 
+const u8 sText_s[] = _("s");
+
 void CopyItemNameHandlePlural(u16 itemId, u8 *dst, u32 quantity)
 {
-    if (itemId == ITEM_POKE_BALL)
+    if (quantity == 1)
     {
-        if (quantity < 2)
-            StringCopy(dst, ItemId_GetName(ITEM_POKE_BALL));
-        else
-            StringCopy(dst, gText_PokeBalls);
+        StringCopy(dst, ItemId_GetName(itemId));
     }
     else
     {
-        if (itemId >= ITEM_CHERI_BERRY && itemId <= ITEM_ENIGMA_BERRY)
+        if (itemId == ITEM_POKE_BALL)
+        {
+            StringCopy(dst, gText_PokeBalls);
+        }
+        else if (itemId >= ITEM_CHERI_BERRY && itemId <= ITEM_ENIGMA_BERRY)
+        {
             GetBerryCountString(dst, gBerries[itemId - ITEM_CHERI_BERRY].name, quantity);
+        }
         else
-            StringCopy(dst, ItemId_GetName(itemId));
+        {
+            u8* end = StringCopy(dst, ItemId_GetName(itemId));
+            StringCopy(end, sText_s);
+        }
     }
 }
 

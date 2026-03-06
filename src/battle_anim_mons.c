@@ -68,6 +68,7 @@ const struct MonCoords gCastformFrontSpriteCoords[] =
     { .size = 0x66, .y_offset =  9 }, // SUN
     { .size = 0x46, .y_offset =  9 }, // RAIN
     { .size = 0x86, .y_offset =  8 }, // HAIL
+    { .size = 0x86, .y_offset =  8 }, // SAND
 };
 
 static const u8 sCastformElevations[] =
@@ -76,6 +77,7 @@ static const u8 sCastformElevations[] =
     14, // SUN
     13, // RAIN
     13, // HAIL
+    12, // SAND
 };
 
 // Y position of the backsprite for each of the four Castform forms.
@@ -85,6 +87,7 @@ static const u8 sCastformBackSpriteYCoords[] =
     0, // SUN
     0, // RAIN
     0, // HAIL
+    0, // SAND
 };
 
 static const struct SpriteTemplate sUnknown_08525F90[] =
@@ -2036,7 +2039,7 @@ u8 sub_80A8394(u16 species, bool8 isBackpic, u8 a3, s16 x, s16 y, u8 subpriority
     u16 palette = AllocSpritePalette(sUnknown_08525F90[a3].paletteTag);
 
     if (gMonSpritesGfxPtr != NULL && gMonSpritesGfxPtr->buffer == NULL)
-        gMonSpritesGfxPtr->buffer = AllocZeroed(0x2000);
+        gMonSpritesGfxPtr->buffer = AllocZeroed(MON_PIC_SIZE * MAX_MON_PIC_FRAMES);
     if (!isBackpic)
     {
         LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(species, trainerId, personality), (palette * 0x10) + 0x100, 0x20);

@@ -138,17 +138,20 @@ FarawayIsland_Interior_EventScript_Mew:: @ 8267DF2
 	special DestroyMewEmergingGrassSprite
 	delay 40
 	waitmoncry
+	setflag FLAG_FORCE_ANIMATIONS
+	setflag FLAG_TRIGGER_SMART_WILD_AI
 	setvar VAR_0x8004, SPECIES_MEW
 	setvar VAR_0x8005, 50 @ level
-	setvar VAR_0x8006, ITEM_NONE
+	setvar VAR_0x8006, ITEM_LUM_BERRY
 	special CreateObedientEnemyMon
 	setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special BattleSetup_StartLegendaryBattle
 	waitstate
 	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+	clearflag FLAG_TRIGGER_SMART_WILD_AI
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq FarawayIsland_Interior_EventScript_MewDefeated
+	goto_if_eq FarawayIsland_Interior_EventScript_PlayerOrMewRan
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq FarawayIsland_Interior_EventScript_PlayerOrMewRan
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
@@ -156,6 +159,8 @@ FarawayIsland_Interior_EventScript_Mew:: @ 8267DF2
 	compare VAR_RESULT, B_OUTCOME_MON_TELEPORTED
 	goto_if_eq FarawayIsland_Interior_EventScript_PlayerOrMewRan
 	setflag FLAG_CAUGHT_MEW
+	compare VAR_SPECIESCHAINED, SPECIES_MEW
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
@@ -166,6 +171,9 @@ FarawayIsland_Interior_EventScript_MewDefeated:: @ 8267E96
 	end
 
 FarawayIsland_Interior_EventScript_PlayerOrMewRan:: @ 8267EA4
+	compare VAR_SPECIESCHAINED, SPECIES_MEW
+	call_if_eq ChainNumberNoLock
+	closemessage
 	setvar VAR_0x8004, SPECIES_MEW
 	goto Common_EventScript_LegendaryFlewAway
 	end

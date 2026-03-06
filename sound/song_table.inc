@@ -611,6 +611,33 @@ gSongTable:: @ 86B49F0
 	song ph_nurse_blend, 2, 2
 	song ph_nurse_held, 2, 2
 	song ph_nurse_solo, 2, 2
+	song mus_dp_vs_uxie_mesprit_azelf, 0, 0
+	song mus_dp_vs_legend, 0, 0
+	song mus_dp_vs_trainer, 0, 0
+	song mus_dp_vs_wild, 0, 0
+	song mus_dp_eterna_forest, 0, 0
+	song mus_dp_lake_caverns, 0, 0
+	song mus_dp_jubilife_day, 0, 0
+	song mus_dp_jubilife_night, 0, 0
+	song mus_dp_route209_day, 0, 0
+	song mus_dp_route209_night, 0, 0
+	song mus_dp_lake, 0, 0
+	song mus_dp_oreburgh_mine, 0, 0
+	song mus_dp_poke_center_night, 0, 0
+	song mus_dp_route225_day, 0, 0
+	song mus_dp_route225_night, 0, 0
+	song mus_dp_hearthome_day, 0, 0
+	song mus_dp_hearthome_night, 0, 0
+	song mus_dp_cycling, 0, 0
+	song mus_dp_poffins, 0, 0
+	song mus_dp_vs_champion, 0, 0
+	song mus_dp_vs_elite_four, 0, 0
+	song mus_hg_vs_ho_oh, 0, 0
+	song mus_hg_vs_lugia, 0, 0
+	song mus_hg_route38, 0, 0
+	song mus_hg_vs_champion, 0, 0
+	song mus_hg_vs_gym_leader_kanto, 0, 0
+	song mus_pl_lilycove_bossa_nova, 0, 0
 
 	.align 2
 dummy_song_header: @ 86B5D00

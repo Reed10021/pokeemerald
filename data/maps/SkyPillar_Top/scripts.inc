@@ -51,14 +51,19 @@ SkyPillar_Top_EventScript_Rayquaza:: @ 8239722
 	playmoncry SPECIES_RAYQUAZA, 2
 	delay 40
 	waitmoncry
-	setwildbattle SPECIES_RAYQUAZA, 70, ITEM_SHARP_BEAK
-	setflag FLAG_SYS_CTRL_OBJ_DELETE
+	setflag FLAG_FORCE_ANIMATIONS
+	setflag FLAG_TRIGGER_SMART_WILD_AI
+	setflag FLAG_TRIGGER_TOTEM_POWER
+	setwildbattle SPECIES_RAYQUAZA, 70, ITEM_DRAGON_FANG
+@	setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special BattleSetup_StartLegendaryBattle
 	waitstate
-	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+@	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+	clearflag FLAG_TRIGGER_SMART_WILD_AI
+	clearflag FLAG_TRIGGER_TOTEM_POWER
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq SkyPillar_Top_EventScript_DefeatedRayquaza
+	goto_if_eq SkyPillar_Top_EventScript_RanFromRayquaza
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq SkyPillar_Top_EventScript_RanFromRayquaza
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
@@ -73,11 +78,16 @@ SkyPillar_Top_EventScript_DefeatedRayquaza:: @ 8239768
 	end
 
 SkyPillar_Top_EventScript_RanFromRayquaza:: @ 8239771
-	setvar VAR_0x8004, SPECIES_RAYQUAZA
-	goto SkyPillar_Top_EventScript_RanFromRayquaza2
+	compare VAR_SPECIESCHAINED, SPECIES_RAYQUAZA
+	call_if_eq ChainNumberNoLock
+	msgbox SkyPillar_Top_Text_RayquazaWatchingYou, MSGBOX_DEFAULT
+	release
 	end
 
 SkyPillar_Top_EventScript_DefeatedRayquaza2:: @ 823977C
+	compare VAR_SPECIESCHAINED, SPECIES_RAYQUAZA
+	call_if_eq ChainNumberNoLock
+	closemessage
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject VAR_LAST_TALKED
 	fadescreenswapbuffers FADE_FROM_BLACK
@@ -102,6 +112,8 @@ SkyPillar_Top_EventScript_RanFromRayquaza2:: @ 8239785
 
 SkyPillar_Top_EventScript_AwakenRayquaza:: @ 823979A
 	lockall
+	setvar VAR_0x8002, SPECIES_RAYQUAZA
+	special MarkMonAsSeen
 	fadeoutbgm 1
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_FaceUp
 	waitmovement 0
@@ -192,7 +204,10 @@ SkyPillar_Top_Movement_CameraPanDown: @ 823985C
 	step_end
 
 SkyPillar_Top_Text_RayquazaFlewOff: @ 8239860
-	.string "The awakened RAYQUAZA flew off…$"
+	.string "The awakened Rayquaza flew off…$"
+
+SkyPillar_Top_Text_RayquazaWatchingYou:
+	.string "Rayquaza is watching you!$"
 
 SkyPillar_Top_Text_DefeatedRayquaza_SomethingOnTheGround:
 	.string "... \n"

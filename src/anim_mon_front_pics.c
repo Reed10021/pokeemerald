@@ -426,3 +426,4 @@ const u32 gMonFrontPic_UnownQuestionMark[] = INCBIN_U32("graphics/pokemon/unown/
 const u32 gMonFrontPic_Deoxys_Attack[] = INCBIN_U32("graphics/pokemon/deoxys/attack/anim_front.4bpp.lz");
 const u32 gMonFrontPic_Deoxys_Defense[] = INCBIN_U32("graphics/pokemon/deoxys/defense/anim_front.4bpp.lz");
 const u32 gMonFrontPic_Deoxys_Speed[] = INCBIN_U32("graphics/pokemon/deoxys/speed/anim_front.4bpp.lz");
+const u32 gMonFrontPic_Regigigas[] = INCBIN_U32("graphics/pokemon/regigigas/anim_front.4bpp.lz");

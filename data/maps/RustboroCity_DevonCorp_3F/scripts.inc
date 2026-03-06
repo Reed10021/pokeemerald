@@ -174,7 +174,7 @@ RustboroCity_DevonCorp_3F_EventScript_MrStoneEeveeEgg::
 	playfanfare MUS_OBTAIN_ITEM
 	message RustboroCity_DevonCorp_3F_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_EEVEE
+	giveegg SPECIES_EEVEE, 0
 	closemessage
 	applymovement VAR_LAST_TALKED, Common_Movement_FaceOriginalDirection
 	waitmovement 0

@@ -317,7 +317,8 @@ BattleFrontier_BattlePikeLobby_Text_NotEnoughValidMonsLv50: @ 825BE8C
 	.string "of Level 50 or less to enter.\p"
 	.string "They also must be holding different\n"
 	.string "kinds of items.\p"
-	.string "EGGS{STR_VAR_1} ineligible.\p"
+	.string "EGGS are ineligible.\p"
+	.string "{STR_VAR_1} limited to one per team.\p"
 	.string "Please come see me when\n"
 	.string "you are ready…$"
 
@@ -329,7 +330,8 @@ BattleFrontier_BattlePikeLobby_Text_NotEnoughValidMonsLvOpen: @ 825BF9A
 	.string "POKéMON to enter.\p"
 	.string "They also must be holding different\n"
 	.string "kinds of items.\p"
-	.string "EGGS{STR_VAR_1} ineligible.\p"
+	.string "EGGS are ineligible.\p"
+	.string "{STR_VAR_1} limited to one per team.\p"
 	.string "Please come see me when\n"
 	.string "you are ready…$"
 

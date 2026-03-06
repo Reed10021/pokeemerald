@@ -73,7 +73,7 @@ extern u8 gLocalLinkPlayerId;
 extern u8 gFieldLinkPlayerCount;
 extern bool8 gSysPcFromPokenav;
 extern u8 gTimeOfDay;
-extern u16 gTimeUpdateCounter;
+extern u8 gTimeUpdateCounter;
 extern struct TimeBlendSettings currentTimeBlend;
 
 // Exported ROM declarations
@@ -133,6 +133,7 @@ void Overworld_PlaySpecialMapMusic(void);
 void Overworld_SetSavedMusic(u16 songNum);
 void Overworld_ClearSavedMusic(void);
 bool32 Overworld_MusicCanOverrideMapMusic(u16 song);
+bool32 Overworld_MusicCanOverrideWarpMapMusic(u16 song);
 void Overworld_ChangeMusicToDefault(void);
 void Overworld_ChangeMusicTo(u16 newMusic);
 u8 GetMapMusicFadeoutSpeed(void);

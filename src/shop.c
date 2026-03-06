@@ -563,7 +563,7 @@ static void BuyMenuPrintPriceInList(u8 windowId, s32 item, u8 y)
         {
             ConvertIntToDecimalStringN(
                 gStringVar1,
-                ItemId_GetPrice(item) >> GetPriceReduction(POKENEWS_SLATEPORT),
+                ItemId_GetPrice(item) >> (GetPriceReduction(POKENEWS_SLATEPORT) || GetPriceReduction(POKENEWS_LILYCOVE)),
                 STR_CONV_MODE_LEFT_ALIGN,
                 5);
         }
@@ -945,7 +945,7 @@ static void Task_BuyMenu(u8 taskId)
 
             if (gMartInfo.martType == MART_TYPE_NORMAL)
             {
-                gShopDataPtr->totalCost = (ItemId_GetPrice(itemId) >> GetPriceReduction(POKENEWS_SLATEPORT));
+                gShopDataPtr->totalCost = (ItemId_GetPrice(itemId) >> (GetPriceReduction(POKENEWS_SLATEPORT) || GetPriceReduction(POKENEWS_LILYCOVE)));
             }
             else
             {
@@ -971,7 +971,7 @@ static void Task_BuyMenu(u8 taskId)
                         ConvertIntToDecimalStringN(gStringVar2, gShopDataPtr->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
                         StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
                         tItemCount = 1;
-                        gShopDataPtr->totalCost = (ItemId_GetPrice(tItemId) >> GetPriceReduction(POKENEWS_SLATEPORT)) * tItemCount;
+                        gShopDataPtr->totalCost = (ItemId_GetPrice(tItemId) >> (GetPriceReduction(POKENEWS_SLATEPORT) || GetPriceReduction(POKENEWS_LILYCOVE))) * tItemCount;
                         BuyMenuDisplayMessage(taskId, gStringVar4, BuyMenuConfirmPurchase);
                     }
                     else
@@ -1000,8 +1000,8 @@ static void Task_BuyHowManyDialogueInit(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
 
-    u16 quantityInBag = CountTotalItemQuantityInBag(tItemId);
-    u16 maxQuantity;
+    u32 quantityInBag = CountTotalItemQuantityInBag(tItemId);
+    u32 maxQuantity;
 
     DrawStdFrameWithCustomTileAndPalette(3, FALSE, 1, 13);
     ConvertIntToDecimalStringN(gStringVar1, quantityInBag, STR_CONV_MODE_RIGHT_ALIGN, 4);
@@ -1032,7 +1032,7 @@ static void Task_BuyHowManyDialogueHandleInput(u8 taskId)
 
     if (AdjustQuantityAccordingToDPadInput(&tItemCount, gShopDataPtr->maxQuantity) == TRUE)
     {
-        gShopDataPtr->totalCost = (ItemId_GetPrice(tItemId) >> GetPriceReduction(POKENEWS_SLATEPORT)) * tItemCount;
+        gShopDataPtr->totalCost = (ItemId_GetPrice(tItemId) >> (GetPriceReduction(POKENEWS_SLATEPORT) || GetPriceReduction(POKENEWS_LILYCOVE))) * tItemCount;
         BuyMenuPrintItemQuantityAndPrice(taskId);
     }
     else

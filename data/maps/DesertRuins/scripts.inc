@@ -66,20 +66,24 @@ DesertRuins_EventScript_Regirock:: @ 822DA02
 	playmoncry SPECIES_REGIROCK, 2
 	delay 40
 	waitmoncry
+	setflag FLAG_FORCE_ANIMATIONS
 	setwildbattle SPECIES_REGIROCK, 40, ITEM_HARD_STONE
-	setflag FLAG_SYS_CTRL_OBJ_DELETE
+@	setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special StartRegiBattle
 	waitstate
-	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+@	clearflag FLAG_SYS_CTRL_OBJ_DELETE
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq DesertRuins_EventScript_DefeatedRegirock
+	goto_if_eq DesertRuins_EventScript_RanFromRegirock
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq DesertRuins_EventScript_RanFromRegirock
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq DesertRuins_EventScript_RanFromRegirock
 	setflag FLAG_DEFEATED_REGIROCK
-	release
+	compare VAR_SPECIESCHAINED, SPECIES_REGIROCK
+	call_if_eq ChainNumberNoLock
+	closemessage
+	goto Common_EventScript_RemoveStaticPokemon
 	end
 
 DesertRuins_EventScript_DefeatedRegirock:: @ 822DA49
@@ -88,7 +92,12 @@ DesertRuins_EventScript_DefeatedRegirock:: @ 822DA49
 	end
 
 DesertRuins_EventScript_RanFromRegirock:: @ 822DA52
-	setvar VAR_0x8004, SPECIES_REGIROCK
-	goto Common_EventScript_LegendaryFlewAway
+	compare VAR_SPECIESCHAINED, SPECIES_REGIROCK
+	call_if_eq ChainNumberNoLock
+	msgbox DesertRuins_Text_RegirockWatchingYou, MSGBOX_DEFAULT
+	release
 	end
+
+DesertRuins_Text_RegirockWatchingYou::
+	.string "Regirock is watching you!$"
 

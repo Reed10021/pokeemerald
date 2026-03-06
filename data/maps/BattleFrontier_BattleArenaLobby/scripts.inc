@@ -415,7 +415,8 @@ BattleFrontier_BattleArenaLobby_Text_NotEnoughValidMonsLvOpen: @ 82565A5
 	.string "different kinds of POKéMON.\p"
 	.string "They also must not hold the same\n"
 	.string "kinds of items.\p"
-	.string "EGGS{STR_VAR_1} ineligible.\p"
+	.string "EGGS are ineligible.\p"
+	.string "{STR_VAR_1} limited to one per team.\p"
 	.string "When you have made your preparations,\n"
 	.string "please do return.$"
 
@@ -429,7 +430,8 @@ BattleFrontier_BattleArenaLobby_Text_NotEnoughValidMonsLv50: @ 82566A8
 	.string "must all be Level 50 or lower.\p"
 	.string "They also must not hold the same\n"
 	.string "kinds of items.\p"
-	.string "EGGS{STR_VAR_1} ineligible.\p"
+	.string "EGGS are ineligible.\p"
+	.string "{STR_VAR_1} limited to one per team.\p"
 	.string "When you have made your preparations,\n"
 	.string "please do return.$"
 

@@ -18,11 +18,57 @@ Route115_OnTransition: @ 81F2947
 	call_if_eq AbnormalWeather_StartGroudonWeather
 	compare VAR_ABNORMAL_WEATHER_LOCATION, ABNORMAL_WEATHER_ROUTE_115_EAST
 	call_if_eq AbnormalWeather_StartGroudonWeather
+	setvar VAR_TEMP_1, 0
+	goto_if_set FLAG_ROUTE115_ENCOUNTER, Route115_EventScript_ForcedEncounter_End
 	end
 
 Route115_OnFrame: @ 81F2969
 	map_script_2 VAR_SHOULD_END_ABNORMAL_WEATHER, 1, AbnormalWeather_EventScript_EndEventAndCleanup_1
 	.2byte 0
+
+Route115_EventScript_ForcedEncounter::
+	goto_if_set FLAG_ROUTE115_ENCOUNTER, Route115_EventScript_ForcedEncounter_End
+	lock
+	playmoncry SPECIES_ALTARIA, 2
+	waitmoncry
+	playse SE_PIN
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
+	delay 25
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestDown
+	delay 20
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestLeft
+	delay 20
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestUp
+	delay 20
+	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFastestRight
+	playmoncry SPECIES_ALTARIA, 2
+	waitmoncry
+	delay 25
+	msgbox Route115_Text_AltariaAttacks, MSGBOX_DEFAULT
+	closemessage
+	setflag FLAG_CANNOT_RUN_AWAY
+	setflag FLAG_TRIGGER_SMART_WILD_AI
+	setflag FLAG_TRIGGER_TOTEM_POWER
+	setflag FLAG_FORCE_ANIMATIONS
+	setwildbattlescaled SPECIES_ALTARIA, 30, ITEM_SITRUS_BERRY
+	special BattleSetup_StartLegendaryBattle
+	waitstate
+	specialvar VAR_RESULT, GetBattleOutcome
+	setflag FLAG_ROUTE115_ENCOUNTER
+	clearflag FLAG_CANNOT_RUN_AWAY
+	clearflag FLAG_TRIGGER_SMART_WILD_AI
+	clearflag FLAG_TRIGGER_TOTEM_POWER
+	compare VAR_SPECIESCHAINED, SPECIES_ALTARIA
+	call_if_eq ChainNumberNoLock
+	release
+Route115_EventScript_ForcedEncounter_End:
+	setvar VAR_TEMP_1, 1
+	end
+
+Route115_Text_AltariaAttacks:
+	.string "Altaria came out from the trees\n"
+	.string "and attacked!$"
+
 
 Route115_EventScript_Woman:: @ 81F2973
 	msgbox Route115_Text_NeverKnowWhenCavePokemonWillAppear, MSGBOX_NPC

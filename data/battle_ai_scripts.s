@@ -58,6 +58,7 @@ AI_CBM_CheckIfNegatesType: @ 82DBF92
 	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus30
 	get_ability AI_TARGET
 	if_equal ABILITY_VOLT_ABSORB, CheckIfVoltAbsorbCancelsElectric
+	if_equal ABILITY_LIGHTNING_ROD, CheckIfVoltAbsorbCancelsElectric
 	if_equal ABILITY_WATER_ABSORB, CheckIfWaterAbsorbCancelsWater
 	if_equal ABILITY_FLASH_FIRE, CheckIfFlashFireCancelsFire
 	if_equal ABILITY_WONDER_GUARD, CheckIfWonderGuardCancelsMove
@@ -103,6 +104,8 @@ AI_CheckBadMove_CheckSoundproof: @ 82DBFFE
 	if_move MOVE_UPROAR, Score_Minus10
 	if_move MOVE_METAL_SOUND, Score_Minus10
 	if_move MOVE_GRASS_WHISTLE, Score_Minus10
+	if_move MOVE_HYPER_VOICE, Score_Minus10
+	if_move MOVE_PERISH_SONG, Score_Minus10
 
 AI_CheckBadMove_CheckEffect: @ 82DC045
 	if_effect EFFECT_SLEEP, AI_CBM_Sleep
@@ -342,6 +345,7 @@ AI_CBM_Roar: @ 82DC47B
 	if_equal 0, Score_Minus10
 	get_ability AI_TARGET
 	if_equal ABILITY_SUCTION_CUPS, Score_Minus10
+	if_equal ABILITY_TITANIC, Score_Minus10
 	end
 
 AI_CBM_Toxic: @ 82DC48C
@@ -788,6 +792,7 @@ AI_CheckViability:
 	if_effect EFFECT_CALM_MIND, AI_CV_SpDefUp
 	if_effect EFFECT_DRAGON_DANCE, AI_CV_DragonDance
 	if_effect EFFECT_GROWTH, AI_CV_Growth
+	if_effect EFFECT_POWER_BASED_ON_TARGET_HP, AI_CV_PowerBasedOnTargetHP
 	end
 
 AI_CV_Sleep: @ 82DCA92
@@ -1758,7 +1763,7 @@ AI_CV_Counter2:
 	score -1
 
 AI_CV_Counter3:
-	if_has_move AI_USER, MOVE_MIRROR_COAT, AI_CV_Counter7
+	if_has_move AI_USER, MOVE_MIRROR_COAT, AI_CV_Counter8
 	get_last_used_bank_move AI_TARGET
 	get_move_power_from_result
 	if_equal 0, AI_CV_Counter5
@@ -1781,16 +1786,17 @@ AI_CV_Counter5:
 
 AI_CV_Counter6:
 	get_target_type1
-	if_in_bytes AI_CV_Counter_PhysicalTypeList, AI_CV_Counter_End
+	if_in_bytes AI_CV_Counter_PhysicalTypeList, AI_CV_Counter7
 	get_target_type2
-	if_in_bytes AI_CV_Counter_PhysicalTypeList, AI_CV_Counter_End
-	if_random_less_than 50, AI_CV_Counter_End
+	if_in_bytes AI_CV_Counter_PhysicalTypeList, AI_CV_Counter7
+	goto AI_CV_Counter_End
 
 AI_CV_Counter7:
-	if_random_less_than 100, AI_CV_Counter8
-	score +4
-
+	if_random_less_than 50, AI_CV_Counter_End
 AI_CV_Counter8:
+	if_random_less_than 100, AI_CV_Counter9
+	score +4
+AI_CV_Counter9:
 	end
 
 AI_CV_Counter_ScoreDown1:
@@ -1918,6 +1924,17 @@ AI_CV_Snore:
 	end
 
 AI_CV_LockOn:
+	get_last_used_bank_move AI_USER
+	get_move_effect_from_result
+	if_not_equal EFFECT_LOCK_ON, AI_CV_LockOn2
+	score -50
+
+AI_CV_LockOn2:
+	if_not_status3 AI_USER, STATUS3_ALWAYS_HITS, AI_CV_LockOn3
+	score -50
+	end
+
+AI_CV_LockOn3:
 	if_random_less_than 128, AI_CV_LockOn_End
 	score +2
 
@@ -2305,9 +2322,12 @@ AI_CV_MirrorCoat5:
 
 AI_CV_MirrorCoat6:
 	get_target_type1
-	if_in_bytes AI_CV_MirrorCoat_SpecialTypeList, AI_CV_MirrorCoat_End
+	if_in_bytes AI_CV_MirrorCoat_SpecialTypeList, AI_CV_MirrorCoat7
 	get_target_type2
-	if_in_bytes AI_CV_MirrorCoat_SpecialTypeList, AI_CV_MirrorCoat_End
+	if_in_bytes AI_CV_MirrorCoat_SpecialTypeList, AI_CV_MirrorCoat7
+	goto AI_CV_MirrorCoat_End
+
+AI_CV_MirrorCoat7:
 	if_random_less_than 50, AI_CV_MirrorCoat_End
 
 AI_CV_MirrorCoat_ScoreUp4:
@@ -2504,10 +2524,14 @@ AI_CV_Trick_EffectsToEncourage:
     .byte HOLD_EFFECT_CONFUSE_SOUR
     .byte HOLD_EFFECT_MACHO_BRACE
     .byte HOLD_EFFECT_CHOICE_BAND
+	.byte HOLD_EFFECT_CHOICE_SPECS
+	.byte HOLD_EFFECT_CHOICE_SCARF
     .byte -1
 
 AI_CV_Trick_EffectsToEncourage2:
     .byte HOLD_EFFECT_CHOICE_BAND
+	.byte HOLD_EFFECT_CHOICE_SPECS
+	.byte HOLD_EFFECT_CHOICE_SCARF
     .byte -1
 
 AI_CV_ChangeSelfAbility:
@@ -2517,7 +2541,7 @@ AI_CV_ChangeSelfAbility:
 	if_in_bytes AI_CV_ChangeSelfAbility_AbilitiesToEncourage, AI_CV_ChangeSelfAbility3
 
 AI_CV_ChangeSelfAbility2:
-	score -1
+	score -2
 	goto AI_CV_ChangeSelfAbility_End
 
 AI_CV_ChangeSelfAbility3:
@@ -2532,9 +2556,13 @@ AI_CV_ChangeSelfAbility_AbilitiesToEncourage:
     .byte ABILITY_BATTLE_ARMOR
     .byte ABILITY_SAND_VEIL
     .byte ABILITY_STATIC
+    .byte ABILITY_WATER_ABSORB
+    .byte ABILITY_VOLT_ABSORB
     .byte ABILITY_FLASH_FIRE
     .byte ABILITY_WONDER_GUARD
+    .byte ABILITY_LEVITATE
     .byte ABILITY_EFFECT_SPORE
+    .byte ABILITY_LIGHTNING_ROD
     .byte ABILITY_SWIFT_SWIM
     .byte ABILITY_HUGE_POWER
     .byte ABILITY_RAIN_DISH
@@ -2544,6 +2572,7 @@ AI_CV_ChangeSelfAbility_AbilitiesToEncourage:
     .byte ABILITY_PURE_POWER
     .byte ABILITY_CHLOROPHYLL
     .byte ABILITY_SHIELD_DUST
+    .byte ABILITY_TECHNICIAN
     .byte -1
 
 AI_CV_Superpower:
@@ -2602,6 +2631,17 @@ AI_CV_Recycle_ItemsToEncourage:
     .byte ITEM_CHESTO_BERRY
     .byte ITEM_LUM_BERRY
     .byte ITEM_STARF_BERRY
+    .byte ITEM_SITRUS_BERRY
+    .byte ITEM_MENTAL_HERB
+    .byte ITEM_FOCUS_SASH
+    .byte ITEM_SALAC_BERRY
+    .byte ITEM_LIECHI_BERRY
+    .byte ITEM_AGUAV_BERRY
+    .byte ITEM_FIGY_BERRY
+    .byte ITEM_IAPAPA_BERRY
+    .byte ITEM_MAGO_BERRY
+    .byte ITEM_WIKI_BERRY
+    .byte ITEM_BERRY_JUICE
     .byte -1
 
 AI_CV_Revenge:
@@ -2812,6 +2852,24 @@ AI_CV_Growth_ScoreDown2::
 
 AI_CV_Growth_End::
 	end
+
+AI_CV_PowerBasedOnTargetHP::
+	if_type_effectiveness AI_EFFECTIVENESS_x0, AI_CV_PowerBasedOnTargetHP_ScoreDown5
+	if_type_effectiveness AI_EFFECTIVENESS_x0_5, AI_CV_PowerBasedOnTargetHP_ScoreDown5
+	if_hp_more_than AI_TARGET, 80, AI_CV_PowerBasedOnTargetHP_ScoreUp2
+	score -1
+	goto AI_CV_PowerBasedOnTargetHP_End
+
+AI_CV_PowerBasedOnTargetHP_ScoreUp2::
+	score +2
+	goto AI_CV_PowerBasedOnTargetHP_End
+
+AI_CV_PowerBasedOnTargetHP_ScoreDown5::
+	score -5
+
+AI_CV_PowerBasedOnTargetHP_End::
+	end
+
 
 AI_TryToFaint:
 	if_target_is_ally AI_Ret
@@ -3146,7 +3204,7 @@ AI_HPAware:
 	if_hp_more_than AI_USER, 70, AI_HPAware_UserHasHighHP
 	if_hp_more_than AI_USER, 30, AI_HPAware_UserHasMediumHP
 	get_considered_move_effect
-	if_in_bytes AI_HPAware_DiscouragedEffectsWhenLowHP, AI_HPAware_TryToDiscourage
+	if_in_bytes AI_HPAware_DiscouragedEffectsWhenLowHP, AI_HPAware_TryToDiscourageLowHp
 	goto AI_HPAware_ConsiderTarget
 
 AI_HPAware_UserHasHighHP:
@@ -3159,6 +3217,12 @@ AI_HPAware_UserHasMediumHP:
 	if_in_bytes AI_HPAware_DiscouragedEffectsWhenMediumHP, AI_HPAware_TryToDiscourage
 	goto AI_HPAware_ConsiderTarget
 
+AI_HPAware_TryToDiscourageLowHp:
+	score -18
+	if_random_less_than 50, AI_HPAware_ConsiderTarget
+	score -12
+	goto AI_HPAware_ConsiderTarget
+
 AI_HPAware_TryToDiscourage:
 	if_random_less_than 50, AI_HPAware_ConsiderTarget
 	score -2
@@ -3167,18 +3231,26 @@ AI_HPAware_ConsiderTarget:
 	if_hp_more_than AI_TARGET, 70, AI_HPAware_TargetHasHighHP
 	if_hp_more_than AI_TARGET, 30, AI_HPAware_TargetHasMediumHP
 	get_considered_move_effect
-	if_in_bytes AI_HPAware_DiscouragedEffectsWhenTargetLowHP, AI_HPAware_TargetTryToDiscourage
+	if_in_bytes AI_HPAware_DiscouragedEffectsWhenTargetLowHP, AI_HPAware_TargetTryToDiscourageLowHp
 	goto AI_HPAware_End
 
 AI_HPAware_TargetHasHighHP:
 	get_considered_move_effect
 	if_in_bytes AI_HPAware_DiscouragedEffectsWhenTargetHighHP, AI_HPAware_TargetTryToDiscourage
+	if_in_bytes AI_HPAware_EncouragedEffectsWhenTargetHighHP, AI_HPAware_TargetTryToEncourage
 	goto AI_HPAware_End
 
 AI_HPAware_TargetHasMediumHP:
 	get_considered_move_effect
 	if_in_bytes AI_HPAware_DiscouragedEffectsWhenTargetMediumHP, AI_HPAware_TargetTryToDiscourage
 	goto AI_HPAware_End
+
+AI_HPAware_TargetTryToEncourage:
+	score +2
+	goto AI_HPAware_End
+
+AI_HPAware_TargetTryToDiscourageLowHp:
+	score -3
 
 AI_HPAware_TargetTryToDiscourage:
 	if_random_less_than 50, AI_HPAware_End
@@ -3303,14 +3375,18 @@ AI_HPAware_DiscouragedEffectsWhenLowHP: @ 82DE258
 AI_HPAware_DiscouragedEffectsWhenTargetHighHP: @ 82DE288
     .byte -1
 
+AI_HPAware_EncouragedEffectsWhenTargetHighHP:
+	.byte EFFECT_POWER_BASED_ON_TARGET_HP
+    .byte -1
+
 AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
-    .byte EFFECT_ATTACK_UP
-    .byte EFFECT_DEFENSE_UP
-    .byte EFFECT_SPEED_UP
-    .byte EFFECT_SPECIAL_ATTACK_UP
-    .byte EFFECT_SPECIAL_DEFENSE_UP
-    .byte EFFECT_ACCURACY_UP
-    .byte EFFECT_EVASION_UP
+@    .byte EFFECT_ATTACK_UP
+@    .byte EFFECT_DEFENSE_UP
+@    .byte EFFECT_SPEED_UP
+@    .byte EFFECT_SPECIAL_ATTACK_UP
+@    .byte EFFECT_SPECIAL_DEFENSE_UP
+@    .byte EFFECT_ACCURACY_UP
+@    .byte EFFECT_EVASION_UP
     .byte EFFECT_ATTACK_DOWN
     .byte EFFECT_DEFENSE_DOWN
     .byte EFFECT_SPEED_DOWN
@@ -3320,13 +3396,13 @@ AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
     .byte EFFECT_EVASION_DOWN
     .byte EFFECT_MIST
     .byte EFFECT_FOCUS_ENERGY
-    .byte EFFECT_ATTACK_UP_2
-    .byte EFFECT_DEFENSE_UP_2
-    .byte EFFECT_SPEED_UP_2
-    .byte EFFECT_SPECIAL_ATTACK_UP_2
-    .byte EFFECT_SPECIAL_DEFENSE_UP_2
-    .byte EFFECT_ACCURACY_UP_2
-    .byte EFFECT_EVASION_UP_2
+@    .byte EFFECT_ATTACK_UP_2
+@    .byte EFFECT_DEFENSE_UP_2
+@    .byte EFFECT_SPEED_UP_2
+@    .byte EFFECT_SPECIAL_ATTACK_UP_2
+@    .byte EFFECT_SPECIAL_DEFENSE_UP_2
+@    .byte EFFECT_ACCURACY_UP_2
+@    .byte EFFECT_EVASION_UP_2
     .byte EFFECT_ATTACK_DOWN_2
     .byte EFFECT_DEFENSE_DOWN_2
     .byte EFFECT_SPEED_DOWN_2
@@ -3339,11 +3415,12 @@ AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
     .byte EFFECT_PERISH_SONG
     .byte EFFECT_SAFEGUARD
     .byte EFFECT_TICKLE
-    .byte EFFECT_COSMIC_POWER
-    .byte EFFECT_BULK_UP
-    .byte EFFECT_CALM_MIND
-    .byte EFFECT_DRAGON_DANCE
-    .byte EFFECT_GROWTH
+@    .byte EFFECT_COSMIC_POWER
+@    .byte EFFECT_BULK_UP
+@    .byte EFFECT_CALM_MIND
+@    .byte EFFECT_DRAGON_DANCE
+@    .byte EFFECT_GROWTH
+	.byte EFFECT_POWER_BASED_ON_TARGET_HP
     .byte -1
 
 AI_HPAware_DiscouragedEffectsWhenTargetLowHP: @ 82DE2B1
@@ -3368,7 +3445,7 @@ AI_HPAware_DiscouragedEffectsWhenTargetLowHP: @ 82DE2B1
     .byte EFFECT_TOXIC
     .byte EFFECT_LIGHT_SCREEN
     .byte EFFECT_OHKO
-    .byte EFFECT_SUPER_FANG //Maybe supposed to be EFFECT_RAZOR_WIND
+    .byte EFFECT_RAZOR_WIND //EFFECT_SUPER_FANG Maybe supposed to be EFFECT_RAZOR_WIND
     .byte EFFECT_SUPER_FANG
     .byte EFFECT_MIST
     .byte EFFECT_FOCUS_ENERGY
@@ -3395,7 +3472,7 @@ AI_HPAware_DiscouragedEffectsWhenTargetLowHP: @ 82DE2B1
     .byte EFFECT_SPITE
     .byte EFFECT_PERISH_SONG
     .byte EFFECT_SWAGGER
-    .byte EFFECT_FURY_CUTTER
+@    .byte EFFECT_FURY_CUTTER
     .byte EFFECT_ATTRACT
     .byte EFFECT_SAFEGUARD
     .byte EFFECT_PSYCH_UP
@@ -3407,6 +3484,7 @@ AI_HPAware_DiscouragedEffectsWhenTargetLowHP: @ 82DE2B1
     .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
     .byte EFFECT_GROWTH
+	.byte EFFECT_POWER_BASED_ON_TARGET_HP
     .byte -1
 
 AI_Unknown:

@@ -29,19 +29,21 @@ LilycoveCity_DepartmentStore_1F_EventScript_LotteryClerk:: @ 821F69C
 	playse SE_PC_ON
 	special DoLotteryCornerComputerEffect
 	special PickLotteryCornerTicket
-	delay 220
+	delay 160
 	special EndLotteryCornerComputerEffect
+	playse SE_PC_OFF
 	delay 10
 	applymovement LOCALID_LOTTERY_CLERK, Common_Movement_FacePlayer
 	waitmovement 0
 	compare VAR_0x8004, 0
-	goto_if_eq LilycoveCity_DepartmentStore_1F_EventScript_NoMatch
+	goto_if_eq LilycoveCity_DepartmentStore_1F_EventScript_NoMatch_SecondChance
 	incrementgamestat GAME_STAT_WON_POKEMON_LOTTERY
 	compare VAR_0x8006, 0
 	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_TicketMatchPartyMon
 	compare VAR_0x8006, 1
 	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_TicketMatchPCMon
-	bufferitemname 0, VAR_0x8005
+	bufferitemnameplural 0, VAR_0x8005, VAR_0x800A
+	buffernumberstring 1, VAR_0x800A
 	compare VAR_0x8004, 1
 	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_OneDigitMatch
 	compare VAR_0x8004, 2
@@ -75,6 +77,42 @@ LilycoveCity_DepartmentStore_1F_EventScript_ComeBackTomorrow:: @ 821F78D
 LilycoveCity_DepartmentStore_1F_EventScript_PleaseVisitAgain:: @ 821F797
 	msgbox LilycoveCity_DepartmentStore_1F_Text_PleaseVisitAgain, MSGBOX_DEFAULT
 	release
+	end
+
+LilycoveCity_DepartmentStore_1F_EventScript_NoMatch_SecondChance::
+	msgbox LilycoveCity_DepartmentStore_1F_Text_NoNumbersMatched, MSGBOX_DEFAULT
+	msgbox LilycoveCity_DepartmentStore_1F_Text_SecondChance, MSGBOX_DEFAULT
+	applymovement LOCALID_LOTTERY_CLERK, Common_Movement_WalkInPlaceFastestRight
+	waitmovement 0
+	playse SE_PC_ON
+	special DoLotteryCornerComputerEffect
+	special PickLotteryCornerTicketSecondChance
+	delay 120
+	special EndLotteryCornerComputerEffect
+	playse SE_PC_OFF
+	delay 10
+	applymovement LOCALID_LOTTERY_CLERK, Common_Movement_FacePlayer
+	waitmovement 0
+	compare VAR_0x8004, 0
+	goto_if_eq LilycoveCity_DepartmentStore_1F_EventScript_NoMatch
+	incrementgamestat GAME_STAT_WON_POKEMON_LOTTERY
+	bufferitemnameplural 0, VAR_0x8005, VAR_0x800A
+	buffernumberstring 1, VAR_0x800A
+	compare VAR_0x8004, 1
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_OneDigitMatch
+	compare VAR_0x8004, 2
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_TwoDigitMatch
+	compare VAR_0x8004, 3
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_ThreeDigitMatch
+	compare VAR_0x8004, 4
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_FourDigitMatch
+	compare VAR_0x8004, 5
+	call_if_eq LilycoveCity_DepartmentStore_1F_EventScript_FullMatch
+	giveitem VAR_0x8005, VAR_0x800A
+	compare VAR_RESULT, FALSE
+	goto_if_eq LilycoveCity_DepartmentStore_1F_EventScript_RecordPrizeNoRoom
+	special TryPutLotteryWinnerReportOnAir
+	goto LilycoveCity_DepartmentStore_1F_EventScript_PleaseVisitAgain2
 	end
 
 LilycoveCity_DepartmentStore_1F_EventScript_NoMatch:: @ 821F7A1

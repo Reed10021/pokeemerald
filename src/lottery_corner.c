@@ -22,6 +22,7 @@ static const u16 sLotteryPrizes[] =
 
 static const u16 sLotteryPrizes1Digit[] =
 {
+    ITEM_RARE_CANDY,
     ITEM_POMEG_BERRY,
     ITEM_KELPSY_BERRY,
     ITEM_QUALOT_BERRY,
@@ -38,7 +39,7 @@ static const u16 sLotteryPrizes1Digit[] =
     ITEM_RARE_CANDY,
 };
 
-#define LOTTERY_ONE_DIGIT_MAX_SIZE 14
+#define LOTTERY_ONE_DIGIT_MAX_SIZE 15
 
 
 static u8 GetMatchingDigits(u16, u16);
@@ -69,15 +70,11 @@ void RetrieveLotteryNumber(void)
 
 void PickLotteryCornerTicket(void)
 {
-    u16 i;
-    u16 j;
-    u32 box;
-    u32 slot;
-    u32 slotForRandom;
-
+    u32 i = 0;
+    u32 j = 0;
+    u32 box = 0;
+    u32 slot = 0;
     gSpecialVar_0x8004 = 0;
-    slot = 0;
-    box = 0;
     for (i = 0; i < PARTY_SIZE; i++)
     {
         struct Pokemon *mon = &gPlayerParty[i];
@@ -89,7 +86,6 @@ void PickLotteryCornerTicket(void)
             {
                 u32 otId = GetMonData(mon, MON_DATA_OT_ID);
                 u8 numMatchingDigits = GetMatchingDigits(gSpecialVar_Result, otId);
-                slotForRandom = i;
 
                 if (numMatchingDigits > gSpecialVar_0x8004 && numMatchingDigits > 0)
                 {
@@ -123,29 +119,6 @@ void PickLotteryCornerTicket(void)
         }
     }
 
-    // 66% of the time, change a bad no win result into a winning result
-    if (gSpecialVar_0x8004 == 0)
-    {
-        if (Random() % 3 > 0) {
-            if (Random() % 2 == 0) {
-                if (Random() % 2 == 0) {
-                    if (Random() % 2 == 0) {
-                        if (Random() % 4 == 0) {
-                            gSpecialVar_0x8004 = 5;
-                        } else
-                            gSpecialVar_0x8004 = 4;
-                    } else
-                        gSpecialVar_0x8004 = 3;
-                } else
-                    gSpecialVar_0x8004 = 2;
-            } else
-                gSpecialVar_0x8004 = 1;
-            box = TOTAL_BOXES_COUNT;
-            slot = slotForRandom;
-        }
-        // Else don't change result
-    }
-
     if (gSpecialVar_0x8004 != 0)
     {
         if (gSpecialVar_0x8004 == 1) {
@@ -175,6 +148,50 @@ void PickLotteryCornerTicket(void)
             GetBoxMonData(&gPokemonStoragePtr->boxes[box][slot], MON_DATA_NICKNAME, gStringVar1);
         }
         StringGetEnd10(gStringVar1);
+    }
+}
+
+void PickLotteryCornerTicketSecondChance(void)
+{
+    gSpecialVar_0x8004 = 0;
+
+    if (Random() % 3 > 0) { // 66%
+        if (Random() % 2 == 0) { // 66% * 50%
+            if (Random() % 2 == 0) { // 66% * 50% * 50%
+                if (Random() % 2 == 0) { // 66% * 50% * 50% * 50%
+                    if (Random() % 4 == 0) { // 66% * 50% * 50% * 50% * 25%
+                        gSpecialVar_0x8004 = 5; // 33/1600 chance to randomly win max prize.
+                    }
+                    else
+                        gSpecialVar_0x8004 = 4;
+                }
+                else
+                    gSpecialVar_0x8004 = 3;
+            }
+            else
+                gSpecialVar_0x8004 = 2;
+        }
+        else
+            gSpecialVar_0x8004 = 1;
+    }
+
+    if (gSpecialVar_0x8004 != 0)
+    {
+        if (gSpecialVar_0x8004 == 1) {
+            gSpecialVar_0x8005 = sLotteryPrizes1Digit[Random() % LOTTERY_ONE_DIGIT_MAX_SIZE];
+            gSpecialVar_0x800A = 3; // Count: 3
+        }
+        else {
+            gSpecialVar_0x8005 = sLotteryPrizes[gSpecialVar_0x8004 - 2]; // We don't use 0, 1 is handled above, sLotteryPrizes starts at element 0 so subtract 2
+            if (gSpecialVar_0x8004 == 2)
+                gSpecialVar_0x800A = 5; // Count: 5
+            else if (gSpecialVar_0x8004 == 3)
+                gSpecialVar_0x800A = 1; // Count: 1
+            else if (gSpecialVar_0x8004 == 4)
+                gSpecialVar_0x800A = 10; // Count: 10
+            else if (gSpecialVar_0x8004 == 5)
+                gSpecialVar_0x800A = 2; // Count: 2
+        }
     }
 }
 

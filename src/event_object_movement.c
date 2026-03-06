@@ -1548,6 +1548,27 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType)
     sprite->affineAnims = gDummySpriteAffineAnimTable;
     sprite->affineAnimBeginning = TRUE;
     sprite->coordOffsetEnabled = TRUE;
+
+    if (gTimeOfDay != TIME_OF_DAY_NIGHT)
+    {
+        sprite->invisible = TRUE;
+    }
+    else
+    {
+        s32 hours = gLocalTime.hours;
+        s32 minutes = gLocalTime.minutes;
+        if ((hours == (TIME_NIGHT_END - 1) && minutes >= 30) || (hours > (TIME_NIGHT_END - 1) && hours < (TIME_NIGHT_BLEND_END - 1)) || (hours == (TIME_NIGHT_BLEND_END - 1) && minutes < 30))
+        {
+            Weather_SetBlendCoeffs(7, 12);
+            sprite->invisible = TRUE;
+        }
+        else
+        {
+            Weather_SetBlendCoeffs(12, 12);
+            sprite->invisible = FALSE;
+        }
+    }
+
     switch (lightType)
     {
     case 0: // Rustboro lanterns
@@ -1694,7 +1715,7 @@ void sub_808E16C(s16 x, s16 y) //SpawnObjectEventsOnReturnToField
         }
     }
     CreateReflectionEffectSprites();
-    //TrySpawnLightSprites(x, y);
+    TrySpawnLightSprites(x, y);
 }
 
 static void sub_808E1B8(u8 objectEventId, s16 x, s16 y) //SpawnObjectEventOnReturnToField
@@ -1809,7 +1830,7 @@ void ObjectEventSetGraphicsId(struct ObjectEvent* objectEvent, u16 graphicsId)
     objectEvent->graphicsId = graphicsId;
 }
 
-void ObjectEventSetGraphicsIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup, u8 graphicsId)
+void ObjectEventSetGraphicsIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroup, u16 graphicsId)
 {
     u8 objectEventId;
 
@@ -2043,15 +2064,15 @@ static u8 FindObjectEventPaletteIndexByTag(u16 tag)
     return 0xFF;
 }
 
-bool8 IsObjectEventPaletteIndex(u8 paletteIndex)
-{
-    if ((paletteIndex - 16) > 10)
-        return FALSE;   //don't mess with the weather pal itself
-    else if (FindObjectEventPaletteIndexByTag(GetSpritePaletteTagByPaletteNum(paletteIndex)) != 0xFF)
-        return TRUE;
-
-    return FALSE;
-}
+//bool8 IsObjectEventPaletteIndex(u8 paletteIndex)
+//{
+//    if ((paletteIndex - 16) > 10)
+//        return FALSE;   //don't mess with the weather pal itself
+//    else if (FindObjectEventPaletteIndexByTag(GetSpritePaletteTagByPaletteNum(paletteIndex)) != 0xFF)
+//        return TRUE;
+//
+//    return FALSE;
+//}
 
 void unref_sub_808EAC4(struct ObjectEvent *objectEvent, s16 x, s16 y)
 {
@@ -7704,20 +7725,28 @@ u8 GetLedgeJumpDirection(s16 x, s16 y, u8 z)
         MetatileBehavior_IsJumpEast,
     };
 
-    u8 b;
+    u8 behavior;
     u8 index = z;
+    struct ObjectEvent* playerObjEvent = &gObjectEvents[gPlayerAvatar.objectEventId];
 
-    if (index == 0)
-        return 0;
-    else if (index > 4)
-        index -= 4;
+    if (index == DIR_NONE)
+        return DIR_NONE;
+    else if (index > DIR_EAST)
+        index -= DIR_EAST;
 
     index--;
-    b = MapGridGetMetatileBehaviorAt(x, y);
+    behavior = MapGridGetMetatileBehaviorAt(x, y);
 
-    if (unknown_08376040[index](b) == 1 || (gPlayerAvatar.acroBikeState == ACRO_STATE_BUNNY_HOP
-        && MB_JUMP_EAST <= b && b <= MB_JUMP_SOUTH))
+    if (unknown_08376040[index](behavior) == 1)
         return index + 1;
+
+    if (gPlayerAvatar.acroBikeState == ACRO_STATE_BUNNY_HOP &&
+        MB_JUMP_EAST <= behavior && behavior <= MB_JUMP_SOUTH)
+    {
+        MoveCoords(z, &x, &y);
+        if (GetCollisionAtCoords(playerObjEvent, x, y, z) == COLLISION_NONE)
+            return index + 1;
+    }
 
     return 0;
 }

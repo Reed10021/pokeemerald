@@ -1,4 +1,8 @@
 .set LOCALID_SUDOWOODO, 14
+.set LOCALID_RED, 27
+.set LOCALID_GREEN, 28
+.set LOCALID_RUBY, 29
+.set LOCALID_SAPPHIRE, 30
 
 BattleFrontier_OutsideEast_MapScripts:: @ 8242C04
 	map_script MAP_SCRIPT_ON_RESUME, BattleFrontier_OutsideEast_OnResume
@@ -142,11 +146,16 @@ BattleFrontier_OutsideEast_EventScript_WaterSudowoodo:: @ 8242CFC
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq BattleFrontier_OutsideEast_EventScript_DefeatedSudowoodo
 	setflag FLAG_DEFEATED_SUDOWOODO
+	compare VAR_SPECIESCHAINED, SPECIES_SUDOWOODO
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
 BattleFrontier_OutsideEast_EventScript_DefeatedSudowoodo:: @ 8242D60
 	setflag FLAG_DEFEATED_SUDOWOODO
+	compare VAR_SPECIESCHAINED, SPECIES_SUDOWOODO
+	call_if_eq ChainNumberNoLock
+	closemessage
 	goto Common_EventScript_RemoveStaticPokemon
 	end
 
@@ -238,27 +247,67 @@ BattleFrontier_OutsideEast_EventScript_Camper:: @ 8242E08
 	end
 
 BattleFrontier_OutsideEast_EventScript_Kirby::
-	trainerbattle_single TRAINER_KIRBY, BattleFrontier_OutsideEast_Text_KirbyIntro, BattleFrontier_OutsideEast_Text_KirbyDefeated
+	lock
+	faceplayer
+	msgbox BattleFrontier_OutsideEast_Text_WouldYouLikeToBattle, MSGBOX_YESNO
+	closemessage
+	compare VAR_RESULT, NO
+	goto_if_eq BattleFrontier_OutsideEast_EventScript_Kirby_End
+	trainerbattle_single TRAINER_KIRBY, BattleFrontier_OutsideEast_Text_SilentIntro, BattleFrontier_OutsideEast_Text_SilentDefeated
 	msgbox BattleFrontier_OutsideEast_Text_KirbyPostBattle, MSGBOX_AUTOCLOSE
 	cleartrainerflag TRAINER_KIRBY
+BattleFrontier_OutsideEast_EventScript_Kirby_End:
+	applymovement LOCALID_RED, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
 	end
 
 BattleFrontier_OutsideEast_EventScript_Reed::
-	trainerbattle_single TRAINER_REED_YELLOW, BattleFrontier_OutsideEast_Text_ReedIntro, BattleFrontier_OutsideEast_Text_ReedDefeated
+	lock
+	faceplayer
+	msgbox BattleFrontier_OutsideEast_Text_WouldYouLikeToBattle, MSGBOX_YESNO
+	closemessage
+	compare VAR_RESULT, NO
+	goto_if_eq BattleFrontier_OutsideEast_EventScript_Reed_End
+	trainerbattle_single TRAINER_REED_YELLOW, BattleFrontier_OutsideEast_Text_SilentIntro, BattleFrontier_OutsideEast_Text_SilentDefeated
 	msgbox BattleFrontier_OutsideEast_Text_ReedPostBattle, MSGBOX_AUTOCLOSE
 	cleartrainerflag TRAINER_REED_YELLOW
+BattleFrontier_OutsideEast_EventScript_Reed_End:
+	applymovement LOCALID_GREEN, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
 	end
 
 BattleFrontier_OutsideEast_EventScript_Chris::
-	trainerbattle_single TRAINER_CHRIS_CRYSTAL, BattleFrontier_OutsideEast_Text_ChrisIntro, BattleFrontier_OutsideEast_Text_ChrisDefeated
-	msgbox BattleFrontier_OutsideEast_Text_ChrisPostBattle, MSGBOX_AUTOCLOSE
+	lock
+	faceplayer
+	msgbox BattleFrontier_OutsideEast_Text_WouldYouLikeToBattle, MSGBOX_YESNO
+	closemessage
+	compare VAR_RESULT, NO
+	goto_if_eq BattleFrontier_OutsideEast_EventScript_Chris_End
+	trainerbattle_single TRAINER_CHRIS_CRYSTAL, BattleFrontier_OutsideEast_Text_SilentIntro, BattleFrontier_OutsideEast_Text_SilentDefeated
+	msgbox BattleFrontier_OutsideEast_Text_SilentPostBattle, MSGBOX_AUTOCLOSE
 	cleartrainerflag TRAINER_CHRIS_CRYSTAL
+BattleFrontier_OutsideEast_EventScript_Chris_End:
+	applymovement LOCALID_RUBY, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
 	end
 
 BattleFrontier_OutsideEast_EventScript_Kris::
-	trainerbattle_single TRAINER_KRIS, BattleFrontier_OutsideEast_Text_KrisIntro, BattleFrontier_OutsideEast_Text_KrisDefeated
-	msgbox BattleFrontier_OutsideEast_Text_KrisPostBattle, MSGBOX_AUTOCLOSE
+	lock
+	faceplayer
+	msgbox BattleFrontier_OutsideEast_Text_WouldYouLikeToBattle, MSGBOX_YESNO
+	closemessage
+	compare VAR_RESULT, NO
+	goto_if_eq BattleFrontier_OutsideEast_EventScript_Kris_End
+	trainerbattle_single TRAINER_KRIS, BattleFrontier_OutsideEast_Text_SilentIntro, BattleFrontier_OutsideEast_Text_SilentDefeated
+	msgbox BattleFrontier_OutsideEast_Text_SilentPostBattle, MSGBOX_AUTOCLOSE
 	cleartrainerflag TRAINER_KRIS
+BattleFrontier_OutsideEast_EventScript_Kris_End:
+	applymovement LOCALID_SAPPHIRE, Common_Movement_FaceOriginalDirection
+	waitmovement 0
+	release
 	end
 
 BattleFrontier_OutsideEast_Text_BattleTowerSign: @ 8242E11
@@ -466,38 +515,25 @@ BattleFrontier_OutsideEast_Text_StickyMonWithLongTail: @ 8243D0B
 	.string "It was hiding under a boulder, and\n"
 	.string "it kept staring at me!$"
 
-BattleFrontier_OutsideEast_Text_KirbyIntro:
+BattleFrontier_OutsideEast_Text_WouldYouLikeToBattle:
+	.string "...\n"
+	.string "...Would you like to have a battle?$"
+
+BattleFrontier_OutsideEast_Text_SilentIntro:
 	.string "...$"
 
-BattleFrontier_OutsideEast_Text_KirbyDefeated:
+BattleFrontier_OutsideEast_Text_SilentDefeated:
 	.string "...!$"
+
+BattleFrontier_OutsideEast_Text_SilentPostBattle:
+	.string "...\n"
+	.string "...Let's do that again sometime...$"
 
 BattleFrontier_OutsideEast_Text_KirbyPostBattle:
-	.string "...$"
-
-BattleFrontier_OutsideEast_Text_ReedIntro:
-	.string "...$"
-
-BattleFrontier_OutsideEast_Text_ReedDefeated:
-	.string "...!$"
+	.string "...\n"
+	.string "Let's do that again sometime.\l"
+	.string "But first, I've got this business idea…$"
 
 BattleFrontier_OutsideEast_Text_ReedPostBattle:
-	.string "...$"
-
-BattleFrontier_OutsideEast_Text_ChrisIntro:
-	.string "...$"
-
-BattleFrontier_OutsideEast_Text_ChrisDefeated:
-	.string "...!$"
-
-BattleFrontier_OutsideEast_Text_ChrisPostBattle:
-	.string "...$"
-
-BattleFrontier_OutsideEast_Text_KrisIntro:
-	.string "...$"
-
-BattleFrontier_OutsideEast_Text_KrisDefeated:
-	.string "...!$"
-
-BattleFrontier_OutsideEast_Text_KrisPostBattle:
-	.string "...$"
+	.string "...\n"
+	.string "...Yeet! Let's do that again sometime.$"

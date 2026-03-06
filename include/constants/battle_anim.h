@@ -296,6 +296,25 @@
 #define ANIM_TAG_SLASH_2                    (ANIM_SPRITES_START + 286)
 #define ANIM_TAG_WHIP_HIT                   (ANIM_SPRITES_START + 287)
 #define ANIM_TAG_BLUE_RING_2                (ANIM_SPRITES_START + 288)
+//new particles
+#define ANIM_TAG_WHITE_STREAK               (ANIM_SPRITES_START + 289) // unused
+#define ANIM_TAG_PURPLE_JAB                 (ANIM_SPRITES_START + 290) // unused
+#define ANIM_TAG_TOXIC_SPIKES               (ANIM_SPRITES_START + 291) // unused
+#define ANIM_TAG_ENERGY_BALL                (ANIM_SPRITES_START + 292) // unused
+#define ANIM_TAG_SEED_BROWN                 (ANIM_SPRITES_START + 293) // unused
+#define ANIM_TAG_FEINT                      (ANIM_SPRITES_START + 294) // unused
+#define ANIM_TAG_MEGA_STONE                 (ANIM_SPRITES_START + 295) // unused
+#define ANIM_TAG_MEGA_SYMBOL                (ANIM_SPRITES_START + 296) // unused
+#define ANIM_TAG_MEGA_PARTICLES             (ANIM_SPRITES_START + 297) // unused
+#define ANIM_TAG_TRUMP_CARD                 (ANIM_SPRITES_START + 298) // unused
+#define ANIM_TAG_TRUMP_CARD_PARTICLES       (ANIM_SPRITES_START + 299) // unused
+#define ANIM_TAG_ACUPRESSURE                (ANIM_SPRITES_START + 300) // unused
+#define ANIM_TAG_WRING_OUT                  (ANIM_SPRITES_START + 301) // unused
+#define ANIM_TAG_COLORED_ORBS               (ANIM_SPRITES_START + 302) // unused
+#define ANIM_TAG_WORRY_SEED                 (ANIM_SPRITES_START + 303) // unused
+#define ANIM_TAG_SMALL_CLOUD                (ANIM_SPRITES_START + 304) // unused
+#define ANIM_TAG_ATTACK_ORDER               (ANIM_SPRITES_START + 305) // unused
+#define ANIM_TAG_DRAGON_PULSE               (ANIM_SPRITES_START + 306)
 
 // battlers
 #define ANIM_ATTACKER    0
@@ -370,6 +389,7 @@
 #define B_ANIM_FOCUS_PUNCH_SETUP        0x14
 #define B_ANIM_INGRAIN_HEAL             0x15
 #define B_ANIM_WISH_HEAL                0x16
+#define B_ANIM_TOTEM_FLARE              0x17
 
 // special animations table
 #define B_ANIM_LVL_UP                   0x0
@@ -438,5 +458,22 @@
 #define BACK_ANIM_FADE_GREEN_WITH_SHAKE        0x18
 #define BACK_ANIM_FADE_BLUE_WITH_SHAKE         0x19
 
-
+// Flags given to various functions to indicate which palettes to consider.
+// Handled by UnpackSelectedBattlePalettes
+#define F_PAL_BG                  (1 << 0)
+#define F_PAL_ATTACKER            (1 << 1)
+#define F_PAL_TARGET              (1 << 2)
+#define F_PAL_ATK_PARTNER         (1 << 3)
+#define F_PAL_DEF_PARTNER         (1 << 4)
+#define F_PAL_ANIM_1              (1 << 5) // Palette set for GetBattleAnimBg1Data/GetBgDataForTransform.
+#define F_PAL_ANIM_2              (1 << 6) // Palette set for GetBattleAnimBgData/GetBgDataForTransform. Unused.
+#define F_PAL_ATK_SIDE            (F_PAL_ATTACKER | F_PAL_ATK_PARTNER)
+#define F_PAL_DEF_SIDE            (F_PAL_TARGET | F_PAL_DEF_PARTNER)
+#define F_PAL_BATTLERS            (F_PAL_ATK_SIDE | F_PAL_DEF_SIDE)
+#define F_PAL_ADJACENT            (F_PAL_DEF_SIDE | F_PAL_ATK_PARTNER)
+#define F_PAL_ALL_BUT_DEF         (F_PAL_ATK_SIDE | F_PAL_DEF_PARTNER)
+#define F_PAL_ALL_BUT_ATK_PARTNER (F_PAL_ATTACKER | F_PAL_DEF_SIDE)
+// The below are only used by AnimTask_BlendBattleAnimPal to get battler sprite palettes by position rather than by role.
+// It's redundant with F_PAL_BATTLERS, because they're only ever used together to refer to all the battlers at once.
+#define F_PAL_BATTLERS_2  (1 << 7 | 1 << 8 | 1 << 9 | 1 << 10)
 #endif // GUARD_CONSTANTS_BATTLE_ANIM_H

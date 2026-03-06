@@ -543,3 +543,8 @@ gSpecials:: @ 81DBA64
 	def_special GetSpeciesFromRoamer
 	def_special GetObjectPosition
 	def_special CheckObjectAtXY
+	def_special MarkMonAsSeen
+	def_special CreateObedientFatefulEncounterEnemyMon
+	def_special PickLotteryCornerTicketSecondChance
+	def_special GetWeatherInstituteShards
+	def_special ResetEvs

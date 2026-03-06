@@ -87,6 +87,8 @@ noJirachi:
 	return
 
 MossdeepCity_SpaceCenter_1F_EventScript_JirachiUnlock::
+	setvar VAR_0x8002, SPECIES_JIRACHI
+	special MarkMonAsSeen
 	playmoncry SPECIES_JIRACHI, 2
 	waitmoncry
 	playse SE_PIN
@@ -110,7 +112,9 @@ MossdeepCity_SpaceCenter_1F_EventScript_JirachiUnlock::
 	playse SE_PIN
 	applymovement LOCALID_SCIENTIST_1, Common_Movement_ExclamationMark
 	delay 45
-	playse SE_DOOR
+	playse SE_M_ROCK_THROW
+	waitse
+	playse SE_M_ROCK_THROW
 	waitse
 	playse SE_DOOR
 	waitse

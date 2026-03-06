@@ -11,6 +11,8 @@ MagmaHideout_4F_MapScripts:: @ 823A55F
 
 MagmaHideout_4F_EventScript_Maxie:: @ 823A560
 	lockall
+	setvar VAR_0x8002, SPECIES_GROUDON
+	special MarkMonAsSeen
 	playbgm MUS_ENCOUNTER_MAGMA, 0
 	msgbox MagmaHideout_4F_Text_MaxieAwakenGroudon, MSGBOX_DEFAULT
 	closemessage

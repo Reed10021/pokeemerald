@@ -18,6 +18,8 @@
 #define WEATHER_UNDERWATER_BUBBLES      14
 #define WEATHER_ABNORMAL                15  // The alternating weather during Groudon/Kyogre conflict 
 #define WEATHER_EXTREME_HEAT            16
+#define WEATHER_THUNDER_LIGHTNING       17 // Weather with occasional thunder, but no rain.
+#define WEATHER_SCATTERED_STORMS        18 // Changes intermittently and randomly between rain, thunderstorms, shade, and thunder & lightning.
 
 #define WEATHER_ROUTE119_CYCLE          20
 #define WEATHER_ROUTE123_CYCLE          21
@@ -40,6 +42,8 @@
 #define WEATHER_LILYCOVE_CYCLE          38
 #define WEATHER_PETALBURGWOODS_CYCLE    39
 #define WEATHER_TIMELESS_FOREST         40
+#define WEATHER_ROUTE101_CYCLE          41
+#define WEATHER_BATTLE_FRONTIER_CYCLE   42
 
 // These are used in maps' coord_weather_event entries.
 // They are not a one-to-one mapping with the engine's

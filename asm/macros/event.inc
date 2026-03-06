@@ -941,9 +941,10 @@
 	.byte 0
 	.endm
 
-	.macro giveegg species:req
+	.macro giveegg species:req, springflag:req
 	.byte 0x7a
 	.2byte \species
+	.2byte \springflag
 	.endm
 
 	.macro setmonmove index:req, slot:req, move:req
@@ -1251,8 +1252,8 @@
 
 	.macro createvobject sprite:req, byte2:req, x:req, y:req, elevation, direction
 	.byte 0xaa
-	.byte \sprite
-	.byte \byte2
+	.2byte \sprite @ graphicsId
+	.byte \byte2 @ id
 	.2byte \x
 	.2byte \y
 	.byte \elevation
@@ -1621,11 +1622,20 @@
 	.byte 0xe4
 	.endm
 
-  @ Like callnative, but function expects a ctx
-  .macro callfunc func:req
-  .byte 0xe3
-  .4byte \func
-  .endm
+	@ Like callnative, but function expects a ctx
+	.macro callfunc func:req
+	.byte 0xe5
+	.4byte \func
+	.endm
+
+	@ Prepares to start a scaled wild battle against a species at Min. Level level holding item. Running this command will not affect
+	@ normal wild battles. You start the prepared battle with dowildbattle.
+	.macro setwildbattlescaled species:req, level:req, item:req
+	.byte 0xe6
+	.2byte \species
+	.byte \level
+	.2byte \item
+	.endm
 
 @ Supplementary
 

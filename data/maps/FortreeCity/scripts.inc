@@ -34,6 +34,9 @@ FortreeCity_EventScript_Girl:: @ 81E25DE
 
 FortreeCity_EventScript_OldMan:: @ 81E25E7
 	goto_if_set FLAG_DEFEATED_FORTREE_GYM, FortreeCity_EventScript_OldMan_StarterThree
+	msgbox FortreeCity_Text_EveryoneHealthyAndLivelyEggCheck, MSGBOX_NPC
+	closemessage
+	delay 10
 FortreeCity_EventScript_OldMan_StarterThree_Received:
 	msgbox FortreeCity_Text_EveryoneHealthyAndLively, MSGBOX_NPC
 	end
@@ -59,7 +62,7 @@ FortreeCity_EventScript_OldMan_StarterThree_Treecko::
 	playfanfare MUS_OBTAIN_ITEM
 	message FortreeCity_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_MUDKIP
+	giveegg SPECIES_MUDKIP, 0
 	closemessage
 	releaseall
 	end
@@ -76,7 +79,7 @@ FortreeCity_EventScript_OldMan_StarterThree_Torchic::
 	playfanfare MUS_OBTAIN_ITEM
 	message FortreeCity_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_TREECKO
+	giveegg SPECIES_TREECKO, 0
 	closemessage
 	releaseall
 	end
@@ -93,7 +96,7 @@ FortreeCity_EventScript_OldMan_StarterThree_Mudkip::
 	playfanfare MUS_OBTAIN_ITEM
 	message FortreeCity_Text_ReceivedTheEgg
 	waitfanfare
-	giveegg SPECIES_TORCHIC
+	giveegg SPECIES_TORCHIC, 0
 	closemessage
 	releaseall
 	end
@@ -248,3 +251,10 @@ FortreeCity_Text_NoRoomForThisEgg:
 FortreeCity_Text_AsYouWishThen:
 	.string "If you have a change of heart about\n"
 	.string "taking this EGG, I will be here.$"
+
+FortreeCity_Text_EveryoneHealthyAndLivelyEggCheck:
+	.string "Hmm… you don't seem capable enough.\p"
+	.string "I have this EGG, but nobody seems\n"
+	.string "capable enough to raise it right.\p"
+	.string "Guess I'll just hold onto it…\p"
+	.string "Let me tell you about the CITY though.$"

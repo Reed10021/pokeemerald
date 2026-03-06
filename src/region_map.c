@@ -18,6 +18,7 @@
 #include "constants/songs.h"
 #include "m4a.h"
 #include "field_effect.h"
+#include "field_move_items.h"
 #include "field_specials.h"
 #include "fldeff.h"
 #include "region_map.h"
@@ -105,6 +106,7 @@ static void LoadFlyDestIcons(void);
 static void CreateFlyDestIcons(void);
 static void TryCreateRedOutlineFlyDestIcons(void);
 static void SpriteCB_FlyDestIcon(struct Sprite *sprite);
+static void SpriteCB_FlyRedOutlineDestIcon(struct Sprite* sprite);
 static void CB_FadeInFlyMap(void);
 static void CB_HandleFlyMapInput(void);
 static void CB_ExitFlyMap(void);
@@ -311,7 +313,7 @@ static const u8 sMapHealLocations[][3] =
     {MAP_GROUP(ROUTE108), MAP_NUM(ROUTE108), 0},
     {MAP_GROUP(ROUTE109), MAP_NUM(ROUTE109), 0},
     {MAP_GROUP(ROUTE110), MAP_NUM(ROUTE110), 0},
-    {MAP_GROUP(ROUTE111), MAP_NUM(ROUTE111), 0},
+    {MAP_GROUP(ROUTE111), MAP_NUM(ROUTE111), HEAL_LOCATION_ROUTE_111_REST_STOP},
     {MAP_GROUP(ROUTE112), MAP_NUM(ROUTE112), 0},
     {MAP_GROUP(ROUTE113), MAP_NUM(ROUTE113), 0},
     {MAP_GROUP(ROUTE114), MAP_NUM(ROUTE114), 0},
@@ -323,7 +325,7 @@ static const u8 sMapHealLocations[][3] =
     {MAP_GROUP(ROUTE120), MAP_NUM(ROUTE120), 0},
     {MAP_GROUP(ROUTE121), MAP_NUM(ROUTE121), 0},
     {MAP_GROUP(ROUTE122), MAP_NUM(ROUTE122), 0},
-    {MAP_GROUP(ROUTE123), MAP_NUM(ROUTE123), 0},
+    {MAP_GROUP(ROUTE123), MAP_NUM(ROUTE123), HEAL_LOCATION_ROUTE_123_BERRY_MASTER},
     {MAP_GROUP(ROUTE124), MAP_NUM(ROUTE124), 0},
     {MAP_GROUP(ROUTE125), MAP_NUM(ROUTE125), 0},
     {MAP_GROUP(ROUTE126), MAP_NUM(ROUTE126), 0},
@@ -423,6 +425,14 @@ static const u16 sRedOutlineFlyDestinations[][2] =
     {
         FLAG_LANDMARK_BATTLE_FRONTIER,
         MAPSEC_BATTLE_FRONTIER
+    },
+    {
+        FLAG_LANDMARK_BERRY_MASTER,
+        MAPSEC_ROUTE_123
+    },
+    {
+        FLAG_LANDMARK_REST_STOP,
+        MAPSEC_ROUTE_111
     },
     {
         -1,
@@ -1212,7 +1222,11 @@ static u8 GetMapsecType(u16 mapSecId)
     case MAPSEC_BATTLE_FRONTIER:
         return FlagGet(FLAG_LANDMARK_BATTLE_FRONTIER) ? MAPSECTYPE_BATTLE_FRONTIER : MAPSECTYPE_NONE;
     case MAPSEC_SOUTHERN_ISLAND:
-        return FlagGet(FLAG_LANDMARK_SOUTHERN_ISLAND) ? MAPSECTYPE_ROUTE : MAPSECTYPE_NONE;
+        return FlagGet(FLAG_LANDMARK_SOUTHERN_ISLAND) ? MAPSECTYPE_ROUTE_CANFLY : MAPSECTYPE_NONE;
+    case MAPSEC_ROUTE_123:
+        return FlagGet(FLAG_LANDMARK_BERRY_MASTER) ? MAPSECTYPE_ROUTE_CANFLY : MAPSECTYPE_ROUTE;
+    case MAPSEC_ROUTE_111:
+        return FlagGet(FLAG_LANDMARK_REST_STOP) ? MAPSECTYPE_ROUTE_CANFLY : MAPSECTYPE_ROUTE;
     default:
         return MAPSECTYPE_ROUTE;
     }
@@ -1768,7 +1782,7 @@ static void DrawFlyDestTextWindow(void)
     bool32 namePrinted;
     const u8 *name;
 
-    if (sFlyMap->regionMap.mapSecType > MAPSECTYPE_NONE && sFlyMap->regionMap.mapSecType <= MAPSECTYPE_BATTLE_FRONTIER)
+    if (sFlyMap->regionMap.mapSecType > MAPSECTYPE_NONE && sFlyMap->regionMap.mapSecType <= MAPSECTYPE_ROUTE_CANFLY)
     {
         namePrinted = FALSE;
         for (i = 0; i < ARRAY_COUNT(sMultiNameFlyDestinations); i++)
@@ -1905,7 +1919,7 @@ static void TryCreateRedOutlineFlyDestIcons(void)
             if (spriteId != MAX_SPRITES)
             {
                 gSprites[spriteId].oam.size = SPRITE_SIZE(16x16);
-                gSprites[spriteId].callback = SpriteCB_FlyDestIcon;
+                gSprites[spriteId].callback = SpriteCB_FlyRedOutlineDestIcon;
                 StartSpriteAnim(&gSprites[spriteId], FLYDESTICON_RED_OUTLINE);
                 gSprites[spriteId].sIconMapSec = mapSecId;
             }
@@ -1931,6 +1945,28 @@ static void SpriteCB_FlyDestIcon(struct Sprite *sprite)
     }
 }
 
+static void SpriteCB_FlyRedOutlineDestIcon(struct Sprite* sprite)
+{
+    u16 x = sFlyMap->regionMap.cursorPosX - MAPCURSOR_X_MIN;
+    u16 y = sFlyMap->regionMap.cursorPosY - MAPCURSOR_Y_MIN;
+
+    if (sFlyMap->regionMap.mapSecId == sprite->sIconMapSec && 
+        gRegionMapEntries[gRegionMap->mapSecId].x == x && 
+        gRegionMapEntries[gRegionMap->mapSecId].y == y)
+    {
+        if (++sprite->sFlickerTimer > 16)
+        {
+            sprite->sFlickerTimer = 0;
+            sprite->invisible = sprite->invisible ? FALSE : TRUE;
+        }
+    }
+    else
+    {
+        sprite->sFlickerTimer = 16;
+        sprite->invisible = FALSE;
+    }
+}
+
 #undef sIconMapSec
 #undef sFlickerTimer
 
@@ -1939,6 +1975,7 @@ static void CB_FadeInFlyMap(void)
     switch (sFlyMap->state)
     {
     case 0:
+        m4aSongNumStart(SE_WIN_OPEN);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 16, 0, RGB_BLACK);
         sFlyMap->state++;
         break;
@@ -1970,6 +2007,18 @@ static void CB_HandleFlyMapInput(void)
                 m4aSongNumStart(SE_SELECT);
                 sFlyMap->choseFlyLocation = TRUE;
                 SetFlyMapCallback(CB_ExitFlyMap);
+            }
+            else if (sFlyMap->regionMap.mapSecType == MAPSECTYPE_ROUTE_CANFLY)
+            {
+                u16 x = sFlyMap->regionMap.cursorPosX - MAPCURSOR_X_MIN;
+                u16 y = sFlyMap->regionMap.cursorPosY - MAPCURSOR_Y_MIN;
+                if (gRegionMapEntries[gRegionMap->mapSecId].x == x &&
+                    gRegionMapEntries[gRegionMap->mapSecId].y == y)
+                {
+                    m4aSongNumStart(SE_SELECT);
+                    sFlyMap->choseFlyLocation = TRUE;
+                    SetFlyMapCallback(CB_ExitFlyMap);
+                }
             }
             break;
         case MAP_INPUT_B_BUTTON:
@@ -2016,12 +2065,21 @@ static void CB_ExitFlyMap(void)
                         SetWarpDestinationToMapWarp(sMapHealLocations[sFlyMap->regionMap.mapSecId][0], sMapHealLocations[sFlyMap->regionMap.mapSecId][1], -1);
                     break;
                 }
-                ReturnToFieldFromFlyMapSelect();
+                //ReturnToFieldFromFlyMapSelect();
+                if (IsFlyToolUsed())
+                    ReturnToFieldFromFlyToolMapSelect();
+                else
+                    ReturnToFieldFromFlyMapSelect();
+            }
+            else if (IsFlyToolUsed())
+            {
+                ReturnToFieldOrBagFromFlyTool();
             }
             else
             {
                 SetMainCallback2(CB2_ReturnToPartyMenuFromFlyMap);
             }
+            ResetFlyTool();
             if (sFlyMap != NULL)
             {
                 free(sFlyMap);

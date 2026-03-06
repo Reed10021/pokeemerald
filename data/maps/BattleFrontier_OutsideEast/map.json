@@ -5,7 +5,7 @@
   "music": "MUS_B_FRONTIER",
   "region_map_section": "MAPSEC_BATTLE_FRONTIER",
   "requires_flash": false,
-  "weather": "WEATHER_NONE",
+  "weather": "WEATHER_BATTLE_FRONTIER_CYCLE",
   "map_type": "MAP_TYPE_ROUTE",
   "allow_cycling": true,
   "allow_escaping": false,
@@ -372,7 +372,7 @@
       "flag": "0"
     },
     {
-      "graphics_id": "OBJ_EVENT_GFX_RED",
+      "graphics_id": "OBJ_EVENT_GFX_LEAF",
       "x": 66,
       "y": 36,
       "elevation": 0,
@@ -385,7 +385,7 @@
       "flag": "0"
     },
     {
-      "graphics_id": "OBJ_EVENT_GFX_RIVAL_BRENDAN_NORMAL",
+      "graphics_id": "OBJ_EVENT_GFX_LINK_RS_BRENDAN",
       "x": 26,
       "y": 66,
       "elevation": 0,
@@ -398,7 +398,7 @@
       "flag": "0"
     },
     {
-      "graphics_id": "OBJ_EVENT_GFX_RIVAL_MAY_NORMAL",
+      "graphics_id": "OBJ_EVENT_GFX_LINK_RS_MAY",
       "x": 24,
       "y": 66,
       "elevation": 0,
@@ -409,6 +409,19 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "BattleFrontier_OutsideEast_EventScript_Kris",
       "flag": "0"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_SPECIAL_ITEM_BALL",
+      "x": 29,
+      "y": 8,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_range_x": 1,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "Battle_Frontier_OutsideEast_EventScript_ItemRareCandy",
+      "flag": "FLAG_DAILY_BATTLE_FRONTIER_EAST_RARE_CANDY"
     },
     {
       "graphics_id": "OBJ_EVENT_GFX_LIGHT_SPRITE",

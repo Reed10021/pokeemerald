@@ -1,4 +1,5 @@
 #include "global.h"
+#include "braille_puzzles.h"
 #include "event_data.h"
 #include "field_camera.h"
 #include "field_effect.h"
@@ -18,7 +19,8 @@
 enum
 {
     REGIROCK_PUZZLE,
-    REGISTEEL_PUZZLE
+    REGISTEEL_PUZZLE,
+    REGIGIGAS_PUZZLE
 };
 
 EWRAM_DATA static u8 sBraillePuzzleCallbackFlag = 0;
@@ -62,10 +64,6 @@ static const u8 gRegicePathCoords[][2] =
     {4,  23},
     {4,  22},
 };
-
-void SealedChamberShakingEffect(u8);
-void DoBrailleRegirockEffect(void);
-void DoBrailleRegisteelEffect(void);
 
 bool8 ShouldDoBrailleDigEffect(void)
 {
@@ -330,6 +328,65 @@ void DoBrailleRegisteelEffect(void)
     ScriptContext2_Disable();
 }
 
+bool8 ShouldDoBrailleRegigigasEffect(void)
+{
+    if (!FlagGet(FLAG_SYS_BRAILLE_REGIGIGAS_COMPLETED) && (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(ISLAND_CAVE) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(ISLAND_CAVE)))
+    {
+        u32 i;
+        bool32 hasRegirock = FALSE;
+        bool32 hasRegisteel = FALSE;
+        bool32 hasRegice = FALSE;
+        bool32 species = 0;
+
+        for (i = 0; i < PARTY_SIZE; i++)
+        {
+            species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+            if (species == SPECIES_NONE)
+                break;
+
+            if (species == SPECIES_REGIROCK)
+                hasRegirock = TRUE;
+            else if (species == SPECIES_REGISTEEL)
+                hasRegisteel = TRUE;
+            else if (species == SPECIES_REGICE)
+                hasRegice = TRUE;
+        }
+
+        if (hasRegirock && hasRegisteel && hasRegice)
+        {
+            sBraillePuzzleCallbackFlag = REGIGIGAS_PUZZLE;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+void SetUpPuzzleEffectRegigigas(void)
+{
+    gFieldEffectArguments[0] = GetCursorSelectionMonId();
+    FieldEffectStart(FLDEFF_USE_TOMB_PUZZLE_EFFECT);
+}
+
+void UseRegigigasHm_Callback(void)
+{
+    FieldEffectActiveListRemove(FLDEFF_USE_TOMB_PUZZLE_EFFECT);
+    DoBrailleRegigigasEffect();
+}
+
+void DoBrailleRegigigasEffect(void)
+{
+    MapGridSetMetatileIdAt(14, 8, METATILE_Cave_SealedChamberEntrance_TopLeft);
+    MapGridSetMetatileIdAt(15, 8, METATILE_Cave_SealedChamberEntrance_TopMid);
+    MapGridSetMetatileIdAt(16, 8, METATILE_Cave_SealedChamberEntrance_TopRight);
+    MapGridSetMetatileIdAt(14, 9, METATILE_Cave_SealedChamberEntrance_BottomLeft | METATILE_COLLISION_MASK);
+    MapGridSetMetatileIdAt(15, 9, METATILE_Cave_SealedChamberEntrance_BottomMid);
+    MapGridSetMetatileIdAt(16, 9, METATILE_Cave_SealedChamberEntrance_BottomRight | METATILE_COLLISION_MASK);
+    DrawWholeMapView();
+    PlaySE(SE_BANG);
+    FlagSet(FLAG_SYS_BRAILLE_REGIGIGAS_COMPLETED);
+    ScriptContext2_Disable();
+}
+
 // theory: another commented out DoBrailleWait and Task_BrailleWait.
 void DoBrailleWait(void)
 {
@@ -417,10 +474,15 @@ bool8 FldEff_UsePuzzleEffect(void)
         gTasks[taskId].data[8] = (u32)UseRegisteelHm_Callback >> 16;
         gTasks[taskId].data[9] = (u32)UseRegisteelHm_Callback;
     }
-    else
+    else if(sBraillePuzzleCallbackFlag == REGIROCK_PUZZLE)
     {
         gTasks[taskId].data[8] = (u32)UseRegirockHm_Callback >> 16;
         gTasks[taskId].data[9] = (u32)UseRegirockHm_Callback;
+    }
+    else
+    {
+        gTasks[taskId].data[8] = (u32)UseRegigigasHm_Callback >> 16;
+        gTasks[taskId].data[9] = (u32)UseRegigigasHm_Callback;
     }
     return FALSE;
 }

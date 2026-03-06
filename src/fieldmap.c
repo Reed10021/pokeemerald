@@ -28,7 +28,6 @@ EWRAM_DATA static u16 gBackupMapData[MAX_MAP_DATA_SIZE] = {0};
 EWRAM_DATA struct MapHeader gMapHeader = {0};
 EWRAM_DATA struct Camera gCamera = {0};
 EWRAM_DATA static struct ConnectionFlags gMapConnectionFlags = {0};
-EWRAM_DATA static u32 sFiller_02037344 = 0; // without this, the next file won't align properly
 
 struct BackupMapLayout gBackupMapLayout;
 
@@ -544,7 +543,6 @@ static bool32 SavedMapViewIsEmpty(void)
 #endif
 #undef UBFIX
 
-
     if (marker == 0)
         return TRUE;
     else
@@ -771,7 +769,7 @@ bool8 CameraMove(int x, int y)
     int old_x, old_y;
     gCamera.active = FALSE;
     direction = GetPostCameraMoveMapBorderId(x, y);
-    if (direction + 1 <= 1)
+    if (direction + 1 <= 1) // CONNECTION_NONE / CONNECTION_INVALID
     {
         gSaveBlock1Ptr->pos.x += x;
         gSaveBlock1Ptr->pos.y += y;

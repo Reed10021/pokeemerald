@@ -440,6 +440,7 @@ const u8 *const gMonIconTable[] =
     [SPECIES_DEOXYS_ATTACK] = gMonIcon_Deoxys_Attack,
     [SPECIES_DEOXYS_DEFENSE] = gMonIcon_Deoxys_Defense,
     [SPECIES_DEOXYS_SPEED] = gMonIcon_Deoxys_Speed,
+    [SPECIES_REGIGIGAS] = gMonIcon_Regigigas,
     [SPECIES_EGG] = gMonIcon_Egg,
     [SPECIES_UNOWN_B] = gMonIcon_UnownB,
     [SPECIES_UNOWN_C] = gMonIcon_UnownC,
@@ -915,6 +916,7 @@ const u8 gMonIconPaletteIndices[] =
     [SPECIES_DEOXYS_ATTACK] = 0,
     [SPECIES_DEOXYS_DEFENSE] = 0,
     [SPECIES_DEOXYS_SPEED] = 0,
+    [SPECIES_REGIGIGAS] = 0,
 };
 
 const struct SpritePalette gMonIconPaletteTable[] =

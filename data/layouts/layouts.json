@@ -2795,7 +2795,7 @@
       "id": "LAYOUT_ISLAND_CAVE",
       "name": "IslandCave_Layout",
       "width": 17,
-      "height": 33,
+      "height": 58,
       "primary_tileset": "gTileset_General",
       "secondary_tileset": "gTileset_Cave",
       "border_filepath": "data/layouts/IslandCave/border.bin",
@@ -4450,6 +4450,36 @@
       "secondary_tileset": "gTileset_Rustboro",
       "border_filepath": "data/layouts/TimelessForest/border.bin",
       "blockdata_filepath": "data/layouts/TimelessForest/map.bin"
+    },
+    {
+      "id": "LAYOUT_SCORCHED_SLAB_B1F",
+      "name": "ScorchedSlab_B1F_Layout",
+      "width": 25,
+      "height": 25,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Cave",
+      "border_filepath": "data/layouts/ScorchedSlab_B1F/border.bin",
+      "blockdata_filepath": "data/layouts/ScorchedSlab_B1F/map.bin"
+    },
+    {
+      "id": "LAYOUT_SCORCHED_SLAB_B2F",
+      "name": "ScorchedSlab_B2F_Layout",
+      "width": 22,
+      "height": 24,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Cave",
+      "border_filepath": "data/layouts/ScorchedSlab_B2F/border.bin",
+      "blockdata_filepath": "data/layouts/ScorchedSlab_B2F/map.bin"
+    },
+    {
+      "id": "LAYOUT_ARTISAN_CAVE_B2F",
+      "name": "ArtisanCave_B2F_Layout",
+      "width": 45,
+      "height": 53,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Cave",
+      "border_filepath": "data/layouts/ArtisanCave_B2F/border.bin",
+      "blockdata_filepath": "data/layouts/ArtisanCave_B2F/map.bin"
     }
   ]
 }

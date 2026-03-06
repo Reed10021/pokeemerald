@@ -26,12 +26,12 @@ const u8 gItemEffect_ParalyzeHeal[6] = {
 const u8 gItemEffect_FullRestore[7] = {
     [3] = ITEM3_STATUS_ALL,
     [4] = ITEM4_HEAL_HP,
-    [6] = -1,
+    [6] = ITEM6_HEAL_HP_FULL,
 };
 
 const u8 gItemEffect_MaxPotion[7] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = -1,
+    [6] = ITEM6_HEAL_HP_FULL,
 };
 
 const u8 gItemEffect_HyperPotion[7] = {
@@ -50,12 +50,12 @@ const u8 gItemEffect_FullHeal[6] = {
 
 const u8 gItemEffect_Revive[7] = {
     [4] = ITEM4_REVIVE | ITEM4_HEAL_HP,
-    [6] = -2,
+    [6] = ITEM6_HEAL_HP_HALF,
 };
 
 const u8 gItemEffect_MaxRevive[7] = {
     [4] = ITEM4_REVIVE | ITEM4_HEAL_HP,
-    [6] = -1,
+    [6] = ITEM6_HEAL_HP_FULL,
 };
 
 const u8 gItemEffect_FreshWater[7] = {
@@ -107,7 +107,7 @@ const u8 gItemEffect_HealPowder[9] = {
 const u8 gItemEffect_RevivalHerb[10] = {
     [4] = ITEM4_REVIVE | ITEM4_HEAL_HP,
     [5] = ITEM5_FRIENDSHIP_ALL,
-    [6] = -1,
+    [6] = ITEM6_HEAL_HP_FULL,
     [7] = -15,
     [8] = -15,
     [9] = -20,
@@ -157,7 +157,7 @@ const u8 gItemEffect_BerryJuice[7] = {
 const u8 gItemEffect_SacredAsh[7] = {
     [0] = ITEM0_SACRED_ASH,
     [4] = ITEM4_REVIVE | ITEM4_HEAL_HP,
-    [6] = -1,
+    [6] = ITEM6_HEAL_HP_FULL,
 };
 
 const u8 gItemEffect_HPUp[10] = {
@@ -206,7 +206,7 @@ const u8 gItemEffect_RareCandy[10] = {
     [3] = ITEM3_LEVEL_UP,
     [4] = ITEM4_REVIVE | ITEM4_HEAL_HP,
     [5] = ITEM5_FRIENDSHIP_ALL,
-    [6] = 0xFD,
+    [6] = ITEM6_HEAL_HP_LVL_UP,
     [7] = 5,
     [8] = 3,
     [9] = 2,
@@ -250,35 +250,42 @@ const u8 gItemEffect_DireHit[8] = {
 };
 
 const u8 gItemEffect_XAttack[8] = {
-    [0] = 1,
+    [1] = ITEM1_X_ATTACK,
     [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
     [6] = 1,
     [7] = 1,
 };
 
 const u8 gItemEffect_XDefend[8] = {
-    [1] = 1 << 4,
+    [1] = ITEM1_X_DEFENSE,
     [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
     [6] = 1,
     [7] = 1,
 };
 
 const u8 gItemEffect_XSpeed[8] = {
-    [1] = 1,
+    [1] = ITEM1_X_SPEED,
     [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
     [6] = 1,
     [7] = 1,
 };
 
 const u8 gItemEffect_XAccuracy[8] = {
-    [2] = 1 << 4,
+    [1] = ITEM1_X_ACCURACY,
     [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
     [6] = 1,
     [7] = 1,
 };
 
 const u8 gItemEffect_XSpecial[8] = {
-    [2] = 1,
+    [1] = ITEM1_X_SPATK,
+    [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
+    [6] = 1,
+    [7] = 1,
+};
+
+const u8 gItemEffect_XSpDef[8] = {
+    [1] = ITEM1_X_SPDEF,
     [5] = ITEM5_FRIENDSHIP_LOW | ITEM5_FRIENDSHIP_MID,
     [6] = 1,
     [7] = 1,
@@ -348,7 +355,7 @@ const u8 gItemEffect_LumBerry[6] = {
 
 const u8 gItemEffect_SitrusBerry[7] = {
     [4] = ITEM4_HEAL_HP,
-    [6] = 30,
+    [6] = ITEM6_HEAL_HP_THIRD,
 };
 
 const u8 gItemEffect_PomegBerry[10] = {
@@ -450,6 +457,7 @@ const u8 *const gItemEffectTable[] =
     [ITEM_X_SPEED - ITEM_POTION] = gItemEffect_XSpeed,
     [ITEM_X_ACCURACY - ITEM_POTION] = gItemEffect_XAccuracy,
     [ITEM_X_SPECIAL - ITEM_POTION] = gItemEffect_XSpecial,
+    [ITEM_X_SP_DEF - ITEM_POTION] = gItemEffect_XSpDef,
     [ITEM_SUN_STONE - ITEM_POTION] = gItemEffect_SunStone,
     [ITEM_MOON_STONE - ITEM_POTION] = gItemEffect_MoonStone,
     [ITEM_FIRE_STONE - ITEM_POTION] = gItemEffect_FireStone,

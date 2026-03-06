@@ -13,7 +13,6 @@ TimelessForest_TreeDisappears::
 	setmetatile 27, 14, 0x001, 0
 	return
 
-
 TimelessForest_EventScript_Celebi::
 	goto_if_set FLAG_CELEBI_BATTLE, TimelessForest_EventScript_Celebi_Daily
 	lock
@@ -25,24 +24,31 @@ TimelessForest_EventScript_Celebi::
 	delay 50
 	msgbox TimelessForest_Text_CelebiAttacks, MSGBOX_DEFAULT
 	closemessage
+	setflag FLAG_FORCE_ANIMATIONS
+	setflag FLAG_TRIGGER_SMART_WILD_AI
 	setvar VAR_0x8004, SPECIES_CELEBI
 	setvar VAR_0x8005, 75  @ level
 	setvar VAR_0x8006, ITEM_WHITE_HERB
-	special CreateObedientEnemyMon
+	special CreateObedientFatefulEncounterEnemyMon
 	special BattleSetup_StartLegendaryBattle
 	waitstate
+	clearflag FLAG_TRIGGER_SMART_WILD_AI
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq PurityCave_EventScript_RanFromCelebi
+	goto_if_eq TimelessForest_EventScript_RanFromCelebi
 	compare VAR_RESULT, B_OUTCOME_RAN
-	goto_if_eq PurityCave_EventScript_RanFromCelebi
+	goto_if_eq TimelessForest_EventScript_RanFromCelebi
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
-	goto_if_eq PurityCave_EventScript_RanFromCelebi
+	goto_if_eq TimelessForest_EventScript_RanFromCelebi
 	setflag FLAG_CELEBI_BATTLE
+	compare VAR_SPECIESCHAINED, SPECIES_CELEBI
+	call_if_eq ChainNumberNoLock
 	release
 	end
 
-PurityCave_EventScript_RanFromCelebi::
+TimelessForest_EventScript_RanFromCelebi::
+	compare VAR_SPECIESCHAINED, SPECIES_CELEBI
+	call_if_eq ChainNumberNoLock
 	setvar VAR_0x8004, SPECIES_CELEBI
 	bufferspeciesname 0, VAR_0x8004
 	msgbox gText_LegendaryFlewAway, MSGBOX_DEFAULT
@@ -61,7 +67,7 @@ TimelessForest_EventScript_Celebi_Daily::
 	compare VAR_RESULT, NO
 	goto_if_eq TimelessForest_EventScript_Celebi_Daily_No
 	special CelebiRandomEgg
-	giveegg VAR_0x8004
+	giveegg VAR_0x8004, 0
 	switch VAR_RESULT
 	case 0, TimelessForest_EventScript_Celebi_Daily_InParty
 	case 1, TimelessForest_EventScript_Celebi_Daily_InPC

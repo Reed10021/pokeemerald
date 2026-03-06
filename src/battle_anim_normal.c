@@ -398,6 +398,7 @@ static void AnimComplexPaletteBlend_Step2(struct Sprite *sprite)
     }
 }
 
+// AnimCirclingSparkle
 static void sub_81159B4(struct Sprite *sprite)
 {
     sprite->pos1.x += gBattleAnimArgs[0];

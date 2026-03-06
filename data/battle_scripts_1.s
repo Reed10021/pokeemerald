@@ -4,6 +4,7 @@
 #include "constants/battle_anim.h"
 #include "constants/battle_string_ids.h"
 #include "constants/abilities.h"
+#include "constants/items.h"
 #include "constants/moves.h"
 #include "constants/songs.h"
 #include "constants/game_stat.h"
@@ -230,6 +231,7 @@ gBattleScriptsForMoveEffects:: @ 82D86A8
 	.4byte BattleScript_EffectDragonDance
 	.4byte BattleScript_EffectCamouflage
 	.4byte BattleScript_EffectGrowth
+	.4byte BattleScript_EffectPowerBasedOnTargetHp
 
 BattleScript_EffectSpeedUp::
 BattleScript_EffectSpecialDefenseUp::
@@ -616,6 +618,7 @@ BattleScript_EffectRoar::
 	attackstring
 	ppreduce
 	jumpifability BS_TARGET, ABILITY_SUCTION_CUPS, BattleScript_AbilityPreventsPhasingOut
+	jumpifability BS_TARGET, ABILITY_TITANIC, BattleScript_AbilityPreventsPhasingOut
 	jumpifstatus3 BS_TARGET, STATUS3_ROOTED, BattleScript_PrintMonIsRooted
 	accuracycheck BattleScript_ButItFailed, NO_ACC_CALC_CHECK_LOCK_ON
 	accuracycheck BattleScript_MoveMissedPause, ACC_CURR_MOVE
@@ -2856,6 +2859,10 @@ BattleScript_GrowthTrySpAtk::
 BattleScript_GrowthEnd::
 	goto BattleScript_MoveEnd
 
+BattleScript_EffectPowerBasedOnTargetHp::
+	scaledamagebytargethp
+	goto BattleScript_EffectHit
+
 BattleScript_FaintAttacker::
 	playfaintcry BS_ATTACKER
 	pause 0x20
@@ -4089,6 +4096,10 @@ BattleScript_IntimidateActivatesLoop:
 	jumpifability BS_TARGET, ABILITY_CLEAR_BODY, BattleScript_IntimidatePrevented
 	jumpifability BS_TARGET, ABILITY_HYPER_CUTTER, BattleScript_IntimidatePrevented
 	jumpifability BS_TARGET, ABILITY_WHITE_SMOKE, BattleScript_IntimidatePrevented
+	jumpifability BS_TARGET, ABILITY_OBLIVIOUS, BattleScript_IntimidatePrevented
+	jumpifability BS_TARGET, ABILITY_OWN_TEMPO, BattleScript_IntimidatePrevented
+	jumpifability BS_TARGET, ABILITY_INNER_FOCUS, BattleScript_IntimidatePrevented
+	jumpifability BS_TARGET, ABILITY_TITANIC, BattleScript_IntimidatePrevented
 	statbuffchange STAT_BUFF_NOT_PROTECT_AFFECTED | STAT_BUFF_ALLOW_PTR, BattleScript_IntimidateActivatesLoopIncrement
 	jumpifbyte CMP_GREATER_THAN, cMULTISTRING_CHOOSER, 0x1, BattleScript_IntimidateActivatesLoopIncrement
 	setgraphicalstatchangevalues
@@ -4113,6 +4124,42 @@ BattleScript_DroughtActivates::
 	playanimation BS_BATTLER_0, B_ANIM_SUN_CONTINUES, NULL
 	call BattleScript_WeatherFormChanges
 	end3
+
+BattleScript_SnowWarningActivates::
+	pause 0x20
+	printstring STRINGID_PKMNSXWHIPPEDUPHAILSTORM
+	waitstate
+	playanimation BS_BATTLER_0, B_ANIM_HAIL_CONTINUES, NULL
+	call BattleScript_WeatherFormChanges
+	end3
+
+BattleScript_ItemActivatesRain::
+	playanimation BS_SCRIPTING, B_ANIM_HELD_ITEM_EFFECT, NULL
+	printstring STRINGID_PKMNSITEMMADEITRAIN
+	waitmessage 0x20
+	playanimation BS_BATTLER_0, B_ANIM_RAIN_CONTINUES, NULL
+	end2
+
+BattleScript_ItemActivatesSun::
+	playanimation BS_SCRIPTING, B_ANIM_HELD_ITEM_EFFECT, NULL
+	printstring STRINGID_PKMNSITEMINTENSIFIEDSUN
+	waitmessage 0x20
+	playanimation BS_BATTLER_0, B_ANIM_SUN_CONTINUES, NULL
+	end2
+
+BattleScript_ItemActivatesSandstorm::
+	playanimation BS_SCRIPTING, B_ANIM_HELD_ITEM_EFFECT, NULL
+	printstring STRINGID_PKMNSITEMWHIPPEDUPSANDSTORM
+	waitmessage 0x20
+	playanimation BS_BATTLER_0, B_ANIM_SANDSTORM_CONTINUES, NULL
+	end2
+
+BattleScript_ItemActivatesHailstorm::
+	playanimation BS_SCRIPTING, B_ANIM_HELD_ITEM_EFFECT, NULL
+	printstring STRINGID_PKMNSITEMWHIPPEDUPHAILSTORM
+	waitmessage 0x20
+	playanimation BS_BATTLER_0, B_ANIM_HAIL_CONTINUES, NULL
+	end2
 
 BattleScript_TookAttack::
 	attackstring
@@ -4199,6 +4246,12 @@ BattleScript_PSNPrevention::
 BattleScript_ObliviousPreventsAttraction::
 	pause 0x20
 	printstring STRINGID_PKMNPREVENTSROMANCEWITH
+	waitmessage 0x40
+	goto BattleScript_MoveEnd
+
+BattleScript_ObliviousPreventsTaunt::
+	pause 0x20
+	printstring STRINGID_PKMNPROTECTSAGAINSTTAUNTS
 	waitmessage 0x40
 	goto BattleScript_MoveEnd
 
@@ -4445,9 +4498,18 @@ BattleScript_SelectingNotAllowedMoveChoiceItem::
 	printselectionstring STRINGID_ITEMALLOWSONLYYMOVE
 	endselectionscript
 
-BattleScript_FocusBandActivates::
+BattleScript_HungOnMsg::
 	playanimation BS_TARGET, B_ANIM_FOCUS_BAND, NULL
 	printstring STRINGID_PKMNHUNGONWITHX
+	waitmessage 0x40
+	jumpifhalfword CMP_EQUAL, gLastUsedItem, ITEM_FOCUS_BAND, BattleScript_HungOnMsgRet
+	removeitem BS_TARGET
+BattleScript_HungOnMsgRet:
+	return
+
+BattleScript_SturdiedMsg::
+	playanimation BS_TARGET, B_ANIM_FOCUS_BAND, NULL
+	printstring STRINGID_ENDUREDSTURDY
 	waitmessage 0x40
 	return
 
@@ -4616,3 +4678,52 @@ BattleScript_PrintPlayerForfeitedLinkBattle::
 	atk57
 	waitmessage 0x40
 	end2
+
+BattleScript_TotemFlaredToLife::
+	setbyte gBattlerTarget, 0x0
+	playanimation BS_ATTACKER, B_ANIM_TOTEM_FLARE, NULL
+	printstring STRINGID_AURAFLAREDTOLIFE
+	waitmessage 0x40
+	call BattleScript_ApplyTotemVarBoost
+	end2
+
+BattleScript_ApplyTotemVarBoost::
+	playstatchangeanimation BS_ATTACKER, BIT_ATK | STAT_SPATK | BIT_DEF| BIT_SPDEF | BIT_SPEED, 0x0
+	setstatchanger STAT_DEF, 2, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_ApplyTotemVarBoostSpDef
+	setstatchanger STAT_DEF, 2, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_ApplyTotemVarBoostPreSpDef
+	setstatchanger STAT_DEF, 2, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_ApplyTotemVarBoostPreSpDef
+BattleScript_ApplyTotemVarBoostPreSpDef:
+	printfromtable gStatUpStringIds
+	waitmessage 0x40
+BattleScript_ApplyTotemVarBoostSpDef:
+	setstatchanger STAT_SPDEF, 2, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_ApplyTotemVarBoostSpd
+	setstatchanger STAT_SPDEF, 2, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_ApplyTotemVarBoostPreSpd
+	setstatchanger STAT_SPDEF, 2, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_ApplyTotemVarBoostPreSpd
+BattleScript_ApplyTotemVarBoostPreSpd:
+	printfromtable gStatUpStringIds
+	waitmessage 0x40
+BattleScript_ApplyTotemVarBoostSpd:
+	setstatchanger STAT_SPEED, 1, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_ApplyTotemVarBoostAtk
+	printfromtable gStatUpStringIds
+	waitmessage 0x40
+BattleScript_ApplyTotemVarBoostAtk:
+	setstatchanger STAT_ATK, 1, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_ApplyTotemVarBoostSpAtk
+	printfromtable gStatUpStringIds
+	waitmessage 0x40
+BattleScript_ApplyTotemVarBoostSpAtk:
+	setstatchanger STAT_SPATK 1, FALSE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_TotemVarEnd
+	printfromtable gStatUpStringIds
+	waitmessage 0x40
+BattleScript_TotemVarEnd:
+	printstring STRINGID_GOINGALLOUT
+	waitmessage 0x40
+	return

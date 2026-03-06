@@ -857,17 +857,21 @@
 #define TRAINER_BRENDAN_PLACEHOLDER         853
 #define TRAINER_MAY_PLACEHOLDER             854
 //new
-#define TRAINER_KIRBY						855
-#define TRAINER_REED_YELLOW					856
-#define TRAINER_CHRIS_CRYSTAL				857
-#define TRAINER_KRIS						858
-#define TRAINER_STEVEN_2					859
+#define TRAINER_KIRBY                       855
+#define TRAINER_REED_YELLOW                 856
+#define TRAINER_CHRIS_CRYSTAL               857
+#define TRAINER_KRIS                        858
+#define TRAINER_STEVEN_2                    859
 
-// NOTE: Because each Trainer uses a flag to determine when they are defeated, there is only space for (9-5 = 4) additional trainers before trainer flag space overflows
+#define TRAINER_SAPPHYR_EMERALD             860
+#define TRAINER_SAPPHYR_EMERALD2            861
+#define TRAINER_RUBY_EMERALD                862
+
+// NOTE: Because each Trainer uses a flag to determine when they are defeated, there is only space for (9-8 = 4) additional trainers before trainer flag space overflows
 //       More space can be made by shifting flags around in constants/flags.h or changing how trainer flags are handled
 //       MAX_TRAINERS_COUNT can be increased but will take up additional saveblock space
 
-#define TRAINERS_COUNT                      860
+#define TRAINERS_COUNT                      863
 #define MAX_TRAINERS_COUNT                  864
 
 #endif  // GUARD_CONSTANTS_OPPONENTS_H

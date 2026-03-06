@@ -2528,7 +2528,7 @@ static void sub_802C9D4(struct PokemonJump2 *arg0, struct PokemonJump1_MonInfo *
     u8 spriteId;
 
     spriteTemplate = gUnknown_082FBE40;
-    buffer = Alloc(0x2000);
+    buffer = Alloc(MON_PIC_SIZE * MAX_MON_PIC_FRAMES);
     unusedBuffer = Alloc(0x800);
     if (multiplayerId == sub_802C8BC())
         subpriority = 3;

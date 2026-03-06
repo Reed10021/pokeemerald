@@ -21,8 +21,8 @@ MtPyre_Exterior_EventScript_FogTrigger:: @ 8231FED
 	doweather
 	end
 
-MtPyre_Exterior_EventScript_SunTrigger:: @ 8231FF2
-	setweather WEATHER_SUNNY
+MtPyre_Exterior_EventScript_RouteWeatherTrigger:: @ 8231FF2
+	setweather WEATHER_ROUTE121_122_CYCLE
 	doweather
 	end
 

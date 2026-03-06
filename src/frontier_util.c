@@ -122,7 +122,7 @@ static const struct FrontierBrainMon sFrontierBrainsMons[][2][FRONTIER_PARTY_SIZ
                 .fixedIV = 24,
                 .nature = NATURE_ADAMANT,
                 .evs = {152, 152, 0, 0, 106, 100},
-                .moves = {MOVE_BODY_SLAM, MOVE_BELLY_DRUM, MOVE_YAWN, MOVE_SHADOW_BALL},
+                .moves = {MOVE_BODY_SLAM, MOVE_BELLY_DRUM, MOVE_YAWN, MOVE_SHADOW_CLAW},
             },
         },
         // Gold Symbol.
@@ -149,7 +149,7 @@ static const struct FrontierBrainMon sFrontierBrainsMons[][2][FRONTIER_PARTY_SIZ
                 .fixedIV = 31,
                 .nature = NATURE_ADAMANT,
                 .evs = {252, 252, 0, 0, 6, 0},
-                .moves = {MOVE_CURSE, MOVE_RETURN, MOVE_REST, MOVE_SHADOW_BALL},
+                .moves = {MOVE_CURSE, MOVE_RETURN, MOVE_REST, MOVE_SHADOW_CLAW},
             },
         },
     },
@@ -228,7 +228,7 @@ static const struct FrontierBrainMon sFrontierBrainsMons[][2][FRONTIER_PARTY_SIZ
                 .fixedIV = 16,
                 .nature = NATURE_HARDY,
                 .evs = {152, 152, 0, 106, 100, 0},
-                .moves = {MOVE_EARTHQUAKE, MOVE_SWAGGER, MOVE_SHADOW_BALL, MOVE_BRICK_BREAK},
+                .moves = {MOVE_EARTHQUAKE, MOVE_SWAGGER, MOVE_SHADOW_CLAW, MOVE_BRICK_BREAK},
             },
             {
                 .species = SPECIES_LAPRAS,
@@ -255,7 +255,7 @@ static const struct FrontierBrainMon sFrontierBrainsMons[][2][FRONTIER_PARTY_SIZ
                 .fixedIV = 31,
                 .nature = NATURE_HARDY,
                 .evs = {6, 252, 0, 252, 0, 0},
-                .moves = {MOVE_HYPER_BEAM, MOVE_EARTHQUAKE, MOVE_SHADOW_BALL, MOVE_YAWN},
+                .moves = {MOVE_HYPER_BEAM, MOVE_EARTHQUAKE, MOVE_SHADOW_CLAW, MOVE_YAWN},
             },
             {
                 .species = SPECIES_SUICUNE,
@@ -293,7 +293,7 @@ static const struct FrontierBrainMon sFrontierBrainsMons[][2][FRONTIER_PARTY_SIZ
                 .fixedIV = 20,
                 .nature = NATURE_ADAMANT,
                 .evs = {0, 252, 6, 252, 0, 0},
-                .moves = {MOVE_SHADOW_BALL, MOVE_RETURN, MOVE_CONFUSE_RAY, MOVE_AERIAL_ACE},
+                .moves = {MOVE_SHADOW_CLAW, MOVE_RETURN, MOVE_CONFUSE_RAY, MOVE_AERIAL_ACE},
             },
         },
         // Gold Symbol.
@@ -500,88 +500,88 @@ static const struct FrontierBrainMon sFrontierBrainsMons[][2][FRONTIER_PARTY_SIZ
 static const u8 sBattlePointAwards[][NUM_FRONTIER_FACILITIES][FRONTIER_MODE_COUNT] =
 {
     {
-        {1, 2, 3, 3}, {1, 1, 0, 0}, {4, 5, 0, 0}, {1, 0, 0, 0}, {3, 4, 0, 0}, {1, 0, 0, 0}, {5, 0, 0, 0}
+        {3, 3, 3, 3}, {2, 2, 0, 0}, {4, 5, 0, 0}, {2, 0, 0, 0}, {3, 4, 0, 0}, {2, 0, 0, 0}, {5, 0, 0, 0}
     },
     {
-        {2, 3, 4, 4}, {1, 1, 0, 0}, {4, 5, 0, 0}, {1, 0, 0, 0}, {3, 4, 0, 0}, {1, 0, 0, 0}, {5, 0, 0, 0}
+        {3, 3, 4, 4}, {3, 3, 0, 0}, {4, 5, 0, 0}, {2, 0, 0, 0}, {3, 4, 0, 0}, {3, 0, 0, 0}, {5, 0, 0, 0}
     },
     {
-        {3, 4, 5, 5}, {2, 2, 0, 0}, {5, 6, 0, 0}, {1, 0, 0, 0}, {4, 5, 0, 0}, {2, 0, 0, 0}, {6, 0, 0, 0}
+        {4, 4, 5, 5}, {3, 3, 0, 0}, {5, 6, 0, 0}, {3, 0, 0, 0}, {4, 5, 0, 0}, {3, 0, 0, 0}, {6, 0, 0, 0}
     },
     {
-        {4, 5, 6, 6}, {2, 2, 0, 0}, {5, 6, 0, 0}, {2, 0, 0, 0}, {4, 5, 0, 0}, {2, 0, 0, 0}, {6, 0, 0, 0}
+        {5, 5, 6, 6}, {4, 4, 0, 0}, {5, 6, 0, 0}, {3, 0, 0, 0}, {4, 5, 0, 0}, {4, 0, 0, 0}, {6, 0, 0, 0}
     },
     {
-        {5, 6, 7, 7}, {3, 3, 0, 0}, {6, 7, 0, 0}, {2, 0, 0, 0}, {5, 6, 0, 0}, {2, 0, 0, 0}, {7, 0, 0, 0}
+        {6, 6, 7, 7}, {4, 4, 0, 0}, {6, 7, 0, 0}, {4, 0, 0, 0}, {5, 6, 0, 0}, {5, 0, 0, 0}, {7, 0, 0, 0}
     },
     {
-        {6, 7, 8, 8}, {3, 3, 0, 0}, {6, 7, 0, 0}, {2, 0, 0, 0}, {5, 6, 0, 0}, {4, 0, 0, 0}, {7, 0, 0, 0}
+        {7, 7, 8, 8}, {5, 5, 0, 0}, {6, 7, 0, 0}, {5, 0, 0, 0}, {5, 6, 0, 0}, {6, 0, 0, 0}, {7, 0, 0, 0}
     },
     {
-        {7, 8, 9, 9}, {4, 4, 0, 0}, {7, 8, 0, 0}, {3, 0, 0, 0}, {6, 7, 0, 0}, {4, 0, 0, 0}, {8, 0, 0, 0}
+        {7, 8, 9, 9}, {5, 5, 0, 0}, {7, 8, 0, 0}, {6, 0, 0, 0}, {6, 7, 0, 0}, {7, 0, 0, 0}, {8, 0, 0, 0}
     },
     {
-        {8, 9, 10, 10}, {4, 4, 0, 0}, {7, 8, 0, 0}, {3, 0, 0, 0},{6, 7, 0, 0}, {4, 0, 0, 0}, {8, 0, 0, 0}
+        {8, 9, 10, 10}, {6, 6, 0, 0}, {7, 8, 0, 0}, {7, 0, 0, 0},{6, 7, 0, 0}, {8, 0, 0, 0}, {8, 0, 0, 0}
     },
     {
-        {9, 10, 11, 11}, {5, 5, 0, 0}, {8, 9, 0, 0}, {4, 0, 0, 0}, {7, 8, 0, 0}, {8, 0, 0, 0}, {9, 0, 0, 0}
+        {9, 10, 11, 11}, {7, 7, 0, 0}, {8, 9, 0, 0}, {8, 0, 0, 0}, {7, 8, 0, 0}, {9, 0, 0, 0}, {9, 0, 0, 0}
     },
     {
-        {10, 11, 12, 12}, {5, 5, 0, 0}, {8, 9, 0, 0}, {4, 0, 0, 0}, {7, 8, 0, 0}, {8, 0, 0, 0}, {9, 0, 0, 0}
+        {10, 11, 12, 12}, {7, 7, 0, 0}, {8, 9, 0, 0}, {9, 0, 0, 0}, {7, 8, 0, 0}, {10, 0, 0, 0}, {9, 0, 0, 0}
     },
     {
-        {11, 12, 13, 13}, {6, 6, 0, 0}, {9, 10, 0, 0}, {5, 0, 0,0}, {8, 9, 0, 0}, {8, 0, 0, 0}, {10, 0, 0, 0}
+        {11, 12, 13, 13}, {8, 8, 0, 0}, {9, 10, 0, 0}, {10, 0, 0,0}, {8, 9, 0, 0}, {11, 0, 0, 0}, {10, 0, 0, 0}
     },
     {
-        {12, 13, 14, 14}, {6, 6, 0, 0}, {9, 10, 0, 0}, {6, 0, 0,0}, {8, 9, 0, 0}, {8, 0, 0, 0}, {10, 0, 0, 0}
+        {12, 13, 14, 14}, {8, 8, 0, 0}, {9, 10, 0, 0}, {10, 0, 0,0}, {8, 9, 0, 0}, {12, 0, 0, 0}, {10, 0, 0, 0}
     },
     {
-        {13, 14, 15, 15}, {7, 7, 0, 0}, {10, 11, 0, 0}, {7, 0, 0, 0}, {9, 10, 0, 0}, {10, 0, 0, 0}, {11, 0, 0, 0}
+        {13, 14, 15, 15}, {9, 9, 0, 0}, {10, 11, 0, 0}, {10, 0, 0, 0}, {9, 10, 0, 0}, {12, 0, 0, 0}, {11, 0, 0, 0}
     },
     {
-        {14, 15, 15, 15}, {7, 7, 0, 0}, {10, 11, 0, 0}, {8, 0, 0, 0}, {9, 10, 0, 0}, {10, 0, 0, 0}, {11, 0, 0, 0}
+        {14, 15, 15, 15}, {9, 9, 0, 0}, {10, 11, 0, 0}, {11, 0, 0, 0}, {9, 10, 0, 0}, {12, 0, 0, 0}, {11, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {8, 8, 0, 0}, {11, 12, 0, 0}, {9, 0, 0, 0}, {10, 11, 0, 0}, {10, 0, 0, 0}, {12, 0, 0, 0}
+        {15, 15, 15, 15}, {10, 10, 0, 0}, {11, 12, 0, 0}, {11, 0, 0, 0}, {10, 11, 0, 0}, {13, 0, 0, 0}, {12, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {8, 8, 0, 0}, {11, 12, 0, 0}, {10, 0, 0, 0}, {10, 11, 0, 0}, {10, 0, 0, 0}, {12, 0, 0, 0}
+        {15, 15, 15, 15}, {10, 10, 0, 0}, {11, 13, 0, 0}, {12, 0, 0, 0}, {10, 11, 0, 0}, {13, 0, 0, 0}, {12, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {9, 9, 0, 0}, {12, 13, 0, 0}, {11, 0, 0, 0}, {11, 12, 0, 0}, {12, 0, 0, 0}, {13, 0, 0, 0}
+        {15, 15, 15, 15}, {11, 11, 0, 0}, {12, 14, 0, 0}, {12, 0, 0, 0}, {11, 12, 0, 0}, {14, 0, 0, 0}, {13, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {9, 9, 0, 0}, {12, 13, 0, 0}, {12, 0, 0, 0}, {11, 12, 0, 0}, {12, 0, 0, 0}, {13, 0, 0, 0}
+        {15, 15, 15, 15}, {11, 11, 0, 0}, {13, 14, 0, 0}, {13, 0, 0, 0}, {11, 12, 0, 0}, {14, 0, 0, 0}, {13, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {10, 10, 0, 0}, {13, 14, 0, 0}, {13, 0, 0, 0}, {12, 13, 0, 0}, {12, 0, 0, 0}, {14, 0, 0, 0}
+        {15, 15, 15, 15}, {12, 12, 0, 0}, {14, 15, 0, 0}, {14, 0, 0, 0}, {12, 13, 0, 0}, {14, 0, 0, 0}, {14, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {10, 10, 0, 0}, {13, 14, 0, 0}, {14, 0, 0, 0}, {12, 13, 0, 0}, {12, 0, 0, 0}, {14, 0, 0, 0}
+        {15, 15, 15, 15}, {12, 12, 0, 0}, {14, 15, 0, 0}, {15, 0, 0, 0}, {12, 13, 0, 0}, {14, 0, 0, 0}, {14, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {11, 11, 0, 0}, {14, 15, 0, 0}, {15, 0, 0, 0}, {13, 14, 0, 0}, {12, 0, 0, 0}, {15, 0, 0, 0}
+        {15, 15, 15, 15}, {13, 13, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {13, 14, 0, 0}, {15, 0, 0, 0}, {15, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {11, 11, 0, 0}, {14, 15, 0, 0}, {15, 0, 0, 0}, {13, 14, 0, 0}, {14, 0, 0, 0}, {15, 0, 0, 0}
+        {15, 15, 15, 15}, {13, 13, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {13, 14, 0, 0}, {14, 0, 0, 0}, {15, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {12, 12, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {14, 15, 0, 0}, {14, 0, 0, 0}, {15, 0, 0, 0}
+        {15, 15, 15, 15}, {14, 14, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {14, 15, 0, 0}, {14, 0, 0, 0}, {15, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {12, 12, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {14, 15, 0, 0}, {14, 0, 0, 0}, {15, 0, 0, 0}
+        {15, 15, 15, 15}, {14, 14, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {14, 15, 0, 0}, {14, 0, 0, 0}, {15, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {13, 13, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {14, 0, 0, 0}, {15, 0, 0, 0}
+        {15, 15, 15, 15}, {15, 15, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {14, 0, 0, 0}, {15, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {13, 13, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 0, 0, 0}
+        {15, 15, 15, 15}, {15, 15, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {14, 14, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 0, 0, 0}
+        {15, 15, 15, 15}, {15, 15, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 0, 0, 0}
     },
     {
-        {15, 15, 15, 15}, {14, 14, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 0, 0, 0}
+        {15, 15, 15, 15}, {15, 15, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 0, 0, 0}
     },
     {
         {15, 15, 15, 15}, {15, 15, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 15, 0, 0}, {15, 0, 0, 0}, {15, 0, 0, 0}
@@ -678,7 +678,10 @@ static const u8 sFrontierBrainObjEventGfx[NUM_FRONTIER_FACILITIES][2] =
 
 const u16 gFrontierBannedSpecies[] =
 {
-   0xFFFF
+    SPECIES_MEW, SPECIES_MEWTWO, SPECIES_HO_OH, SPECIES_LUGIA, SPECIES_CELEBI,
+    SPECIES_KYOGRE, SPECIES_GROUDON, SPECIES_RAYQUAZA, SPECIES_DEOXYS, SPECIES_JIRACHI,
+    SPECIES_DEOXYS_ATTACK, SPECIES_DEOXYS_DEFENSE, SPECIES_DEOXYS_SPEED, SPECIES_REGIGIGAS,
+    0xFFFF
 };
 
 static const u8 *const sRecordsWindowChallengeTexts[][2] =
@@ -1889,7 +1892,7 @@ static void GiveBattlePoints(void)
 
     points = sBattlePointAwards[challengeNum][facility][battleMode];
     if (gTrainerBattleOpponent_A == TRAINER_FRONTIER_BRAIN)
-        points += 10;
+        points += 15;
     gSaveBlock2Ptr->frontier.battlePoints += points;
     ConvertIntToDecimalStringN(gStringVar1, points, STR_CONV_MODE_LEFT_ALIGN, 2);
     if (gSaveBlock2Ptr->frontier.battlePoints > MAX_BATTLE_FRONTIER_POINTS)
@@ -1900,8 +1903,8 @@ static void GiveBattlePoints(void)
     IncrementDailyBattlePoints(sBattlePointAwards[challengeNum][facility][battleMode]);
     if (gTrainerBattleOpponent_A == TRAINER_FRONTIER_BRAIN)
     {
-        points += 10;
-        IncrementDailyBattlePoints(10);
+        points += 15;
+        IncrementDailyBattlePoints(15);
     }
     if (points > 0xFFFF)
         points = 0xFFFF;
@@ -1939,6 +1942,8 @@ static u8 AppendCaughtBannedMonSpeciesName(u16 species, u8 count, s32 numBannedM
         switch (count)
         {
         case 1:
+            StringAppend(gStringVar1, gText_SpaceLikeSpace);
+            break;
         case 3:
         case 5:
         case 7:
@@ -1970,6 +1975,28 @@ static u8 AppendCaughtBannedMonSpeciesName(u16 species, u8 count, s32 numBannedM
     return count;
 }
 
+bool32 IsFrontierRestrictedSpecies(u16 species)
+{
+    u32 i;
+    for (i = 0; gFrontierBannedSpecies[i] != 0xFFFF; i++)
+    {
+        if (gFrontierBannedSpecies[i] == species)
+            return TRUE;
+    }
+    return FALSE;
+}
+
+static u32 CountRestrictedInArray(const u16* speciesArray, u8 count)
+{
+    u32 i, restricted = 0;
+    for (i = 0; i < count; i++)
+    {
+        if (IsFrontierRestrictedSpecies(speciesArray[i]))
+            restricted++;
+    }
+    return restricted;
+}
+
 static void AppendIfValid(u16 species, u16 heldItem, u16 hp, u8 lvlMode, u8 monLevel, u16 *speciesArray, u16 *itemsArray, u8 *count)
 {
     s32 i = 0;
@@ -1977,11 +2004,19 @@ static void AppendIfValid(u16 species, u16 heldItem, u16 hp, u8 lvlMode, u8 monL
     if (species == SPECIES_EGG || species == SPECIES_NONE)
         return;
 
-    for (i = 0; gFrontierBannedSpecies[i] != 0xFFFF && gFrontierBannedSpecies[i] != species; i++)
-        ;
+    //for (i = 0; gFrontierBannedSpecies[i] != 0xFFFF && gFrontierBannedSpecies[i] != species; i++)
+    //    ;
 
-    if (gFrontierBannedSpecies[i] != 0xFFFF)
-        return;
+    //if (gFrontierBannedSpecies[i] != 0xFFFF)
+    //    return;
+
+// Restriction: at most 1 restricted species in the eligible set
+    if (IsFrontierRestrictedSpecies(species))
+    {
+        if (CountRestrictedInArray(speciesArray, *count) >= 1)
+            return;
+    }
+
     if (lvlMode == FRONTIER_LVL_50 && monLevel > 50)
         return;
 
@@ -2076,23 +2111,19 @@ static void CheckPartyIneligibility(void)
         }
         gStringVar1[0] = EOS;
         gSpecialVar_0x8004 = TRUE;
+        StringAppend(gStringVar1, gText_RestrictedPkmn);
         count = 0;
         for (i = 0; gFrontierBannedSpecies[i] != 0xFFFF; i++)
             count = AppendCaughtBannedMonSpeciesName(gFrontierBannedSpecies[i], count, caughtBannedMons);
 
-        if (count == 0)
-        {
-            StringAppend(gStringVar1, gText_Space2);
-            StringAppend(gStringVar1, gText_Are);
-        }
+        if (count == 0 || count == 1)
+            StringAppend(gStringVar1, gText_NewLine);
+        else if (count & 1)
+            StringAppend(gStringVar1, gText_LineBreak);
         else
-        {
-            if (count & 1)
-                StringAppend(gStringVar1, gText_LineBreak);
-            else
-                StringAppend(gStringVar1, gText_Space2);
-            StringAppend(gStringVar1, gText_Are2);
-        }
+            StringAppend(gStringVar1, gText_Space2);
+
+        StringAppend(gStringVar1, gText_Are2);
     }
     else
     {

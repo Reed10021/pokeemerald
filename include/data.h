@@ -6,6 +6,13 @@
 
 #define SPECIES_SHINY_TAG 500
 
+#define TRAINER_PIC_WIDTH 64
+#define TRAINER_PIC_HEIGHT 64
+#define TRAINER_PIC_SIZE (TRAINER_PIC_WIDTH * TRAINER_PIC_HEIGHT / 2)
+
+// Red and Leaf's back pics have 5 frames, but this is presumably irrelevant in the places this is used.
+#define MAX_TRAINER_PIC_FRAMES 5
+
 struct MonCoords
 {
     // This would use a bitfield, but some function
@@ -41,6 +48,7 @@ struct TrainerMonItemCustomMoves
 {
     u16 iv;
     u8 lvl;
+    u8 abilityNum;
     u16 species;
     u16 heldItem;
     u16 moves[MAX_MON_MOVES];
@@ -115,6 +123,6 @@ extern const struct CompressedSpriteSheet gMonFrontPicTable[];
 extern const struct Trainer gTrainers[];
 extern const u8 gTrainerClassNames[][13];
 extern const u8 gSpeciesNames[][POKEMON_NAME_LENGTH + 1];
-extern const u8 gMoveNames[MOVES_COUNT][MOVE_NAME_LENGTH + 1];
+extern const u8 gMoveNames[MOVES_COUNT][MOVE_NAME_LENGTH];
 
 #endif // GUARD_DATA_H

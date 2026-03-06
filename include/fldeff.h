@@ -27,6 +27,7 @@ bool8 SetUpFieldMove_Flash(void);
 void CB2_DoChangeMap(void);
 bool8 GetMapPairFadeToType(u8 a1, u8 a2);
 bool8 GetMapPairFadeFromType(u8 a1, u8 a2);
+void FldEff_UseFlash(void);
 
 // strength
 bool8 SetUpFieldMove_Strength(void);
@@ -35,10 +36,12 @@ bool8 FldEff_UseStrength(void);
 // sweet scent
 bool8 SetUpFieldMove_SweetScent(void);
 bool8 FldEff_SweetScent(void);
+void StartSweetScentFieldEffect(void);
 
 // teleport
 bool8 SetUpFieldMove_Teleport(void);
 bool8 FldEff_UseTeleport(void);
+void StartTeleportFieldEffect(void);
 
 // dig
 bool8 SetUpFieldMove_Dig(void);
@@ -49,5 +52,7 @@ bool8 CheckObjectGraphicsInFrontOfPlayer(u16 graphicsId);
 u8 CreateFieldMoveTask(void);
 bool8 SetUpFieldMove_RockSmash(void);
 bool8 FldEff_UseRockSmash(void);
+
+void Task_DoFieldMove_RunFunc(u8 taskId);
 
 #endif // GUARD_FLDEFF_H

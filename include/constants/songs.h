@@ -541,6 +541,36 @@
 #define PH_NURSE_HELD               608
 #define PH_NURSE_SOLO               609
 
+#define MUS_DP_VS_UXIE_MESPRIT_AZELF 610
+#define MUS_DP_VS_LEGEND             611
+#define MUS_DP_VS_TRAINER            612
+#define MUS_DP_VS_WILD               613
+#define MUS_DP_ETERNA_FOREST         614
+#define MUS_DP_LAKE_CAVERNS          615
+#define MUS_DP_JUBILIFE_DAY          616
+#define MUS_DP_JUBILIFE_NIGHT        617
+#define MUS_DP_ROUTE209_DAY          618
+#define MUS_DP_ROUTE209_NIGHT        619
+#define MUS_DP_LAKE                  620
+#define MUS_DP_OREBURGH_MINE         621
+#define MUS_DP_POKE_CENTER_NIGHT     622
+#define MUS_DP_ROUTE225_DAY          623
+#define MUS_DP_ROUTE225_NIGHT        624
+#define MUS_DP_HEARTHOME_DAY         625
+#define MUS_DP_HEARTHOME_NIGHT       626
+#define MUS_DP_CYCLING               627
+#define MUS_DP_POFFINS               628
+#define MUS_DP_VS_CHAMPION           629
+#define MUS_DP_VS_ELITE_FOUR         630
+
+#define MUS_HG_VS_HO_OH              631
+#define MUS_HG_VS_LUGIA              632
+#define MUS_HG_ROUTE38               633
+#define MUS_HG_VS_CHAMPION           634
+#define MUS_HG_VS_KANTO_LEADER       635
+
+#define MUS_PL_LILYCOVE_BOSSA_NOVA   636
+
 #define MUS_ROUTE118                0x7FFF  // Map is split into 2 music sections. controlled by GetCurrLocationDefaultMusic().
 
 #define MUS_NONE                    0xFFFF

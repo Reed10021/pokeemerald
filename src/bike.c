@@ -983,11 +983,12 @@ void GetOnOffBike(u8 transitionFlags)
     }
     else
     {
+        u16 cyclingSong = DoTimeBasedMusic(MUS_CYCLING);
         SetPlayerAvatarTransitionFlags(transitionFlags);
-        if (Overworld_MusicCanOverrideMapMusic(MUS_CYCLING))
+        if (Overworld_MusicCanOverrideMapMusic(cyclingSong))
         {
-            Overworld_SetSavedMusic(MUS_CYCLING);
-            Overworld_ChangeMusicTo(MUS_CYCLING);
+            Overworld_SetSavedMusic(cyclingSong);
+            Overworld_ChangeMusicTo(cyclingSong);
         }
     }
 }

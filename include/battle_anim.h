@@ -221,6 +221,8 @@ void sub_8117854(u8 taskId, int unused, u16 arg2, u8 battler1, u8 arg4, u8 arg5,
 void SetSpriteNextToMonHead(u8 battler, struct Sprite* sprite);
 void AnimMoveTwisterParticle(struct Sprite* sprite);
 void AnimParticleBurst(struct Sprite *);
+void AnimTask_CompressTargetHorizontally(u8 taskId);
+void AnimTask_CompressTargetHorizontallyFast(u8 taskId);
 
 // battle_anim_water.c
 void AnimWaterPulseRing(struct Sprite *sprite);

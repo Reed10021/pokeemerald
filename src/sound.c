@@ -115,6 +115,88 @@ void MapMusicMain(void)
     }
 }
 
+u16 DoTimeBasedMusic(u16 baseTrack)
+{
+    // We don't want to waste a call to UpdateTimeOfDay() if 
+    // a track isn't a day/night compatible track.
+    switch (baseTrack)
+    {
+        case MUS_SURF:
+        case MUS_DP_LAKE:
+            UpdateTimeOfDay();
+            if (gTimeOfDay != TIME_OF_DAY_DAY)
+                return MUS_DP_LAKE;
+            else
+                return MUS_SURF;
+        case MUS_CYCLING:
+        case MUS_DP_CYCLING:
+            UpdateTimeOfDay();
+            if (gTimeOfDay != TIME_OF_DAY_DAY)
+                return MUS_DP_CYCLING;
+            else
+                return MUS_CYCLING;
+        case MUS_DP_ROUTE209_DAY:
+        case MUS_DP_ROUTE209_NIGHT:
+            UpdateTimeOfDay();
+            if (gTimeOfDay != TIME_OF_DAY_DAY) //Night
+                return MUS_DP_ROUTE209_NIGHT;
+            else
+                return MUS_DP_ROUTE209_DAY;
+        case MUS_DP_JUBILIFE_DAY:
+        case MUS_DP_JUBILIFE_NIGHT:
+            UpdateTimeOfDay();
+            if (gTimeOfDay != TIME_OF_DAY_DAY)
+                return MUS_DP_JUBILIFE_NIGHT;
+            else
+                return MUS_DP_JUBILIFE_DAY;
+        case MUS_DP_ROUTE225_DAY:
+        case MUS_DP_ROUTE225_NIGHT:
+            UpdateTimeOfDay();
+            if (gTimeOfDay != TIME_OF_DAY_DAY)
+                return MUS_DP_ROUTE225_NIGHT;
+            else
+                return MUS_DP_ROUTE225_DAY;
+        case MUS_DP_HEARTHOME_DAY:
+        case MUS_DP_HEARTHOME_NIGHT:
+            UpdateTimeOfDay();
+            if (gTimeOfDay != TIME_OF_DAY_DAY)
+                return MUS_DP_HEARTHOME_NIGHT;
+            else
+                return MUS_DP_HEARTHOME_DAY;
+        case MUS_LILYCOVE:
+        case MUS_PL_LILYCOVE_BOSSA_NOVA:
+            UpdateTimeOfDay();
+            if (gTimeOfDay != TIME_OF_DAY_DAY)
+                return MUS_PL_LILYCOVE_BOSSA_NOVA;
+            else
+                return MUS_LILYCOVE;
+        case MUS_POKE_CENTER:
+        case MUS_RG_NET_CENTER:
+        case MUS_C_COMM_CENTER:
+        case MUS_RG_POKE_CENTER:
+        case MUS_DP_POKE_CENTER_NIGHT:
+            UpdateTimeOfDay();
+            // Alternate music depending on time of day
+            if (gTimeOfDay != TIME_OF_DAY_DAY) // Night
+            {
+                // Play transition Evening/Dusk music from 7-8pm
+                if (gLocalTime.hours > TIME_DAY_BLEND_END && gLocalTime.hours < TIME_NIGHT_BLEND_END)
+                    return MUS_C_COMM_CENTER;
+                else
+                    return MUS_DP_POKE_CENTER_NIGHT;
+            }
+            else
+            {
+                // Play transition Morning/Dawn music from 7-10am
+                if (gLocalTime.hours > TIME_NIGHT_END && gLocalTime.hours < TIME_NIGHT_DAY_BLEND_END)
+                    return MUS_RG_POKE_CENTER;
+            }
+            return MUS_POKE_CENTER;
+        default:
+            return baseTrack;
+    }
+}
+
 void ResetMapMusic(void)
 {
     sCurrentMapMusic = 0;
@@ -125,20 +207,14 @@ void ResetMapMusic(void)
 
 u16 GetCurrentMapMusic(void)
 {
+    sCurrentMapMusic = DoTimeBasedMusic(sCurrentMapMusic);
+
     return sCurrentMapMusic;
 }
 
 void PlayNewMapMusic(u16 songNum)
 {
-    if (songNum == MUS_POKE_CENTER)
-    {
-        // Alternate music depending on time of day
-        if (gTimeOfDay != TIME_OF_DAY_DAY) // Night
-        {
-            songNum = MUS_RG_NET_CENTER;
-        }
-    }
-    sCurrentMapMusic = songNum;
+    sCurrentMapMusic = DoTimeBasedMusic(songNum);
     sNextMapMusic = 0;
     sMapMusicState = 1;
 }
@@ -163,7 +239,7 @@ void FadeOutAndPlayNewMapMusic(u16 songNum, u8 speed)
 {
     FadeOutMapMusic(speed);
     sCurrentMapMusic = 0;
-    sNextMapMusic = songNum;
+    sNextMapMusic = DoTimeBasedMusic(songNum);
     sMapMusicState = 6;
 }
 
@@ -171,15 +247,16 @@ void FadeOutAndFadeInNewMapMusic(u16 songNum, u8 fadeOutSpeed, u8 fadeInSpeed)
 {
     FadeOutMapMusic(fadeOutSpeed);
     sCurrentMapMusic = 0;
-    sNextMapMusic = songNum;
+    sNextMapMusic = DoTimeBasedMusic(songNum);
     sMapMusicState = 7;
     sMapMusicFadeInSpeed = fadeInSpeed;
 }
 
 void FadeInNewMapMusic(u16 songNum, u8 speed)
 {
-    FadeInNewBGM(songNum, speed);
-    sCurrentMapMusic = songNum;
+    u16 timeBasedSong = DoTimeBasedMusic(songNum);
+    FadeInNewBGM(timeBasedSong, speed);
+    sCurrentMapMusic = timeBasedSong;
     sNextMapMusic = 0;
     sMapMusicState = 2;
     sMapMusicFadeInSpeed = 0;

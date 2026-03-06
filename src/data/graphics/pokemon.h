@@ -2715,6 +2715,13 @@ const u32 gMonBackPic_Deoxys_Speed[] = INCBIN_U32("graphics/pokemon/deoxys/speed
 const u32 gMonShinyPalette_Deoxys_Speed[] = INCBIN_U32("graphics/pokemon/deoxys/speed/shiny.gbapal.lz");
 const u8 gMonIcon_Deoxys_Speed[] = INCBIN_U8("graphics/pokemon/deoxys/speed/icon.4bpp");
 
+const u32 gMonStillFrontPic_Regigigas[] = INCBIN_U32("graphics/pokemon/regigigas/front.4bpp.lz");
+const u32 gMonPalette_Regigigas[] = INCBIN_U32("graphics/pokemon/regigigas/normal.gbapal.lz");
+const u32 gMonBackPic_Regigigas[] = INCBIN_U32("graphics/pokemon/regigigas/back.4bpp.lz");
+const u32 gMonShinyPalette_Regigigas[] = INCBIN_U32("graphics/pokemon/regigigas/shiny.gbapal.lz");
+const u8 gMonIcon_Regigigas[] = INCBIN_U8("graphics/pokemon/regigigas/icon.4bpp");
+const u8 gMonFootprint_Regigigas[] = INCBIN_U8("graphics/pokemon/regigigas/footprint.1bpp");
+
 // Probably the leftover space from the other Deoxys forms
 //static const u8 sEmpty[0x6800] = {0};
 

@@ -17,6 +17,7 @@ IslandCave_EventScript_TryRemoveRegice:: @ 8238E44
 
 IslandCave_OnLoad: @ 8238E58
 	call_if_unset FLAG_SYS_BRAILLE_REGICE_COMPLETED, IslandCave_EventScript_HideRegiEntrance
+	call_if_unset FLAG_SYS_BRAILLE_REGIGIGAS_COMPLETED, IslandCave_EventScript_HideRegigigasEntrance
 	end
 
 IslandCave_EventScript_HideRegiEntrance:: @ 8238E62
@@ -28,14 +29,28 @@ IslandCave_EventScript_HideRegiEntrance:: @ 8238E62
 	setmetatile 9, 20, METATILE_Cave_SealedChamberBraille_Mid, 1
 	return
 
+IslandCave_EventScript_HideRegigigasEntrance::
+	setmetatile 7, 1, METATILE_Cave_EntranceCover, 1
+	setmetatile 8, 1, METATILE_Cave_EntranceCover, 1
+	setmetatile 9, 1, METATILE_Cave_EntranceCover, 1
+	setmetatile 7, 2, METATILE_Cave_SealedChamberBraille_Mid, 1
+	setmetatile 8, 2, METATILE_Cave_SealedChamberBraille_Mid, 1
+	setmetatile 9, 2, METATILE_Cave_SealedChamberBraille_Mid, 1
+	return
+
 IslandCave_OnTransition: @ 8238E99
 	setflag FLAG_LANDMARK_ISLAND_CAVE
 	call IslandCave_EventScript_ClearSteps
 	call_if_unset FLAG_DEFEATED_REGICE, IslandCave_EventScript_ShowRegice
+	call_if_unset FLAG_DEFEATED_REGIGIGAS, IslandCave_EventScript_ShowRegigigas
 	end
 
 IslandCave_EventScript_ShowRegice:: @ 8238EAB
 	clearflag FLAG_HIDE_REGICE
+	return
+
+IslandCave_EventScript_ShowRegigigas::
+	clearflag FLAG_HIDE_REGIGIGAS
 	return
 
 IslandCave_EventScript_OpenRegiEntrance:: @ 8238EAF
@@ -75,6 +90,19 @@ IslandCave_EventScript_CaveEntranceSide:: @ 8238F1D
 	goto IslandCave_EventScript_CloseBrailleMsg
 	end
 
+IslandCave_EventScript_CaveEntranceMiddle2::
+	lockall
+	goto_if_set FLAG_SYS_BRAILLE_REGIGIGAS_COMPLETED, IslandCave_EventScript_BigHoleInWall
+	braillemessage IslandCave_Braille_Regigigias
+	goto IslandCave_EventScript_CloseBrailleMsg
+	end
+
+IslandCave_EventScript_CaveEntranceSide2::
+	lockall
+	braillemessage IslandCave_Braille_Regigigias
+	goto IslandCave_EventScript_CloseBrailleMsg
+	end
+
 IslandCave_EventScript_CloseBrailleMsg:: @ 8238F41
 	waitbuttonpress
 	closebraillemessage
@@ -95,19 +123,27 @@ IslandCave_EventScript_Regice:: @ 8238F58
 	playmoncry SPECIES_REGICE, 2
 	delay 40
 	waitmoncry
+	setflag FLAG_FORCE_ANIMATIONS
 	setwildbattle SPECIES_REGICE, 40, ITEM_NEVER_MELT_ICE
-	setflag FLAG_SYS_CTRL_OBJ_DELETE
+@	setflag FLAG_SYS_CTRL_OBJ_DELETE
 	special StartRegiBattle
 	waitstate
-	clearflag FLAG_SYS_CTRL_OBJ_DELETE
+@	clearflag FLAG_SYS_CTRL_OBJ_DELETE
 	specialvar VAR_RESULT, GetBattleOutcome
 	compare VAR_RESULT, B_OUTCOME_WON
-	goto_if_eq IslandCave_EventScript_DefeatedRegice
+	goto_if_eq IslandCave_EventScript_RanFromRegice
 	compare VAR_RESULT, B_OUTCOME_RAN
 	goto_if_eq IslandCave_EventScript_RanFromRegice
 	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
 	goto_if_eq IslandCave_EventScript_RanFromRegice
 	setflag FLAG_DEFEATED_REGICE
+	compare VAR_SPECIESCHAINED, SPECIES_REGICE
+	call_if_eq ChainNumberNoLock
+	closemessage
+	fadescreenswapbuffers FADE_TO_BLACK
+	removeobject VAR_LAST_TALKED
+	fadescreenswapbuffers FADE_FROM_BLACK
+	msgbox IslandCave_Text_StillFeelPresence, MSGBOX_DEFAULT
 	release
 	end
 
@@ -117,6 +153,54 @@ IslandCave_EventScript_DefeatedRegice:: @ 8238F9F
 	end
 
 IslandCave_EventScript_RanFromRegice:: @ 8238FA8
-	setvar VAR_0x8004, SPECIES_REGICE
-	goto Common_EventScript_LegendaryFlewAway
+	compare VAR_SPECIESCHAINED, SPECIES_REGICE
+	call_if_eq ChainNumberNoLock
+	msgbox IslandCave_Text_RegiceWatchingYou, MSGBOX_DEFAULT
+	release
 	end
+
+IslandCave_EventScript_RanFromRegigigas::
+	compare VAR_SPECIESCHAINED, SPECIES_REGIGIGAS
+	call_if_eq ChainNumberNoLock
+	msgbox IslandCave_Text_RegigigasWatchingYou, MSGBOX_DEFAULT
+	release
+	end
+
+IslandCave_EventScript_Regigigas::
+	lock
+	faceplayer
+	waitse
+	playmoncry SPECIES_REGIGIGAS, 2
+	delay 40
+	waitmoncry
+	setflag FLAG_TRIGGER_SMART_WILD_AI
+	setflag FLAG_TRIGGER_TOTEM_POWER
+	setflag FLAG_FORCE_ANIMATIONS
+	setwildbattle SPECIES_REGIGIGAS, 80, ITEM_STARF_BERRY
+	special StartRegiBattle
+	waitstate
+	clearflag FLAG_TRIGGER_SMART_WILD_AI
+	clearflag FLAG_TRIGGER_TOTEM_POWER
+	specialvar VAR_RESULT, GetBattleOutcome
+	compare VAR_RESULT, B_OUTCOME_WON
+	goto_if_eq IslandCave_EventScript_RanFromRegigigas
+	compare VAR_RESULT, B_OUTCOME_RAN
+	goto_if_eq IslandCave_EventScript_RanFromRegigigas
+	compare VAR_RESULT, B_OUTCOME_PLAYER_TELEPORTED
+	goto_if_eq IslandCave_EventScript_RanFromRegigigas
+	setflag FLAG_DEFEATED_REGIGIGAS
+	compare VAR_SPECIESCHAINED, SPECIES_REGIGIGAS
+	call_if_eq ChainNumberNoLock
+	closemessage
+	goto Common_EventScript_RemoveStaticPokemon
+	end
+
+IslandCave_Text_StillFeelPresence::
+	.string "You still feel the presence of a\n"
+	.string "REGI somewhere in this area... $"
+
+IslandCave_Text_RegiceWatchingYou::
+	.string "Regice is watching you!$"
+
+IslandCave_Text_RegigigasWatchingYou::
+	.string "Regigigas is watching you!$"

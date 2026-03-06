@@ -76,7 +76,14 @@ EventScript_BufferMedicinePocket::
 	return
 
 EventScript_ObtainedItem:: @ 8271B95
+	compare VAR_0x8001, TRUE
+	goto_if_eq EventScript_ObtainedItemMessage
+	buffernumberstring 0, VAR_0x8001
+	message gText_ObtainedTheItems
+	goto EventScript_ContinueObtainedItem
+EventScript_ObtainedItemMessage:
 	message gText_ObtainedTheItem
+EventScript_ContinueObtainedItem:
 	waitfanfare
 @	msgbox gText_PutItemInPocket, MSGBOX_DEFAULT
 	call EventScript_PutItemMsg
@@ -157,6 +164,30 @@ EventScript_CheckPCSpaceContinue::
 	return
 
 EventScript_PickUpItem:: @ 8271C3A
+	compare VAR_0x8004, ITEM_HM_POWER_GLOVE
+	goto_if_ne EventScript_PickUpItem_Skip_Power_Glove
+	checkitem ITEM_HM_PICKAXE, 1
+	compare VAR_RESULT, FALSE
+	goto_if_eq EventScript_PickUpItem_Give_Pickaxe
+	removeitem ITEM_HM_PICKAXE
+	goto EventScript_PickUpItem_Skip_Surfboard
+EventScript_PickUpItem_Give_Pickaxe:
+	setvar VAR_0x8004, ITEM_HM_PICKAXE
+	bufferitemnameplural 1, VAR_0x8004, VAR_0x8005
+	goto EventScript_PickUpItem_Skip_Surfboard
+EventScript_PickUpItem_Skip_Power_Glove:
+	compare VAR_0x8004, ITEM_HM_UPGRADED_SURFBOARD
+	goto_if_ne EventScript_PickUpItem_Skip_Surfboard
+	checkitem ITEM_HM_SURFBOARD, 1
+	compare VAR_RESULT, FALSE
+	goto_if_eq EventScript_PickUpItem_Give_Surfboard
+	removeitem ITEM_HM_SURFBOARD
+	goto EventScript_PickUpItem_Skip_Surfboard
+EventScript_PickUpItem_Give_Surfboard:
+	setvar VAR_0x8004, ITEM_HM_SURFBOARD
+	bufferitemnameplural 1, VAR_0x8004, VAR_0x8005
+	@ goto EventScript_PickUpItem_Skip_Surfboard
+EventScript_PickUpItem_Skip_Surfboard:
 	removeobject VAR_LAST_TALKED
 	compare VAR_0x8007, 2
 	goto_if_eq EventScript_PickUpItemPCAdd
@@ -191,6 +222,12 @@ EventScript_FoundTMHM:: @ 8271C8F
 	return
 
 EventScript_FoundItem:: @ 8271C9B
+	compare VAR_0x8001, TRUE
+	goto_if_eq EventScript_FoundItemMessage
+	buffernumberstring 0, VAR_0x8001
+	message gText_PlayerFoundItems
+	return
+EventScript_FoundItemMessage::
 	message gText_PlayerFoundOneItem
 	return
 

@@ -2889,6 +2889,14 @@ extern const u32 gMonShinyPalette_Deoxys_Speed[];
 extern const u32 gMonStillFrontPic_Deoxys_Speed[];
 extern const u8 gMonIcon_Deoxys_Speed[];
 
+extern const u32 gMonFrontPic_Regigigas[];
+extern const u32 gMonStillFrontPic_Regigigas[];
+extern const u32 gMonPalette_Regigigas[];
+extern const u32 gMonBackPic_Regigigas[];
+extern const u32 gMonShinyPalette_Regigigas[];
+extern const u8 gMonIcon_Regigigas[];
+extern u8 gMonFootprint_Regigigas[];
+
 // trainer sprites
 extern const u32 gTrainerFrontPic_Hiker[];
 extern const u32 gTrainerFrontPic_AquaGruntM[];
@@ -3544,6 +3552,7 @@ extern const u32 gItemIcon_PokeDoll[];
 extern const u32 gItemIconPalette_PokeDoll[];
 extern const u32 gItemIcon_FluffyTail[];
 extern const u32 gItemIconPalette_FluffyTail[];
+extern const u32 gItemIconPalette_XSpecialDefense[];
 // Field items
 extern const u32 gItemIcon_Repel[];
 extern const u32 gItemIconPalette_SuperRepel[];
@@ -3579,6 +3588,13 @@ extern const u32 gItemIcon_Nugget[];
 extern const u32 gItemIconPalette_Nugget[];
 extern const u32 gItemIcon_HeartScale[];
 extern const u32 gItemIconPalette_HeartScale[];
+
+extern const u32 gItemIcon_TeraShard[];
+extern const u32 gItemIconPalette_WaterTeraShard[];
+extern const u32 gItemIconPalette_FireTeraShard[];
+extern const u32 gItemIconPalette_RockTeraShard[];
+extern const u32 gItemIconPalette_IceTeraShard[];
+
 // Mail
 extern const u32 gItemIcon_OrangeMail[];
 extern const u32 gItemIconPalette_OrangeMail[];
@@ -3786,6 +3802,36 @@ extern const u32 gItemIcon_ThickClub[];
 extern const u32 gItemIconPalette_ThickClub[];
 extern const u32 gItemIcon_Stick[];
 extern const u32 gItemIconPalette_Stick[];
+extern const u32 gItemIcon_WeatherOrb[];
+extern const u32 gItemIconPalette_WeatherOrb[];
+extern const u32 gItemIcon_PunchingGlove[];
+extern const u32 gItemIconPalette_PunchingGlove[];
+extern const u32 gItemIcon_FocusSash[];
+extern const u32 gItemIconPalette_FocusSash[];
+extern const u32 gItemIcon_ChoiceSpecs[];
+extern const u32 gItemIconPalette_ChoiceSpecs[];
+extern const u32 gItemIcon_ChoiceScarf[];
+extern const u32 gItemIconPalette_ChoiceScarf[];
+extern const u32 gItemIcon_MuscleBand[];
+extern const u32 gItemIconPalette_MuscleBand[];
+extern const u32 gItemIcon_WiseGlasses[];
+extern const u32 gItemIconPalette_WiseGlasses[];
+
+extern const u32 gItemIcon_Axe[];
+extern const u32 gItemIconPalette_Axe[];
+extern const u32 gItemIconPalette_Taxi_Flute[];
+extern const u32 gItemIcon_Surfboard[];
+extern const u32 gItemIconPalette_Surfboard[];
+extern const u32 gItemIconPalette_SuperSurfboard[];
+extern const u32 gItemIcon_PowerGlove[];
+extern const u32 gItemIconPalette_PowerGlove[];
+extern const u32 gItemIcon_Lantern[];
+extern const u32 gItemIconPalette_Lantern[];
+extern const u32 gItemIcon_Pickaxe[];
+extern const u32 gItemIconPalette_Pickaxe[];
+extern const u32 gItemIcon_ScubaGear[];
+extern const u32 gItemIconPalette_ScubaGear[];
+
 // Contest hold items
 extern const u32 gItemIcon_Scarf[];
 extern const u32 gItemIconPalette_RedScarf[];
@@ -4788,6 +4834,10 @@ extern const u32 gBattleAnimSpritePal_CrossImpact[];
 extern const u32 gBattleAnimSpritePal_Slash2[];
 extern const u32 gBattleAnimSpritePal_WhipHit[];
 extern const u32 gBattleAnimSpritePal_BlueRing2[];
+extern const u32 gBattleAnimSpriteGfx_Acupressure[];
+extern const u32 gBattleAnimSpritePal_Acupressure[];
+extern const u32 gBattleAnimSpriteGfx_DragonPulse[];
+extern const u32 gBattleAnimSpritePal_DragonPulse[];
 
 extern const u32 gBattleAnimBgImage_Dark[];
 extern const u32 gBattleAnimBgImage_Ghost[];

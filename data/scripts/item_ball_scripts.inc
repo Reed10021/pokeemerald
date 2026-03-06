@@ -126,6 +126,10 @@ Route115_EventScript_ItemPPUp:: @ 8290E6B
 	finditem ITEM_PP_UP
 	end
 
+Route115_EventScript_ItemHastyMint::
+	finditem ITEM_HASTY_MINT
+	end
+
 Route116_EventScript_ItemXSpecial:: @ 8290E78
 	finditem ITEM_X_SPECIAL
 	end
@@ -642,8 +646,16 @@ ArtisanCave_B1F_EventScript_ItemIron::
 	finditem ITEM_IRON, 3
 	end
 
-ArtisanCave_1F_EventScript_ItemCarbos:: @ 82914D1
+ArtisanCave_1F_EventScript_ItemCarbos::
 	finditem ITEM_CARBOS, 3
+	end
+
+ArtisanCave_B1F_EventScript_ItemRareCandy::
+	finditem ITEM_RARE_CANDY, 3
+	end
+
+Battle_Frontier_OutsideEast_EventScript_ItemRareCandy::
+	finditem ITEM_RARE_CANDY, 3
 	end
 
 MagmaHideout_1F_EventScript_ItemRareCandy:: @ 82914DE
@@ -672,4 +684,128 @@ MagmaHideout_4F_EventScript_MaxRevive:: @ 829151F
 
 MagmaHideout_3F_3R_EventScript_ItemEscapeRope:: @ 829152C
 	finditem ITEM_ESCAPE_ROPE
+	end
+
+GraniteCave_B2F_EventScript_ItemRareCandy2::
+	finditem ITEM_RARE_CANDY
+	end
+
+GraniteCave_B2F_EventScript_ItemHMLantern::
+	finditem ITEM_HM_LANTERN
+	end
+
+Route115_EventScript_ItemRareCandy::
+	finditem ITEM_RARE_CANDY
+	end
+
+Route115_EventScript_ItemHMAxe::
+	finditem ITEM_HM_AXE
+	end
+
+NewMauville_Inside_EventScript_ItemAbilityCapsule::
+	finditem ITEM_ABILITY_CAPSULE
+	end
+
+NewMauville_Inside_EventScript_ItemModestMint::
+	finditem ITEM_MODEST_MINT
+	end
+
+NewMauville_Inside_EventScript_ItemStrengthUpgrade::
+	finditem ITEM_HM_POWER_GLOVE
+	end
+
+SafariZone_North_EventScript_ItemRareCandy::
+	finditem ITEM_RARE_CANDY
+	end
+
+SafariZone_North_EventScript_ItemStrengthUpgrade::
+	finditem ITEM_HM_POWER_GLOVE
+	end
+
+MeteorFalls_StevensCave_EventScript_ItemAbilityCapsule::
+	finditem ITEM_ABILITY_CAPSULE
+	end
+
+MeteorFalls_StevensCave_EventScript_ItemRareCandy::
+	finditem ITEM_RARE_CANDY
+	end
+
+MeteorFalls_StevensCave_EventScript_ItemWaterfallUpgrade::
+	finditem ITEM_HM_UPGRADED_SURFBOARD
+	end
+
+ScorchedSlab_B1F_EventScript_ItemStarPiece::
+	finditem ITEM_STAR_PIECE
+	end
+
+ScorchedSlab_B2F_EventScript_ItemAdamantMint::
+	finditem ITEM_ADAMANT_MINT
+	end
+
+ScorchedSlab_B2F_EventScript_ItemMaxRevive::
+	finditem ITEM_MAX_REVIVE
+	end
+
+ScorchedSlab_B2F_EventScript_ItemRareCandy::
+	finditem ITEM_RARE_CANDY
+	end
+
+ScorchedSlab_B2F_EventScript_ItemWaterfallUpgrade::
+	finditem ITEM_HM_UPGRADED_SURFBOARD
+	end
+
+ShoalCave_LowTideIceRoom_EventScript_ItemAdamantMint::
+	finditem ITEM_ADAMANT_MINT
+	end
+
+ShoalCave_LowTideIceRoom_EventScript_ItemModestMint::
+	finditem ITEM_MODEST_MINT
+	end
+
+ShoalCave_LowTideIceRoom_EventScript_ItemHMTaxiFlute::
+	finditem ITEM_HM_TAXI_FLUTE
+	end
+
+AbandonedShip_HiddenFloorRooms_EventScript_ItemJollyMint::
+	finditem ITEM_JOLLY_MINT
+	end
+
+AbandonedShip_HiddenFloorRooms_EventScript_ItemTimidMint::
+	finditem ITEM_TIMID_MINT
+	end
+
+AbandonedShip_HiddenFloorRooms_EventScript_ItemHMScubaGear::
+	finditem ITEM_HM_SCUBA_GEAR
+	end
+
+Route112_EventScript_ItemHeartScale::
+	finditem ITEM_HEART_SCALE
+	end
+
+Route112_EventScript_ItemNaughtyMint::
+	finditem ITEM_NAUGHTY_MINT
+	end
+
+Route112_EventScript_ItemBraveMint::
+	finditem ITEM_BRAVE_MINT
+	end
+
+WaterPath_EventScript_ItemQuietMint::
+	finditem ITEM_QUIET_MINT
+	end
+
+Route119_EventScript_ItemRainShard::
+	finditem ITEM_RAIN_SHARD
+	end
+
+Route116_EventScript_ItemDroughtShard::
+	finditem ITEM_DROUGHT_SHARD
+	end
+
+Route111_EventScript_ItemSandstormShard::
+	finditem ITEM_SANDSTORM_SHARD
+	end
+
+ShoalCave_LowTideIceRoom_EventScript_ItemHailstormShard::
+	finditem ITEM_HAILSTORM_SHARD
 	end

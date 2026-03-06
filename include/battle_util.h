@@ -35,6 +35,9 @@
 #define ABILITY_ON_FIELD2(abilityId)(AbilityBattleEffects(ABILITYEFFECT_FIELD_SPORT, 0, abilityId, 0, 0))
 
 #define ITEMEFFECT_ON_SWITCH_IN                 0x0
+#define ITEMEFFECT_NORMAL                       0x1
+#define ITEMEFFECT_BATTLE_START                 0x2
+//#define ITEMEFFECT_DUMMY                      0x2
 #define ITEMEFFECT_MOVE_END                     0x3
 #define ITEMEFFECT_KINGSROCK_SHELLBELL          0x4
 

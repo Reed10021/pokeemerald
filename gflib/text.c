@@ -859,20 +859,7 @@ u16 RenderText(struct TextPrinter *textPrinter)
     u16 currChar;
     s32 width;
     s32 widthHelper;
-    u8 repeats;
-
-	switch (GetPlayerTextSpeed())
-	{
-		case OPTIONS_TEXT_SPEED_SLOW:
-			repeats = 1;
-			break;
-		case OPTIONS_TEXT_SPEED_MID:
-			repeats = 2;
-			break;
-		case OPTIONS_TEXT_SPEED_FAST:
-			repeats = 4;
-			break;
-	}
+    s32 repeats;
 
     switch (textPrinter->state)
     {
@@ -895,8 +882,21 @@ u16 RenderText(struct TextPrinter *textPrinter)
             textPrinter->delayCounter = 3;
         else
             textPrinter->delayCounter = textPrinter->textSpeed;
-		
-		do
+
+        switch (GetPlayerTextSpeed())
+        {
+            case OPTIONS_TEXT_SPEED_SLOW:
+                repeats = 1;
+                break;
+            case OPTIONS_TEXT_SPEED_MID:
+                repeats = 2;
+                break;
+            case OPTIONS_TEXT_SPEED_FAST:
+                repeats = 4;
+                break;
+        }
+
+        do
         {
             currChar = *textPrinter->printerTemplate.currentChar;
             textPrinter->printerTemplate.currentChar++;
@@ -1094,10 +1094,13 @@ u16 RenderText(struct TextPrinter *textPrinter)
                     textPrinter->printerTemplate.currentX += width;
                 }
             }
-            else if (textPrinter->japanese)
-                textPrinter->printerTemplate.currentX += (gUnknown_03002F90.width + textPrinter->printerTemplate.letterSpacing);
             else
-                textPrinter->printerTemplate.currentX += gUnknown_03002F90.width;
+            {
+                if (textPrinter->japanese)
+                    textPrinter->printerTemplate.currentX += (gUnknown_03002F90.width + textPrinter->printerTemplate.letterSpacing);
+                else
+                    textPrinter->printerTemplate.currentX += gUnknown_03002F90.width;
+            }
 		    repeats--;
 		
 	    } while (repeats > 0);

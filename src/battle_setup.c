@@ -48,6 +48,7 @@
 #include "constants/species.h"
 #include "constants/trainers.h"
 #include "constants/trainer_hill.h"
+#include "constants/weather.h"
 
 enum
 {
@@ -70,8 +71,6 @@ struct TrainerBattleParameter
 static void DoBattlePikeWildBattle(void);
 static void DoSafariBattle(void);
 static void DoStandardWildBattle(void);
-static void CB2_EndWildBattle(void);
-static void CB2_EndScriptedWildBattle(void);
 static u8 GetWildBattleTransition(void);
 static u8 GetTrainerBattleTransition(void);
 static void TryUpdateGymLeaderRematchFromWild(void);
@@ -86,10 +85,6 @@ static void RegisterTrainerInMatchCall(void);
 static void HandleRematchVarsOnBattleEnd(void);
 static const u8 *GetIntroSpeechOfApproachingTrainer(void);
 static const u8 *GetTrainerCantBattleSpeech(void);
-
-extern const u8 ChainNumber[];
-extern const u8 DeleteChain[];
-extern const u8 RoamerTextScript[];
 
 // ewram vars
 EWRAM_DATA static u16 sTrainerBattleMode = 0;
@@ -347,6 +342,67 @@ static const u16 sBadgeFlags[NUM_BADGES] =
     FLAG_BADGE05_GET, FLAG_BADGE06_GET, FLAG_BADGE07_GET, FLAG_BADGE08_GET,
 };
 
+// base^exp (exp 1-9, base <= 100) – result fits within 64 bits
+static inline u64 pow_u64(u32 base, u32 exp)
+{
+    u64 res = 1;
+    while (exp--)
+        res *= base;
+    return res;
+}
+
+// Greatest y such that y^r < value (r = 2–9)
+static u32 rth_root(u64 value, u32 r)
+{
+    u32 lo = 0, hi = 100, mid = 0;
+    while (lo < hi)
+    {
+        mid = (lo + hi + 1) >> 1;
+        if (pow_u64(mid, r) <= value)
+            lo = mid;
+        else
+            hi = mid - 1;
+    }
+    return lo; // floor(value^(1/r))
+}
+
+u32 CalcGeneralizedMean(const u32* levels, u32 count)
+{
+    u32 min = 255, max = 0;
+    u32 sum = 0, i = 0, lv = 0, diff = 0, r = 0, mean = 0;
+    u64 sum_pow = 0, avg_pow = 0;
+
+    for (i = 0; i < count; ++i)
+    {
+        lv = levels[i];
+        if (lv < min) min = lv;
+        if (lv > max) max = lv;
+        sum += lv;
+    }
+    diff = max - min;
+
+    // Small spread = just use arithmetic mean
+    if (diff <= 8)
+        return (u32)(sum / count);
+    // Choose r for the generalized mean
+    else if (diff <= 15) r = 2;
+    else if (diff <= 40) r = 4;
+    else if (diff <= 65) r = 6;
+    else                 r = 8;
+
+    // Sum of powers in 64 bit
+    for (i = 0; i < count; ++i)
+        sum_pow += pow_u64(levels[i], r);
+
+    avg_pow = sum_pow / count; // fits 64 bits.
+
+    // r-th root back to level domain
+    mean = rth_root(avg_pow, r);
+    if (mean > 100) mean = 100;
+
+    return mean;
+}
+
 #define tState data[0]
 #define tTransition data[1]
 
@@ -520,7 +576,6 @@ void BattleSetup_StartLegendaryBattle(void)
 
     switch (GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL))
     {
-    default:
     case SPECIES_GROUDON:
         gBattleTypeFlags |= BATTLE_TYPE_GROUDON;
         CreateBattleStartTask(B_TRANSITION_GROUDON, MUS_VS_KYOGRE_GROUDON);
@@ -534,18 +589,29 @@ void BattleSetup_StartLegendaryBattle(void)
         CreateBattleStartTask(B_TRANSITION_RAYQUAZA, MUS_VS_RAYQUAZA);
         break;
     case SPECIES_DEOXYS:
+    case SPECIES_DEOXYS_ATTACK:
+    case SPECIES_DEOXYS_DEFENSE:
+    case SPECIES_DEOXYS_SPEED:
         CreateBattleStartTask(B_TRANSITION_SHRED_SPLIT, MUS_RG_VS_DEOXYS);
         break;
     case SPECIES_JIRACHI:
         CreateBattleStartTask(B_TRANSITION_BLACKHOLE2, MUS_RG_VS_DEOXYS);
         break;
     case SPECIES_LUGIA:
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_HG_VS_LUGIA);
+        break;
     case SPECIES_HO_OH:
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_HG_VS_HO_OH);
+        break;
     case SPECIES_CELEBI:
-        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_C_VS_LEGEND_BEAST);
+    case SPECIES_MEWTWO:
+        CreateBattleStartTask(B_TRANSITION_SHRED_SPLIT, MUS_DP_VS_UXIE_MESPRIT_AZELF);
         break;
     case SPECIES_MEW:
         CreateBattleStartTask(B_TRANSITION_RECTANGULAR_SPIRAL, MUS_VS_MEW);
+        break;
+    default:
+        CreateBattleStartTask(B_TRANSITION_RECTANGULAR_SPIRAL, MUS_DP_VS_LEGEND);
         break;
     }
 
@@ -605,153 +671,29 @@ void StartRegiBattle(void)
     TryUpdateGymLeaderRematchFromWild();
 }
 
-/*static void CB2_EndWildBattle(void)
+void CB2_EndWildBattle(void)
 {
     CpuFill16(0, (void*)(BG_PLTT), BG_PLTT_SIZE);
     ResetOamRange(0, 128);
 
     if (IsPlayerDefeated(gBattleOutcome) == TRUE && !InBattlePyramid() && !InBattlePike())
     {
+        DoBattleChain(GetMonData(&gEnemyParty[0], MON_DATA_SPECIES), FALSE, TRUE);
         SetMainCallback2(CB2_WhiteOut);
     }
     else
     {
+        DoBattleChain(GetMonData(&gEnemyParty[0], MON_DATA_SPECIES), FALSE, FALSE);
         SetMainCallback2(CB2_ReturnToField);
         gFieldCallback = sub_80AF6F0;
     }
-}*/
-
-static void CB2_EndWildBattle(void)
-{
-    u16 species;
-    u16 ptr;
-    u8 nickname[POKEMON_NAME_LENGTH + 1];
-    u16 lastPokemonFound;
-    u16 chainCount = VarGet(VAR_CHAIN);
-    species = GetMonData(&gEnemyParty[0], MON_DATA_SPECIES);
-    CpuFill16(0, (void*)(BG_PLTT), BG_PLTT_SIZE);
-    ResetOamRange(0, 128);
-    if (IsPlayerDefeated(gBattleOutcome) == TRUE && !InBattlePyramid() && !InBattlePike())
-    {
-		// If we had a chain and the species was correct but we died.
-		if (chainCount != 0 && species == VarGet(VAR_SPECIESCHAINED))
-		{
-            if (chainCount >= 3)
-            {
-                u8 numDigits = CountDigits(chainCount);
-                ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
-                GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
-                ScriptContext1_SetupScript(DeleteChain);
-            }
-			VarSet(VAR_CHAIN,0);
-			VarSet(VAR_SPECIESCHAINED,0);
-		}
-        SetMainCallback2(CB2_WhiteOut);
-    }
-    else
-    {
-		if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_PLAYER_TELEPORTED || gBattleOutcome == B_OUTCOME_MON_TELEPORTED || gBattleOutcome == B_OUTCOME_MON_FLED)
-		{
-            // Handle special roamer case
-            if (gBattleTypeFlags & BATTLE_TYPE_ROAMER && gBattleOutcome == B_OUTCOME_WON)
-            {
-                // Handle chain stuff for roamer, that way player can chain roamer if needed.
-                if (species != VarGet(VAR_SPECIESCHAINED))
-                {
-                    if (chainCount >= 3)
-                    {
-                        u8 numDigits = CountDigits(chainCount);
-                        ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
-                        GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
-                        gSpecialVar_0x8003 = 10; // set flag to show chain break text
-                    }
-
-                    VarSet(VAR_SPECIESCHAINED, species);
-                    if (chainCount != 0)
-                        VarSet(VAR_CHAIN, 1); // Already defeated one, so set to one.
-                }
-                else
-                {
-                    if (chainCount != 0xFFFF)
-                        VarSet(VAR_CHAIN, chainCount + 1); // We're already chaining, so increment by one.
-                    GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
-                }
-
-                // If roamer is still active, show shiny/not shiny text.
-                if (IsRoamerActive())
-                {
-                    ScriptContext1_SetupScript(RoamerTextScript);
-                }
-            }
-            // If not a roamer, handle normal chain stuff
-            else
-            {
-                // if we have a species, the species wasn't correct, and the chain is not zero, yeet.
-                // Don't penalize for roamers.
-                if (species != VarGet(VAR_SPECIESCHAINED) && chainCount != 0)
-                {
-                    // If the chain was 3, show textbox showing you messed up.
-                    if (chainCount >= 3)
-                    {
-                        u8 numDigits = CountDigits(chainCount);
-                        ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
-                        GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
-                        ScriptContext1_SetupScript(DeleteChain);
-                        // Cleanup
-                        VarSet(VAR_CHAIN, 0);
-                        VarSet(VAR_SPECIESCHAINED, 0);
-                    }
-                    else // if the chain wasn't +3, then act like we've started chaining this new species and are incrementing the counter.
-                    {
-                        VarSet(VAR_SPECIESCHAINED, species);
-                        VarSet(VAR_CHAIN, 1);
-                    }
-                }
-                else
-                {
-                    // if no chain, start chaining
-                    if (VarGet(VAR_SPECIESCHAINED) == 0)
-                        VarSet(VAR_SPECIESCHAINED, species);
-                    // if chain, increment chain and maybe show text
-                    if (species == VarGet(VAR_SPECIESCHAINED))
-                    {
-                        // If we caught a chained pokemon, increase the chain by 6 (5 here + the normal 1).
-                        // The ChainNumber script contains a check for 0xFFFF, so if we increase by 5 here it won't increase again.
-                        if (gBattleOutcome == B_OUTCOME_CAUGHT && chainCount >= 1 && chainCount <= 0xFFFA)
-                            VarSet(VAR_CHAIN, chainCount + 5);
-
-                        GetSpeciesName(gStringVar2, species);
-                        ScriptContext1_SetupScript(ChainNumber);
-                    }
-                }
-            }
-		}
-		else // Else we ran
-		{
-			// If we had a chain and the species was correct but we ran from it.
-			if (chainCount != 0 && species == VarGet(VAR_SPECIESCHAINED))
-			{
-                if (chainCount >= 3)
-                {
-                    u8 numDigits = CountDigits(chainCount);
-                    ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, numDigits);
-                    GetSpeciesName(gStringVar2, VarGet(VAR_SPECIESCHAINED));
-                    ScriptContext1_SetupScript(DeleteChain);
-                }
-				VarSet(VAR_CHAIN,0);
-				VarSet(VAR_SPECIESCHAINED,0);
-			}
-		}
-
-		SetMainCallback2(CB2_ReturnToField);
-		gFieldCallback = sub_80AF6F0;
-    }
 }
 
-static void CB2_EndScriptedWildBattle(void)
+void CB2_EndScriptedWildBattle(void)
 {
     CpuFill16(0, (void*)(BG_PLTT), BG_PLTT_SIZE);
     ResetOamRange(0, 128);
+    DoBattleChain(GetMonData(&gEnemyParty[0], MON_DATA_SPECIES), FALSE, TRUE);
 
     if (IsPlayerDefeated(gBattleOutcome) == TRUE)
     {
@@ -818,7 +760,7 @@ u8 BattleSetup_GetTerrainId(void)
     }
     if (gSaveBlock1Ptr->location.mapGroup == MAP_GROUP(ROUTE113) && gSaveBlock1Ptr->location.mapNum == MAP_NUM(ROUTE113))
         return BATTLE_TERRAIN_SAND;
-    if (GetSav1Weather() == 8)
+    if (GetSav1Weather() == WEATHER_SANDSTORM)
         return BATTLE_TERRAIN_SAND;
 
     return BATTLE_TERRAIN_PLAIN;
@@ -1241,8 +1183,26 @@ void SetMapVarsToTrainer(void)
 
 const u8 *BattleSetup_ConfigureTrainerBattle(const u8 *data)
 {
+    u16 trainer = 0;
     InitTrainerBattleVariables();
     sTrainerBattleMode = TrainerBattleLoadArg8(data);
+
+    trainer = T1_READ_16(data + 1);
+
+    if (gTrainers[trainer].trainerClass == TRAINER_CLASS_PKMN_TRAINER_3 || // Rival, Wally, & Steven
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_PKMN_TRAINER_1 ||
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_PKMN_TRAINER_2 ||
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_PKMN_TRAINER_4 ||
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_MAGMA_ADMIN || // Magma
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_MAGMA_LEADER ||
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_AQUA_ADMIN || // Aqua
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_AQUA_LEADER ||
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_LEADER || // Gyms
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
+        gTrainers[trainer].trainerClass == TRAINER_CLASS_CHAMPION)
+    {
+        FlagSet(FLAG_FORCE_ANIMATIONS);
+    }
 
     switch (sTrainerBattleMode)
     {
@@ -2024,3 +1984,240 @@ u16 CountBattledRematchTeams(u16 trainerId)
 
     return i;
 }
+
+#define DISPLAY_CHAIN_NUMBER(count, species)            \
+    do {                                                \
+        u32 _numDigits = CountDigits(count);            \
+        ConvertIntToDecimalStringN(gStringVar1, count,  \
+            STR_CONV_MODE_LEFT_ALIGN, (u8)_numDigits);  \
+        GetSpeciesName(gStringVar2, (u16)species);      \
+        ScriptContext1_SetupScript(ChainNumber);        \
+    } while (0)
+
+#define DISPLAY_DELETE_CHAIN(count, species)            \
+    do {                                                \
+        u32 _numDigits = CountDigits(count);            \
+        ConvertIntToDecimalStringN(gStringVar1, count,  \
+            STR_CONV_MODE_LEFT_ALIGN, (u8)_numDigits);  \
+        GetSpeciesName(gStringVar2, (u16)species);      \
+        ScriptContext1_SetupScript(DeleteChain);        \
+    } while (0)
+
+void DoBattleChain(u32 species, bool32 safariMode, bool32 noScriptMode)
+{
+    u32 chainCount = VarGet(VAR_CHAIN);
+    u32 speciesChained = VarGet(VAR_SPECIESCHAINED);
+    bool32 sameSpecies = (species == speciesChained);
+    // Use existing value of gSpecialVar_0x8003 here, then reset it.
+    bool32 showText = (!noScriptMode && gSpecialVar_0x8003 != 5);
+    // If we use gSpecialVar_0x8003 later in this function, then it causes the
+    // DeleteChainNoLock script to be called, which sets gSpecialVar_0x8003 back to 0 again.
+    gSpecialVar_0x8003 = 0;
+
+    /*** Safari Zone ***/
+    if (safariMode)
+    {
+        // If in the safari zone, be a little more generous with chaining.
+        // We can chain with a successful catch or a 'mon fleeing.
+        // We do not reset the chain on running out of balls, but do on the player running away.
+        // Handle win case
+        if (gBattleOutcome == B_OUTCOME_CAUGHT || gBattleOutcome == B_OUTCOME_MON_FLED)
+        {
+            // if we have a species, the species wasn't correct, and the chain is not zero, yeet.
+            if (!sameSpecies && chainCount)
+            {
+                // If the chain was >= 3, show textbox showing you messed up.
+                // ...unless showText is false.
+                if (showText && chainCount >= 3)
+                    DISPLAY_DELETE_CHAIN(chainCount, speciesChained);
+
+                // Existing chain broke.
+                // We've started chaining this new species and are thus the counter starts at 1.
+                chainCount = 1;
+                speciesChained = species;
+            }
+            else
+            {
+                // if no chain, start chaining
+                if (speciesChained == 0)
+                {
+                    speciesChained = species;
+                    sameSpecies = TRUE;
+                }
+                // if chain, increment chain and maybe show text
+                if (sameSpecies)
+                {
+                    // If we caught a chained pokemon, increase the chain by 6 (5 here + the normal 1).
+                    if (gBattleOutcome == B_OUTCOME_CAUGHT && chainCount)
+                        chainCount += 5;
+                    chainCount += 1;
+
+                    // Check u32 -> u16 overflow.
+                    chainCount = min(chainCount, 0xFFFF);
+
+                    // Show chain textbox
+                    // ...unless showText is false.
+                    if (showText)
+                        DISPLAY_CHAIN_NUMBER(chainCount, speciesChained);
+                }
+            }
+            // end win case
+        }
+        else if (gBattleOutcome == B_OUTCOME_RAN)
+        {
+            // Handle player running away case
+            if (chainCount && sameSpecies)
+            {
+                // If the chain was >= 3, show textbox showing you messed up.
+                // ...unless showText is false.
+                if (showText && chainCount >= 3)
+                    DISPLAY_DELETE_CHAIN(chainCount, speciesChained);
+
+                // Chain broke
+                chainCount = 0;
+                speciesChained = 0;
+            }
+        }
+        // If not caught, fled, or ran, ignore battle outcome and don't apply any chain logic.
+        /*** End Safari Zone ***/
+    }
+    else
+    {
+        /*** Wild Battle ***/
+        // Handle player defeated case
+        if (IsPlayerDefeated(gBattleOutcome) == TRUE && !InBattlePyramid() && !InBattlePike())
+        {
+            if (chainCount && sameSpecies)
+            {
+                // Chain broke
+                chainCount = 0;
+                speciesChained = 0;
+            }
+        }
+        else
+        {
+            // Handle win cases
+            if (gBattleOutcome == B_OUTCOME_WON ||
+                gBattleOutcome == B_OUTCOME_CAUGHT ||
+                gBattleOutcome == B_OUTCOME_PLAYER_TELEPORTED ||
+                gBattleOutcome == B_OUTCOME_MON_TELEPORTED ||
+                gBattleOutcome == B_OUTCOME_MON_FLED)
+            {
+                /*** Roamer Battle ***/
+                if (gBattleTypeFlags & BATTLE_TYPE_ROAMER)
+                {
+                    // Only check knockout & caught outcomes. 
+                    // Ignore run outcomes, as the player shouldn't get rewarded or penalized if the AI decided to flee.
+                    if (gBattleOutcome == B_OUTCOME_WON || gBattleOutcome == B_OUTCOME_CAUGHT)
+                    {
+                        if (!sameSpecies)
+                        {
+                            if (showText && chainCount >= 3)
+                            {
+                                u32 numDigits = CountDigits(chainCount);
+                                ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, (u8)numDigits);
+                                GetSpeciesName(gStringVar2, (u16)speciesChained);
+                                gSpecialVar_0x8003 = 10; // set flag to show chain break text
+                                // Fall outside to call RoamerTextScript
+                            }
+
+                            speciesChained = species;
+                            chainCount = 2; // Already defeated one, so increment counter.
+                        }
+                        else
+                        {
+                            chainCount += 2;
+                            // Check u32 -> u16 overflow.
+                            chainCount = min(chainCount, 0xFFFF);
+
+                            if (showText)
+                            {
+                                u32 numDigits = CountDigits(chainCount);
+                                ConvertIntToDecimalStringN(gStringVar1, chainCount, STR_CONV_MODE_LEFT_ALIGN, (u8)numDigits);
+                                GetSpeciesName(gStringVar2, (u16)speciesChained);
+                                // Fall outside to call RoamerTextScript
+                            }
+                        }
+
+                        // If roamer is still active, show shiny/not shiny text.
+                        // gSpecialVar_0x8003 wouldn't be set to 5 in any roamer case, since that flag
+                        // is set by a non-roamer battle triggering the roamer to roam.
+                        // So showText is really only keying off of noScriptMode.
+                        if (showText && IsRoamerActive())
+                        {
+                            ScriptContext1_SetupScript(RoamerTextScript);
+                        }
+                    }
+                    /*** End Roamer ***/
+                }
+                else
+                {
+                    // Handle win case: Broken chain case
+                    // if the species wasn't correct, and the chain is not zero, chain broke.
+                    if (!sameSpecies && chainCount)
+                    {
+                        // If the chain was >= 3, show textbox showing you messed up.
+                        // ...unless showText is false.
+                        if (showText && chainCount >= 3)
+                            DISPLAY_DELETE_CHAIN(chainCount, speciesChained);
+
+                        // we've started chaining this new species and are incrementing the counter.
+                        chainCount = 1;
+                        speciesChained = species;
+                        // End Broken chain case
+                    }
+                    else
+                    {
+                        // Handle win case: Start/maintain chain case
+                        // if no chain, start chaining
+                        if (speciesChained == 0)
+                        {
+                            speciesChained = species;
+                            sameSpecies = TRUE;
+                        }
+                        // if chain, increment chain and maybe show text
+                        if (sameSpecies)
+                        {
+                            // If we caught a chained pokemon, increase the chain by 6 (5 here + the normal 1).
+                            if (gBattleOutcome == B_OUTCOME_CAUGHT && chainCount)
+                                chainCount += 5;
+                            chainCount += 1;
+
+                            // Check u32 -> u16 overflow.
+                            chainCount = min(chainCount, 0xFFFF);
+
+                            // Show chain textbox
+                            // ...unless showText is false.
+                            if (showText)
+                                DISPLAY_CHAIN_NUMBER(chainCount, speciesChained);
+                        }
+                        // End Start/maintain chain case
+                    }
+                }
+            }
+            else
+            {
+                // Handle lose/run case
+                // If we had a chain and the species was correct but we ran from it.
+                if (chainCount && sameSpecies)
+                {
+                    // If the chain was >= 3, show textbox showing you messed up.
+                    // ...unless showText is false.
+                    if (showText && chainCount >= 3)
+                        DISPLAY_DELETE_CHAIN(chainCount, speciesChained);
+
+                    // Chain broke
+                    chainCount = 0;
+                    speciesChained = 0;
+                }
+                // End lose/run case
+            }
+        }
+    } /*** End Wild Battle ***/
+
+    VarSet(VAR_SPECIESCHAINED, (u16)speciesChained);
+    VarSet(VAR_CHAIN, (u16)chainCount);
+}
+
+#undef DISPLAY_CHAIN_NUMBER
+#undef DISPLAY_DELETE_CHAIN

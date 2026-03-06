@@ -151,6 +151,37 @@ static void AnimTask_SkullBashPositionSet(u8);
 static void AnimTask_SkullBashPositionReset(u8);
 static void AnimTask_DoubleTeam_Step(u8);
 static void AnimDoubleTeam(struct Sprite *);
+static void AnimMoveAccupressure(struct Sprite*);
+
+static const union AffineAnimCmd sAccupressureTurn[] =
+{
+    AFFINEANIMCMD_FRAME(0, 0, 1, 20),
+    AFFINEANIMCMD_FRAME(0, 0, -1, 40),
+    AFFINEANIMCMD_END,
+};
+
+static const union AffineAnimCmd sAccupressureStill[] =
+{
+    AFFINEANIMCMD_FRAME(256, 256, 0, 0),
+    AFFINEANIMCMD_END
+};
+
+static const union AffineAnimCmd* const sAccupressureAffineAnims[] =
+{
+    sAccupressureStill,
+    sAccupressureTurn
+};
+
+const struct SpriteTemplate gAcupressureSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_ACUPRESSURE,
+    .paletteTag = ANIM_TAG_ACUPRESSURE,
+    .oam = &gOamData_AffineDouble_ObjNormal_32x32,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = sAccupressureAffineAnims,
+    .callback = AnimMoveAccupressure,
+};
 
 const union AnimCmd gPowderParticlesAnimCmds[] =
 {
@@ -1646,6 +1677,39 @@ const struct SpriteTemplate gEndureEnergySpriteTemplate =
     .callback = AnimEndureEnergy,
 };
 
+const struct SpriteTemplate gBlueEndureEnergySpriteTemplate =
+{
+    .tileTag = ANIM_TAG_FOCUS_ENERGY,
+    .paletteTag = ANIM_TAG_SWEAT_BEAD,
+    .oam = &gOamData_AffineOff_ObjNormal_16x32,
+    .anims = gEndureEnergyAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimEndureEnergy,
+};
+
+const struct SpriteTemplate gGreenEndureEnergySpriteTemplate =
+{
+    .tileTag = ANIM_TAG_FOCUS_ENERGY,
+    .paletteTag = ANIM_TAG_WHIP_HIT,
+    .oam = &gOamData_AffineOff_ObjNormal_16x32,
+    .anims = gEndureEnergyAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimEndureEnergy,
+};
+
+const struct SpriteTemplate gYellowEndureEnergySpriteTemplate =
+{
+    .tileTag = ANIM_TAG_FOCUS_ENERGY,
+    .paletteTag = ANIM_TAG_PAW_PRINT,
+    .oam = &gOamData_AffineOff_ObjNormal_16x32,
+    .anims = gEndureEnergyAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimEndureEnergy,
+};
+
 const union AnimCmd gSharpenSphereAnimCmds[] =
 {
     ANIMCMD_FRAME(0, 18),
@@ -2182,6 +2246,39 @@ const struct SpriteTemplate gTauntFingerSpriteTemplate =
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = AnimTauntFinger,
 };
+
+static void AnimMoveAccupressureTransition(struct Sprite* sprite)
+{
+    switch (sprite->data[5])
+    {
+    case 0:
+        if (AnimTranslateLinear(sprite))
+        {
+            StartSpriteAffineAnim(sprite, 1);
+            sprite->data[5]++;
+        }
+        break;
+    case 1:
+        if (sprite->affineAnimEnded)
+        {
+            DestroyAnimSprite(sprite);
+        }
+        break;
+    }
+}
+
+static void AnimMoveAccupressure(struct Sprite* sprite)
+{
+    InitSpritePosToAnimTarget(sprite, TRUE);
+    sprite->data[0] = gBattleAnimArgs[2];
+    sprite->data[1] = sprite->pos1.x;
+    sprite->data[2] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X);
+    sprite->data[3] = sprite->pos1.y;
+    sprite->data[4] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y);
+    sprite->data[5] = 0;
+    InitAnimLinearTranslation(sprite);
+    sprite->callback = AnimMoveAccupressureTransition;
+}
 
 // Animates the falling particles that horizontally wave back and forth.
 // Used by Sleep Powder, Stun Spore, and Poison Powder.
@@ -5607,4 +5704,45 @@ static void AnimTauntFinger_Step2(struct Sprite* sprite)
 {
     if (++sprite->data[1] > 5)
         DestroyAnimSprite(sprite);
+}
+
+
+static const union AffineAnimCmd sCompressTargetHorizontallyAffineAnimCmds[] =
+{
+    AFFINEANIMCMD_FRAME(64, 0, 0, 16), //Compress
+    AFFINEANIMCMD_FRAME(0, 0, 0, 64),
+    AFFINEANIMCMD_FRAME(-64, 0, 0, 16),
+    AFFINEANIMCMD_END,
+};
+
+static const union AffineAnimCmd sCompressTargetHorizontallyAffineAnimCmdsFast[] =
+{
+    AFFINEANIMCMD_FRAME(32, 0, 0, 16), //Compress
+    AFFINEANIMCMD_FRAME(0, 0, 0, 32),
+    AFFINEANIMCMD_FRAME(-32, 0, 0, 16),
+    AFFINEANIMCMD_END,
+};
+
+static void AnimTask_CompressTargetStep(u8 taskId)
+{
+    struct Task* task = &gTasks[taskId];
+
+    if (!RunAffineAnimFromTaskData(task))
+        DestroyAnimVisualTask(taskId);
+}
+
+void AnimTask_CompressTargetHorizontally(u8 taskId)
+{
+    struct Task* task = &gTasks[taskId];
+    u8 spriteId = GetAnimBattlerSpriteId(ANIM_TARGET);
+    PrepareAffineAnimInTaskData(task, spriteId, sCompressTargetHorizontallyAffineAnimCmds);
+    task->func = AnimTask_CompressTargetStep;
+}
+
+void AnimTask_CompressTargetHorizontallyFast(u8 taskId)
+{
+    struct Task* task = &gTasks[taskId];
+    u8 spriteId = GetAnimBattlerSpriteId(ANIM_TARGET);
+    PrepareAffineAnimInTaskData(task, spriteId, sCompressTargetHorizontallyAffineAnimCmdsFast);
+    task->func = AnimTask_CompressTargetStep;
 }

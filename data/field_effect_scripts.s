@@ -72,6 +72,10 @@ gFieldEffectScriptPointers:: @ 82DB9D4
 	.4byte gFieldEffectScript_RayquazaSpotlight         @ FLDEFF_RAYQUAZA_SPOTLIGHT
 	.4byte gFieldEffectScript_DestroyDeoxysRock         @ FLDEFF_DESTROY_DEOXYS_ROCK
 	.4byte gFieldEffectScript_MoveDeoxysRock            @ FLDEFF_MOVE_DEOXYS_ROCK
+    .4byte gFieldEffectScript_UseSurfTool               @ FLDEFF_USE_SURF_TOOL
+    .4byte gFieldEffectScript_UseWaterfallTool          @ FLDEFF_USE_WATERFALL_TOOL 
+    .4byte gFieldEffectScript_UseDiveTool               @ FLDEFF_USE_DIVE_TOOL
+    .4byte gFieldEffectScript_UseTeleportTool           @ FLDEFF_USE_TELEPORT_TOOL
 
 gFieldEffectScript_ExclamationMarkIcon1:: @ 82DBAE0
 	field_eff_callnative FldEff_ExclamationMarkIcon
@@ -342,4 +346,20 @@ gFieldEffectScript_DestroyDeoxysRock:: @ 82DBCF9
 
 gFieldEffectScript_MoveDeoxysRock:: @ 82DBCFF
 	field_eff_callnative FldEff_MoveDeoxysRock
+	field_eff_end
+
+gFieldEffectScript_UseSurfTool::
+	field_eff_callnative FldEff_UseSurfTool
+	field_eff_end
+
+gFieldEffectScript_UseWaterfallTool::
+    field_eff_callnative FldEff_UseWaterfallTool
+	field_eff_end
+
+gFieldEffectScript_UseDiveTool::
+    field_eff_callnative FldEff_UseDiveTool
+	field_eff_end
+
+gFieldEffectScript_UseTeleportTool::
+    field_eff_callnative FldEff_UseTeleportTool
 	field_eff_end
