@@ -333,7 +333,7 @@ static s32 MapPosToBgTilemapOffset(struct FieldCameraOffset *cameraOffset, s32 x
 
 static void CameraUpdateCallback(struct CameraObject *fieldCamera)
 {
-    if (fieldCamera->spriteId != 0)
+    if (fieldCamera->spriteId < MAX_SPRITES)
     {
         fieldCamera->movementSpeedX = gSprites[fieldCamera->spriteId].data[2];
         fieldCamera->movementSpeedY = gSprites[fieldCamera->spriteId].data[3];
@@ -346,13 +346,13 @@ void ResetCameraUpdateInfo(void)
     gFieldCamera.movementSpeedY = 0;
     gFieldCamera.x = 0;
     gFieldCamera.y = 0;
-    gFieldCamera.spriteId = 0;
+    gFieldCamera.spriteId = MAX_SPRITES;
     gFieldCamera.callback = NULL;
 }
 
 u32 InitCameraUpdateCallback(u8 trackedSpriteId)
 {
-    if (gFieldCamera.spriteId != 0)
+    if (gFieldCamera.spriteId < MAX_SPRITES)
         DestroySprite(&gSprites[gFieldCamera.spriteId]);
     gFieldCamera.spriteId = AddCameraObject(trackedSpriteId);
     gFieldCamera.callback = CameraUpdateCallback;

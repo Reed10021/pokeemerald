@@ -977,7 +977,7 @@ static void ClearObjectEvent(struct ObjectEvent *objectEvent)
 
 static void ClearAllObjectEvents(void)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
         ClearObjectEvent(&gObjectEvents[i]);
@@ -1008,7 +1008,7 @@ static void CreateReflectionEffectSprites(void)
 
 u8 GetFirstInactiveObjectEventId(void)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         if (!gObjectEvents[i].active)
@@ -1038,7 +1038,7 @@ bool8 TryGetObjectEventIdByLocalIdAndMap(u8 localId, u8 mapNum, u8 mapGroupId, u
 
 u8 GetObjectEventIdByXY(s16 x, s16 y)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         if (gObjectEvents[i].active && gObjectEvents[i].currentCoords.x == x && gObjectEvents[i].currentCoords.y == y)
@@ -1050,7 +1050,7 @@ u8 GetObjectEventIdByXY(s16 x, s16 y)
 
 static u8 GetObjectEventIdByLocalIdAndMapInternal(u8 localId, u8 mapNum, u8 mapGroupId)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         if (gObjectEvents[i].active && gObjectEvents[i].localId == localId && gObjectEvents[i].mapNum == mapNum && gObjectEvents[i].mapGroup == mapGroupId)
@@ -1062,7 +1062,7 @@ static u8 GetObjectEventIdByLocalIdAndMapInternal(u8 localId, u8 mapNum, u8 mapG
 
 static u8 GetObjectEventIdByLocalId(u8 localId)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
         if (gObjectEvents[i].active && gObjectEvents[i].localId == localId)
@@ -1124,8 +1124,8 @@ static u8 InitObjectEventStateFromTemplate(struct ObjectEventTemplate *template,
 
 u8 Unref_TryInitLocalObjectEvent(u8 localId)
 {
-    u8 i;
-    u8 objectEventCount;
+    u32 i;
+    u32 objectEventCount;
     struct ObjectEventTemplate *template;
 
     if (gMapHeader.events != NULL)
@@ -1161,7 +1161,7 @@ static bool8 GetAvailableObjectEventId(u16 localId, u8 mapNum, u8 mapGroup, u8 *
 // If no slots are available, or if the object is already
 // loaded, returns TRUE.
 {
-    u8 i = 0;
+    u32 i;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
@@ -1216,7 +1216,7 @@ static void RemoveObjectEventInternal(struct ObjectEvent *objectEvent)
 
 void RemoveAllObjectEventsExceptPlayer(void)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
@@ -1359,8 +1359,10 @@ static void MakeObjectTemplateFromObjectEventTemplate(struct ObjectEventTemplate
     MakeObjectTemplateFromObjectEventGraphicsInfoWithCallbackIndex(objectEventTemplate->graphicsId, objectEventTemplate->movementType, spriteTemplate, subspriteTables);
 }
 
+// Update sprite's palette, freeing old palette if necessary
 static u8 UpdateSpritePalette(const struct SpritePalette* spritePalette, struct Sprite* sprite)
 {
+    // Free palette if otherwise unused
     sprite->inUse = FALSE;
     FieldEffectFreePaletteIfUnused(sprite->oam.paletteNum);
     sprite->inUse = TRUE;
@@ -1370,7 +1372,9 @@ static u8 UpdateSpritePalette(const struct SpritePalette* spritePalette, struct 
         UpdateSpritePaletteWithWeather(sprite->oam.paletteNum, FALSE);
     }
     else
+    {
         sprite->oam.paletteNum = LoadSpritePalette(spritePalette);
+    }
 
     return sprite->oam.paletteNum;
 }
@@ -1405,6 +1409,9 @@ u8 CreateObjectGraphicsSpriteWithTag(u16 graphicsId, void (*callback)(struct Spr
     u8 spriteId;
 
     spriteTemplate = malloc(sizeof(struct SpriteTemplate));
+    if (spriteTemplate == NULL)
+        return MAX_SPRITES;
+
     MakeObjectTemplateFromObjectEventGraphicsInfo(graphicsId, callback, spriteTemplate, &subspriteTables);
     if (spriteTemplate->paletteTag != TAG_NONE)
     {
@@ -1525,7 +1532,9 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType)
 {
     struct Sprite* sprite;
     const struct SpriteTemplate* template;
-    u8 i;
+    u32 i;
+    u32 spriteId;
+    u32 sheetTileStart;
 
     for (i = 0; i < MAX_SPRITES; i++)
     {
@@ -1536,7 +1545,15 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType)
     lightType = min(lightType, ARRAY_COUNT(gFieldEffectObjectTemplate_Light) - 1);
     template = gFieldEffectObjectTemplate_Light[lightType];
     LoadSpriteSheetByTemplate(template, 0);
-    sprite = &gSprites[CreateSprite(template, 0, 0, 0)];
+    sheetTileStart = GetSpriteTileStartByTag(template->tileTag);
+    spriteId = CreateSprite(template, 0, 0, 0);
+    if (spriteId == MAX_SPRITES)
+    {
+        if (sheetTileStart != 0xFFFF)
+            FieldEffectFreeTilesIfUnused(sheetTileStart);
+        return;
+    }
+    sprite = &gSprites[spriteId];
     if (lightType == 0 && (i = IndexOfSpritePaletteTag(template->paletteTag + 1)) < 16)
         sprite->oam.paletteNum = i;
     else
@@ -1592,8 +1609,8 @@ static void SpawnLightSprite(s16 x, s16 y, s16 camX, s16 camY, u32 lightType)
 
 void TrySpawnLightSprites(s16 camX, s16 camY)
 {
-    u8 i;
-    u8 objectCount;
+    u32 i;
+    u32 objectCount;
     s16 left = gSaveBlock1Ptr->pos.x - 2;
     s16 right = gSaveBlock1Ptr->pos.x + MAP_OFFSET_W + 2;
     s16 top = gSaveBlock1Ptr->pos.y;
@@ -1624,8 +1641,8 @@ void TrySpawnLightSprites(s16 camX, s16 camY)
 
 void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 {
-    u8 i;
-    u8 objectCount;
+    u32 i;
+    u32 objectCount;
 
     if (gMapHeader.events != NULL)
     {
@@ -1666,7 +1683,7 @@ void TrySpawnObjectEvents(s16 cameraX, s16 cameraY)
 
 void RemoveObjectEventsOutsideView(void)
 {
-    u8 i, j;
+    u32 i, j;
     bool8 isActiveLinkPlayer;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
@@ -1704,7 +1721,7 @@ static void RemoveObjectEventIfOutsideView(struct ObjectEvent *objectEvent)
 
 void sub_808E16C(s16 x, s16 y) //SpawnObjectEventsOnReturnToField
 {
-    u8 i;
+    u32 i;
 
     ClearPlayerAvatarInfo();
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
@@ -1721,6 +1738,7 @@ void sub_808E16C(s16 x, s16 y) //SpawnObjectEventsOnReturnToField
 static void sub_808E1B8(u8 objectEventId, s16 x, s16 y) //SpawnObjectEventOnReturnToField
 {
     u8 spriteId;
+    u32 i;
     struct Sprite *sprite;
     struct ObjectEvent *objectEvent;
     struct SpriteTemplate spriteTemplate;
@@ -1728,7 +1746,6 @@ static void sub_808E1B8(u8 objectEventId, s16 x, s16 y) //SpawnObjectEventOnRetu
     const struct SubspriteTable *subspriteTables;
     const struct ObjectEventGraphicsInfo *graphicsInfo;
 
-#define i spriteId
     for (i = 0; i < ARRAY_COUNT(gLinkPlayerObjectEvents); i++)
     {
         if (gLinkPlayerObjectEvents[i].active && objectEventId == gLinkPlayerObjectEvents[i].objEventId)
@@ -1736,7 +1753,6 @@ static void sub_808E1B8(u8 objectEventId, s16 x, s16 y) //SpawnObjectEventOnRetu
             return;
         }
     }
-#undef i
 
     objectEvent = &gObjectEvents[objectEventId];
     subspriteTables = NULL;
@@ -2030,7 +2046,7 @@ u8 LoadObjectEventPalette(u16 paletteTag)
 
 void Unused_LoadObjectEventPaletteSet(u16 *paletteTags)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; paletteTags[i] != OBJ_EVENT_PAL_TAG_NONE; i++)
     {
@@ -2052,7 +2068,7 @@ static u8 sub_808E8F4(const struct SpritePalette *spritePalette)
 
 static u8 FindObjectEventPaletteIndexByTag(u16 tag)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; sObjectEventSpritePalettes[i].tag != OBJ_EVENT_PAL_TAG_NONE; i++)
     {
@@ -2134,7 +2150,7 @@ void ShiftStillObjectEventCoords(struct ObjectEvent *objectEvent)
 
 void UpdateObjectEventCoordsForCameraUpdate(void)
 {
-    u8 i;
+    u32 i;
     s16 dx;
     s16 dy;
 
@@ -2159,7 +2175,7 @@ void UpdateObjectEventCoordsForCameraUpdate(void)
 
 u8 GetObjectEventIdByXYZ(u16 x, u16 y, u8 z)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
@@ -2193,6 +2209,8 @@ void UpdateObjectEventsForCameraUpdate(s16 x, s16 y)
 u8 AddCameraObject(u8 linkedSpriteId)
 {
     u8 spriteId = CreateSprite(&gCameraSpriteTemplate, 0, 0, 4);
+    if (spriteId == MAX_SPRITES)
+        return MAX_SPRITES;
 
     gSprites[spriteId].invisible = TRUE;
     gSprites[spriteId].data[0] = linkedSpriteId;
@@ -2237,7 +2255,7 @@ static void CameraObject_2(struct Sprite *sprite)
 
 static struct Sprite *FindCameraObject(void)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < MAX_SPRITES; i++)
     {
@@ -2292,7 +2310,7 @@ void CameraObjectReset2(void)
 
 u8 CopySprite(struct Sprite *sprite, s16 x, s16 y, u8 subpriority)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < MAX_SPRITES; i++)
     {
@@ -2310,7 +2328,7 @@ u8 CopySprite(struct Sprite *sprite, s16 x, s16 y, u8 subpriority)
 
 u8 CreateCopySpriteAt(struct Sprite *sprite, s16 x, s16 y, u8 subpriority)
 {
-    s16 i;
+    s32 i;
 
     for (i = MAX_SPRITES - 1; i > -1; i--)
     {
@@ -2423,7 +2441,7 @@ static struct ObjectEventTemplate *GetObjectEventTemplateByLocalIdAndMap(u8 loca
 
 static struct ObjectEventTemplate *FindObjectEventTemplateByLocalId(u8 localId, struct ObjectEventTemplate *templates, u8 count)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < count; i++)
     {
@@ -4769,7 +4787,7 @@ static bool8 IsMetatileDirectionallyImpassable(struct ObjectEvent *objectEvent, 
 
 static bool8 DoesObjectCollideWithObjectAt(struct ObjectEvent *objectEvent, s16 x, s16 y)
 {
-    u8 i;
+    u32 i;
     struct ObjectEvent *curObject;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
@@ -7657,7 +7675,7 @@ static void GetGroundEffectFlags_JumpLanding(struct ObjectEvent *objEvent, u32 *
 
     if (objEvent->landingJump && !objEvent->disableJumpLandingGroundEffect)
     {
-        u8 i;
+        u32 i;
 
         for (i = 0; i < ARRAY_COUNT(metatileFuncs); i++)
         {
@@ -7677,10 +7695,10 @@ static u8 ObjectEventCheckForReflectiveSurface(struct ObjectEvent *objEvent)
     // ceil div by tile width?
     s16 width = (info->width + 8) >> 4;
     s16 height = (info->height + 8) >> 4;
-    s16 i;
-    s16 j;
+    s32 i;
+    s32 j;
     u8 result;
-    u8 b;
+    u32 b;
     s16 one;
 
 #define RETURN_REFLECTION_TYPE_AT(x, y)              \
@@ -8120,7 +8138,7 @@ static void GroundEffect_Shadow(struct ObjectEvent* objEvent, struct Sprite* spr
 
 static void DoFlaggedGroundEffects(struct ObjectEvent *objEvent, struct Sprite *sprite, u32 flags)
 {
-    u8 i;
+    u32 i;
 
     if (ObjectEventIsFarawayIslandMew(objEvent) == TRUE && !ShouldMewShakeGrass(objEvent))
         return;
@@ -8221,7 +8239,7 @@ bool8 FreezeObjectEvent(struct ObjectEvent *objectEvent)
 
 void FreezeObjectEvents(void)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
         if (gObjectEvents[i].active && i != gPlayerAvatar.objectEventId)
             FreezeObjectEvent(&gObjectEvents[i]);
@@ -8229,7 +8247,7 @@ void FreezeObjectEvents(void)
 
 void FreezeObjectEventsExceptOne(u8 objectEventId)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
         if (i != objectEventId && gObjectEvents[i].active && i != gPlayerAvatar.objectEventId)
             FreezeObjectEvent(&gObjectEvents[i]);
@@ -8247,7 +8265,7 @@ void UnfreezeObjectEvent(struct ObjectEvent *objectEvent)
 
 void UnfreezeObjectEvents(void)
 {
-    u8 i;
+    u32 i;
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
         if (gObjectEvents[i].active)
             UnfreezeObjectEvent(&gObjectEvents[i]);
@@ -8835,13 +8853,16 @@ u8 MovementAction_StoreAndLockAnim_Step0(struct ObjectEvent *objectEvent, struct
     if (gLockedAnimObjectEvents == NULL)
     {
         gLockedAnimObjectEvents = AllocZeroed(sizeof(struct LockedAnimObjectEvents));
-        gLockedAnimObjectEvents->objectEventIds[0] = objectEvent->localId;
-        gLockedAnimObjectEvents->count = 1;
-        ableToStore = TRUE;
+        if (gLockedAnimObjectEvents != NULL)
+        {
+            gLockedAnimObjectEvents->objectEventIds[0] = objectEvent->localId;
+            gLockedAnimObjectEvents->count = 1;
+            ableToStore = TRUE;
+        }
     }
     else
     {
-        u8 i, firstFreeSlot;
+        u32 i, firstFreeSlot;
         bool8 found;
         for (firstFreeSlot = 16, found = FALSE, i = 0; i < 16; i++)
         {
@@ -8904,7 +8925,7 @@ u8 MovementAction_FreeAndUnlockAnim_Step0(struct ObjectEvent *objectEvent, struc
 
 u8 FindLockedObjectEventIndex(struct ObjectEvent *objectEvent)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {
@@ -8953,7 +8974,7 @@ void DestroyExtraMovementTask(u8 taskId)
 
 void sub_8098074(u8 var1, u8 var2)
 {
-    u8 i;
+    u32 i;
 
     for(i = 0; i < OBJECT_EVENTS_COUNT; i++)
     {

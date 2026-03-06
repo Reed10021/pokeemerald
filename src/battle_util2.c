@@ -11,6 +11,8 @@
 #include "random.h"
 #include "battle_scripts.h"
 
+void FreeBattleResources(void);
+
 void AllocateBattleResources(void)
 {
     gBattleResources = gBattleResources; // something dumb needed to match
@@ -18,29 +20,78 @@ void AllocateBattleResources(void)
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
         InitTrainerHillBattleStruct();
 
+    gBattleStruct = NULL;
+    gBattleResources = NULL;
+    gLinkBattleSendBuffer = NULL;
+    gLinkBattleRecvBuffer = NULL;
+    gUnknown_0202305C = NULL;
+    gUnknown_02023060 = NULL;
+
     gBattleStruct = AllocZeroed(sizeof(*gBattleStruct));
+    if (gBattleStruct == NULL)
+        goto fail;
 
     gBattleResources = AllocZeroed(sizeof(*gBattleResources));
+    if (gBattleResources == NULL)
+        goto fail;
+
     gBattleResources->secretBase = AllocZeroed(sizeof(*gBattleResources->secretBase));
+    if (gBattleResources->secretBase == NULL)
+        goto fail;
+
     gBattleResources->flags = AllocZeroed(sizeof(*gBattleResources->flags));
+    if (gBattleResources->flags == NULL)
+        goto fail;
+
     gBattleResources->battleScriptsStack = AllocZeroed(sizeof(*gBattleResources->battleScriptsStack));
+    if (gBattleResources->battleScriptsStack == NULL)
+        goto fail;
+
     gBattleResources->battleCallbackStack = AllocZeroed(sizeof(*gBattleResources->battleCallbackStack));
+    if (gBattleResources->battleCallbackStack == NULL)
+        goto fail;
+
     gBattleResources->beforeLvlUp = AllocZeroed(sizeof(*gBattleResources->beforeLvlUp));
+    if (gBattleResources->beforeLvlUp == NULL)
+        goto fail;
+
     gBattleResources->ai = AllocZeroed(sizeof(*gBattleResources->ai));
+    if (gBattleResources->ai == NULL)
+        goto fail;
+
     gBattleResources->battleHistory = AllocZeroed(sizeof(*gBattleResources->battleHistory));
+    if (gBattleResources->battleHistory == NULL)
+        goto fail;
+
     gBattleResources->AI_ScriptsStack = AllocZeroed(sizeof(*gBattleResources->AI_ScriptsStack));
+    if (gBattleResources->AI_ScriptsStack == NULL)
+        goto fail;
 
     gLinkBattleSendBuffer = AllocZeroed(BATTLE_BUFFER_LINK_SIZE);
+    if (gLinkBattleSendBuffer == NULL)
+        goto fail;
+
     gLinkBattleRecvBuffer = AllocZeroed(BATTLE_BUFFER_LINK_SIZE);
+    if (gLinkBattleRecvBuffer == NULL)
+        goto fail;
 
     gUnknown_0202305C = AllocZeroed(0x2000);
+    if (gUnknown_0202305C == NULL)
+        goto fail;
+
     gUnknown_02023060 = AllocZeroed(0x1000);
+    if (gUnknown_02023060 == NULL)
+        goto fail;
 
     if (gBattleTypeFlags & BATTLE_TYPE_SECRET_BASE)
     {
         u16 currSecretBaseId = VarGet(VAR_CURRENT_SECRET_BASE);
         CreateSecretBaseEnemyParty(&gSaveBlock1Ptr->secretBases[currSecretBaseId]);
     }
+    return;
+
+fail:
+    FreeBattleResources();
 }
 
 void FreeBattleResources(void)
@@ -48,10 +99,10 @@ void FreeBattleResources(void)
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
         FreeTrainerHillBattleStruct();
 
+    FREE_AND_SET_NULL(gBattleStruct);
+
     if (gBattleResources != NULL)
     {
-        FREE_AND_SET_NULL(gBattleStruct);
-
         FREE_AND_SET_NULL(gBattleResources->secretBase);
         FREE_AND_SET_NULL(gBattleResources->flags);
         FREE_AND_SET_NULL(gBattleResources->battleScriptsStack);
@@ -61,13 +112,13 @@ void FreeBattleResources(void)
         FREE_AND_SET_NULL(gBattleResources->battleHistory);
         FREE_AND_SET_NULL(gBattleResources->AI_ScriptsStack);
         FREE_AND_SET_NULL(gBattleResources);
-
-        FREE_AND_SET_NULL(gLinkBattleSendBuffer);
-        FREE_AND_SET_NULL(gLinkBattleRecvBuffer);
-
-        FREE_AND_SET_NULL(gUnknown_0202305C);
-        FREE_AND_SET_NULL(gUnknown_02023060);
     }
+
+    FREE_AND_SET_NULL(gLinkBattleSendBuffer);
+    FREE_AND_SET_NULL(gLinkBattleRecvBuffer);
+
+    FREE_AND_SET_NULL(gUnknown_0202305C);
+    FREE_AND_SET_NULL(gUnknown_02023060);
 }
 
 void AdjustFriendshipOnBattleFaint(u8 battlerId)

@@ -3084,8 +3084,14 @@ void SurfFieldEffect_End(struct Task *task)
 u8 FldEff_RayquazaSpotlight(void)
 {
     u8 i, j, k;
+    struct Sprite *sprite;
     u8 spriteId = CreateSprite(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_RAYQUAZA], 120, -24, 1);
-    struct Sprite *sprite = &gSprites[spriteId];
+    if (spriteId == MAX_SPRITES)
+    {
+        FieldEffectActiveListRemove(FLDEFF_RAYQUAZA_SPOTLIGHT);
+        return MAX_SPRITES;
+    }
+    sprite = &gSprites[spriteId];
 
     sprite->oam.priority = 1;
     sprite->oam.paletteNum = 4;
@@ -3120,8 +3126,14 @@ u8 FldEff_RayquazaSpotlight(void)
 
 u8 FldEff_NPCFlyOut(void)
 {
+    struct Sprite *sprite;
     u8 spriteId = CreateSprite(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_BIRD], 0x78, 0, 1);
-    struct Sprite *sprite = &gSprites[spriteId];
+    if (spriteId == MAX_SPRITES)
+    {
+        FieldEffectActiveListRemove(FLDEFF_NPCFLY_OUT);
+        return MAX_SPRITES;
+    }
+    sprite = &gSprites[spriteId];
 
     sprite->oam.priority = 1;
     sprite->callback = SpriteCB_NPCFlyOut;
@@ -3304,6 +3316,9 @@ static u8 CreateFlyBirdSprite(void)
     u8 spriteId;
     struct Sprite *sprite;
     spriteId = CreateSprite(gFieldEffectObjectTemplatePointers[FLDEFFOBJ_BIRD], 0xff, 0xb4, 0x1);
+    if (spriteId == MAX_SPRITES)
+        return MAX_SPRITES;
+
     sprite = &gSprites[spriteId];
     sprite->oam.priority = 1;
     sprite->callback = SpriteCB_FlyBirdLeaveBall;
@@ -3313,12 +3328,18 @@ static u8 CreateFlyBirdSprite(void)
 
 static u8 GetFlyBirdAnimCompleted(u8 spriteId)
 {
+    if (spriteId == MAX_SPRITES)
+        return TRUE;
+
     return gSprites[spriteId].sAnimCompleted;
 }
 
 static void StartFlyBirdSwoopDown(u8 spriteId)
 {
     struct Sprite *sprite;
+    if (spriteId == MAX_SPRITES)
+        return;
+
     sprite = &gSprites[spriteId];
     sprite->callback = SpriteCB_FlyBirdSwoopDown;
     sprite->pos1.x = DISPLAY_WIDTH / 2;
@@ -3331,6 +3352,9 @@ static void StartFlyBirdSwoopDown(u8 spriteId)
 
 static void SetFlyBirdPlayerSpriteId(u8 birdSpriteId, u8 playerSpriteId)
 {
+    if (birdSpriteId == MAX_SPRITES)
+        return;
+
     gSprites[birdSpriteId].sPlayerSpriteId = playerSpriteId;
 }
 
@@ -3450,6 +3474,9 @@ static void SpriteCB_FlyBirdReturnToBall(struct Sprite *sprite)
 
 static void StartFlyBirdReturnToBall(u8 spriteId)
 {
+    if (spriteId == MAX_SPRITES)
+        return;
+
     StartFlyBirdSwoopDown(spriteId); // Set up is the same, but overrwrites the callback below
     gSprites[spriteId].callback = SpriteCB_FlyBirdReturnToBall;
 }
@@ -3581,7 +3608,8 @@ static void FlyInFieldEffect_WaitBirdReturn(struct Task *task)
 {
     if (GetFlyBirdAnimCompleted(task->tBirdSpriteId))
     {
-        DestroySprite(&gSprites[task->tBirdSpriteId]);
+        if (task->tBirdSpriteId != MAX_SPRITES)
+            DestroySprite(&gSprites[task->tBirdSpriteId]);
         task->tState++;
         task->data[1] = 16;
     }
@@ -3898,4 +3926,3 @@ static void Task_MoveDeoxysRock(u8 taskId)
             break;
     }
 }
-

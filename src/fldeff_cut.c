@@ -309,7 +309,8 @@ static void StartCutGrassFieldEffect(void)
 bool8 FldEff_CutGrass(void)
 {
     s16 x, y;
-    u8 i = 0;
+    u32 i = 0;
+    u32 createdSprites = 0;
 
     PlaySE(SE_M_CUT);
     PlayerGetDestCoords(&gPlayerFacingPosition.x, &gPlayerFacingPosition.y);
@@ -331,16 +332,41 @@ bool8 FldEff_CutGrass(void)
     SetCutGrassMetatiles(gPlayerFacingPosition.x - sTileCountFromPlayer_X, gPlayerFacingPosition.y - (1 + sTileCountFromPlayer_Y));
     DrawWholeMapView();
     sCutGrassSpriteArrayPtr = AllocZeroed(CUT_SPRITE_ARRAY_COUNT);
-
-    // populate sprite ID array
-    for (i = 0; i < CUT_SPRITE_ARRAY_COUNT; i++)
+    if (sCutGrassSpriteArrayPtr != NULL)
     {
-        sCutGrassSpriteArrayPtr[i] = CreateSprite(&sSpriteTemplate_CutGrass,
-        gSprites[gPlayerAvatar.spriteId].oam.x + 8, gSprites[gPlayerAvatar.spriteId].oam.y + 20, 0);
-        gSprites[sCutGrassSpriteArrayPtr[i]].data[2] = 32 * i;
-    }
 
-    return FALSE;
+        // populate sprite ID array
+        for (i = 0; i < CUT_SPRITE_ARRAY_COUNT; i++)
+        {
+            u32 spriteId = CreateSprite(&sSpriteTemplate_CutGrass,
+                gSprites[gPlayerAvatar.spriteId].oam.x + 8,
+                gSprites[gPlayerAvatar.spriteId].oam.y + 20, 0);
+            if (spriteId == MAX_SPRITES)
+                goto failure;
+
+            sCutGrassSpriteArrayPtr[i] = spriteId;
+            gSprites[spriteId].data[2] = 32 * i;
+            createdSprites++;
+        }
+
+        return FALSE;
+    }
+    else
+    {
+    failure:
+        for (i = 1; i < createdSprites; i++)
+            DestroySprite(&gSprites[sCutGrassSpriteArrayPtr[i]]);
+        if (createdSprites != 0)
+            FieldEffectStop(&gSprites[sCutGrassSpriteArrayPtr[0]], FLDEFF_CUT_GRASS);
+        else
+            FieldEffectActiveListRemove(FLDEFF_CUT_GRASS);
+        FREE_AND_SET_NULL(sCutGrassSpriteArrayPtr);
+        ScriptUnfreezeObjectEvents();
+        ScriptContext2_Disable();
+        if (IsMewPlayingHideAndSeek() == TRUE)
+            ScriptContext1_SetupScript(FarawayIsland_Interior_EventScript_HideMewWhenGrassCut);
+        return FALSE;
+    }
 }
 
 // set map grid metatile depending on x, y

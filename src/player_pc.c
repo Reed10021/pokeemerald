@@ -313,16 +313,30 @@ void NewGameInitPCItems(void)
 
 void BedroomPC(void)
 {
+    u32 taskId;
+
     gPcItemMenuOptionOrder = gBedroomPC_OptionOrder;
     gPcItemMenuOptionsNum = 4;
-    DisplayItemMessageOnField(CreateTask(TaskDummy, 0), gText_WhatWouldYouLike, InitPlayerPCMenu);
+    taskId = CreateTaskIfSpace(TaskDummy, 0);
+    if (taskId < NUM_TASKS)
+        DisplayItemMessageOnField((u8)taskId, gText_WhatWouldYouLike, InitPlayerPCMenu);
+    else if (gSaveBlock2Ptr->playerGender == MALE)
+        ScriptContext1_SetupScript(LittlerootTown_BrendansHouse_2F_EventScript_TurnOffPlayerPC);
+    else
+        ScriptContext1_SetupScript(LittlerootTown_MaysHouse_2F_EventScript_TurnOffPlayerPC);
 }
 
 void PlayerPC(void)
 {
+    u32 taskId;
+
     gPcItemMenuOptionOrder = gPlayerPC_OptionOrder;
     gPcItemMenuOptionsNum = 3;
-    DisplayItemMessageOnField(CreateTask(TaskDummy, 0), gText_WhatWouldYouLike, InitPlayerPCMenu);
+    taskId = CreateTaskIfSpace(TaskDummy, 0);
+    if (taskId < NUM_TASKS)
+        DisplayItemMessageOnField((u8)taskId, gText_WhatWouldYouLike, InitPlayerPCMenu);
+    else
+        EnableBothScriptContexts();
 }
 
 static void InitPlayerPCMenu(u8 taskId)
@@ -505,9 +519,15 @@ void sub_816B31C(void)
 
 void Mailbox_DoRedrawMailboxMenuAfterReturn(void)
 {
+    u32 taskId;
+
     LoadMessageBoxAndBorderGfx();
     DrawDialogueFrame(0, 1);
-    InitItemStorageMenu(CreateTask(ItemStorage_HandleReturnToProcessInput, 0), 1);
+    taskId = CreateTaskIfSpace(ItemStorage_HandleReturnToProcessInput, 0);
+    if (taskId < NUM_TASKS)
+        InitItemStorageMenu((u8)taskId, 1);
+    else
+        EnableBothScriptContexts();
     FadeInFromBlack();
 }
 
@@ -557,6 +577,12 @@ static void ItemStorage_WithdrawToss_Helper(u8 taskId, bool8 toss)
     playerPCItemPageInfo.scrollIndicatorId = 0xFF;
     ItemStorage_SetItemAndMailCount(taskId);
     sub_816BC14();
+    if (gUnknown_0203BCC4 == NULL)
+    {
+        PlayerPC_ItemStorage(taskId);
+        return;
+    }
+
     FreeAndReserveObjectSpritePalettes();
     LoadListMenuArrowsGfx();
     sub_8122344(gUnknown_0203BCC4->spriteIds, 7);
@@ -737,14 +763,29 @@ static void Mailbox_ReturnToFieldFromReadMail(void)
 
 static void pal_fill_for_maplights_or_black(void)
 {
-    u8 taskId;
+    u32 taskId;
+    bool8 restoreScriptContexts = FALSE;
 
     LoadMessageBoxAndBorderGfx();
-    taskId = CreateTask(Mailbox_HandleReturnToProcessInput, 0);
+    taskId = CreateTaskIfSpace(Mailbox_HandleReturnToProcessInput, 0);
     if (sub_81D1C44(playerPCItemPageInfo.count) == TRUE)
-        Mailbox_DrawMailboxMenu(taskId);
-    else
+    {
+        if (taskId < NUM_TASKS)
+            Mailbox_DrawMailboxMenu((u8)taskId);
+        else
+        {
+            sub_81D1EC0();
+            restoreScriptContexts = TRUE;
+        }
+    }
+    else if (taskId < NUM_TASKS)
         DestroyTask(taskId);
+    else
+        restoreScriptContexts = TRUE;
+
+    if (restoreScriptContexts)
+        EnableBothScriptContexts();
+
     FadeInFromBlack();
 }
 
@@ -837,9 +878,11 @@ void Mailbox_ReturnToMailListAfterDeposit(void)
 
 static void Mailbox_UpdateMailListAfterDeposit(void)
 {
-    u8 taskId;
-    u8 prevCount;
-    taskId = CreateTask(Mailbox_HandleReturnToProcessInput, 0);
+    u32 taskId;
+    u32 prevCount;
+    bool8 restoreScriptContexts = FALSE;
+
+    taskId = CreateTaskIfSpace(Mailbox_HandleReturnToProcessInput, 0);
     prevCount = playerPCItemPageInfo.count;
     playerPCItemPageInfo.count = GetMailboxMailCount();
     Mailbox_UpdateMailList();
@@ -849,9 +892,23 @@ static void Mailbox_UpdateMailListAfterDeposit(void)
     ItemStorage_SetItemAndMailCount(taskId);
     LoadMessageBoxAndBorderGfx();
     if (sub_81D1C44(playerPCItemPageInfo.count) == TRUE)
-        Mailbox_DrawMailboxMenu(taskId);
+    {
+        if (taskId < NUM_TASKS)
+            Mailbox_DrawMailboxMenu((u8)taskId);
+        else
+        {
+            sub_81D1EC0();
+            restoreScriptContexts = TRUE;
+        }
+    }
+    else if (taskId < NUM_TASKS)
+        DestroyTask((u8)taskId);
     else
-        DestroyTask(taskId);
+        restoreScriptContexts = TRUE;
+
+    if (restoreScriptContexts)
+        EnableBothScriptContexts();
+
     FadeInFromBlack();
 }
 
@@ -872,6 +929,9 @@ static void Mailbox_Cancel(u8 taskId)
 static void sub_816BC14(void)
 {
     gUnknown_0203BCC4 = AllocZeroed(sizeof(struct Struct203BCC4));
+    if (gUnknown_0203BCC4 == NULL)
+        return;
+
     memset(gUnknown_0203BCC4->windowIds, 0xFF, 0x6);
     gUnknown_0203BCC4->unk666 = 0xFF;
     gUnknown_0203BCC4->spriteId = 0xFF;
@@ -881,9 +941,13 @@ static void sub_816BC58(void)
 {
     u32 i;
 
+    if (gUnknown_0203BCC4 == NULL)
+        return;
+
     for(i = 0; i < 6; i++)
         sub_816BCC4(i);
     Free(gUnknown_0203BCC4);
+    gUnknown_0203BCC4 = NULL;
 }
 
 static u8 sub_816BC7C(u8 a)

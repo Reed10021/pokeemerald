@@ -3043,6 +3043,12 @@ static void Task_ShowTourneyInfoCard(u8 taskId)
     case 3:
         SetVBlankCallback(VblankCb_TourneyInfoCard);
         sInfoCard = AllocZeroed(sizeof(*sInfoCard));
+        if (sInfoCard == NULL)
+        {
+            DestroyTask(taskId);
+            SetMainCallback2(CB2_ReturnToFieldContinueScriptPlayMapMusic);
+            break;
+        }
         for (i = 0; i < NUM_INFOCARD_SPRITES; i++)
             sInfoCard->spriteIds[i] = 0xFF;
         LoadMonIconPalettes();
@@ -3065,27 +3071,39 @@ static void Task_ShowTourneyInfoCard(u8 taskId)
         {
             // Scroll up arrow
             id = CreateSprite(&sVerticalScrollArrowSpriteTemplate, 120, 4, 0);
-            StartSpriteAnim(&gSprites[id], 0);
-            gSprites[id].data[0] = i;
+            if (id != MAX_SPRITES)
+            {
+                StartSpriteAnim(&gSprites[id], 0);
+                gSprites[id].data[0] = i;
+            }
 
             // Scroll down arrow
             id = CreateSprite(&sVerticalScrollArrowSpriteTemplate, 120, 156, 0);
-            StartSpriteAnim(&gSprites[id], 1);
-            gSprites[id].data[0] = i;
+            if (id != MAX_SPRITES)
+            {
+                StartSpriteAnim(&gSprites[id], 1);
+                gSprites[id].data[0] = i;
+            }
 
             // Scroll left arrow
             id = CreateSprite(&sHorizontalScrollArrowSpriteTemplate, 6, 80, 0);
-            StartSpriteAnim(&gSprites[id], 0);
-            gSprites[id].data[0] = i;
-            gSprites[id].data[1] = 0;
-            if (mode == INFOCARD_TRAINER)
-                gSprites[id].invisible = TRUE;
+            if (id != MAX_SPRITES)
+            {
+                StartSpriteAnim(&gSprites[id], 0);
+                gSprites[id].data[0] = i;
+                gSprites[id].data[1] = 0;
+                if (mode == INFOCARD_TRAINER)
+                    gSprites[id].invisible = TRUE;
+            }
 
             // Scroll right arrow
             id = CreateSprite(&sHorizontalScrollArrowSpriteTemplate, 234, 80, 0);
-            StartSpriteAnim(&gSprites[id], 1);
-            gSprites[id].data[0] = i;
-            gSprites[id].data[1] = 1;
+            if (id != MAX_SPRITES)
+            {
+                StartSpriteAnim(&gSprites[id], 1);
+                gSprites[id].data[0] = i;
+                gSprites[id].data[1] = 1;
+            }
         }
         DestroyTask(taskId);
         break;
@@ -4247,6 +4265,9 @@ static void DisplayTrainerInfoOnCard(u8 flags, u8 trainerTourneyId)
     int x = 0, y = 0;
     u8 palSlot = 0;
     s16 *allocatedArray = AllocZeroed(sizeof(s16) * ALLOC_ARRAY_SIZE);
+    if (allocatedArray == NULL)
+        return;
+
     trainerId = DOME_TRAINERS[trainerTourneyId].trainerId;
 
     if (flags & CARD_ALTERNATE_SLOT)
@@ -4267,8 +4288,10 @@ static void DisplayTrainerInfoOnCard(u8 flags, u8 trainerTourneyId)
         sInfoCard->spriteIds[arrId] = CreateTrainerPicSprite(GetDomeBrainTrainerPicId(), TRUE, x + 48, y + 64, palSlot + 12, 0xFFFF);
     else
         sInfoCard->spriteIds[arrId] = CreateTrainerPicSprite(GetFrontierTrainerFrontSpriteId(trainerId), TRUE, x + 48, y + 64, palSlot + 12, 0xFFFF);
+    if (sInfoCard->spriteIds[arrId] == MAX_SPRITES)
+        sInfoCard->spriteIds[arrId] = 0xFF;
 
-    if (flags & MOVE_CARD)
+    if ((flags & MOVE_CARD) && sInfoCard->spriteIds[arrId] != 0xFF)
         gSprites[sInfoCard->spriteIds[arrId]].invisible = TRUE;
 
     // Create party mon icons
@@ -4281,7 +4304,6 @@ static void DisplayTrainerInfoOnCard(u8 flags, u8 trainerTourneyId)
                                                                   x | sInfoTrainerMonX[i],
                                                                   y + sInfoTrainerMonY[i],
                                                                   0, 0, TRUE);
-            gSprites[sInfoCard->spriteIds[2 + i + arrId]].oam.priority = 0;
         }
         else if (trainerId == TRAINER_FRONTIER_BRAIN)
         {
@@ -4290,7 +4312,6 @@ static void DisplayTrainerInfoOnCard(u8 flags, u8 trainerTourneyId)
                                                                   x | sInfoTrainerMonX[i],
                                                                   y + sInfoTrainerMonY[i],
                                                                   0, 0, TRUE);
-            gSprites[sInfoCard->spriteIds[2 + i + arrId]].oam.priority = 0;
         }
         else
         {
@@ -4299,10 +4320,13 @@ static void DisplayTrainerInfoOnCard(u8 flags, u8 trainerTourneyId)
                                                                   x | sInfoTrainerMonX[i],
                                                                   y + sInfoTrainerMonY[i],
                                                                   0, 0, TRUE);
-            gSprites[sInfoCard->spriteIds[2 + i + arrId]].oam.priority = 0;
         }
+        if (sInfoCard->spriteIds[2 + i + arrId] == MAX_SPRITES)
+            sInfoCard->spriteIds[2 + i + arrId] = 0xFF;
+        else
+            gSprites[sInfoCard->spriteIds[2 + i + arrId]].oam.priority = 0;
 
-        if (flags & MOVE_CARD)
+        if ((flags & MOVE_CARD) && sInfoCard->spriteIds[2 + i + arrId] != 0xFF)
             gSprites[sInfoCard->spriteIds[2 + i + arrId]].invisible = TRUE;
     }
 

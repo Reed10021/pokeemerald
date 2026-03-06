@@ -4166,6 +4166,18 @@ static void Task_ExitCaughtMonPage(u8 taskId)
         paletteNum = gSprites[gTasks[taskId].tMonSpriteId].oam.paletteNum;
         lzPaletteData = GetMonSpritePalFromSpeciesAndPersonality(species, otId, personality);
         LoadCompressedPalette(lzPaletteData, OBJ_PLTT_ID(paletteNum), PLTT_SIZE_4BPP);
+
+        if (sPokedexView != NULL)
+        {
+            u32 i = 0;
+            for (i; i < ARRAY_COUNT(sPokedexView->typeIconSpriteIds); i++)
+            {
+                if (sPokedexView->typeIconSpriteIds[i] != 0xFF)
+                    DestroySprite(&gSprites[sPokedexView->typeIconSpriteIds[i]]);
+            }
+            Free(sPokedexView);
+            sPokedexView = NULL;
+        }
         DestroyTask(taskId);
     }
 }

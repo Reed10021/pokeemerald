@@ -214,6 +214,11 @@ void StartWeather(void)
     if (!FuncIsActiveTask(Task_WeatherMain))
     {
         u8 index = AllocSpritePalette(0x1200);
+        u32 taskId;
+
+        if (index == 0xFF)
+            return;
+
         CpuCopy32(gUnknown_083970E8, &gPlttBufferUnfaded[0x100 + index * 16], 32);
         //BuildGammaShiftTables();
         sPaletteGammaTypes = sBasePaletteGammaTypes;
@@ -235,7 +240,16 @@ void StartWeather(void)
         gWeatherPtr->palProcessingState = WEATHER_PAL_STATE_IDLE;
         gWeatherPtr->readyForInit = FALSE;
         gWeatherPtr->weatherChangeComplete = TRUE;
-        gWeatherPtr->taskId = CreateTask(Task_WeatherInit, 80);
+        taskId = CreateTaskIfSpace(Task_WeatherInit, 80);
+        if (taskId < NUM_TASKS)
+        {
+            gWeatherPtr->taskId = (u8)taskId;
+        }
+        else
+        {
+            FreeSpritePaletteByTag(0x1200);
+            gWeatherPtr->altGammaSpritePalIndex = 0xFF;
+        }
     }
 }
 
@@ -738,28 +752,42 @@ static void ApplyDroughtGammaShiftWithBlend(s8 gammaIndex, u8 blendCoeff, u16 bl
     }
 }
 
+// This is only called during fade-in/fade-out in fog
+// blendCoeff & blendColor are the *fade* colors, not fog colors
 static void ApplyFogBlend(u8 blendCoeff, u16 blendColor)
 {
     u32 curPalIndex;
     u16 fogCoeff = min((gTimeOfDay + 1) * 4, 12);
 
+    // First blend all palettes with time
     UpdateAltBgPalettes(PALETTES_BG);
     CpuFastCopy(gPlttBufferUnfaded, gPlttBufferFaded, PLTT_BUFFER_SIZE * 2);
     UpdatePalettesWithTime(PALETTES_ALL);
+    // Then blend tile palettes [0, 12] faded->faded with fadeIn color
     BlendPalettesFine(0x1FFF, gPlttBufferFaded, gPlttBufferFaded, blendCoeff, blendColor);
 
+    // Do fog blending on marked sprite palettes
     for (curPalIndex = 16; curPalIndex < 32; curPalIndex++)
     {
         if (LightenSpritePaletteInFog(curPalIndex))
         {
             BlendPalettesFine(1, gPlttBufferFaded + PLTT_ID(curPalIndex), gPlttBufferFaded + PLTT_ID(curPalIndex), fogCoeff, RGB(28, 31, 28));
         }
-        BlendPalettesFine(PALETTES_OBJECTS, gPlttBufferFaded, gPlttBufferFaded, blendCoeff, blendColor);
     }
+    // Finally blend all sprite palettes faded->faded with fadeIn color
+    BlendPalettesFine(PALETTES_OBJECTS, gPlttBufferFaded, gPlttBufferFaded, blendCoeff, blendColor);
 }
 
 static void MarkFogSpritePalToLighten(u8 paletteIndex)
 {
+    u32 i;
+
+    for (i = 0; i < gWeatherPtr->lightenedFogSpritePalsCount; i++)
+    {
+        if (gWeatherPtr->lightenedFogSpritePals[i] == paletteIndex)
+            return;
+    }
+
     if (gWeatherPtr->lightenedFogSpritePalsCount < 6)
     {
         gWeatherPtr->lightenedFogSpritePals[gWeatherPtr->lightenedFogSpritePalsCount] = paletteIndex;
@@ -769,9 +797,9 @@ static void MarkFogSpritePalToLighten(u8 paletteIndex)
 
 static bool8 LightenSpritePaletteInFog(u8 paletteIndex)
 {
-    u16 i;
+    u32 i;
 
-    if (paletteIndex >= 16 && (GetSpritePaletteTagByPaletteNum(i - 16) >> 15))
+    if (paletteIndex >= 16 && (GetSpritePaletteTagByPaletteNum(paletteIndex - 16) >> 15))
         return FALSE;
 
     for (i = 0; i < gWeatherPtr->lightenedFogSpritePalsCount; i++)
@@ -779,8 +807,6 @@ static bool8 LightenSpritePaletteInFog(u8 paletteIndex)
         if (gWeatherPtr->lightenedFogSpritePals[i] == paletteIndex)
             return TRUE;
     }
-    //if (IsObjectEventPaletteIndex(paletteIndex))
-    //    return TRUE;
 
     return FALSE;
 }
@@ -893,7 +919,7 @@ bool8 IsWeatherNotFadingIn(void)
 void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex, bool8 allowFog)
 {
     u16 paletteIndex = 16 + spritePaletteIndex;
-    u16 i;
+    u32 i;
 
     switch (gWeatherPtr->palProcessingState)
     {
@@ -924,16 +950,22 @@ void UpdateSpritePaletteWithWeather(u8 spritePaletteIndex, bool8 allowFog)
         }
         else
         {
+            // In horizontal fog, only specific palettes should be fog-blended
             if (allowFog)
             {
-                i = min((gTimeOfDay + 1) * 4, 12);
+                i = min((gTimeOfDay + 1) * 4, 12); // fog coeff, highest in day and lowest at night
                 paletteIndex = PLTT_ID(paletteIndex);
+                // First blend with time
                 CpuFastCopy(gPlttBufferUnfaded + paletteIndex, gPlttBufferFaded + paletteIndex, PLTT_SIZE_4BPP);
                 UpdateSpritePaletteWithTime(spritePaletteIndex);
+                // Then blend faded->faded with fog coeff
                 BlendPalettesFine(1, gPlttBufferFaded + paletteIndex, gPlttBufferFaded + paletteIndex, i, RGB(28, 31, 28));
             }
             else
+            {
+                // Otherwise, just time-blend the palette
                 UpdateSpritePaletteWithTime(spritePaletteIndex);
+            }
         }
         break;
     }

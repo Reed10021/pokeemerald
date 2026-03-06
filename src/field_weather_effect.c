@@ -294,7 +294,7 @@ bool8 Drought_Finish(void)
 
 void StartDroughtWeatherBlend(void)
 {
-    CreateTask(UpdateDroughtBlend, 0x50);
+    CreateTaskIfSpace(UpdateDroughtBlend, 0x50);
 }
 
 #define tState      data[0]
@@ -2674,8 +2674,13 @@ static void Task_DoAbnormalWeather(u8 taskId)
 
 static void CreateAbnormalWeatherTask(void)
 {
-    u8 taskId = CreateTask(Task_DoAbnormalWeather, 0);
-    s16 *data = gTasks[taskId].data;
+    u32 taskId = CreateTaskIfSpace(Task_DoAbnormalWeather, 0);
+    s16 *data;
+
+    if (taskId >= NUM_TASKS)
+        return;
+
+    data = gTasks[taskId].data;
 
     data[15] = 600;
     if (gCurrentAbnormalWeather == WEATHER_DOWNPOUR)
@@ -2733,6 +2738,7 @@ void SetWeather_Unused(u32 weather)
 void DoCurrentWeather(void)
 {
     u8 weather = GetSav1Weather();
+    u32 taskId;
 
     if (weather == WEATHER_ABNORMAL)
     {
@@ -2743,7 +2749,11 @@ void DoCurrentWeather(void)
     else
     {
         if (FuncIsActiveTask(Task_DoAbnormalWeather))
-            DestroyTask(FindTaskIdByFunc(Task_DoAbnormalWeather));
+        {
+            taskId = FindTaskIdByFunc(Task_DoAbnormalWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
         gCurrentAbnormalWeather = WEATHER_DOWNPOUR;
     }
     SetNextWeather(weather);
@@ -2752,6 +2762,7 @@ void DoCurrentWeather(void)
 void ResumePausedWeather(void)
 {
     u8 weather = GetSav1Weather();
+    u32 taskId;
 
     if (weather == WEATHER_ABNORMAL)
     {
@@ -2762,7 +2773,11 @@ void ResumePausedWeather(void)
     else
     {
         if (FuncIsActiveTask(Task_DoAbnormalWeather))
-            DestroyTask(FindTaskIdByFunc(Task_DoAbnormalWeather));
+        {
+            taskId = FindTaskIdByFunc(Task_DoAbnormalWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
         gCurrentAbnormalWeather = WEATHER_DOWNPOUR;
     }
     SetCurrentAndNextWeather(weather);

@@ -37,6 +37,8 @@ extern const struct CompressedSpriteSheet gSpriteSheet_EnemyShadow;
 extern const struct SpriteTemplate gSpriteTemplate_EnemyShadow;
 
 // this file's functions
+void FreeBattleSpritesData(void);
+void FreeMonSpritesGfx(void);
 static u8 GetBattlePalaceMoveGroup(u16 move);
 static u16 GetBattlePalaceTarget(void);
 static void sub_805D7EC(struct Sprite *sprite);
@@ -90,11 +92,35 @@ static const struct SpritePalette sSpritePalettes_HealthBoxHealthBar[2] =
 // code
 void AllocateBattleSpritesData(void)
 {
+    gBattleSpritesDataPtr = NULL;
     gBattleSpritesDataPtr = AllocZeroed(sizeof(struct BattleSpriteData));
+    if (gBattleSpritesDataPtr == NULL)
+        return;
+
     gBattleSpritesDataPtr->battlerData = AllocZeroed(sizeof(struct BattleSpriteInfo) * MAX_BATTLERS_COUNT);
+    if (gBattleSpritesDataPtr->battlerData == NULL)
+    {
+        FreeBattleSpritesData();
+        return;
+    }
+
     gBattleSpritesDataPtr->healthBoxesData = AllocZeroed(sizeof(struct BattleHealthboxInfo) * MAX_BATTLERS_COUNT);
+    if (gBattleSpritesDataPtr->healthBoxesData == NULL)
+    {
+        FreeBattleSpritesData();
+        return;
+    }
+
     gBattleSpritesDataPtr->animationData = AllocZeroed(sizeof(struct BattleAnimationInfo));
+    if (gBattleSpritesDataPtr->animationData == NULL)
+    {
+        FreeBattleSpritesData();
+        return;
+    }
+
     gBattleSpritesDataPtr->battleBars = AllocZeroed(sizeof(struct BattleBarInfo) * MAX_BATTLERS_COUNT);
+    if (gBattleSpritesDataPtr->battleBars == NULL)
+        FreeBattleSpritesData();
 }
 
 void FreeBattleSpritesData(void)
@@ -1158,14 +1184,18 @@ void LoadAndCreateEnemyShadowSprites(void)
     LoadCompressedSpriteSheet(&gSpriteSheet_EnemyShadow);
 
     battlerId = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+    gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId = MAX_SPRITES;
     gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId = CreateSprite(&gSpriteTemplate_EnemyShadow, GetBattlerSpriteCoord(battlerId, 0), GetBattlerSpriteCoord(battlerId, 1) + 29, 0xC8);
-    gSprites[gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId].data[0] = battlerId;
+    if (gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId < MAX_SPRITES)
+        gSprites[gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId].data[0] = battlerId;
 
     if (IsDoubleBattle())
     {
         battlerId = GetBattlerAtPosition(B_POSITION_OPPONENT_RIGHT);
+        gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId = MAX_SPRITES;
         gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId = CreateSprite(&gSpriteTemplate_EnemyShadow, GetBattlerSpriteCoord(battlerId, 0), GetBattlerSpriteCoord(battlerId, 1) + 29, 0xC8);
-        gSprites[gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId].data[0] = battlerId;
+        if (gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId < MAX_SPRITES)
+            gSprites[gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId].data[0] = battlerId;
     }
 }
 
@@ -1203,6 +1233,7 @@ void SpriteCB_SetInvisible(struct Sprite *sprite)
 
 void SetBattlerShadowSpriteCallback(u8 battlerId, u16 species)
 {
+    u32 shadowSpriteId;
     // The player's shadow is never seen.
     if (GetBattlerSide(battlerId) == B_SIDE_PLAYER)
         return;
@@ -1214,15 +1245,22 @@ void SetBattlerShadowSpriteCallback(u8 battlerId, u16 species)
     if (gBattleSpritesDataPtr->battlerData[battlerId].transformSpecies != SPECIES_NONE)
         species = gBattleSpritesDataPtr->battlerData[battlerId].transformSpecies;
 
+    shadowSpriteId = gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId;
+    if (shadowSpriteId >= MAX_SPRITES)
+        return;
+
     if (gEnemyMonElevation[species] != 0)
-        gSprites[gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId].callback = SpriteCB_EnemyShadow;
+        gSprites[shadowSpriteId].callback = SpriteCB_EnemyShadow;
     else
-        gSprites[gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId].callback = SpriteCB_SetInvisible;
+        gSprites[shadowSpriteId].callback = SpriteCB_SetInvisible;
 }
 
 void HideBattlerShadowSprite(u8 battlerId)
 {
-    gSprites[gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId].callback = SpriteCB_SetInvisible;
+    u8 shadowSpriteId = gBattleSpritesDataPtr->healthBoxesData[battlerId].shadowSpriteId;
+
+    if (shadowSpriteId < MAX_SPRITES)
+        gSprites[shadowSpriteId].callback = SpriteCB_SetInvisible;
 }
 
 void sub_805EF14(void)
@@ -1258,11 +1296,19 @@ void ClearTemporarySpeciesSpriteData(u8 battlerId, bool8 dontClearSubstitute)
 
 void AllocateMonSpritesGfx(void)
 {
-    u8 i = 0, j;
+    u32 i = 0, j;
 
     gMonSpritesGfxPtr = NULL;
     gMonSpritesGfxPtr = AllocZeroed(sizeof(*gMonSpritesGfxPtr));
+    if (gMonSpritesGfxPtr == NULL)
+        return;
+
     gMonSpritesGfxPtr->firstDecompressed = AllocZeroed(MON_PIC_SIZE * MAX_MON_PIC_FRAMES * MAX_BATTLERS_COUNT);
+    if (gMonSpritesGfxPtr->firstDecompressed == NULL)
+    {
+        FreeMonSpritesGfx();
+        return;
+    }
 
     for (i = 0; i < MAX_BATTLERS_COUNT; i++)
     {
@@ -1279,6 +1325,8 @@ void AllocateMonSpritesGfx(void)
     }
 
     gMonSpritesGfxPtr->barFontGfx = AllocZeroed(0x1000);
+    if (gMonSpritesGfxPtr->barFontGfx == NULL)
+        FreeMonSpritesGfx();
 }
 
 void FreeMonSpritesGfx(void)

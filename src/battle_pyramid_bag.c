@@ -59,7 +59,7 @@ static void SetBagItemsListTemplate(void);
 static void sub_81C504C(void);
 static void sub_81C51DC(void);
 static void AddScrollArrow(void);
-static void sub_81C56F8(void);
+static bool32 sub_81C56F8(void);
 static void sub_81C5A20(void);
 static void sub_81C6BD8(void);
 static void sub_81C6EF4(void);
@@ -83,6 +83,7 @@ static void sub_81C5EAC(u8 windowId);
 static void sub_81C5F08(u8 windowId, u8 horizontalCount, u8 verticalCount);
 static bool8 IsValidMenuAction(s8 arg0);
 static void sub_81C6DAC(u8 taskId, const struct YesNoFuncTable *yesNoTable);
+static bool32 ExitPyramidBagMenuDueToInitFailure(void);
 static void sub_81C6CEC(u8 windowId);
 static void sub_81C704C(u8 y);
 static void sub_81C7028(bool8 invisible);
@@ -356,9 +357,16 @@ static void sub_81C4F10(void)
 
 void ChooseItemsToTossFromPyramidBag(void)
 {
+    u32 taskId;
+
     ScriptContext2_Enable();
     FadeScreen(FADE_TO_BLACK, 0);
-    CreateTask(Task_ChooseItemsToTossFromPyramidBag, 10);
+    taskId = CreateTaskIfSpace(Task_ChooseItemsToTossFromPyramidBag, 10);
+    if (taskId == NUM_TASKS)
+    {
+        ScriptContext2_Disable();
+        BeginNormalPaletteFade(0xFFFFFFFF, 0, 0x10, 0, RGB_BLACK);
+    }
 }
 
 static void Task_ChooseItemsToTossFromPyramidBag(u8 taskId)
@@ -380,6 +388,13 @@ void CB2_ReturnToPyramidBagMenu(void)
 void GoToBattlePyramidBagMenu(u8 a0, void (*callback)(void))
 {
     gPyramidBagResources = AllocZeroed(sizeof(*gPyramidBagResources));
+    if (gPyramidBagResources == NULL)
+    {
+        ScriptContext2_Disable();
+        if (callback != NULL)
+            SetMainCallback2(callback);
+        return;
+    }
 
     if (a0 != 4)
         gPyramidBagCursorData.unk4 = a0;
@@ -477,7 +492,8 @@ static bool8 sub_81C5078(void)
             gMain.state++;
             break;
         case 11:
-            sub_81C56F8();
+            if (!sub_81C56F8())
+                return ExitPyramidBagMenuDueToInitFailure();
             gMain.state++;
             break;
         case 12:
@@ -670,11 +686,29 @@ static void RemoveScrollArrow(void)
     }
 }
 
-static void sub_81C56F8(void)
+static bool32 sub_81C56F8(void)
 {
-    u8 taskId = CreateTask(Task_HandlePyramidBagInput, 0);
-    s16 *data = gTasks[taskId].data;
+    u32 taskId = CreateTaskIfSpace(Task_HandlePyramidBagInput, 0);
+    s16 *data;
+
+    if (taskId == NUM_TASKS)
+        return FALSE;
+
+    data = gTasks[taskId].data;
     data[0] = ListMenuInit(&gMultiuseListMenuTemplate, gPyramidBagCursorData.scrollPosition, gPyramidBagCursorData.cursorPosition);
+    return TRUE;
+}
+
+static bool32 ExitPyramidBagMenuDueToInitFailure(void)
+{
+    gPaletteFade.bufferTransferDisabled = FALSE;
+    RemoveScrollArrow();
+    ResetSpriteData();
+    FreeAllSpritePalettes();
+    FreeAllWindowBuffers();
+    FREE_AND_SET_NULL(gPyramidBagResources);
+    SetMainCallback2(gPyramidBagCursorData.callback);
+    return TRUE;
 }
 
 static void SwapItems(u16 id1, u16 id2)
@@ -1352,11 +1386,18 @@ static void sub_81C6A14(u8 taskId)
 
 void TryStoreHeldItemsInPyramidBag(void)
 {
-    u8 i;
+    u32 i;
     struct Pokemon *party = gPlayerParty;
     u16 *newItems = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(u16));
     u8 *newQuantities = Alloc(PYRAMID_BAG_ITEMS_COUNT * sizeof(u8));
     u16 heldItem;
+    if (newItems == NULL || newQuantities == NULL)
+    {
+        Free(newItems);
+        Free(newQuantities);
+        gSpecialVar_Result = 1;
+        return;
+    }
 
     memcpy(newItems, gSaveBlock2Ptr->frontier.pyramidBag.itemId[gSaveBlock2Ptr->frontier.lvlMode], PYRAMID_BAG_ITEMS_COUNT * sizeof(u16));
     memcpy(newQuantities, gSaveBlock2Ptr->frontier.pyramidBag.quantity[gSaveBlock2Ptr->frontier.lvlMode], PYRAMID_BAG_ITEMS_COUNT * sizeof(u8));
@@ -1489,6 +1530,8 @@ static void sub_81C6E98(void)
 {
     struct SpritePalette spritePalette;
     u16 *palPtr = Alloc(0x40);
+    if (palPtr == NULL)
+        return;
 
     LZDecompressWram(gBattleFrontierGfx_PyramidBag_Pal, palPtr);
     spritePalette.data = palPtr + (gSaveBlock2Ptr->frontier.lvlMode * 16);
@@ -1501,11 +1544,18 @@ static void sub_81C6EF4(void)
 {
     u8 *spriteId = &gPyramidBagResources->itemsSpriteIds[0];
     *spriteId = CreateSprite(&gUnknown_0861F3D4, 0x44, 0x38, 0);
+    if (*spriteId == MAX_SPRITES)
+        *spriteId = 0xFF;
 }
 
 static void sub_81C6F20(void)
 {
-    struct Sprite *sprite = &gSprites[gPyramidBagResources->itemsSpriteIds[0]];
+    struct Sprite *sprite;
+
+    if (gPyramidBagResources->itemsSpriteIds[0] >= MAX_SPRITES)
+        return;
+
+    sprite = &gSprites[gPyramidBagResources->itemsSpriteIds[0]];
     if (sprite->affineAnimEnded)
     {
         StartSpriteAffineAnim(sprite, 1);

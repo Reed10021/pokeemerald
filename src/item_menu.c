@@ -61,19 +61,20 @@ enum
 
 void GoToBagMenu(u8 bagMenuType, u8 pocketId, void (*postExitMenuMainCallback2)());
 void CB2_Bag(void);
-bool8 SetupBagMenu(void);
+bool32 SetupBagMenu(void);
 void BagMenu_InitBGs(void);
-bool8 LoadBagMenu_Graphics(void);
+bool32 LoadBagMenu_Graphics(void);
 void SetupBagMenu_Textboxes(void);
-void AllocateBagItemListBuffers(void);
+bool32 AllocateBagItemListBuffers(void);
 void LoadBagItemListBuffers(u8);
 void BagMenu_PrintPocketNames(const u8*, const u8*);
 void BagMenu_CopyPocketNameToWindow(u32);
 static void DrawPocketIndicatorSquare(u8 x, bool8 isCurrentPocket);
 void CreatePocketScrollArrowPair(void);
 void CreatePocketSwitchArrowPair(void);
+void BagDestroyPocketScrollArrowPair(void);
 void BagMenu_PrepareTMHMMoveWindow(void);
-bool8 IsWallysBag(void);
+bool32 IsWallysBag(void);
 void Task_WallyTutorialBagMenu(u8);
 void Task_BagMenu_HandleInput(u8);
 void GetItemName(s8*, u16);
@@ -85,9 +86,11 @@ void BagMenu_Print(u8, u8, const u8*, u8, u8, u8, u8, u8, u8);
 bool8 ItemId_GetImportance(u16);
 u16 BagGetQuantityByPocketPosition(u8, u16);
 void BagDestroyPocketSwitchArrowPair(void);
+void FreeBagItemListBuffers(void);
 void TaskCloseBagMenu_2(u8);
 u8 AddItemMessageWindow(u8);
 void BagMenu_RemoveBagItemMessageindow(u8);
+static bool32 ExitBagMenuDueToInitFailure(void);
 void set_callback3_to_bag(u8);
 void PrintItemDepositAmount(u8, s16);
 static u8 BagMenu_AddWindow(u8);
@@ -131,7 +134,7 @@ void CB2_QuizLadyExitBagMenu(void);
 void All_CalculateNItemsAndMaxShowed(void);
 static void SetPocketListPositions(void);
 void UpdatePocketScrollPositions(void);
-u8 CreateBagInputHandlerTask(u8);
+u32 CreateBagInputHandlerTask(u8);
 void sub_81AC23C(u8);
 void BagMenu_MoveCursorCallback(s32 a, bool8 b, struct ListMenu*);
 void BagMenu_ItemPrintCallback(u8 windowId, s32 itemIndex, u8 a);
@@ -685,9 +688,9 @@ void CB2_Bag(void)
     while(MenuHelpers_CallLinkSomething() != TRUE && SetupBagMenu() != TRUE && MenuHelpers_LinkSomething() != TRUE) {};
 }
 
-bool8 SetupBagMenu(void)
+bool32 SetupBagMenu(void)
 {
-    u8 taskId;
+    u32 taskId;
 
     switch (gMain.state)
     {
@@ -742,7 +745,8 @@ bool8 SetupBagMenu(void)
         gMain.state++;
         break;
     case 11:
-        AllocateBagItemListBuffers();
+        if (!AllocateBagItemListBuffers())
+            return ExitBagMenuDueToInitFailure();
         gMain.state++;
         break;
     case 12:
@@ -759,6 +763,8 @@ bool8 SetupBagMenu(void)
         break;
     case 14:
         taskId = CreateBagInputHandlerTask(gBagPositionStruct.location);
+        if (taskId == NUM_TASKS)
+            return ExitBagMenuDueToInitFailure();
         gTasks[taskId].data[0] = ListMenuInit(&gMultiuseListMenuTemplate, gBagPositionStruct.scrollPosition[gBagPositionStruct.pocket], gBagPositionStruct.cursorPosition[gBagPositionStruct.pocket]);
         gTasks[taskId].data[3] = 0;
         gTasks[taskId].tItemCount = 0;
@@ -798,6 +804,17 @@ bool8 SetupBagMenu(void)
     return FALSE;
 }
 
+static bool32 ExitBagMenuDueToInitFailure(void)
+{
+    gPaletteFade.bufferTransferDisabled = FALSE;
+    BagDestroyPocketScrollArrowPair();
+    ResetSpriteData();
+    FreeAllSpritePalettes();
+    FreeBagItemListBuffers();
+    SetMainCallback2(gBagPositionStruct.bagCallback);
+    return TRUE;
+}
+
 void BagMenu_InitBGs(void)
 {
     ResetVramOamAndBgCntRegs();
@@ -814,7 +831,7 @@ void BagMenu_InitBGs(void)
     SetGpuReg(REG_OFFSET_BLDCNT, 0);
 }
 
-bool8 LoadBagMenu_Graphics(void)
+bool32 LoadBagMenu_Graphics(void)
 {
     switch (gBagMenu->graphicsLoadState)
     {
@@ -856,20 +873,28 @@ bool8 LoadBagMenu_Graphics(void)
     return FALSE;
 }
 
-u8 CreateBagInputHandlerTask(u8 location)
+u32 CreateBagInputHandlerTask(u8 location)
 {
-    u8 taskId;
+    u32 taskId;
     if (location == ITEMMENULOCATION_WALLY)
-        taskId = CreateTask(Task_WallyTutorialBagMenu, 0);
+        taskId = CreateTaskIfSpace(Task_WallyTutorialBagMenu, 0);
     else
-        taskId = CreateTask(Task_BagMenu_HandleInput, 0);
+        taskId = CreateTaskIfSpace(Task_BagMenu_HandleInput, 0);
     return taskId;
 }
 
-void AllocateBagItemListBuffers(void)
+bool32 AllocateBagItemListBuffers(void)
 {
     sListBuffer1 = Alloc(sizeof(struct ListBuffer1));
     sListBuffer2 = Alloc(sizeof(struct ListBuffer2));
+    if (sListBuffer1 == NULL || sListBuffer2 == NULL)
+    {
+        FREE_AND_SET_NULL(sListBuffer1);
+        FREE_AND_SET_NULL(sListBuffer2);
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
 void LoadBagItemListBuffers(u8 pocketId)
@@ -2262,7 +2287,7 @@ static void BagMenu_Deposit_WaitForABPress(u8 taskId)
     }
 }
 
-bool8 IsWallysBag(void)
+bool32 IsWallysBag(void)
 {
     if (gBagPositionStruct.location == 10)
         return TRUE;
@@ -2274,6 +2299,9 @@ void PrepareBagForWallyTutorial(void)
     u32 i;
 
     sTempWallyBag = AllocZeroed(sizeof(struct TempWallyStruct));
+    if (sTempWallyBag == NULL)
+        return;
+
     memcpy(sTempWallyBag->bagPocket_Medicine, gSaveBlock1Ptr->bagPocket_Medicine, sizeof(gSaveBlock1Ptr->bagPocket_Medicine));
     memcpy(sTempWallyBag->bagPocket_PokeBalls, gSaveBlock1Ptr->bagPocket_PokeBalls, sizeof(gSaveBlock1Ptr->bagPocket_PokeBalls));
     sTempWallyBag->pocket = gBagPositionStruct.pocket;
@@ -2291,6 +2319,9 @@ void RestoreBagAfterWallyTutorial(void)
 {
     u32 i;
 
+    if (sTempWallyBag == NULL)
+        return;
+
     memcpy(gSaveBlock1Ptr->bagPocket_Medicine, sTempWallyBag->bagPocket_Medicine, sizeof(sTempWallyBag->bagPocket_Medicine));
     memcpy(gSaveBlock1Ptr->bagPocket_PokeBalls, sTempWallyBag->bagPocket_PokeBalls, sizeof(sTempWallyBag->bagPocket_PokeBalls));
     gBagPositionStruct.pocket = sTempWallyBag->pocket;
@@ -2299,7 +2330,7 @@ void RestoreBagAfterWallyTutorial(void)
         gBagPositionStruct.cursorPosition[i] = sTempWallyBag->cursorPosition[i];
         gBagPositionStruct.scrollPosition[i] = sTempWallyBag->scrollPosition[i];
     }
-    Free(sTempWallyBag);
+    FREE_AND_SET_NULL(sTempWallyBag);
 }
 
 void DoWallyTutorialBagMenu(void)

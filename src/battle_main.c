@@ -39,6 +39,7 @@
 #include "random.h"
 #include "recorded_battle.h"
 #include "roamer.h"
+#include "overworld.h"
 #include "safari_zone.h"
 #include "scanline_effect.h"
 #include "script.h"
@@ -589,6 +590,36 @@ void CB2_InitBattle(void)
     AllocateBattleResources();
     AllocateBattleSpritesData();
     AllocateMonSpritesGfx();
+    if (gBattleStruct == NULL
+     || gBattleResources == NULL
+     || gBattleResources->secretBase == NULL
+     || gBattleResources->flags == NULL
+     || gBattleResources->battleScriptsStack == NULL
+     || gBattleResources->battleCallbackStack == NULL
+     || gBattleResources->beforeLvlUp == NULL
+     || gBattleResources->ai == NULL
+     || gBattleResources->battleHistory == NULL
+     || gBattleResources->AI_ScriptsStack == NULL
+     || gLinkBattleSendBuffer == NULL
+     || gLinkBattleRecvBuffer == NULL
+     || gUnknown_0202305C == NULL
+     || gUnknown_02023060 == NULL
+     || gBattleSpritesDataPtr == NULL
+     || gBattleSpritesDataPtr->battlerData == NULL
+     || gBattleSpritesDataPtr->healthBoxesData == NULL
+     || gBattleSpritesDataPtr->animationData == NULL
+     || gBattleSpritesDataPtr->battleBars == NULL
+     || gMonSpritesGfxPtr == NULL
+     || gMonSpritesGfxPtr->firstDecompressed == NULL
+     || gMonSpritesGfxPtr->barFontGfx == NULL)
+    {
+        FreeMonSpritesGfx();
+        FreeBattleSpritesData();
+        FreeBattleResources();
+        SetMainCallback2(CB2_ReturnToField);
+        return;
+    }
+
     sub_8185F84();
 
     if (gBattleTypeFlags & BATTLE_TYPE_MULTI)

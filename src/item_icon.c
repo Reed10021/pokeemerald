@@ -110,10 +110,22 @@ u8 AddItemIconSprite(u16 tilesTag, u16 paletteTag, u16 itemId)
         LoadCompressedSpritePalette(&spritePalette);
 
         spriteTemplate = Alloc(sizeof(*spriteTemplate));
+        if (spriteTemplate == NULL)
+        {
+            FreeItemIconTemporaryBuffers();
+            FreeSpriteTilesByTag(tilesTag);
+            FreeSpritePaletteByTag(paletteTag);
+            return MAX_SPRITES;
+        }
         CpuCopy16(&gItemIconSpriteTemplate, spriteTemplate, sizeof(*spriteTemplate));
         spriteTemplate->tileTag = tilesTag;
         spriteTemplate->paletteTag = paletteTag;
         spriteId = CreateSprite(spriteTemplate, 0, 0, 0);
+        if (spriteId == MAX_SPRITES)
+        {
+            FreeSpriteTilesByTag(tilesTag);
+            FreeSpritePaletteByTag(paletteTag);
+        }
 
         FreeItemIconTemporaryBuffers();
         Free(spriteTemplate);
@@ -147,10 +159,22 @@ u8 AddCustomItemIconSprite(const struct SpriteTemplate *customSpriteTemplate, u1
         LoadCompressedSpritePalette(&spritePalette);
 
         spriteTemplate = Alloc(sizeof(*spriteTemplate));
+        if (spriteTemplate == NULL)
+        {
+            FreeItemIconTemporaryBuffers();
+            FreeSpriteTilesByTag(tilesTag);
+            FreeSpritePaletteByTag(paletteTag);
+            return MAX_SPRITES;
+        }
         CpuCopy16(customSpriteTemplate, spriteTemplate, sizeof(*spriteTemplate));
         spriteTemplate->tileTag = tilesTag;
         spriteTemplate->paletteTag = paletteTag;
         spriteId = CreateSprite(spriteTemplate, 0, 0, 0);
+        if (spriteId == MAX_SPRITES)
+        {
+            FreeSpriteTilesByTag(tilesTag);
+            FreeSpritePaletteByTag(paletteTag);
+        }
 
         FreeItemIconTemporaryBuffers();
         Free(spriteTemplate);

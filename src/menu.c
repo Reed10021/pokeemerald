@@ -1820,9 +1820,16 @@ void DecompressAndLoadBgGfxUsingHeap(u8 bgId, const void *src, u32 size, u16 off
         size = sizeOut;
     if (ptr)
     {
-        u8 taskId = CreateTask(task_free_buf_after_copying_tile_data_to_vram, 0);
-        gTasks[taskId].data[0] = copy_decompressed_tile_data_to_vram(bgId, ptr, size, offset, mode);
-        SetWordTaskArg(taskId, 1, (u32)ptr);
+        u8 taskId = CreateTaskIfSpace(task_free_buf_after_copying_tile_data_to_vram, 0);
+        if (taskId != NUM_TASKS)
+        {
+            gTasks[taskId].data[0] = copy_decompressed_tile_data_to_vram(bgId, ptr, size, offset, mode);
+            SetWordTaskArg(taskId, 1, (u32)ptr);
+        }
+        else
+        {
+            Free(ptr);
+        }
     }
 }
 

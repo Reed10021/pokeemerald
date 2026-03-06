@@ -139,6 +139,7 @@ static void CB2_InitSelectScreen(void);
 static void Select_SetWinRegs(s16 mWin0H, s16 nWin0H, s16 mWin0V, s16 nWin0V);
 static void Select_InitMonsData(void);
 static void Select_InitAllSprites(void);
+static void Select_DestroyAllSprites(void);
 static void Select_ShowSummaryMonSprite(void);
 static void Select_PrintSelectMonString(void);
 static void Select_PrintMonSpecies(void);
@@ -188,6 +189,7 @@ static void Swap_PrintMonSpecies2(void);
 static void Swap_PrintMonSpecies3(void);
 static void Swap_PrintMonCategory(void);
 static void Swap_InitAllSprites(void);
+static bool32 Swap_AreSpritesValid(void);
 static void Swap_PrintPkmnSwap(void);
 static void sub_819EADC(void);
 static void sub_819EAF8(void);
@@ -1114,6 +1116,19 @@ static void CB2_InitSelectScreen(void)
         sSelectMonCardBgTilesetBuffer = AllocZeroed(0x440);
         sSelectMenuTilemapBuffer = Alloc(0x800);
         sSelectMonCardBgTilemapBuffer = AllocZeroed(0x800);
+        if (sSelectMenuTilesetBuffer == NULL
+         || sSelectMonCardBgTilesetBuffer == NULL
+         || sSelectMenuTilemapBuffer == NULL
+         || sSelectMonCardBgTilemapBuffer == NULL)
+        {
+            FREE_AND_SET_NULL(sSelectMenuTilesetBuffer);
+            FREE_AND_SET_NULL(sSelectMonCardBgTilesetBuffer);
+            FREE_AND_SET_NULL(sSelectMenuTilemapBuffer);
+            FREE_AND_SET_NULL(sSelectMonCardBgTilemapBuffer);
+            FreeAllWindowBuffers();
+            SetMainCallback2(CB2_ReturnToFieldContinueScript);
+            break;
+        }
         ChangeBgX(0, 0, 0);
         ChangeBgY(0, 0, 0);
         ChangeBgX(1, 0, 0);
@@ -1146,7 +1161,7 @@ static void CB2_InitSelectScreen(void)
         LoadPalette(gFrontierFactorySelectMenu_Pal, 0, 0x40);
         LoadPalette(gUnknown_0861046C, 0xF0, 8);
         LoadPalette(gUnknown_0861046C, 0xE0, 10);
-        if (sFactorySelectScreen->fromSummaryScreen == TRUE)
+        if (sFactorySelectScreen != NULL && sFactorySelectScreen->fromSummaryScreen == TRUE)
             gPlttBufferUnfaded[228] = sFactorySelectScreen->unk2A4;
         LoadPalette(gUnknown_0861039C, 0x20, 4);
         gMain.state++;
@@ -1168,7 +1183,7 @@ static void CB2_InitSelectScreen(void)
         SetVBlankCallback(Select_VblankCb);
         BeginNormalPaletteFade(0xFFFFFFFF, 0, 0x10, 0, RGB_BLACK);
         SetGpuReg(REG_OFFSET_DISPCNT, DISPCNT_OBJ_ON | DISPCNT_BG0_ON | DISPCNT_BG1_ON | DISPCNT_OBJ_1D_MAP);
-        if (sFactorySelectScreen->fromSummaryScreen == TRUE)
+        if (sFactorySelectScreen != NULL && sFactorySelectScreen->fromSummaryScreen == TRUE)
         {
             Select_SetWinRegs(88, 152, 32, 96);
             ShowBg(3);
@@ -1182,10 +1197,34 @@ static void CB2_InitSelectScreen(void)
         gMain.state++;
         break;
     case 5:
-        if (sFactorySelectScreen->fromSummaryScreen == TRUE)
+        if (sFactorySelectScreen != NULL && sFactorySelectScreen->fromSummaryScreen == TRUE)
             sFactorySelectScreen->cursorPos = gLastViewedMonIndex;
         Select_InitMonsData();
+        if (sFactorySelectScreen == NULL)
+        {
+            FREE_AND_SET_NULL(sSelectMenuTilesetBuffer);
+            FREE_AND_SET_NULL(sSelectMonCardBgTilesetBuffer);
+            FREE_AND_SET_NULL(sSelectMenuTilemapBuffer);
+            FREE_AND_SET_NULL(sSelectMonCardBgTilemapBuffer);
+            FreeAllWindowBuffers();
+            SetMainCallback2(CB2_ReturnToFieldContinueScript);
+            break;
+        }
         Select_InitAllSprites();
+        if (sFactorySelectScreen->cursorSpriteId == MAX_SPRITES
+         || sFactorySelectScreen->menuCursor1SpriteId == MAX_SPRITES
+         || sFactorySelectScreen->menuCursor2SpriteId == MAX_SPRITES)
+        {
+            Select_DestroyAllSprites();
+            FREE_AND_SET_NULL(sSelectMenuTilesetBuffer);
+            FREE_AND_SET_NULL(sSelectMonCardBgTilesetBuffer);
+            FREE_AND_SET_NULL(sSelectMenuTilemapBuffer);
+            FREE_AND_SET_NULL(sSelectMonCardBgTilemapBuffer);
+            FREE_AND_SET_NULL(sFactorySelectScreen);
+            FreeAllWindowBuffers();
+            SetMainCallback2(CB2_ReturnToFieldContinueScript);
+            break;
+        }
         if (sFactorySelectScreen->fromSummaryScreen == TRUE)
             Select_ShowSummaryMonSprite();
         gMain.state++;
@@ -1232,17 +1271,31 @@ static void CB2_InitSelectScreen(void)
 
 static void Select_InitMonsData(void)
 {
-    u8 i;
+    u32 i;
 
     if (sFactorySelectScreen != NULL)
         return;
 
     sFactorySelectScreen = AllocZeroed(sizeof(*sFactorySelectScreen));
+    if (sFactorySelectScreen == NULL)
+        return;
+
     sFactorySelectScreen->cursorPos = 0;
+    sFactorySelectScreen->cursorSpriteId = MAX_SPRITES;
+    sFactorySelectScreen->menuCursor1SpriteId = MAX_SPRITES;
+    sFactorySelectScreen->menuCursor2SpriteId = MAX_SPRITES;
     sFactorySelectScreen->selectingMonsState = 1;
     sFactorySelectScreen->fromSummaryScreen = FALSE;
     for (i = 0; i < SELECTABLE_MONS_COUNT; i++)
+    {
+        sFactorySelectScreen->mons[i].spriteId = MAX_SPRITES;
         sFactorySelectScreen->mons[i].selectedId = 0;
+    }
+    for (i = 0; i < 3; i++)
+    {
+        sFactorySelectScreen->unk294[i].field0 = MAX_SPRITES;
+        sFactorySelectScreen->unk294[i].field1 = MAX_SPRITES;
+    }
 
     if (gSaveBlock2Ptr->frontier.lvlMode != FRONTIER_LVL_TENT)
         CreateFrontierFactorySelectableMons(0);
@@ -1252,20 +1305,30 @@ static void Select_InitMonsData(void)
 
 static void Select_InitAllSprites(void)
 {
-    u8 i, cursorPos;
+    u32 i, cursorPos;
     s16 x;
 
     for (i = 0; i < SELECTABLE_MONS_COUNT; i++)
     {
         sFactorySelectScreen->mons[i].spriteId = CreateSprite(&gUnknown_086105D8, (35 * i) + 32, 64, 1);
+        if (sFactorySelectScreen->mons[i].spriteId == MAX_SPRITES)
+            return;
+
         gSprites[sFactorySelectScreen->mons[i].spriteId].data[0] = 0;
         Select_SetBallSpritePaletteNum(i);
     }
     cursorPos = sFactorySelectScreen->cursorPos;
+    if (sFactorySelectScreen->mons[cursorPos].spriteId == MAX_SPRITES)
+        return;
+
     x = gSprites[sFactorySelectScreen->mons[cursorPos].spriteId].pos1.x;
     sFactorySelectScreen->cursorSpriteId = CreateSprite(&gUnknown_086105F0, x, 88, 0);
     sFactorySelectScreen->menuCursor1SpriteId = CreateSprite(&gUnknown_08610608, 176, 112, 0);
     sFactorySelectScreen->menuCursor2SpriteId = CreateSprite(&gUnknown_08610620, 176, 144, 0);
+    if (sFactorySelectScreen->cursorSpriteId == MAX_SPRITES
+     || sFactorySelectScreen->menuCursor1SpriteId == MAX_SPRITES
+     || sFactorySelectScreen->menuCursor2SpriteId == MAX_SPRITES)
+        return;
 
     gSprites[sFactorySelectScreen->menuCursor1SpriteId].invisible = TRUE;
     gSprites[sFactorySelectScreen->menuCursor2SpriteId].invisible = TRUE;
@@ -1278,14 +1341,20 @@ static void Select_InitAllSprites(void)
 
 static void Select_DestroyAllSprites(void)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < SELECTABLE_MONS_COUNT; i++)
-        DestroySprite(&gSprites[sFactorySelectScreen->mons[i].spriteId]);
+    {
+        if (sFactorySelectScreen->mons[i].spriteId < MAX_SPRITES)
+            DestroySprite(&gSprites[sFactorySelectScreen->mons[i].spriteId]);
+    }
 
-    DestroySprite(&gSprites[sFactorySelectScreen->cursorSpriteId]);
-    DestroySprite(&gSprites[sFactorySelectScreen->menuCursor1SpriteId]);
-    DestroySprite(&gSprites[sFactorySelectScreen->menuCursor2SpriteId]);
+    if (sFactorySelectScreen->cursorSpriteId < MAX_SPRITES)
+        DestroySprite(&gSprites[sFactorySelectScreen->cursorSpriteId]);
+    if (sFactorySelectScreen->menuCursor1SpriteId < MAX_SPRITES)
+        DestroySprite(&gSprites[sFactorySelectScreen->menuCursor1SpriteId]);
+    if (sFactorySelectScreen->menuCursor2SpriteId < MAX_SPRITES)
+        DestroySprite(&gSprites[sFactorySelectScreen->menuCursor2SpriteId]);
 }
 
 static void Select_UpdateBallCursorPosition(s8 direction)
@@ -1398,7 +1467,7 @@ static void Select_SetBallSpritePaletteNum(u8 id)
 
 static void Task_FromSelectScreenToSummaryScreen(u8 taskId)
 {
-    u8 i;
+    u32 i;
     u8 currMonId;
 
     switch (gTasks[taskId].data[0])
@@ -1452,6 +1521,7 @@ static void Task_CloseSelectionScreen(u8 taskId)
                 DestroyTask(sFactorySelectScreen->fadeSpeciesNameTaskId);
                 Select_DestroyAllSprites();
                 FREE_AND_SET_NULL(sSelectMenuTilesetBuffer);
+                FREE_AND_SET_NULL(sSelectMonCardBgTilesetBuffer);
                 FREE_AND_SET_NULL(sSelectMenuTilemapBuffer);
                 FREE_AND_SET_NULL(sSelectMonCardBgTilemapBuffer);
                 FREE_AND_SET_NULL(sFactorySelectScreen);
@@ -1942,8 +2012,11 @@ static void Summary_ShowMonSprite(void)
     u32 otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
 
     sFactorySelectScreen->unk294[1].field0 = CreateMonPicSprite_HandleDeoxys(species, otId, personality, TRUE, 88, 32, 15, 0xFFFF);
-    gSprites[sFactorySelectScreen->unk294[1].field0].centerToCornerVecX = 0;
-    gSprites[sFactorySelectScreen->unk294[1].field0].centerToCornerVecY = 0;
+    if (sFactorySelectScreen->unk294[1].field0 < MAX_SPRITES)
+    {
+        gSprites[sFactorySelectScreen->unk294[1].field0].centerToCornerVecX = 0;
+        gSprites[sFactorySelectScreen->unk294[1].field0].centerToCornerVecY = 0;
+    }
 
     sFactorySelectScreen->unk2A0 = FALSE;
 }
@@ -1960,7 +2033,8 @@ static void Select_ShowSummaryMonSprite(void)
     u32 personality, otId;
 
     sFactorySelectScreen->unk294[1].field1 = CreateSprite(&gUnknown_08610638, 120, 64, 1);
-    StartSpriteAffineAnim(&gSprites[sFactorySelectScreen->unk294[1].field1], 2);
+    if (sFactorySelectScreen->unk294[1].field1 < MAX_SPRITES)
+        StartSpriteAffineAnim(&gSprites[sFactorySelectScreen->unk294[1].field1], 2);
 
     mon = &sFactorySelectScreen->mons[sFactorySelectScreen->cursorPos].monData;
     species = GetMonData(mon, MON_DATA_SPECIES, NULL);
@@ -1968,10 +2042,14 @@ static void Select_ShowSummaryMonSprite(void)
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
 
     sFactorySelectScreen->unk294[1].field0 = CreateMonPicSprite_HandleDeoxys(species, otId, personality, TRUE, 88, 32, 15, 0xFFFF);
-    gSprites[sFactorySelectScreen->unk294[1].field0].centerToCornerVecX = 0;
-    gSprites[sFactorySelectScreen->unk294[1].field0].centerToCornerVecY = 0;
+    if (sFactorySelectScreen->unk294[1].field0 < MAX_SPRITES)
+    {
+        gSprites[sFactorySelectScreen->unk294[1].field0].centerToCornerVecX = 0;
+        gSprites[sFactorySelectScreen->unk294[1].field0].centerToCornerVecY = 0;
+    }
 
-    gSprites[sFactorySelectScreen->unk294[1].field1].invisible = TRUE;
+    if (sFactorySelectScreen->unk294[1].field1 < MAX_SPRITES)
+        gSprites[sFactorySelectScreen->unk294[1].field1].invisible = TRUE;
 }
 
 static void Select_ShowChosenMonsSprites(void)
@@ -1990,8 +2068,11 @@ static void Select_ShowChosenMonsSprites(void)
                 u32 otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
 
                 sFactorySelectScreen->unk294[i].field0 = CreateMonPicSprite_HandleDeoxys(species, otId, personality, TRUE, (i * 72) + 16, 32, i + 13, 0xFFFF);
-                gSprites[sFactorySelectScreen->unk294[i].field0].centerToCornerVecX = 0;
-                gSprites[sFactorySelectScreen->unk294[i].field0].centerToCornerVecY = 0;
+                if (sFactorySelectScreen->unk294[i].field0 < MAX_SPRITES)
+                {
+                    gSprites[sFactorySelectScreen->unk294[i].field0].centerToCornerVecX = 0;
+                    gSprites[sFactorySelectScreen->unk294[i].field0].centerToCornerVecY = 0;
+                }
                 break;
             }
         }
@@ -2129,6 +2210,22 @@ static void sub_819C4B4(void)
     sFactorySelectScreen->unk294[1].field1 = CreateSprite(&gUnknown_08610638, 120, 64, 1);
     sFactorySelectScreen->unk294[0].field1 = CreateSprite(&gUnknown_08610638,  44, 64, 1);
     sFactorySelectScreen->unk294[2].field1 = CreateSprite(&gUnknown_08610638, 196, 64, 1);
+    if (sFactorySelectScreen->unk294[1].field1 == MAX_SPRITES
+     || sFactorySelectScreen->unk294[0].field1 == MAX_SPRITES
+     || sFactorySelectScreen->unk294[2].field1 == MAX_SPRITES)
+    {
+        if (sFactorySelectScreen->unk294[1].field1 < MAX_SPRITES)
+            DestroySprite(&gSprites[sFactorySelectScreen->unk294[1].field1]);
+        if (sFactorySelectScreen->unk294[0].field1 < MAX_SPRITES)
+            DestroySprite(&gSprites[sFactorySelectScreen->unk294[0].field1]);
+        if (sFactorySelectScreen->unk294[2].field1 < MAX_SPRITES)
+            DestroySprite(&gSprites[sFactorySelectScreen->unk294[2].field1]);
+        sFactorySelectScreen->unk294[1].field1 = MAX_SPRITES;
+        sFactorySelectScreen->unk294[0].field1 = MAX_SPRITES;
+        sFactorySelectScreen->unk294[2].field1 = MAX_SPRITES;
+        sFactorySelectScreen->unk2A0 = FALSE;
+        return;
+    }
 
     gSprites[sFactorySelectScreen->unk294[1].field1].callback = sub_819C040;
     gSprites[sFactorySelectScreen->unk294[0].field1].callback = SpriteCallbackDummy;
@@ -2139,14 +2236,40 @@ static void sub_819C4B4(void)
 
 static void sub_819C568(void)
 {
-    u8 taskId;
+    u32 taskId;
 
-    FreeAndDestroyMonPicSprite(sFactorySelectScreen->unk294[0].field0);
-    FreeAndDestroyMonPicSprite(sFactorySelectScreen->unk294[1].field0);
-    FreeAndDestroyMonPicSprite(sFactorySelectScreen->unk294[2].field0);
+    if (sFactorySelectScreen->unk294[0].field0 < MAX_SPRITES)
+        FreeAndDestroyMonPicSprite(sFactorySelectScreen->unk294[0].field0);
+    if (sFactorySelectScreen->unk294[1].field0 < MAX_SPRITES)
+        FreeAndDestroyMonPicSprite(sFactorySelectScreen->unk294[1].field0);
+    if (sFactorySelectScreen->unk294[2].field0 < MAX_SPRITES)
+        FreeAndDestroyMonPicSprite(sFactorySelectScreen->unk294[2].field0);
 
-    taskId = CreateTask(sub_819C2D4, 1);
-    gTasks[taskId].func(taskId);
+    taskId = CreateTaskIfSpace(sub_819C2D4, 1);
+    if (taskId == NUM_TASKS)
+    {
+        if (sFactorySelectScreen->unk294[0].field1 < MAX_SPRITES)
+        {
+            FreeOamMatrix(gSprites[sFactorySelectScreen->unk294[0].field1].oam.matrixNum);
+            DestroySprite(&gSprites[sFactorySelectScreen->unk294[0].field1]);
+            sFactorySelectScreen->unk294[0].field1 = MAX_SPRITES;
+        }
+        if (sFactorySelectScreen->unk294[1].field1 < MAX_SPRITES)
+        {
+            FreeOamMatrix(gSprites[sFactorySelectScreen->unk294[1].field1].oam.matrixNum);
+            DestroySprite(&gSprites[sFactorySelectScreen->unk294[1].field1]);
+            sFactorySelectScreen->unk294[1].field1 = MAX_SPRITES;
+        }
+        if (sFactorySelectScreen->unk294[2].field1 < MAX_SPRITES)
+        {
+            FreeOamMatrix(gSprites[sFactorySelectScreen->unk294[2].field1].oam.matrixNum);
+            DestroySprite(&gSprites[sFactorySelectScreen->unk294[2].field1]);
+            sFactorySelectScreen->unk294[2].field1 = MAX_SPRITES;
+        }
+        sFactorySelectScreen->unk2A0 = FALSE;
+        return;
+    }
+    gTasks[taskId].func((u8)taskId);
 
     sFactorySelectScreen->unk2A0 = TRUE;
 }
@@ -2663,7 +2786,7 @@ static void Task_SwapFadeSpeciesName2(u8 taskId)
 
 static void sub_819D12C(u8 taskId)
 {
-    s8 i;
+    s32 i;
     u8 var_2C;
     bool8 destroyTask;
 
@@ -3030,7 +3153,7 @@ static void sub_819D770(u8 taskId)
 
 static void sub_819D9EC(u8 taskId)
 {
-    u8 i;
+    u32 i;
     if (sFactorySwapScreen->unk30 == TRUE)
         return;
 
@@ -3085,12 +3208,37 @@ static void sub_819D9EC(u8 taskId)
 
 static void Swap_InitStruct(void)
 {
+    u32 i, j;
+
     if (sFactorySwapScreen == NULL)
     {
         sFactorySwapScreen = AllocZeroed(sizeof(*sFactorySwapScreen));
+        if (sFactorySwapScreen == NULL)
+            return;
         sFactorySwapScreen->cursorPos = 0;
         sFactorySwapScreen->unk30 = FALSE;
         sFactorySwapScreen->fromSummaryScreen = FALSE;
+    }
+
+    sFactorySwapScreen->cursorSpriteId = MAX_SPRITES;
+    sFactorySwapScreen->menuCursor1SpriteId = MAX_SPRITES;
+    sFactorySwapScreen->menuCursor2SpriteId = MAX_SPRITES;
+    sFactorySwapScreen->unk2C.field0 = MAX_SPRITES;
+    sFactorySwapScreen->unk2C.field1 = MAX_SPRITES;
+
+    for (i = 0; i < 3; i++)
+        sFactorySwapScreen->ballSpriteIds[i] = MAX_SPRITES;
+
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 3; j++)
+            sFactorySwapScreen->unk8[i][j] = MAX_SPRITES;
+    }
+
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 2; j++)
+            sFactorySwapScreen->unkE[i][j] = MAX_SPRITES;
     }
 }
 
@@ -3121,6 +3269,19 @@ static void CB2_InitSwapScreen(void)
         sSwapMonCardBgTilesetBuffer = AllocZeroed(0x440);
         sSwapMenuTilemapBuffer = Alloc(0x800);
         sSwapMonCardBgTilemapBuffer = AllocZeroed(0x800);
+        if (sSwapMenuTilesetBuffer == NULL
+         || sSwapMonCardBgTilesetBuffer == NULL
+         || sSwapMenuTilemapBuffer == NULL
+         || sSwapMonCardBgTilemapBuffer == NULL)
+        {
+            FREE_AND_SET_NULL(sSwapMenuTilesetBuffer);
+            FREE_AND_SET_NULL(sSwapMonCardBgTilesetBuffer);
+            FREE_AND_SET_NULL(sSwapMenuTilemapBuffer);
+            FREE_AND_SET_NULL(sSwapMonCardBgTilemapBuffer);
+            FreeAllWindowBuffers();
+            SetMainCallback2(CB2_ReturnToFieldContinueScript);
+            break;
+        }
         ChangeBgX(0, 0, 0);
         ChangeBgY(0, 0, 0);
         ChangeBgX(1, 0, 0);
@@ -3171,13 +3332,35 @@ static void CB2_InitSwapScreen(void)
         gMain.state++;
         break;
     case 5:
-        if (sFactorySwapScreen->fromSummaryScreen == TRUE)
+        if (sFactorySwapScreen != NULL && sFactorySwapScreen->fromSummaryScreen == TRUE)
             sFactorySwapScreen->cursorPos = gLastViewedMonIndex;
         gMain.state++;
         break;
     case 6:
         Swap_InitStruct();
+        if (sFactorySwapScreen == NULL)
+        {
+            FREE_AND_SET_NULL(sSwapMenuTilesetBuffer);
+            FREE_AND_SET_NULL(sSwapMonCardBgTilesetBuffer);
+            FREE_AND_SET_NULL(sSwapMenuTilemapBuffer);
+            FREE_AND_SET_NULL(sSwapMonCardBgTilemapBuffer);
+            FreeAllWindowBuffers();
+            SetMainCallback2(CB2_ReturnToFieldContinueScript);
+            break;
+        }
         Swap_InitAllSprites();
+        if (!Swap_AreSpritesValid())
+        {
+            Swap_DestroyAllSprites();
+            FREE_AND_SET_NULL(sSwapMenuTilesetBuffer);
+            FREE_AND_SET_NULL(sSwapMonCardBgTilesetBuffer);
+            FREE_AND_SET_NULL(sSwapMenuTilemapBuffer);
+            FREE_AND_SET_NULL(sSwapMonCardBgTilemapBuffer);
+            FREE_AND_SET_NULL(sFactorySwapScreen);
+            FreeAllWindowBuffers();
+            SetMainCallback2(CB2_ReturnToFieldContinueScript);
+            break;
+        }
         if (sFactorySwapScreen->fromSummaryScreen == TRUE)
             Swap_ShowSummaryMonSprite();
         Swap_InitActions(ACTIONS_PLAYER_SCREEN);
@@ -3258,9 +3441,25 @@ static void CB2_InitSwapScreen(void)
 
 static void Swap_InitAllSprites(void)
 {
-    u8 i;
+    u32 i, j;
     u8 x;
     struct SpriteTemplate spriteTemplate;
+
+    sFactorySwapScreen->cursorSpriteId = MAX_SPRITES;
+    sFactorySwapScreen->menuCursor1SpriteId = MAX_SPRITES;
+    sFactorySwapScreen->menuCursor2SpriteId = MAX_SPRITES;
+    for (i = 0; i < 3; i++)
+        sFactorySwapScreen->ballSpriteIds[i] = MAX_SPRITES;
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 3; j++)
+            sFactorySwapScreen->unk8[i][j] = MAX_SPRITES;
+    }
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 2; j++)
+            sFactorySwapScreen->unkE[i][j] = MAX_SPRITES;
+    }
 
     spriteTemplate = gUnknown_08610834;
     spriteTemplate.paletteTag = TAG_PAL_BALL_SELECTED;
@@ -3268,11 +3467,21 @@ static void Swap_InitAllSprites(void)
     for (i = 0; i < 3; i++)
     {
         sFactorySwapScreen->ballSpriteIds[i] = CreateSprite(&spriteTemplate, (48 * i) + 72, 64, 1);
+        if (sFactorySwapScreen->ballSpriteIds[i] == MAX_SPRITES)
+            return;
         gSprites[sFactorySwapScreen->ballSpriteIds[i]].data[0] = 0;
     }
+    if (sFactorySwapScreen->ballSpriteIds[sFactorySwapScreen->cursorPos] == MAX_SPRITES)
+        return;
+
     sFactorySwapScreen->cursorSpriteId = CreateSprite(&gUnknown_0861084C, gSprites[sFactorySwapScreen->ballSpriteIds[sFactorySwapScreen->cursorPos]].pos1.x, 88, 0);
     sFactorySwapScreen->menuCursor1SpriteId = CreateSprite(&gUnknown_08610864, 176, 112, 0);
     sFactorySwapScreen->menuCursor2SpriteId = CreateSprite(&gUnknown_0861087C, 176, 144, 0);
+    if (sFactorySwapScreen->cursorSpriteId == MAX_SPRITES
+     || sFactorySwapScreen->menuCursor1SpriteId == MAX_SPRITES
+     || sFactorySwapScreen->menuCursor2SpriteId == MAX_SPRITES)
+        return;
+
     gSprites[sFactorySwapScreen->menuCursor1SpriteId].invisible = TRUE;
     gSprites[sFactorySwapScreen->menuCursor2SpriteId].invisible = TRUE;
     gSprites[sFactorySwapScreen->menuCursor1SpriteId].centerToCornerVecX = 0;
@@ -3288,37 +3497,57 @@ static void Swap_InitAllSprites(void)
     spriteTemplate = gUnknown_0861084C;
     spriteTemplate.tileTag = TAG_TILE_68;
     sFactorySwapScreen->unk8[0][0] = CreateSprite(&spriteTemplate, 240, 120, 10);
+    if (sFactorySwapScreen->unk8[0][0] == MAX_SPRITES)
+        return;
 
     spriteTemplate = gUnknown_08610864;
     spriteTemplate.tileTag = TAG_TILE_69;
     sFactorySwapScreen->unk8[0][1] = CreateSprite(&spriteTemplate, 256, 120, 10);
+    if (sFactorySwapScreen->unk8[0][1] == MAX_SPRITES)
+        return;
     sFactorySwapScreen->unk8[0][2] = CreateSprite(&spriteTemplate, 288, 120, 10);
+    if (sFactorySwapScreen->unk8[0][2] == MAX_SPRITES)
+        return;
 
     spriteTemplate = gUnknown_0861084C;
     spriteTemplate.tileTag = TAG_TILE_6A;
     sFactorySwapScreen->unk8[1][0] = CreateSprite(&spriteTemplate, 240, 120, 1);
+    if (sFactorySwapScreen->unk8[1][0] == MAX_SPRITES)
+        return;
 
     spriteTemplate = gUnknown_08610864;
     spriteTemplate.tileTag = TAG_TILE_6B;
     sFactorySwapScreen->unk8[1][1] = CreateSprite(&spriteTemplate, 256, 120, 1);
+    if (sFactorySwapScreen->unk8[1][1] == MAX_SPRITES)
+        return;
     spriteTemplate.tileTag = TAG_TILE_6C;
     sFactorySwapScreen->unk8[1][2] = CreateSprite(&spriteTemplate, 288, 120, 1);
+    if (sFactorySwapScreen->unk8[1][2] == MAX_SPRITES)
+        return;
 
     spriteTemplate = gUnknown_0861084C;
     spriteTemplate.tileTag = TAG_TILE_68;
     sFactorySwapScreen->unkE[0][0] = CreateSprite(&spriteTemplate, x, 144, 10);
+    if (sFactorySwapScreen->unkE[0][0] == MAX_SPRITES)
+        return;
 
     spriteTemplate = gUnknown_08610864;
     spriteTemplate.tileTag = TAG_TILE_69;
     sFactorySwapScreen->unkE[0][1] = CreateSprite(&spriteTemplate, x + 16, 144, 10);
+    if (sFactorySwapScreen->unkE[0][1] == MAX_SPRITES)
+        return;
 
     spriteTemplate = gUnknown_0861084C;
     spriteTemplate.tileTag = TAG_TILE_6A;
     sFactorySwapScreen->unkE[1][0] = CreateSprite(&spriteTemplate, x, 144, 1);
+    if (sFactorySwapScreen->unkE[1][0] == MAX_SPRITES)
+        return;
 
     spriteTemplate = gUnknown_08610864;
     spriteTemplate.tileTag = TAG_TILE_6C;
     sFactorySwapScreen->unkE[1][1] = CreateSprite(&spriteTemplate, x + 16, 144, 1);
+    if (sFactorySwapScreen->unkE[1][1] == MAX_SPRITES)
+        return;
 
     for (i = 0; i < 2; i++)
     {
@@ -3347,24 +3576,72 @@ static void Swap_InitAllSprites(void)
     gSprites[sFactorySwapScreen->unk8[0][2]].invisible = FALSE;
 }
 
-static void Swap_DestroyAllSprites(void)
+static bool32 Swap_AreSpritesValid(void)
 {
-    u8 i, j;
+    u32 i, j;
 
     for (i = 0; i < 3; i++)
-        DestroySprite(&gSprites[sFactorySwapScreen->ballSpriteIds[i]]);
-    DestroySprite(&gSprites[sFactorySwapScreen->cursorSpriteId]);
-    DestroySprite(&gSprites[sFactorySwapScreen->menuCursor1SpriteId]);
-    DestroySprite(&gSprites[sFactorySwapScreen->menuCursor2SpriteId]);
+    {
+        if (sFactorySwapScreen->ballSpriteIds[i] >= MAX_SPRITES)
+            return FALSE;
+    }
+
+    if (sFactorySwapScreen->cursorSpriteId >= MAX_SPRITES
+     || sFactorySwapScreen->menuCursor1SpriteId >= MAX_SPRITES
+     || sFactorySwapScreen->menuCursor2SpriteId >= MAX_SPRITES)
+        return FALSE;
+
     for (i = 0; i < 2; i++)
     {
         for (j = 0; j < 3; j++)
-            DestroySprite(&gSprites[sFactorySwapScreen->unk8[i][j]]);
+        {
+            if (sFactorySwapScreen->unk8[i][j] >= MAX_SPRITES)
+                return FALSE;
+        }
+    }
+
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 2; j++)
+        {
+            if (sFactorySwapScreen->unkE[i][j] >= MAX_SPRITES)
+                return FALSE;
+        }
+    }
+
+    return TRUE;
+}
+
+static void Swap_DestroyAllSprites(void)
+{
+    u32 i, j;
+
+    for (i = 0; i < 3; i++)
+    {
+        if (sFactorySwapScreen->ballSpriteIds[i] < MAX_SPRITES)
+            DestroySprite(&gSprites[sFactorySwapScreen->ballSpriteIds[i]]);
+    }
+    if (sFactorySwapScreen->cursorSpriteId < MAX_SPRITES)
+        DestroySprite(&gSprites[sFactorySwapScreen->cursorSpriteId]);
+    if (sFactorySwapScreen->menuCursor1SpriteId < MAX_SPRITES)
+        DestroySprite(&gSprites[sFactorySwapScreen->menuCursor1SpriteId]);
+    if (sFactorySwapScreen->menuCursor2SpriteId < MAX_SPRITES)
+        DestroySprite(&gSprites[sFactorySwapScreen->menuCursor2SpriteId]);
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 3; j++)
+        {
+            if (sFactorySwapScreen->unk8[i][j] < MAX_SPRITES)
+                DestroySprite(&gSprites[sFactorySwapScreen->unk8[i][j]]);
+        }
     }
     for (i = 0; i < 2; i++)
     {
         for (j = 0; j < 2; j++)
-            DestroySprite(&gSprites[sFactorySwapScreen->unkE[i][j]]);
+        {
+            if (sFactorySwapScreen->unkE[i][j] < MAX_SPRITES)
+                DestroySprite(&gSprites[sFactorySwapScreen->unkE[i][j]]);
+        }
     }
 }
 
@@ -3478,7 +3755,7 @@ static void Swap_UpdateMenuCursorPosition(s8 direction)
 
 static void sub_819E838(u8 arg0)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < 3; i++)
     {
@@ -3499,7 +3776,7 @@ static void sub_819E838(u8 arg0)
 
 static void sub_819E8EC(void)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < 3; i++)
     {
@@ -3871,6 +4148,12 @@ static void Swap_ActionMon(u8 taskId)
 static void sub_819F2B4(u8 *arg0, bool8 *arg1, bool8 swapScreen)
 {
     *arg0 = CreateSprite(&gUnknown_08610894, 120, 64, 1);
+    if (*arg0 == MAX_SPRITES)
+    {
+        *arg1 = FALSE;
+        return;
+    }
+
     gSprites[*arg0].callback = sub_819F600;
     gSprites[*arg0].data[7] = swapScreen;
     *arg1 = TRUE;
@@ -3883,7 +4166,8 @@ static void Swap_ShowSummaryMonSprite(void)
     u32 personality, otId;
 
     sFactorySwapScreen->unk2C.field1 = CreateSprite(&gUnknown_08610894, 120, 64, 1);
-    StartSpriteAffineAnim(&gSprites[sFactorySwapScreen->unk2C.field1], 2);
+    if (sFactorySwapScreen->unk2C.field1 < MAX_SPRITES)
+        StartSpriteAffineAnim(&gSprites[sFactorySwapScreen->unk2C.field1], 2);
 
     mon = &gPlayerParty[sFactorySwapScreen->cursorPos];
     species = GetMonData(mon, MON_DATA_SPECIES, NULL);
@@ -3891,29 +4175,53 @@ static void Swap_ShowSummaryMonSprite(void)
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
 
     sFactorySwapScreen->unk2C.field0 = CreateMonPicSprite_HandleDeoxys(species, otId, personality, TRUE, 88, 32, 15, 0xFFFF); // BUG: (fixed) otId and personality should be switched.
-    gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecX = 0;
-    gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecY = 0;
+    if (sFactorySwapScreen->unk2C.field0 < MAX_SPRITES)
+    {
+        gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecX = 0;
+        gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecY = 0;
+    }
 
-    gSprites[sFactorySwapScreen->unk2C.field1].invisible = TRUE;
+    if (sFactorySwapScreen->unk2C.field1 < MAX_SPRITES)
+        gSprites[sFactorySwapScreen->unk2C.field1].invisible = TRUE;
 }
 
 static void sub_819F3F8(struct UnkFactoryStruct arg0, bool8 *arg1, bool8 swapScreen)
 {
-    u8 taskId;
+    u32 taskId;
 
-    FreeAndDestroyMonPicSprite(arg0.field0);
-    taskId = CreateTask(sub_819F7B4, 1);
+    if (arg0.field1 >= MAX_SPRITES)
+    {
+        *arg1 = FALSE;
+        return;
+    }
+
+    if (arg0.field0 < MAX_SPRITES)
+    {
+        FreeAndDestroyMonPicSprite(arg0.field0);
+        arg0.field0 = MAX_SPRITES;
+    }
+
+    taskId = CreateTaskIfSpace(sub_819F7B4, 1);
+    if (taskId == NUM_TASKS)
+    {
+        sub_819F444(arg0, arg1);
+        return;
+    }
     gTasks[taskId].data[7] = swapScreen;
     gTasks[taskId].data[6] = arg0.field1;
-    gTasks[taskId].func(taskId);
+    gTasks[taskId].func((u8)taskId);
     *arg1 = TRUE;
 }
 
 static void sub_819F444(struct UnkFactoryStruct arg0, bool8 *arg1)
 {
-    FreeAndDestroyMonPicSprite(arg0.field0);
-    FreeOamMatrix(gSprites[arg0.field1].oam.matrixNum);
-    DestroySprite(&gSprites[arg0.field1]);
+    if (arg0.field0 < MAX_SPRITES)
+        FreeAndDestroyMonPicSprite(arg0.field0);
+    if (arg0.field1 < MAX_SPRITES)
+    {
+        FreeOamMatrix(gSprites[arg0.field1].oam.matrixNum);
+        DestroySprite(&gSprites[arg0.field1]);
+    }
     *arg1 = FALSE;
 }
 
@@ -3961,7 +4269,7 @@ static void Task_SwapCantHaveSameMons(u8 taskId)
 
 static bool8 Swap_AlreadyHasSameSpecies(u8 monId)
 {
-    u8 i;
+    u32 i;
     u16 species = GetMonData(&gEnemyParty[monId], MON_DATA_SPECIES, NULL);
 
     for (i = 0; i < 3; i++)
@@ -4002,6 +4310,8 @@ static void sub_819F654(struct Sprite *sprite)
 static void sub_819F69C(u8 taskId)
 {
     struct Task *task = &gTasks[taskId];
+    bool8 swapScreen = task->data[7];
+
     switch (task->data[0])
     {
     case 0:
@@ -4034,8 +4344,7 @@ static void sub_819F69C(u8 taskId)
         break;
     default:
         DestroyTask(taskId);
-        // UB: Should not use the task after it has been deleted.
-        if (gTasks[taskId].data[7] == TRUE)
+        if (swapScreen == TRUE)
             Swap_ShowMonSprite();
         else
             Summary_ShowMonSprite();
@@ -4101,8 +4410,11 @@ static void Swap_ShowMonSprite(void)
     otId = GetMonData(mon, MON_DATA_OT_ID, NULL);
 
     sFactorySwapScreen->unk2C.field0 = CreateMonPicSprite_HandleDeoxys(species, otId, personality, TRUE, 88, 32, 15, 0xFFFF);
-    gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecX = 0;
-    gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecY = 0;
+    if (sFactorySwapScreen->unk2C.field0 < MAX_SPRITES)
+    {
+        gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecX = 0;
+        gSprites[sFactorySwapScreen->unk2C.field0].centerToCornerVecY = 0;
+    }
 
     sFactorySwapScreen->unk30 = FALSE;
 }

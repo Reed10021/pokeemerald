@@ -1385,8 +1385,11 @@ void ResetConditionSparkleSprites(struct Sprite **sprites)
 
 void CreateConditionSparkleSprites(struct Sprite **sprites, u8 monSpriteId, u8 _count)
 {
-    u16 i, spriteId, firstSpriteId = 0;
-    u8 count = _count;
+    u32 i, spriteId, firstSpriteId = MAX_SPRITES;
+    u32 count = _count, createdCount = 0;
+
+    if (count >= MAX_CONDITION_SPARKLES)
+        count = MAX_CONDITION_SPARKLES - 1;
 
     for (i = 0; i < count + 1; i++)
     {
@@ -1400,6 +1403,7 @@ void CreateConditionSparkleSprites(struct Sprite **sprites, u8 monSpriteId, u8 _
                 sprites[i - 1]->sNextSparkleSpriteId = spriteId;
             else
                 firstSpriteId = spriteId;
+            createdCount++;
         }
         else
         {
@@ -1407,7 +1411,16 @@ void CreateConditionSparkleSprites(struct Sprite **sprites, u8 monSpriteId, u8 _
         }
     }
 
-    sprites[count]->sNextSparkleSpriteId = firstSpriteId;
+    if (createdCount == 0)
+        return;
+
+    if (createdCount < count + 1)
+        count = createdCount - 1;
+
+    sprites[createdCount - 1]->sNextSparkleSpriteId = firstSpriteId;
+    for (i = createdCount; i < MAX_CONDITION_SPARKLES; i++)
+        sprites[i] = NULL;
+
     InitConditionSparkles(count, TRUE, sprites);
 }
 

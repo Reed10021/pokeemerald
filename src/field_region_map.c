@@ -93,6 +93,11 @@ void FieldInitRegionMap(MainCallback callback)
 {
     SetVBlankCallback(NULL);
     sFieldRegionMapHandler = malloc(sizeof(*sFieldRegionMapHandler));
+    if (sFieldRegionMapHandler == NULL)
+    {
+        SetMainCallback2(callback);
+        return;
+    }
     sFieldRegionMapHandler->state = 0;
     sFieldRegionMapHandler->callback = callback;
     SetMainCallback2(MCB2_InitRegionMapRegisters);

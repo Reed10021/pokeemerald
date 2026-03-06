@@ -1758,7 +1758,9 @@ static void OverworldBasic(void)
     UpdatePaletteFade();
     UpdateTilesetAnimations();
     DoScheduledBgTilemapCopiesToVram();
-    if (++gTimeUpdateCounter >= 230 && !gPaletteFade.active) // Update blend every ~3 seconds
+    if (++gTimeUpdateCounter >= 230
+        && !gPaletteFade.active
+        && gWeatherPtr->palProcessingState == WEATHER_PAL_STATE_IDLE) // Update blend every ~3 seconds
     {
         gTimeUpdateCounter = 0;
         UpdateTimeOfDay();
@@ -2117,7 +2119,6 @@ static bool32 LoadMapInStepsLink(u8 *state)
     switch (*state)
     {
     case 0:
-        InitOverworldBgs();
         ScriptContext1_Init();
         ScriptContext2_Disable();
         ResetMirageTowerAndSaveBlockPtrs();

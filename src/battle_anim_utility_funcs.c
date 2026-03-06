@@ -393,6 +393,11 @@ void sub_8116EB4(u8 taskId)
     u8 i;
 
     sAnimStatsChangeData = AllocZeroed(sizeof(struct AnimStatsChangeData));
+    if (sAnimStatsChangeData == NULL)
+    {
+        DestroyAnimVisualTask(taskId);
+        return;
+    }
     for (i = 0; i < 8; i++)
         sAnimStatsChangeData->data[i] = gBattleAnimArgs[i];
 

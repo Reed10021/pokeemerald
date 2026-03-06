@@ -34,4 +34,17 @@ u8 GetTaskCount(void);
 void SetWordTaskArg(u8 taskId, u8 dataElem, u32 value);
 u32 GetWordTaskArg(u8 taskId, u8 dataElem);
 
+static inline u32 CreateTaskIfSpace(TaskFunc func, u32 priority)
+{
+    u32 taskId;
+
+    for (taskId = 0; taskId < NUM_TASKS; taskId++)
+    {
+        if (!gTasks[taskId].isActive)
+            return CreateTask(func, (u8)priority);
+    }
+
+    return NUM_TASKS;
+}
+
 #endif // GUARD_TASK_H

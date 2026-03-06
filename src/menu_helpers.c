@@ -327,7 +327,7 @@ bool8 MenuHelpers_CallLinkSomething(void)
 
 void sub_812220C(struct ItemSlot *slots, u8 count, u8 *arg2, u8 *usedSlotsCount, u8 maxUsedSlotsCount)
 {
-    u16 i;
+    u32 i;
     struct ItemSlot *slots_ = slots;
 
     (*usedSlotsCount) = 0;
@@ -398,11 +398,14 @@ void LoadListMenuArrowsGfx(void)
 
 void sub_8122344(u8 *spriteIds, u8 count)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < count; i++)
     {
         spriteIds[i] = CreateSprite(&gUnknown_0859F524, i * 16, 0, 0);
+        if (spriteIds[i] >= MAX_SPRITES)
+            continue;
+
         if (i != 0)
             StartSpriteAnim(&gSprites[spriteIds[i]], 1);
 
@@ -412,10 +415,13 @@ void sub_8122344(u8 *spriteIds, u8 count)
 
 void sub_81223B0(u8 *spriteIds, u8 count)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < count; i++)
     {
+        if (spriteIds[i] >= MAX_SPRITES)
+            continue;
+
         if (i == count - 1)
             DestroySpriteAndFreeResources(&gSprites[spriteIds[i]]);
         else
@@ -425,22 +431,26 @@ void sub_81223B0(u8 *spriteIds, u8 count)
 
 void sub_81223FC(u8 *spriteIds, u8 count, bool8 invisible)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < count; i++)
     {
-        gSprites[spriteIds[i]].invisible = invisible;
+        if (spriteIds[i] < MAX_SPRITES)
+            gSprites[spriteIds[i]].invisible = invisible;
     }
 }
 
 void sub_8122448(u8 *spriteIds, u8 count, s16 x, u16 y)
 {
-    u8 i;
+    u32 i;
     bool8 unknownBit = count & 0x80;
     count &= ~(0x80);
 
     for (i = 0; i < count; i++)
     {
+        if (spriteIds[i] >= MAX_SPRITES)
+            continue;
+
         if (i == count - 1 && unknownBit)
             gSprites[spriteIds[i]].pos2.x = x - 8;
         else
