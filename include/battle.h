@@ -449,8 +449,9 @@ struct BattleStruct
 
 #define IS_PHYSICAL_MOVE(move)(move == MOVE_CRABHAMMER || move == MOVE_SACRED_FIRE || move == MOVE_BLAZE_KICK || move == MOVE_FLARE_BLITZ || move == MOVE_OUTRAGE || move == MOVE_DRAGON_CLAW \
                             || move == MOVE_WATERFALL || move == MOVE_BITE ||move == MOVE_CRUNCH || move == MOVE_NEEDLE_ARM || move == MOVE_BULLET_SEED || move == MOVE_KNOCK_OFF || move == MOVE_AVALANCHE \
-                            || move == MOVE_ICE_SHARD)
-#define IS_SPECIAL_MOVE(move)(move == MOVE_AEROBLAST || move == MOVE_SIGNAL_BEAM || move == MOVE_AIR_SLASH || move == MOVE_WEATHER_BALL || move == MOVE_TRI_ATTACK || move == MOVE_SHADOW_BALL)
+                            || move == MOVE_ICE_SHARD || move == MOVE_SEED_BOMB)
+#define IS_SPECIAL_MOVE(move)(move == MOVE_AEROBLAST || move == MOVE_SIGNAL_BEAM || move == MOVE_AIR_SLASH || move == MOVE_WEATHER_BALL || move == MOVE_TRI_ATTACK || move == MOVE_SHADOW_BALL \
+                            || move == MOVE_AURA_SPHERE || move == MOVE_BUG_BUZZ  || move == MOVE_FLASH_CANNON)
 
 #define IS_TYPE_PHYSICAL(move, moveType)((moveType < TYPE_MYSTERY || IS_PHYSICAL_MOVE(move)) && !IS_SPECIAL_MOVE(move))
 #define IS_TYPE_SPECIAL(move, moveType)((moveType > TYPE_MYSTERY || IS_SPECIAL_MOVE(move)) && !IS_PHYSICAL_MOVE(move))
@@ -458,7 +459,8 @@ struct BattleStruct
 #define IS_PUNCHING_MOVE(move)(move == MOVE_COMET_PUNCH || move == MOVE_DIZZY_PUNCH || move == MOVE_DYNAMIC_PUNCH || move == MOVE_FIRE_PUNCH || move == MOVE_FOCUS_PUNCH \
                             || move == MOVE_ICE_PUNCH || move == MOVE_MACH_PUNCH || move == MOVE_MEGA_PUNCH || move == MOVE_SHADOW_PUNCH || move == MOVE_SKY_UPPERCUT \
                             || move == MOVE_THUNDER_PUNCH || move == MOVE_METEOR_MASH || move == MOVE_NEEDLE_ARM || move == MOVE_BULLET_PUNCH || move == MOVE_DRAIN_PUNCH \
-                            || move == MOVE_ARM_THRUST || move == MOVE_ROCK_SMASH || move == MOVE_STRENGTH || move == MOVE_FAINT_ATTACK)
+                            || move == MOVE_ARM_THRUST || move == MOVE_ROCK_SMASH || move == MOVE_STRENGTH || move == MOVE_FAINT_ATTACK || move == MOVE_CLOSE_COMBAT \
+                            || move == MOVE_FORCE_PALM)
 
 #define TARGET_TURN_DAMAGED ((gSpecialStatuses[gBattlerTarget].physicalDmg != 0 || gSpecialStatuses[gBattlerTarget].specialDmg != 0))
 

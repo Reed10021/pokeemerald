@@ -1176,7 +1176,7 @@ static void Cmd_get_considered_move_power(void)
 static void Cmd_get_how_powerful_move_is(void)
 {
     s32 i, checkedMove;
-    s32 moveDmgs[MAX_MON_MOVES];
+    s32 moveDmgs[MAX_MON_MOVES] = { 0 };
 
     for (i = 0; sDiscouragedPowerfulMoveEffects[i] != 0xFFFF; i++)
     {

@@ -199,19 +199,19 @@ static const struct {
     },
     {
         .species = SPECIES_TOGETIC,
-        .moves = {MOVE_ICE_BEAM, MOVE_TRI_ATTACK, MOVE_TAIL_GLOW, MOVE_THUNDER},
+        .moves = {MOVE_ICE_BEAM, MOVE_TRI_ATTACK, MOVE_NASTY_PLOT, MOVE_THUNDER},
         .level = 23,
         .location = MAP_NUM(ROUTE110)
     },
     {
         .species = SPECIES_FEEBAS,
-        .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_PUMP, MOVE_ICE_BEAM, MOVE_THUNDER},
+        .moves = {MOVE_NASTY_PLOT, MOVE_HYDRO_PUMP, MOVE_ICE_BEAM, MOVE_THUNDER},
         .level = 20,
         .location = MAP_NUM(ROUTE109)
     },
     {
         .species = SPECIES_SEEDOT,
-        .moves = {MOVE_BIDE, MOVE_HARDEN, MOVE_LEECH_SEED},
+        .moves = {MOVE_BIDE, MOVE_HARDEN, MOVE_LEECH_SEED, MOVE_NASTY_PLOT},
         .level = 3, 
         .location = MAP_NUM(ROUTE102)
     },
@@ -247,13 +247,13 @@ static const struct {
     },
     {
         .species = SPECIES_SLOWPOKE,
-        .moves = {MOVE_PSYCHIC, MOVE_TAIL_GLOW, MOVE_AMNESIA, MOVE_FUTURE_SIGHT},
+        .moves = {MOVE_PSYCHIC, MOVE_NASTY_PLOT, MOVE_AMNESIA, MOVE_FUTURE_SIGHT},
         .level = 20,
         .location = MAP_NUM(ROUTE112)
     },
     {
         .species = SPECIES_ANORITH,
-        .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_ROCK_SLIDE, MOVE_EARTHQUAKE},
+        .moves = {MOVE_SWORDS_DANCE, MOVE_X_SCISSOR, MOVE_ROCK_SLIDE, MOVE_EARTHQUAKE},
         .level = 26,
         .location = MAP_NUM(ROUTE122)
     },
@@ -289,7 +289,7 @@ static const struct {
     },
     {
         .species = SPECIES_PICHU,
-        .moves = {MOVE_VOLT_TACKLE, MOVE_THUNDERBOLT, MOVE_SURF, MOVE_TAIL_GLOW},
+        .moves = {MOVE_VOLT_TACKLE, MOVE_THUNDERBOLT, MOVE_SURF, MOVE_NASTY_PLOT},
         .level = 9,
         .location = MAP_NUM(ROUTE103)
     },
@@ -307,19 +307,19 @@ static const struct {
     },
     {
         .species = SPECIES_SHELLDER,
-        .moves = {MOVE_CLAMP, MOVE_TAIL_GLOW, MOVE_AMNESIA, MOVE_BARRIER},
+        .moves = {MOVE_CLAMP, MOVE_NASTY_PLOT, MOVE_AMNESIA, MOVE_BARRIER},
         .level = 22,
         .location = MAP_NUM(ROUTE105)
     },
     {
         .species = SPECIES_CASTFORM,
-        .moves = {MOVE_WEATHER_BALL, MOVE_TAIL_GLOW, MOVE_RAIN_DANCE, MOVE_ICE_BALL},
+        .moves = {MOVE_WEATHER_BALL, MOVE_NASTY_PLOT, MOVE_RAIN_DANCE, MOVE_ICE_BALL},
         .level = 30,
         .location = MAP_NUM(ROUTE119)
     },
     {
         .species = SPECIES_BELLSPROUT,
-        .moves = {MOVE_GIGA_DRAIN, MOVE_TAIL_GLOW, MOVE_SWORDS_DANCE, MOVE_SLUDGE_BOMB},
+        .moves = {MOVE_GIGA_DRAIN, MOVE_NASTY_PLOT, MOVE_SWORDS_DANCE, MOVE_SLUDGE_BOMB},
         .level = 25,
         .location = MAP_NUM(ROUTE119)
     },
@@ -337,7 +337,7 @@ static const struct {
     },
     {
         .species = SPECIES_HOUNDOUR,
-        .moves = {MOVE_TAIL_GLOW, MOVE_YAWN, MOVE_HEAT_WAVE, MOVE_DRAGON_BREATH},
+        .moves = {MOVE_NASTY_PLOT, MOVE_YAWN, MOVE_HEAT_WAVE, MOVE_DRAGON_BREATH},
         .level = 14,
         .location = MAP_NUM(ROUTE112)
     },
@@ -361,13 +361,13 @@ static const struct {
     },
     {
         .species = SPECIES_MAGBY,
-        .moves = {MOVE_THUNDER_PUNCH, MOVE_ICE_PUNCH, MOVE_HEAT_WAVE, MOVE_TAIL_GLOW},
+        .moves = {MOVE_THUNDER_PUNCH, MOVE_ICE_PUNCH, MOVE_HEAT_WAVE, MOVE_NASTY_PLOT},
         .level = 19,
         .location = MAP_NUM(ROUTE118)
     },
     {
         .species = SPECIES_CASTFORM,
-        .moves = {MOVE_WEATHER_BALL, MOVE_TAIL_GLOW, MOVE_SUNNY_DAY, MOVE_SOLAR_BEAM},
+        .moves = {MOVE_WEATHER_BALL, MOVE_NASTY_PLOT, MOVE_SUNNY_DAY, MOVE_SOLAR_BEAM},
         .level = 30,
         .location = MAP_NUM(ROUTE112)
     },
@@ -379,7 +379,7 @@ static const struct {
     },
     {
         .species = SPECIES_ELEKID,
-        .moves = {MOVE_ICE_PUNCH, MOVE_FIRE_PUNCH, MOVE_VOLT_TACKLE, MOVE_TAIL_GLOW},
+        .moves = {MOVE_ICE_PUNCH, MOVE_FIRE_PUNCH, MOVE_VOLT_TACKLE, MOVE_NASTY_PLOT},
         .level = 21,
         .location = MAP_NUM(ROUTE110)
     },
@@ -391,7 +391,7 @@ static const struct {
     },
     {   // Starter outbreaks
         .species = SPECIES_TREECKO,
-        .moves = {MOVE_TAIL_GLOW, MOVE_ICE_PUNCH, MOVE_YAWN, MOVE_GIGA_DRAIN},
+        .moves = {MOVE_NASTY_PLOT, MOVE_ICE_PUNCH, MOVE_YAWN, MOVE_GIGA_DRAIN},
         .level = 17,
         .location = MAP_NUM(ROUTE119)
     },
@@ -403,25 +403,25 @@ static const struct {
     },
     {
         .species = SPECIES_MUDKIP,
-        .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_SLUDGE_BOMB, MOVE_EARTHQUAKE},
+        .moves = {MOVE_SWORDS_DANCE, MOVE_FURY_CUTTER, MOVE_POISON_JAB, MOVE_EARTHQUAKE},
         .level = 17,
         .location = MAP_NUM(ROUTE119)
     },
     {
         .species = SPECIES_LAPRAS,
-        .moves = {MOVE_HAIL, MOVE_ICE_BEAM, MOVE_TAIL_GLOW, MOVE_YAWN},
+        .moves = {MOVE_HAIL, MOVE_ICE_BEAM, MOVE_NASTY_PLOT, MOVE_YAWN},
         .level = 30,
         .location = MAP_NUM(ROUTE109)
     },
     {
         .species = SPECIES_GOREBYSS,
-        .moves = {MOVE_THUNDER_WAVE, MOVE_TAIL_GLOW, MOVE_MUDDY_WATER, MOVE_SHEER_COLD},
+        .moves = {MOVE_THUNDER_WAVE, MOVE_NASTY_PLOT, MOVE_MUDDY_WATER, MOVE_SHEER_COLD},
         .level = 40,
         .location = MAP_NUM(ROUTE133)
     },
     {
         .species = SPECIES_LAPRAS,
-        .moves = {MOVE_RAIN_DANCE, MOVE_HYDRO_CANNON, MOVE_TAIL_GLOW, MOVE_YAWN},
+        .moves = {MOVE_RAIN_DANCE, MOVE_HYDRO_CANNON, MOVE_NASTY_PLOT, MOVE_YAWN},
         .level = 30,
         .location = MAP_NUM(ROUTE108)
     },
@@ -439,7 +439,7 @@ static const struct {
     },
     {
         .species = SPECIES_CASTFORM,
-        .moves = {MOVE_WEATHER_BALL, MOVE_TAIL_GLOW, MOVE_HAIL, MOVE_PSYCHIC},
+        .moves = {MOVE_WEATHER_BALL, MOVE_NASTY_PLOT, MOVE_HAIL, MOVE_PSYCHIC},
         .level = 30,
         .location = MAP_NUM(ROUTE125)
     },
@@ -493,13 +493,13 @@ static const struct {
     },
     {
         .species = SPECIES_SLOWBRO,
-        .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_CANNON, MOVE_BELLY_DRUM, MOVE_PSYCHO_BOOST},
+        .moves = {MOVE_NASTY_PLOT, MOVE_HYDRO_CANNON, MOVE_BELLY_DRUM, MOVE_PSYCHO_BOOST},
         .level = 60,
         .location = MAP_NUM(ROUTE132)
     },
     {
         .species = SPECIES_SLOWKING,
-        .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_CANNON, MOVE_BELLY_DRUM, MOVE_PSYCHO_BOOST},
+        .moves = {MOVE_NASTY_PLOT, MOVE_HYDRO_CANNON, MOVE_BELLY_DRUM, MOVE_PSYCHO_BOOST},
         .level = 60,
         .location = MAP_NUM(ROUTE131)
     },
@@ -517,7 +517,7 @@ static const struct {
     },
     {
         .species = SPECIES_DEWGONG,
-        .moves = {MOVE_TAIL_GLOW, MOVE_HAIL, MOVE_ICE_BALL, MOVE_HYDRO_PUMP},
+        .moves = {MOVE_NASTY_PLOT, MOVE_HAIL, MOVE_ICE_BALL, MOVE_HYDRO_PUMP},
         .level = 50,
         .location = MAP_NUM(ROUTE126)
     },
@@ -541,7 +541,7 @@ static const struct {
     },
     {
         .species = SPECIES_POLITOED,
-        .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_CANNON, MOVE_ICE_BEAM, MOVE_THUNDER_PUNCH},
+        .moves = {MOVE_NASTY_PLOT, MOVE_HYDRO_CANNON, MOVE_ICE_BEAM, MOVE_THUNDER_PUNCH},
         .level = 50,
         .location = MAP_NUM(ROUTE129)
     },
@@ -560,7 +560,7 @@ static const struct {
     },
     {
         .species = SPECIES_SQUIRTLE,
-        .moves = {MOVE_CURSE, MOVE_METEOR_MASH, MOVE_CROSS_CHOP, MOVE_HYDRO_CANNON},
+        .moves = {MOVE_CURSE, MOVE_FLASH_CANNON, MOVE_CROSS_CHOP, MOVE_HYDRO_CANNON},
         .level = 25,
         .location = MAP_NUM(ROUTE124)
     },
@@ -603,7 +603,7 @@ static const struct {
     },
     {
         .species = SPECIES_CYNDAQUIL,
-        .moves = {MOVE_TAIL_GLOW, MOVE_HEAT_WAVE, MOVE_ICE_PUNCH, MOVE_HYPNOSIS},
+        .moves = {MOVE_NASTY_PLOT, MOVE_HEAT_WAVE, MOVE_ICE_PUNCH, MOVE_HYPNOSIS},
         .level = 5,
         .location = MAP_NUM(ROUTE101)
     },
@@ -633,7 +633,7 @@ static const struct {
     },
     {
         .species = SPECIES_EXEGGCUTE,
-        .moves = {MOVE_TAIL_GLOW, MOVE_PETAL_DANCE, MOVE_PSYCHO_BOOST, MOVE_SPORE},
+        .moves = {MOVE_NASTY_PLOT, MOVE_PETAL_DANCE, MOVE_PSYCHO_BOOST, MOVE_SPORE},
         .level = 26,
         .location = MAP_NUM(ROUTE120)
     },
@@ -645,7 +645,7 @@ static const struct {
     },
     {
         .species = SPECIES_EEVEE,
-        .moves = {MOVE_TAIL_GLOW, MOVE_SURF, MOVE_FLAMETHROWER, MOVE_THUNDERBOLT},
+        .moves = {MOVE_NASTY_PLOT, MOVE_SURF, MOVE_FLAMETHROWER, MOVE_THUNDERBOLT},
         .level = 5,
         .location = MAP_NUM(ROUTE101)
     },
@@ -676,13 +676,13 @@ static const struct {
     {
         .species = SPECIES_LEDYBA,
         .moves = {MOVE_CRUNCH, MOVE_SCREECH, MOVE_MEGA_PUNCH, MOVE_COSMIC_POWER},
-        .level = 15,
+        .level = 10,
         .location = MAP_NUM(ROUTE103)
     },
     {
         .species = SPECIES_LEDIAN,
         .moves = {MOVE_DRAGON_DANCE, MOVE_DRAIN_PUNCH, MOVE_MEGA_PUNCH, MOVE_SHADOW_PUNCH},
-        .level = 15,
+        .level = 20,
         .location = MAP_NUM(ROUTE113)
     },
     {
@@ -693,7 +693,7 @@ static const struct {
     },
     {
         .species = SPECIES_TANGELA,
-        .moves = {MOVE_SPORE, MOVE_ANCIENT_POWER, MOVE_LEAF_STORM, MOVE_TAIL_GLOW},
+        .moves = {MOVE_SPORE, MOVE_ANCIENT_POWER, MOVE_LEAF_STORM, MOVE_NASTY_PLOT},
         .level = 24,
         .location = MAP_NUM(ROUTE119)
     },

@@ -741,6 +741,10 @@ static const u16 sMovesForbiddenToCopy[] =
     MOVE_COVET,
     MOVE_TRICK,
     MOVE_FOCUS_PUNCH,
+    MOVE_SNORE,
+    MOVE_TRANSFORM,
+    MOVE_NATURE_POWER,
+    MOVE_ASSIST,
     METRONOME_FORBIDDEN_END
 };
 
@@ -3207,6 +3211,10 @@ void SetMoveEffect(bool8 primary, u8 certain)
                 {
                     gBattlescriptCurrInstr++;
                 }
+                break;
+            case MOVE_EFFECT_DEF_SPDEF_DOWN: // Close Combat
+                BattleScriptPush(gBattlescriptCurrInstr + 1);
+                gBattlescriptCurrInstr = BattleScript_DefSpDefDown;
                 break;
             case MOVE_EFFECT_SP_ATK_TWO_DOWN: // Overheat
                 BattleScriptPush(gBattlescriptCurrInstr + 1);
@@ -8224,26 +8232,26 @@ static void Cmd_metronome(void)
         if (gCurrentMove >= MOVES_COUNT)
             continue;
         // Check for unused moves.
-        if (gCurrentMove >= MOVE_ROOST && gCurrentMove <= MOVE_MAGNET_RISE)
+        if (gCurrentMove >= MOVE_ROOST && gCurrentMove <= MOVE_U_TURN)
             continue;
-        else if (gCurrentMove >= MOVE_FORCE_PALM && gCurrentMove <= MOVE_POISON_JAB)
+        else if (gCurrentMove >= MOVE_NIGHT_SLASH && gCurrentMove <= MOVE_MAGNET_RISE)
             continue;
-        else if (gCurrentMove >= MOVE_NIGHT_SLASH && gCurrentMove <= MOVE_SEED_BOMB)
-            continue;
-        else if (gCurrentMove >= MOVE_X_SCISSOR && gCurrentMove <= MOVE_BUG_BUZZ)
+        else if (gCurrentMove >= MOVE_PAYBACK && gCurrentMove <= MOVE_AQUA_TAIL)
             continue;
         else if (gCurrentMove >= MOVE_DRAGON_RUSH && gCurrentMove <= MOVE_POWER_GEM)
             continue;
-        else if (gCurrentMove >= MOVE_VACUUM_WAVE && gCurrentMove <= MOVE_NASTY_PLOT)
+        else if (gCurrentMove >= MOVE_VACUUM_WAVE && gCurrentMove <= MOVE_ENERGY_BALL)
+            continue;
+        else if (gCurrentMove >= MOVE_EARTH_POWER && gCurrentMove <= MOVE_GIGA_IMPACT)
             continue;
         else if (gCurrentMove >= MOVE_AVALANCHE && gCurrentMove <= MOVE_ICE_SHARD)
             continue;
-        else if (gCurrentMove >= MOVE_THUNDER_FANG && gCurrentMove <= MOVE_LUNAR_DANCE)
+        else if (gCurrentMove >= MOVE_THUNDER_FANG && gCurrentMove <= MOVE_MIRROR_SHOT)
+            continue;
+        else if (gCurrentMove >= MOVE_ROCK_CLIMB && gCurrentMove <= MOVE_LUNAR_DANCE)
             continue;
         else if (gCurrentMove >= MOVE_MAGMA_STORM && gCurrentMove <= MOVE_SHADOW_FORCE)
             continue;
-
-        for (i = 0; i < MAX_MON_MOVES; i++); // ?
 
         i = -1;
         while (1)

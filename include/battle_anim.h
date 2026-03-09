@@ -236,6 +236,7 @@ u8 SmokescreenImpact(s16 x, s16 y, u8 a3);
 u32 UnpackSelectedBattleAnimPalettes(s16);
 
 u8 GetBattlerSpriteFinal_Y(u8, u16, u8);
+void AnimPoisonJabProjectile(struct Sprite* sprite);
 
 extern const struct OamData gOamData_AffineOff_ObjNormal_8x16;
 extern const struct OamData gOamData_AffineNormal_ObjBlend_16x16;
@@ -281,6 +282,7 @@ extern const struct OamData gOamData_AffineDouble_ObjNormal_32x16;
 extern const struct OamData gOamData_AffineOff_ObjNormal_64x32;
 extern const struct OamData gOamData_AffineOff_ObjBlend_64x32;
 extern const struct OamData gOamData_AffineOff_ObjBlend_16x32;
+extern const struct OamData gOamData_AffineDouble_ObjBlend_32x8;
 
 extern const struct CompressedSpriteSheet gBattleAnimPicTable[];
 extern const struct CompressedSpritePalette gBattleAnimPaletteTable[];

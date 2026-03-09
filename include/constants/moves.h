@@ -374,7 +374,7 @@
 #define MOVE_ACUPRESSURE  367 // Unused / Placeholder
 #define MOVE_METAL_BURST  368 // Unused / Placeholder
 #define MOVE_U_TURN       369 // Unused / Placeholder
-#define MOVE_CLOSE_COMBAT 370 // Unused / Placeholder
+#define MOVE_CLOSE_COMBAT 370 
 #define MOVE_PAYBACK      371 // Unused / Placeholder
 #define MOVE_ASSURANCE    372 // Unused / Placeholder
 #define MOVE_EMBARGO      373 // Unused / Placeholder
@@ -399,17 +399,17 @@
 #define MOVE_AQUA_RING    392 // Unused / Placeholder
 #define MOVE_MAGNET_RISE  393 // Unused / Placeholder
 #define MOVE_FLARE_BLITZ  394
-#define MOVE_FORCE_PALM   395 // Unused / Placeholder
-#define MOVE_AURA_SPHERE  396 // Unused / Placeholder
-#define MOVE_ROCK_POLISH  397 // Unused / Placeholder
-#define MOVE_POISON_JAB   398 // Unused / Placeholder
+#define MOVE_FORCE_PALM   395
+#define MOVE_AURA_SPHERE  396
+#define MOVE_ROCK_POLISH  397
+#define MOVE_POISON_JAB   398
 #define MOVE_DARK_PULSE   399
 #define MOVE_NIGHT_SLASH  400 // Unused / Placeholder
 #define MOVE_AQUA_TAIL    401 // Unused / Placeholder
-#define MOVE_SEED_BOMB    402 // Unused / Placeholder
+#define MOVE_SEED_BOMB    402
 #define MOVE_AIR_SLASH    403
-#define MOVE_X_SCISSOR    404 // Unused / Placeholder
-#define MOVE_BUG_BUZZ     405 // Unused / Placeholder
+#define MOVE_X_SCISSOR    404
+#define MOVE_BUG_BUZZ     405
 #define MOVE_DRAGON_PULSE 406
 #define MOVE_DRAGON_RUSH  407 // Unused / Placeholder
 #define MOVE_POWER_GEM    408 // Unused / Placeholder
@@ -417,11 +417,11 @@
 #define MOVE_VACUUM_WAVE  410 // Unused / Placeholder
 #define MOVE_FOCUS_BLAST  411 // Unused / Placeholder
 #define MOVE_ENERGY_BALL  412 // Unused / Placeholder
-#define MOVE_BRAVE_BIRD   413 // Unused / Placeholder
+#define MOVE_BRAVE_BIRD   413
 #define MOVE_EARTH_POWER  414 // Unused / Placeholder
 #define MOVE_SWITCHEROO   415 // Unused / Placeholder
 #define MOVE_GIGA_IMPACT  416 // Unused / Placeholder
-#define MOVE_NASTY_PLOT   417 // Unused / Placeholder
+#define MOVE_NASTY_PLOT   417
 #define MOVE_BULLET_PUNCH 418
 #define MOVE_AVALANCHE    419
 #define MOVE_ICE_SHARD    420
@@ -434,7 +434,7 @@
 #define MOVE_PSYCHO_CUT   427 // Unused / Placeholder
 #define MOVE_ZEN_HEADBUTT 428 // Unused / Placeholder
 #define MOVE_MIRROR_SHOT  429 // Unused / Placeholder
-#define MOVE_FLASH_CANNON 430 // Unused / Placeholder
+#define MOVE_FLASH_CANNON 430
 #define MOVE_ROCK_CLIMB   431 // Unused / Placeholder
 #define MOVE_DEFOG        432 // Unused / Placeholder
 #define MOVE_TRICK_ROOM   433 // Unused / Placeholder

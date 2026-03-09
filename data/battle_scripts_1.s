@@ -232,6 +232,7 @@ gBattleScriptsForMoveEffects:: @ 82D86A8
 	.4byte BattleScript_EffectCamouflage
 	.4byte BattleScript_EffectGrowth
 	.4byte BattleScript_EffectPowerBasedOnTargetHp
+	.4byte BattleScript_EffectCloseCombat
 
 BattleScript_EffectSpeedUp::
 BattleScript_EffectSpecialDefenseUp::
@@ -2863,6 +2864,10 @@ BattleScript_EffectPowerBasedOnTargetHp::
 	scaledamagebytargethp
 	goto BattleScript_EffectHit
 
+BattleScript_EffectCloseCombat::
+	setmoveeffect MOVE_EFFECT_DEF_SPDEF_DOWN | MOVE_EFFECT_AFFECTS_USER | MOVE_EFFECT_CERTAIN
+	goto BattleScript_EffectHit
+
 BattleScript_FaintAttacker::
 	playfaintcry BS_ATTACKER
 	pause 0x20
@@ -4726,4 +4731,23 @@ BattleScript_ApplyTotemVarBoostSpAtk:
 BattleScript_TotemVarEnd:
 	printstring STRINGID_GOINGALLOUT
 	waitmessage 0x40
+	return
+
+BattleScript_DefSpDefDown::
+	setbyte sSTAT_ANIM_PLAYED, FALSE
+	playstatchangeanimation BS_ATTACKER, BIT_DEF | BIT_SPDEF, STAT_CHANGE_CANT_PREVENT | STAT_CHANGE_NEGATIVE | STAT_CHANGE_MULTIPLE_STATS
+	playstatchangeanimation BS_ATTACKER, BIT_DEF, STAT_CHANGE_CANT_PREVENT | STAT_CHANGE_NEGATIVE
+	setstatchanger STAT_DEF, 1, TRUE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | MOVE_EFFECT_CERTAIN | STAT_BUFF_ALLOW_PTR, BattleScript_DefSpDefDown_TrySpDef
+	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, 0x2, BattleScript_DefSpDefDown_TrySpDef
+	printfromtable gStatDownStringIds
+	waitmessage 0x40
+BattleScript_DefSpDefDown_TrySpDef::
+	playstatchangeanimation BS_ATTACKER, BIT_SPDEF, STAT_CHANGE_CANT_PREVENT | STAT_CHANGE_NEGATIVE
+	setstatchanger STAT_SPDEF, 1, TRUE
+	statbuffchange MOVE_EFFECT_AFFECTS_USER | MOVE_EFFECT_CERTAIN | STAT_BUFF_ALLOW_PTR, BattleScript_DefSpDefDown_End
+	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, 0x2, BattleScript_DefSpDefDown_End
+	printfromtable gStatDownStringIds
+	waitmessage 0x40
+BattleScript_DefSpDefDown_End::
 	return

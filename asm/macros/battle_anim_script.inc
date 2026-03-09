@@ -316,3 +316,15 @@
 	.macro create_basic_hitsplat_sprite anim_battler:req, subpriority_offset:req, x:req, y:req, relative_to:req, animation:req
 	createsprite gBasicHitSplatSpriteTemplate, \anim_battler, \subpriority_offset, \x, \y, \relative_to, \animation
 	.endm
+
+	.macro attacker_fade_to_invisible priority=2, step_delay:req
+	createvisualtask AnimTask_AttackerFadeToInvisible, \priority, \step_delay
+	.endm
+
+	.macro attacker_fade_from_invisible priority=2, step_delay:req
+	createvisualtask AnimTask_AttackerFadeFromInvisible, \priority, \step_delay
+	.endm
+
+	.macro shrink_target_copy priority=5, unk0:req, unk1:req
+	createvisualtask AnimTask_ShrinkTargetCopy, \priority, \unk0, \unk1
+	.endm

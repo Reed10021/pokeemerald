@@ -1254,7 +1254,7 @@
 #define FLAG_ITEM_ABANDONED_SHIP_HIDDEN_FLOOR_ROOM_4_SCUBA_GEAR     0x4B2 // Was unused Flag
 #define FLAG_ABANDONED_SHIP_HIDDEN_FLOOR_ROOM_4_ENCOUNTER           0x4B3 // Was unused Flag
 #define FLAG_ITEM_WEATHER_INSTITUTE_WEATHER_ORB_AWARDED             0x4B4 // Was unused Flag
-#define FLAG_UNUSED_0x4B5                                           0x4B5 // Unused Flag
+#define FLAG_ITEM_ALTERING_CAVE_WATER_STONE                         0x4B5 // Was unused Flag
 #define FLAG_UNUSED_0x4B6                                           0x4B6 // Unused Flag
 #define FLAG_UNUSED_0x4B7                                           0x4B7 // Unused Flag
 #define FLAG_UNUSED_0x4B8                                           0x4B8 // Unused Flag

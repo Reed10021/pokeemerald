@@ -38,7 +38,7 @@ PurityCave_EventScript_JirachiSurprise::
 	setflag FLAG_FORCE_ANIMATIONS
 	setflag FLAG_TRIGGER_SMART_WILD_AI
 	setvar VAR_0x8004, SPECIES_JIRACHI
-	setvar VAR_0x8005, 65  @ level
+	setvar VAR_0x8005, 55  @ level
 	setvar VAR_0x8006, ITEM_STAR_PIECE
 	special CreateObedientFatefulEncounterEnemyMon
 	special BattleSetup_StartLegendaryBattle

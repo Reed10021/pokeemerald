@@ -218,6 +218,7 @@ AI_CheckBadMove_CheckEffect: @ 82DC045
 	if_effect EFFECT_CALM_MIND, AI_CBM_CalmMind
 	if_effect EFFECT_DRAGON_DANCE, AI_CBM_DragonDance
 	if_effect EFFECT_GROWTH, AI_CBM_Growth
+	if_effect EFFECT_CLOSE_COMBAT, AI_CBM_HighRiskForDamage
 	end
 
 AI_CBM_Sleep: @ 82DC2D4
@@ -793,6 +794,7 @@ AI_CheckViability:
 	if_effect EFFECT_DRAGON_DANCE, AI_CV_DragonDance
 	if_effect EFFECT_GROWTH, AI_CV_Growth
 	if_effect EFFECT_POWER_BASED_ON_TARGET_HP, AI_CV_PowerBasedOnTargetHP
+	if_effect EFFECT_CLOSE_COMBAT, AI_CV_CloseCombat
 	end
 
 AI_CV_Sleep: @ 82DCA92
@@ -918,6 +920,7 @@ AI_CV_MirrorMove_EncouragedMovesToMirror: @ 82DCB6C
     .2byte MOVE_TRICK
     .2byte MOVE_SUPERPOWER
     .2byte MOVE_SKILL_SWAP
+	.2byte MOVE_CLOSE_COMBAT
     .2byte -1
 
 AI_CV_AttackUp: @ 82DCBBC
@@ -2854,9 +2857,10 @@ AI_CV_Growth_End::
 	end
 
 AI_CV_PowerBasedOnTargetHP::
-	if_type_effectiveness AI_EFFECTIVENESS_x0, AI_CV_PowerBasedOnTargetHP_ScoreDown5
-	if_type_effectiveness AI_EFFECTIVENESS_x0_5, AI_CV_PowerBasedOnTargetHP_ScoreDown5
-	if_hp_more_than AI_TARGET, 80, AI_CV_PowerBasedOnTargetHP_ScoreUp2
+	if_type_effectiveness AI_EFFECTIVENESS_x0, AI_CV_PowerBasedOnTargetHP_ScoreDown2
+	if_type_effectiveness AI_EFFECTIVENESS_x0_25, AI_CV_PowerBasedOnTargetHP_ScoreDown2
+	if_type_effectiveness AI_EFFECTIVENESS_x0_5, AI_CV_PowerBasedOnTargetHP_ScoreDown2
+	if_hp_more_than AI_TARGET, 85, AI_CV_PowerBasedOnTargetHP_ScoreUp2
 	score -1
 	goto AI_CV_PowerBasedOnTargetHP_End
 
@@ -2864,10 +2868,26 @@ AI_CV_PowerBasedOnTargetHP_ScoreUp2::
 	score +2
 	goto AI_CV_PowerBasedOnTargetHP_End
 
-AI_CV_PowerBasedOnTargetHP_ScoreDown5::
-	score -5
+AI_CV_PowerBasedOnTargetHP_ScoreDown2::
+	score -2
 
 AI_CV_PowerBasedOnTargetHP_End::
+	end
+
+AI_CV_CloseCombat:
+	if_type_effectiveness AI_EFFECTIVENESS_x0, AI_CV_CloseCombat_ScoreDown1
+	if_type_effectiveness AI_EFFECTIVENESS_x0_25, AI_CV_CloseCombat_ScoreDown1
+	if_type_effectiveness AI_EFFECTIVENESS_x0_5, AI_CV_CloseCombat_ScoreDown1
+	if_target_faster AI_CV_CloseCombat2
+	goto AI_CV_CloseCombat_End
+
+AI_CV_CloseCombat2:
+	if_hp_less_than AI_USER, 60, AI_CV_CloseCombat_End
+
+AI_CV_CloseCombat_ScoreDown1:
+	score -1
+
+AI_CV_CloseCombat_End:
 	end
 
 
@@ -3398,10 +3418,10 @@ AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
     .byte EFFECT_FOCUS_ENERGY
 @    .byte EFFECT_ATTACK_UP_2
 @    .byte EFFECT_DEFENSE_UP_2
-@    .byte EFFECT_SPEED_UP_2
+    .byte EFFECT_SPEED_UP_2
 @    .byte EFFECT_SPECIAL_ATTACK_UP_2
 @    .byte EFFECT_SPECIAL_DEFENSE_UP_2
-@    .byte EFFECT_ACCURACY_UP_2
+    .byte EFFECT_ACCURACY_UP_2
 @    .byte EFFECT_EVASION_UP_2
     .byte EFFECT_ATTACK_DOWN_2
     .byte EFFECT_DEFENSE_DOWN_2
@@ -3418,8 +3438,8 @@ AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
 @    .byte EFFECT_COSMIC_POWER
 @    .byte EFFECT_BULK_UP
 @    .byte EFFECT_CALM_MIND
-@    .byte EFFECT_DRAGON_DANCE
-@    .byte EFFECT_GROWTH
+    .byte EFFECT_DRAGON_DANCE
+    .byte EFFECT_GROWTH
 	.byte EFFECT_POWER_BASED_ON_TARGET_HP
     .byte -1
 

@@ -297,7 +297,7 @@
 #define ANIM_TAG_WHIP_HIT                   (ANIM_SPRITES_START + 287)
 #define ANIM_TAG_BLUE_RING_2                (ANIM_SPRITES_START + 288)
 //new particles
-#define ANIM_TAG_WHITE_STREAK               (ANIM_SPRITES_START + 289) // unused
+#define ANIM_TAG_WHITE_STREAK               (ANIM_SPRITES_START + 289)
 #define ANIM_TAG_PURPLE_JAB                 (ANIM_SPRITES_START + 290) // unused
 #define ANIM_TAG_TOXIC_SPIKES               (ANIM_SPRITES_START + 291) // unused
 #define ANIM_TAG_ENERGY_BALL                (ANIM_SPRITES_START + 292) // unused
@@ -315,6 +315,17 @@
 #define ANIM_TAG_SMALL_CLOUD                (ANIM_SPRITES_START + 304) // unused
 #define ANIM_TAG_ATTACK_ORDER               (ANIM_SPRITES_START + 305) // unused
 #define ANIM_TAG_DRAGON_PULSE               (ANIM_SPRITES_START + 306)
+#define ANIM_TAG_WOOD_HAMMER                (ANIM_SPRITES_START + 307) // unused
+#define ANIM_TAG_PSYCHO_CUT                 (ANIM_SPRITES_START + 308) // unused
+#define ANIM_TAG_POWER_GEM                  (ANIM_SPRITES_START + 309) // unused
+#define ANIM_TAG_STONE_EDGE                 (ANIM_SPRITES_START + 310) // unused
+#define ANIM_TAG_STEALTH_ROCK               (ANIM_SPRITES_START + 311) // unused
+#define ANIM_TAG_POISON_JAB                 (ANIM_SPRITES_START + 312) // unused
+#define ANIM_TAG_GREEN_POISON_BUBBLE        (ANIM_SPRITES_START + 313) // unused
+#define ANIM_TAG_FLASH_CANNON_BALL          (ANIM_SPRITES_START + 314)
+#define ANIM_TAG_WATER_GUN                  (ANIM_SPRITES_START + 315) // unused
+#define ANIM_TAG_PUNISHMENT_BLADES          (ANIM_SPRITES_START + 316) // unused
+#define ANIM_TAG_QUICK_GUARD_HAND           (ANIM_SPRITES_START + 317) // unused
 
 // battlers
 #define ANIM_ATTACKER    0
@@ -364,6 +375,7 @@
 #define BG_SOLARBEAM_OPPONENT 24
 #define BG_SOLARBEAM_PLAYER 25
 #define BG_SOLARBEAM_CONTESTS 26
+#define BG_AURA_SPHERE 27
 
 // table ids for general animations
 #define B_ANIM_CASTFORM_CHANGE          0x0

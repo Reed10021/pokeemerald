@@ -809,3 +809,7 @@ Route111_EventScript_ItemSandstormShard::
 ShoalCave_LowTideIceRoom_EventScript_ItemHailstormShard::
 	finditem ITEM_HAILSTORM_SHARD
 	end
+
+Altering_Cave_EventScript_ItemWaterStone::
+	finditem ITEM_WATER_STONE
+	end

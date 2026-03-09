@@ -231,5 +231,8 @@ extern const u8 BattleScript_ActionGetNear[];
 extern const u8 BattleScript_ActionThrowPokeblock[];
 extern const u8 BattleScript_TotemFlaredToLife[];
 extern const u8 BattleScript_SturdiedMsg[];
+extern const u8 BattleScript_DefSpDefDown[];
+
+extern const u8 BattleScript_AtkDefDown[];
 
 #endif // GUARD_BATTLE_SCRIPTS_H

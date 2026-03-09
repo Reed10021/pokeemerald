@@ -1414,24 +1414,36 @@ const struct CompressedSpriteSheet gBattleAnimPicTable[] =
     {gBattleAnimSpriteGfx_Slash, 0x0800, ANIM_TAG_SLASH_2},
     {gBattleAnimSpriteGfx_SlamHit, 0x1000, ANIM_TAG_WHIP_HIT},
     {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_BLUE_RING_2},
-    {gBattleAnimSpriteGfx_GoldRing, 0x0200, ANIM_TAG_WHITE_STREAK},   // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_PURPLE_JAB},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0080, ANIM_TAG_TOXIC_SPIKES},   // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0200, ANIM_TAG_ENERGY_BALL},    // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0080, ANIM_TAG_SEED_BROWN},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0800, ANIM_TAG_FEINT},          // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x800, ANIM_TAG_MEGA_STONE},      // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0200, ANIM_TAG_MEGA_SYMBOL},    // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0180, ANIM_TAG_MEGA_PARTICLES}, // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0180, ANIM_TAG_TRUMP_CARD},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0060, ANIM_TAG_TRUMP_CARD_PARTICLES}, // Unused
+    {gBattleAnimSpriteGfx_WhiteStreak, 0x0200, ANIM_TAG_WHITE_STREAK},
+    {gBattleAnimSpriteGfx_PurpleJab, 0x0100, ANIM_TAG_PURPLE_JAB},
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_TOXIC_SPIKES},   // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_ENERGY_BALL},    // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_SEED_BROWN},     // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_FEINT},          // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_MEGA_STONE},      // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_MEGA_SYMBOL},    // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_MEGA_PARTICLES}, // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_TRUMP_CARD},     // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_TRUMP_CARD_PARTICLES}, // Unused
     {gBattleAnimSpriteGfx_Acupressure, 0x0200, ANIM_TAG_ACUPRESSURE},
-    {gBattleAnimSpriteGfx_GoldRing, 0x0200, ANIM_TAG_WRING_OUT},      // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0300, ANIM_TAG_COLORED_ORBS},   // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0080, ANIM_TAG_WORRY_SEED},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0080, ANIM_TAG_SMALL_CLOUD},    // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0480, ANIM_TAG_ATTACK_ORDER},   // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WRING_OUT},      // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_COLORED_ORBS},   // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WORRY_SEED},     // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_SMALL_CLOUD},    // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_ATTACK_ORDER},   // Unused
     {gBattleAnimSpriteGfx_DragonPulse, 0x0100, ANIM_TAG_DRAGON_PULSE},
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WOOD_HAMMER},   // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_PSYCHO_CUT},     // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_POWER_GEM},       // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_STONE_EDGE},     // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_STEALTH_ROCK}, // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0080, ANIM_TAG_POISON_JAB},     // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_GREEN_POISON_BUBBLE}, // Unused
+    {gBattleAnimSpriteGfx_FlashCannonBall, 0x200, ANIM_TAG_FLASH_CANNON_BALL}, 
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WATER_GUN},        // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_PUNISHMENT_BLADES}, // Unused
+    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_QUICK_GUARD_HAND}, // Unused
+
 };
 
 const struct CompressedSpritePalette gBattleAnimPaletteTable[] =
@@ -1725,8 +1737,8 @@ const struct CompressedSpritePalette gBattleAnimPaletteTable[] =
     {gBattleAnimSpritePal_Slash2, ANIM_TAG_SLASH_2},
     {gBattleAnimSpritePal_WhipHit, ANIM_TAG_WHIP_HIT},
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_BLUE_RING_2},
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_WHITE_STREAK},   // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_PURPLE_JAB},     // Unused
+    {gBattleAnimSpritePal_WhiteStreak, ANIM_TAG_WHITE_STREAK},
+    {gBattleAnimSpritePal_PurpleJab, ANIM_TAG_PURPLE_JAB},
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_TOXIC_SPIKES},   // Unused
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_ENERGY_BALL},    // Unused
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_SEED_BROWN},     // Unused
@@ -1743,6 +1755,17 @@ const struct CompressedSpritePalette gBattleAnimPaletteTable[] =
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_SMALL_CLOUD},  // Unused
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_ATTACK_ORDER}, // Unused
     {gBattleAnimSpritePal_DragonPulse, ANIM_TAG_DRAGON_PULSE},
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_WOOD_HAMMER},       // Unused
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_PSYCHO_CUT},        // Unused
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_POWER_GEM},         // Unused
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_STONE_EDGE},        // Unused
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_STEALTH_ROCK},      // Unused
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_POISON_JAB},        // Unused
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_GREEN_POISON_BUBBLE}, // Unused
+    {gBattleAnimSpritePal_FlashCannonBall, ANIM_TAG_FLASH_CANNON_BALL},
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_WATER_GUN},         // Unused
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_PUNISHMENT_BLADES}, // Unused
+    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_QUICK_GUARD_HAND},  // Unused
 };
 
 const struct BattleAnimBackground gBattleAnimBackgroundTable[] =
@@ -1774,6 +1797,7 @@ const struct BattleAnimBackground gBattleAnimBackgroundTable[] =
     [BG_SOLARBEAM_OPPONENT] = {gBattleAnimBgImage_Impact, gBattleAnimBgPalette_Solarbeam, gBattleAnimBgTilemap_ImpactOpponent},
     [BG_SOLARBEAM_PLAYER] = {gBattleAnimBgImage_Impact, gBattleAnimBgPalette_Solarbeam, gBattleAnimBgTilemap_ImpactPlayer},
     [BG_SOLARBEAM_CONTESTS] = {gBattleAnimBgImage_Impact, gBattleAnimBgPalette_Solarbeam, gBattleAnimBgTilemap_ImpactContests},
+    [BG_AURA_SPHERE] = {gBattleAnimBgImage_FocusBlast, gBattleAnimBgPalette_AuraSphere, gBattleAnimBgTilemap_FocusBlast},
 };
 
 static void (* const sScriptCmdTable[])(void) =
