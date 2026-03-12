@@ -168,6 +168,7 @@ SlateportCity_Pokemart_EnergyGuru: @ 81DCDD4
 	end
 
 SlateportCity_Pokemart_EnergyGuru_Sale:
+	.2byte ITEM_PP_UP
 	.2byte ITEM_PROTEIN
 	.2byte ITEM_CALCIUM
 	.2byte ITEM_IRON

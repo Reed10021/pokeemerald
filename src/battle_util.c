@@ -1115,6 +1115,7 @@ enum
     ENDTURN_SANDSTORM,
     ENDTURN_SUN,
     ENDTURN_HAIL,
+    ENDTURN_TRICK_ROOM,
     ENDTURN_FIELD_COUNT,
 };
 
@@ -1365,6 +1366,15 @@ u8 DoFieldEndTurnEffects(void)
                 gBattleScripting.animArg1 = B_ANIM_HAIL_CONTINUES;
                 gBattleCommunication[MULTISTRING_CHOOSER] = 1;
                 BattleScriptExecute(gBattlescriptCurrInstr);
+                effect++;
+            }
+            gBattleStruct->turnCountersTracker++;
+            break;
+        case ENDTURN_TRICK_ROOM:
+            if (gWishFutureKnock.trickRoomTimer != 0
+                && --gWishFutureKnock.trickRoomTimer == 0)
+            {
+                BattleScriptExecute(BattleScript_TrickRoomEnds);
                 effect++;
             }
             gBattleStruct->turnCountersTracker++;
@@ -1699,7 +1709,7 @@ u8 DoBattlerEndTurnEffects(void)
                      && gBattleMons[gActiveBattler].ability != ABILITY_INSOMNIA && !UproarWakeUpCheck(gActiveBattler))
                     {
                         CancelMultiTurnMoves(gActiveBattler);
-                        gBattleMons[gActiveBattler].status1 |= STATUS1_SLEEP_TURN((Random() & 3) + 2); // 2-5 turns of sleep
+                        gBattleMons[gActiveBattler].status1 |= STATUS1_SLEEP_TURN((Random() % 3) + 2); // 2-4 turns of sleep
                         BtlController_EmitSetMonData(0, REQUEST_STATUS_BATTLE, 0, 4, &gBattleMons[gActiveBattler].status1);
                         MarkBattlerForControllerExec(gActiveBattler);
                         gEffectBattler = gActiveBattler;
@@ -2587,6 +2597,17 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                         effect++;
                     }
                     break;
+                case ABILITY_SOLAR_POWER:
+                    if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_SUN_ANY))
+                    {
+                        PREPARE_ABILITY_BUFFER(gBattleTextBuff1, gLastUsedAbility)
+                        BattleScriptPushCursorAndCallback(BattleScript_SolarPowerActivates);
+                        gBattleMoveDamage = gBattleMons[battler].maxHP / 8;
+                        if (gBattleMoveDamage == 0)
+                            gBattleMoveDamage = 1;
+                        effect++;
+                    }
+                    break;
                 case ABILITY_SHED_SKIN:
                     if ((gBattleMons[battler].status1 & STATUS1_ANY) && (Random() % 3) == 0)
                     {
@@ -2699,11 +2720,24 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                 case ABILITY_LIGHTNING_ROD:
                     if (moveType == TYPE_ELECTRIC)
                     {
-                        gBattleCommunication[MULTISTRING_CHOOSER] = 1;
-                        if (gProtectStructs[gBattlerAttacker].notFirstStrike)
-                            gBattlescriptCurrInstr = BattleScript_FlashFireBoost;
+                        if (gBattleMons[battler].statStages[STAT_SPATK] < MAX_STAT_STAGE)
+                        {
+                            gBattleMons[battler].statStages[STAT_SPATK]++;
+                            gBattleScripting.animArg1 = 0xE + STAT_SPATK;
+                            gBattleScripting.animArg2 = 0;
+                            if (gProtectStructs[gBattlerAttacker].notFirstStrike)
+                                gBattlescriptCurrInstr = BattleScript_LightningRodActivates;
+                            else
+                                gBattlescriptCurrInstr = BattleScript_LightningRodActivates_PPLoss;
+                        }
                         else
-                            gBattlescriptCurrInstr = BattleScript_FlashFireBoost_PPLoss;
+                        {
+                            gBattleCommunication[MULTISTRING_CHOOSER] = 1;
+                            if (gProtectStructs[gBattlerAttacker].notFirstStrike)
+                                gBattlescriptCurrInstr = BattleScript_FlashFireBoost;
+                            else
+                                gBattlescriptCurrInstr = BattleScript_FlashFireBoost_PPLoss;
+                        }
 
                         effect = 2;
                     }

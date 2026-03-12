@@ -28,6 +28,10 @@
 #define AI_WEATHER_SANDSTORM 2
 #define AI_WEATHER_HAIL 3
 
+// trick room state
+#define AI_TRICK_ROOM_OFF 0
+#define AI_TRICK_ROOM_ON 1
+
 // get_how_powerful_move_is
 #define MOVE_POWER_DISCOURAGED  0
 #define MOVE_NOT_MOST_POWERFUL  1

@@ -414,7 +414,7 @@ static bool8 SetUpFieldMove_Dive(void);
 // code
 static void InitPartyMenu(u8 menuType, u8 layout, u8 partyAction, bool8 keepCursorPos, u8 messageId, TaskFunc task, MainCallback callback)
 {
-    u16 i;
+    u32 i;
 
     ResetPartyMenu();
     sPartyMenuInternal = Alloc(sizeof(struct PartyMenuInternal));
@@ -734,7 +734,7 @@ static void FreePartyPointers(void)
 
 static void InitPartyMenuBoxes(u8 layout)
 {
-    u8 i;
+    u32 i;
 
     sPartyMenuBoxes = Alloc(sizeof(struct PartyMenuBox[PARTY_SIZE]));
 
@@ -846,13 +846,15 @@ static bool32 PartyMenuHasRestrictedSelected(s8 excludeSlot)
         if (gSelectedOrderFromParty[i] != 0)
         {
             u32 slot = gSelectedOrderFromParty[i] - 1;
-            u32 sp;
+            u32 species;
+            u32 heldItem;
 
             if (slot == excludeSlot)
                 continue;
 
-            sp = GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES);
-            if (IsFrontierRestrictedSpecies(sp))
+            species = GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES);
+            heldItem = GetMonData(&gPlayerParty[slot], MON_DATA_HELD_ITEM);
+            if (IsFrontierRestrictedMon(species, heldItem))
                 return TRUE;
         }
     }
@@ -863,11 +865,12 @@ static s32 CanSelectBattleEntrySlot(u8 slot)
 {
     struct Pokemon* mon = &gPlayerParty[slot];
     u32 species = GetMonData(mon, MON_DATA_SPECIES);
+    u32 heldItem = GetMonData(mon, MON_DATA_HELD_ITEM);
 
     if (!GetBattleEntryEligibility(mon))
         return 0;
 
-    if (IsFrontierRestrictedSpecies(species) && PartyMenuHasRestrictedSelected(slot))
+    if (IsFrontierRestrictedMon(species, heldItem) && PartyMenuHasRestrictedSelected(slot))
         return -1;
 
     return 1;
@@ -877,6 +880,7 @@ static void RefreshChooseHalfRestrictedNonSelectedSlots(s8 skipSlot)
 {
     u32 slot;
     u32 species;
+    u32 heldItem;
     struct Pokemon* curMon;
 
     for (slot = 0; slot < PARTY_SIZE; slot++)
@@ -893,7 +897,8 @@ static void RefreshChooseHalfRestrictedNonSelectedSlots(s8 skipSlot)
             continue;
 
         species = GetMonData(&gPlayerParty[slot], MON_DATA_SPECIES);
-        if (!IsFrontierRestrictedSpecies(species))
+        heldItem = GetMonData(&gPlayerParty[slot], MON_DATA_HELD_ITEM);
+        if (!IsFrontierRestrictedMon(species, heldItem))
             continue;
 
         // Recompute text for this slot
@@ -1945,7 +1950,7 @@ static void SetPartyMonsAllowedInMinigame(void)
 
     if (gPartyMenu.menuType == PARTY_MENU_TYPE_MINIGAME)
     {
-        u8 i;
+        u32 i;
 
         ptr = &gPartyMenu.data1;
         gPartyMenu.data1 = 0;
@@ -2079,7 +2084,7 @@ bool8 CanLearnTutorMove(u16 species, u8 tutor)
 
 static void InitPartyMenuWindows(u8 layout)
 {
-    u8 i;
+    u32 i;
 
     switch (layout)
     {
@@ -2511,8 +2516,8 @@ void DisplayPartyMenuStdMessage(u32 stringId)
 static bool8 ShouldUseChooseMonText(void)
 {
     struct Pokemon *party = gPlayerParty;
-    u8 i;
-    u8 numAliveMons = 0;
+    u32 i;
+    u32 numAliveMons = 0;
 
     if (gPartyMenu.action == PARTY_ACTION_SEND_OUT)
         return TRUE;
@@ -2596,7 +2601,7 @@ static void RemoveLevelUpStatsWindow(void)
 
 static void SetPartyMonSelectionActions(struct Pokemon *mons, u8 slotId, u8 action)
 {
-    u8 i;
+    u32 i;
 
     if (action == ACTIONS_NONE)
     {
@@ -3566,11 +3571,12 @@ static void CursorCb_SendMon(u8 taskId)
 
 static void CursorCb_Enter(u8 taskId)
 {
-    u8 maxBattlers;
-    u8 i;
+    u32 maxBattlers;
+    u32 i;
     bool32 hadRestricted = PartyMenuHasRestrictedSelected(-1);
     u32 pickedSpecies = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_SPECIES);
-    bool32 pickedIsRestricted = IsFrontierRestrictedSpecies(pickedSpecies);
+    u32 pickedHeldItem = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM);
+    bool32 pickedIsRestricted = IsFrontierRestrictedMon(pickedSpecies, pickedHeldItem);
 
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[0]);
     PartyMenuRemoveWindow(&sPartyMenuInternal->windowId[1]);
@@ -3608,13 +3614,13 @@ static void MoveCursorToConfirm(void)
 
 static void CursorCb_NoEntry(u8 taskId)
 {
-    u8 maxBattlers;
-    u8 i, j;
+    u32 maxBattlers;
+    u32 i, j;
     s32 removedIndex = -1;
     bool32 hadRestricted = PartyMenuHasRestrictedSelected(-1);
-    bool32 removedWasRestricted = IsFrontierRestrictedSpecies(
-        GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_SPECIES)
-    );
+    u32 removedSpecies = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_SPECIES);
+    u32 removedHeldItem = GetMonData(&gPlayerParty[gPartyMenu.slotId], MON_DATA_HELD_ITEM);
+    bool32 removedWasRestricted = IsFrontierRestrictedMon(removedSpecies, removedHeldItem);
     bool32 hasRestrictedAfter;
 
     PlaySE(SE_SELECT);
@@ -4140,7 +4146,7 @@ void LoadHeldItemIcons(void)
 
 void DrawHeldItemIconsForTrade(u8 *partyCounts, u8 *partySpriteIds, u8 whichParty)
 {
-    u16 i;
+    u32 i;
     u16 item;
 
     switch (whichParty)
@@ -4790,7 +4796,7 @@ u16 ItemIdToBattleMoveId(u16 item)
 
 bool8 IsMoveHm(u16 move)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < NUM_HIDDEN_MACHINES; i++)
     {
@@ -5767,7 +5773,7 @@ static u8 CheckBattleEntriesAndGetMessage(void)
 
 static bool8 HasPartySlotAlreadyBeenSelected(u8 slot)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < ARRAY_COUNT(gSelectedOrderFromParty); i++)
     {
@@ -6188,7 +6194,7 @@ u8 GetPartyIdFromBattlePartyId(u8 battlePartyId)
 static void UpdatePartyToBattleOrder(void)
 {
     struct Pokemon *partyBuffer = Alloc(sizeof(gPlayerParty));
-    u8 i;
+    u32 i;
 
     memcpy(partyBuffer, gPlayerParty, sizeof(gPlayerParty));
     for (i = 0; i < PARTY_SIZE; i++)
@@ -6199,7 +6205,7 @@ static void UpdatePartyToBattleOrder(void)
 static void UpdatePartyToFieldOrder(void)
 {
     struct Pokemon *partyBuffer = Alloc(sizeof(gPlayerParty));
-    u8 i;
+    u32 i;
 
     memcpy(partyBuffer, gPlayerParty, sizeof(gPlayerParty));
     for (i = 0; i < PARTY_SIZE; i++)
@@ -6210,9 +6216,9 @@ static void UpdatePartyToFieldOrder(void)
 // Unused
 static void SwitchAliveMonIntoLeadSlot(void)
 {
-    u8 i;
+    u32 i;
     struct Pokemon *mon;
-    u8 partyId;
+    u32 partyId;
 
     for (i = 1; i < PARTY_SIZE; i++)
     {
@@ -6251,7 +6257,7 @@ static void Task_InitMultiPartnerPartySlideIn(u8 taskId)
 static void Task_MultiPartnerPartySlideIn(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
-    u8 i;
+    u32 i;
 
     if (!gPaletteFade.active)
     {
@@ -6288,7 +6294,7 @@ static void MoveMultiPartyMenuBoxSprite(u8 spriteId, s16 x)
 static void SlideMultiPartyMenuBoxSpritesOneStep(u8 taskId)
 {
     s16 *data = gTasks[taskId].data;
-    u8 i;
+    u32 i;
 
     for (i = 3; i < PARTY_SIZE; i++)
     {
@@ -6418,7 +6424,7 @@ static void CB2_ChooseMonForMoveRelearner(void)
 
 void DoBattlePyramidMonsHaveHeldItem(void)
 {
-    u8 i;
+    u32 i;
 
     gSpecialVar_Result = FALSE;
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
@@ -6458,7 +6464,7 @@ void MoveDeleterChooseMoveToForget(void)
 
 void GetNumMovesSelectedMonHas(void)
 {
-    u8 i;
+    u32 i;
 
     gSpecialVar_Result = 0;
     for (i = 0; i < MAX_MON_MOVES; i++)
@@ -6479,7 +6485,7 @@ void BufferMoveDeleterNicknameAndMove(void)
 
 void MoveDeleterForgetMove(void)
 {
-    u16 i;
+    u32 i;
 
     SetMonMoveSlot(&gPlayerParty[gSpecialVar_0x8004], MOVE_NONE, gSpecialVar_0x8005);
     RemoveMonPPBonus(&gPlayerParty[gSpecialVar_0x8004], gSpecialVar_0x8005);
@@ -6857,4 +6863,3 @@ void ItemUseCB_PokeBall(u8 taskId, TaskFunc task)
         RemoveBagItem(newBall, 1);
     }
 }
-

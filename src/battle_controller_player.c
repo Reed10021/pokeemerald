@@ -1483,7 +1483,7 @@ static void MoveSelectionDisplayMoveDescription(void)
     u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
     u16 pwr = gBattleMoves[move].power;
     u16 acc = gBattleMoves[move].accuracy;
-    u16 pri = gBattleMoves[move].priority;
+    s16 pri = gBattleMoves[move].priority;
     u32 type = gBattleMoves[move].type;
     u8 pwr_num[3], acc_num[3], pri_num[3], i;
     u8 acc_flag = 0;

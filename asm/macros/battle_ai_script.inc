@@ -467,8 +467,10 @@
 	.byte \battler
 	.endm
 
-	.macro nullsub_52
+	.macro get_who_strikes_first battler1:req, battler2:req
 	.byte 0x52
+	.byte \battler1
+	.byte \battler2
 	.endm
 
 	.macro nullsub_53

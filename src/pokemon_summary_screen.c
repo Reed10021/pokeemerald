@@ -3852,7 +3852,8 @@ static void PrintMovePowerAndAccuracy(u16 moveIndex)
             moveIndex == MOVE_MEMENTO || moveIndex == MOVE_MIMIC || moveIndex == MOVE_MUD_SPORT || moveIndex == MOVE_NIGHTMARE ||
             moveIndex == MOVE_PAIN_SPLIT || moveIndex == MOVE_RECYCLE || moveIndex == MOVE_REFRESH || moveIndex == MOVE_ROLE_PLAY ||
             moveIndex == MOVE_SKILL_SWAP || moveIndex == MOVE_SLACK_OFF || moveIndex == MOVE_SNATCH || moveIndex == MOVE_SOFT_BOILED ||
-            moveIndex == MOVE_SPIDER_WEB || moveIndex == MOVE_TAIL_GLOW || moveIndex == MOVE_WATER_SPORT || moveIndex == MOVE_WISH || moveIndex == MOVE_YAWN)
+            moveIndex == MOVE_SPIDER_WEB || moveIndex == MOVE_TAIL_GLOW || moveIndex == MOVE_WATER_SPORT || moveIndex == MOVE_WISH || 
+            moveIndex == MOVE_YAWN || moveIndex == MOVE_NASTY_PLOT || moveIndex == MOVE_TRICK_ROOM)
         {
             text = gText_ThreeDashes;
         }

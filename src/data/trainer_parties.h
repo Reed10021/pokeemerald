@@ -3322,7 +3322,7 @@ static const struct TrainerMonItemCustomMoves sParty_Phoebe[] = {
     .species = SPECIES_MISDREAVUS,
     .abilityNum = 0,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_DARK_PULSE, MOVE_THUNDER_WAVE, MOVE_FLAMETHROWER, MOVE_TAIL_GLOW}
+    .moves = {MOVE_DARK_PULSE, MOVE_THUNDER_WAVE, MOVE_FLAMETHROWER, MOVE_NASTY_PLOT}
     }
 };
 
@@ -3505,7 +3505,7 @@ static const struct TrainerMonItemCustomMoves sParty_Wattson1[] = {
     .species = SPECIES_CHINCHOU,
     .abilityNum = 0,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_WATER_GUN, MOVE_SHOCK_WAVE, MOVE_CONFUSE_RAY, MOVE_TAIL_GLOW}
+    .moves = {MOVE_WATER_GUN, MOVE_SHOCK_WAVE, MOVE_CONFUSE_RAY, MOVE_NASTY_PLOT}
     },
     {
     .iv = 250,
@@ -3618,7 +3618,7 @@ static const struct TrainerMonItemCustomMoves sParty_Winona1[] = {
     .species = SPECIES_TROPIUS,
     .abilityNum = 0,
     .heldItem = ITEM_STARF_BERRY,
-    .moves = {MOVE_TAIL_GLOW, MOVE_OUTRAGE, MOVE_GIGA_DRAIN, MOVE_AIR_CUTTER}
+    .moves = {MOVE_NASTY_PLOT, MOVE_OUTRAGE, MOVE_GIGA_DRAIN, MOVE_AIR_CUTTER}
     },
     {
     .iv = 220,
@@ -3645,7 +3645,7 @@ static const struct TrainerMonItemCustomMoves sParty_TateAndLiza1[] = {
     .species = SPECIES_CLAYDOL,
     .abilityNum = 0,
     .heldItem = ITEM_BRIGHT_POWDER,
-    .moves = {MOVE_EARTHQUAKE, MOVE_ANCIENT_POWER, MOVE_PSYCHIC, MOVE_LIGHT_SCREEN}
+    .moves = {MOVE_EARTHQUAKE, MOVE_ANCIENT_POWER, MOVE_REFLECT, MOVE_LIGHT_SCREEN}
     },
     {
     .iv = 250,
@@ -3661,7 +3661,7 @@ static const struct TrainerMonItemCustomMoves sParty_TateAndLiza1[] = {
     .species = SPECIES_LUNATONE,
     .abilityNum = 0,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_REFLECT, MOVE_PSYCHIC, MOVE_HYPNOSIS, MOVE_CALM_MIND}
+    .moves = {MOVE_WEATHER_BALL, MOVE_PSYCHIC, MOVE_HYPNOSIS, MOVE_CALM_MIND}
     },
     {
     .iv = 250,
@@ -3669,7 +3669,7 @@ static const struct TrainerMonItemCustomMoves sParty_TateAndLiza1[] = {
     .species = SPECIES_SOLROCK,
     .abilityNum = 0,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_SUNNY_DAY, MOVE_SOLAR_BEAM, MOVE_PSYCHIC, MOVE_FLAMETHROWER}
+    .moves = {MOVE_SUNNY_DAY, MOVE_SOLAR_BEAM, MOVE_MORNING_SUN, MOVE_FLARE_BLITZ}
     }
 };
 
@@ -3720,7 +3720,7 @@ static const struct TrainerMonItemCustomMoves sParty_Juan1[] = {
     .species = SPECIES_LANTURN,
     .abilityNum = 0,
     .heldItem = ITEM_LEFTOVERS,
-    .moves = {MOVE_WATER_PULSE, MOVE_THUNDER, MOVE_ICE_BEAM, MOVE_TAIL_GLOW}
+    .moves = {MOVE_WATER_PULSE, MOVE_THUNDER, MOVE_ICE_BEAM, MOVE_NASTY_PLOT}
     }
 };
 
@@ -10885,7 +10885,7 @@ static const struct TrainerMonItemCustomMoves sParty_Wattson3[] = {
     .species = SPECIES_LANTURN,
     .abilityNum = 0,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_SURF, MOVE_THUNDER, MOVE_RAIN_DANCE, MOVE_TAIL_GLOW}
+    .moves = {MOVE_SURF, MOVE_THUNDER, MOVE_RAIN_DANCE, MOVE_NASTY_PLOT}
     },
     {
     .iv = 255,
@@ -10936,7 +10936,7 @@ static const struct TrainerMonItemCustomMoves sParty_Wattson4[] = {
     .species = SPECIES_LANTURN,
     .abilityNum = 0,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_SURF, MOVE_THUNDER, MOVE_RAIN_DANCE, MOVE_TAIL_GLOW}
+    .moves = {MOVE_SURF, MOVE_THUNDER, MOVE_RAIN_DANCE, MOVE_NASTY_PLOT}
     },
     {
     .iv = 255,
@@ -10944,7 +10944,7 @@ static const struct TrainerMonItemCustomMoves sParty_Wattson4[] = {
     .species = SPECIES_MANECTRIC,
     .abilityNum = 1,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_ICICLE_SPEAR, MOVE_THUNDER_WAVE, MOVE_THUNDER, MOVE_TAIL_GLOW}
+    .moves = {MOVE_ICICLE_SPEAR, MOVE_THUNDER_WAVE, MOVE_THUNDER, MOVE_NASTY_PLOT}
     }
 };
 
@@ -10987,7 +10987,7 @@ static const struct TrainerMonItemCustomMoves sParty_Wattson5[] = {
     .species = SPECIES_LANTURN,
     .abilityNum = 0,
     .heldItem = ITEM_SITRUS_BERRY,
-    .moves = {MOVE_SURF, MOVE_THUNDER, MOVE_RAIN_DANCE, MOVE_TAIL_GLOW}
+    .moves = {MOVE_SURF, MOVE_THUNDER, MOVE_RAIN_DANCE, MOVE_NASTY_PLOT}
     },
     {
     .iv = 255,
@@ -11124,7 +11124,7 @@ static const struct TrainerMonItemCustomMoves sParty_Flannery4[] = {
     .species = SPECIES_TORKOAL,
     .abilityNum = 1,
     .heldItem = ITEM_LEFTOVERS,
-    .moves = {MOVE_OVERHEAT, MOVE_WEATHER_BALL, MOVE_TAIL_GLOW, MOVE_YAWN}
+    .moves = {MOVE_OVERHEAT, MOVE_WEATHER_BALL, MOVE_NASTY_PLOT, MOVE_YAWN}
     }
 };
 
@@ -11175,7 +11175,7 @@ static const struct TrainerMonItemCustomMoves sParty_Flannery5[] = {
     .species = SPECIES_TORKOAL,
     .abilityNum = 1,
     .heldItem = ITEM_LEFTOVERS,
-    .moves = {MOVE_OVERHEAT, MOVE_SOLAR_BEAM, MOVE_TAIL_GLOW, MOVE_YAWN}
+    .moves = {MOVE_OVERHEAT, MOVE_SOLAR_BEAM, MOVE_NASTY_PLOT, MOVE_YAWN}
     }
 };
 
@@ -11323,7 +11323,7 @@ static const struct TrainerMonItemCustomMoves sParty_Norman5[] = {
     .species = SPECIES_GIRAFARIG,
     .abilityNum = 0,
     .heldItem = ITEM_LEFTOVERS,
-    .moves = {MOVE_PSYCHIC, MOVE_TRI_ATTACK, MOVE_CONFUSE_RAY, MOVE_TAIL_GLOW}
+    .moves = {MOVE_PSYCHIC, MOVE_TRI_ATTACK, MOVE_CONFUSE_RAY, MOVE_NASTY_PLOT}
     },
     {
     .iv = 255,
@@ -11946,7 +11946,7 @@ static const struct TrainerMonItemCustomMoves sParty_Angelo[] = {
     .species = SPECIES_ILLUMISE,
     .abilityNum = 0,
     .heldItem = ITEM_NONE,
-    .moves = {MOVE_SHOCK_WAVE, MOVE_QUICK_ATTACK, MOVE_CHARM, MOVE_NONE}
+    .moves = {MOVE_SHOCK_WAVE, MOVE_QUICK_ATTACK, MOVE_CHARM, MOVE_TAIL_GLOW}
     },
     {
     .iv = 100,
@@ -11954,7 +11954,7 @@ static const struct TrainerMonItemCustomMoves sParty_Angelo[] = {
     .species = SPECIES_VOLBEAT,
     .abilityNum = 0,
     .heldItem = ITEM_NONE,
-    .moves = {MOVE_SHOCK_WAVE, MOVE_QUICK_ATTACK, MOVE_CONFUSE_RAY, MOVE_NONE}
+    .moves = {MOVE_SHOCK_WAVE, MOVE_QUICK_ATTACK, MOVE_CONFUSE_RAY, MOVE_TAIL_GLOW}
     }
 };
 
@@ -12825,7 +12825,7 @@ static const struct TrainerMonItemCustomMoves sParty_Kirby[] = {
     .iv = 255,
     .lvl = 100,
     .species = SPECIES_PIKACHU,
-    .abilityNum = 0,
+    .abilityNum = 1,
     .heldItem = ITEM_LIGHT_BALL,
     .moves = {MOVE_HYPER_BEAM, MOVE_THUNDER, MOVE_EARTHQUAKE, MOVE_HYDRO_PUMP}
     },
@@ -12843,7 +12843,7 @@ static const struct TrainerMonItemCustomMoves sParty_Kirby[] = {
     .species = SPECIES_CHARIZARD,
     .abilityNum = 0,
     .heldItem = ITEM_CHARCOAL,
-    .moves = {MOVE_FIRE_BLAST, MOVE_DRILL_PECK, MOVE_TAIL_GLOW, MOVE_THUNDER}
+    .moves = {MOVE_FIRE_BLAST, MOVE_DRILL_PECK, MOVE_NASTY_PLOT, MOVE_THUNDER}
     },
     {
     .iv = 255,
@@ -12859,7 +12859,7 @@ static const struct TrainerMonItemCustomMoves sParty_Kirby[] = {
     .species = SPECIES_MEW,
     .abilityNum = 0,
     .heldItem = ITEM_TWISTED_SPOON,
-    .moves = {MOVE_PSYCHIC, MOVE_THUNDERBOLT, MOVE_TAIL_GLOW, MOVE_PETAL_DANCE}
+    .moves = {MOVE_PSYCHIC, MOVE_THUNDERBOLT, MOVE_NASTY_PLOT, MOVE_PETAL_DANCE}
     }
 };
 
@@ -12870,13 +12870,13 @@ static const struct TrainerMonItemCustomMoves sParty_Reed_Yellow[] = {
     .species = SPECIES_VAPOREON,
     .abilityNum = 0,
     .heldItem = ITEM_MYSTIC_WATER,
-    .moves = {MOVE_TAIL_GLOW, MOVE_ICE_BEAM, MOVE_RAIN_DANCE, MOVE_HYDRO_PUMP}
+    .moves = {MOVE_NASTY_PLOT, MOVE_ICE_BEAM, MOVE_RAIN_DANCE, MOVE_HYDRO_PUMP}
     },
     {
     .iv = 255,
     .lvl = 100,
     .species = SPECIES_PIKACHU,
-    .abilityNum = 0,
+    .abilityNum = 1,
     .heldItem = ITEM_LIGHT_BALL,
     .moves = {MOVE_THUNDER, MOVE_PETAL_DANCE, MOVE_FIRE_BLAST, MOVE_HYPER_BEAM}
     },
@@ -12910,7 +12910,7 @@ static const struct TrainerMonItemCustomMoves sParty_Reed_Yellow[] = {
     .species = SPECIES_MEWTWO,
     .abilityNum = 1,
     .heldItem = ITEM_TWISTED_SPOON,
-    .moves = {MOVE_PSYCHIC, MOVE_THUNDER, MOVE_TAIL_GLOW, MOVE_FLAMETHROWER}
+    .moves = {MOVE_PSYCHIC, MOVE_THUNDER, MOVE_NASTY_PLOT, MOVE_FLAMETHROWER}
     }
 };
 
@@ -12921,7 +12921,7 @@ static const struct TrainerMonItemCustomMoves sParty_Chris_Crystal[] = {
     .species = SPECIES_SUICUNE,
     .abilityNum = 1,
     .heldItem = ITEM_MYSTIC_WATER,
-    .moves = {MOVE_TAIL_GLOW, MOVE_HYDRO_PUMP, MOVE_THUNDER, MOVE_ICE_BEAM}
+    .moves = {MOVE_NASTY_PLOT, MOVE_HYDRO_PUMP, MOVE_THUNDER, MOVE_ICE_BEAM}
     },
     {
     .iv = 255,
@@ -12980,7 +12980,7 @@ static const struct TrainerMonItemCustomMoves sParty_Kris[] = {
     .species = SPECIES_KINGDRA,
     .abilityNum = 0,
     .heldItem = ITEM_MYSTIC_WATER,
-    .moves = {MOVE_SURF, MOVE_DARK_PULSE, MOVE_TAIL_GLOW, MOVE_DRAGON_CLAW}
+    .moves = {MOVE_SURF, MOVE_DARK_PULSE, MOVE_NASTY_PLOT, MOVE_DRAGON_CLAW}
     },
     {
     .iv = 255,
@@ -12996,7 +12996,7 @@ static const struct TrainerMonItemCustomMoves sParty_Kris[] = {
     .species = SPECIES_RAIKOU,
     .abilityNum = 1,
     .heldItem = ITEM_MAGNET,
-    .moves = {MOVE_TAIL_GLOW, MOVE_PETAL_DANCE, MOVE_EXTREME_SPEED, MOVE_THUNDER}
+    .moves = {MOVE_NASTY_PLOT, MOVE_PETAL_DANCE, MOVE_EXTREME_SPEED, MOVE_THUNDER}
     },
     {
     .iv = 255,
@@ -13012,7 +13012,7 @@ static const struct TrainerMonItemCustomMoves sParty_Kris[] = {
     .species = SPECIES_MEWTWO,
     .abilityNum = 0,
     .heldItem = ITEM_LEFTOVERS,
-    .moves = {MOVE_PSYCHIC, MOVE_SLUDGE_BOMB, MOVE_TAIL_GLOW, MOVE_BLIZZARD}
+    .moves = {MOVE_PSYCHIC, MOVE_SLUDGE_BOMB, MOVE_NASTY_PLOT, MOVE_BLIZZARD}
     }
 };
 
@@ -13098,7 +13098,7 @@ static const struct TrainerMonItemCustomMoves sParty_Sapphyr_Emerald[] = {
     .species = SPECIES_ZAPDOS,
     .abilityNum = 1,
     .heldItem = ITEM_LEFTOVERS,
-    .moves = {MOVE_VOLT_TACKLE, MOVE_AEROBLAST, MOVE_LEAF_BLADE, MOVE_TAIL_GLOW}
+    .moves = {MOVE_VOLT_TACKLE, MOVE_AEROBLAST, MOVE_LEAF_BLADE, MOVE_NASTY_PLOT}
     },
     {
     .iv = 255,
@@ -13141,7 +13141,7 @@ static const struct TrainerMonItemCustomMoves sParty_Sapphyr_Emerald2[] = {
     .species = SPECIES_ZAPDOS,
     .abilityNum = 1,
     .heldItem = ITEM_LEFTOVERS,
-    .moves = {MOVE_VOLT_TACKLE, MOVE_AEROBLAST, MOVE_LEAF_BLADE, MOVE_TAIL_GLOW}
+    .moves = {MOVE_VOLT_TACKLE, MOVE_AEROBLAST, MOVE_LEAF_BLADE, MOVE_NASTY_PLOT}
     },
     {
     .iv = 255,
@@ -13157,7 +13157,7 @@ static const struct TrainerMonItemCustomMoves sParty_Sapphyr_Emerald2[] = {
     .species = SPECIES_MEWTWO,
     .abilityNum = 0,
     .heldItem = ITEM_WEATHER_ORB,
-    .moves = {MOVE_TAIL_GLOW, MOVE_PSYCHIC, MOVE_BLIZZARD, MOVE_HYDRO_PUMP}
+    .moves = {MOVE_NASTY_PLOT, MOVE_PSYCHIC, MOVE_BLIZZARD, MOVE_HYDRO_PUMP}
     },
     {
     .iv = 255,
@@ -13176,7 +13176,7 @@ static const struct TrainerMonItemCustomMoves sParty_Ruby_Emerald[] = {
     .species = SPECIES_CELEBI,
     .abilityNum = 0,
     .heldItem = ITEM_LAX_INCENSE,
-    .moves = {MOVE_ICE_BEAM, MOVE_TAIL_GLOW, MOVE_LEAF_BLADE, MOVE_PSYCHIC}
+    .moves = {MOVE_ICE_BEAM, MOVE_NASTY_PLOT, MOVE_LEAF_BLADE, MOVE_PSYCHIC}
     },
     {
     .iv = 255,

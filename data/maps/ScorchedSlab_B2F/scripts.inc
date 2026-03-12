@@ -31,7 +31,7 @@ ScorchedSlab_B2F_EventScript_ForcedEncounter::
 	setflag FLAG_TRIGGER_SMART_WILD_AI
 	setflag FLAG_TRIGGER_TOTEM_POWER
 	setflag FLAG_FORCE_ANIMATIONS
-	setwildbattlescaled SPECIES_ARCANINE, 60, ITEM_MASTER_BALL
+	setwildbattlescaled SPECIES_ARCANINE, 50, ITEM_MASTER_BALL
 	special BattleSetup_StartLegendaryBattle
 	waitstate
 	specialvar VAR_RESULT, GetBattleOutcome

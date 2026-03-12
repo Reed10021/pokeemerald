@@ -783,7 +783,8 @@ static void MoveRelearnerLoadBattleMoveDescription(u32 chosenMove)
         chosenMove == MOVE_MEMENTO || chosenMove == MOVE_MIMIC || chosenMove == MOVE_MUD_SPORT || chosenMove == MOVE_NIGHTMARE ||
         chosenMove == MOVE_PAIN_SPLIT || chosenMove == MOVE_RECYCLE || chosenMove == MOVE_REFRESH || chosenMove == MOVE_ROLE_PLAY ||
         chosenMove == MOVE_SKILL_SWAP || chosenMove == MOVE_SLACK_OFF || chosenMove == MOVE_SNATCH || chosenMove == MOVE_SOFT_BOILED ||
-        chosenMove == MOVE_SPIDER_WEB || chosenMove == MOVE_TAIL_GLOW || chosenMove == MOVE_WATER_SPORT || chosenMove == MOVE_WISH || chosenMove == MOVE_YAWN)
+        chosenMove == MOVE_SPIDER_WEB || chosenMove == MOVE_TAIL_GLOW || chosenMove == MOVE_WATER_SPORT || chosenMove == MOVE_WISH || 
+        chosenMove == MOVE_YAWN || chosenMove == MOVE_NASTY_PLOT || chosenMove == MOVE_TRICK_ROOM)
     {
         str = gText_ThreeDashes;
     }

@@ -676,6 +676,7 @@ static const u8 sFrontierBrainObjEventGfx[NUM_FRONTIER_FACILITIES][2] =
     [FRONTIER_FACILITY_PYRAMID] = {OBJ_EVENT_GFX_BRANDON, FALSE},
 };
 
+// Latios and Latias are restricted if they hold Soul Dew - see IsFrontierRestrictedMon.
 const u16 gFrontierBannedSpecies[] =
 {
     SPECIES_MEW, SPECIES_MEWTWO, SPECIES_HO_OH, SPECIES_LUGIA, SPECIES_CELEBI,
@@ -908,7 +909,7 @@ static void SetFrontierTrainers(void)
 
 static void SaveSelectedParty(void)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
     {
@@ -1986,12 +1987,26 @@ bool32 IsFrontierRestrictedSpecies(u16 species)
     return FALSE;
 }
 
-static u32 CountRestrictedInArray(const u16* speciesArray, u8 count)
+bool32 IsFrontierRestrictedMon(u16 species, u16 heldItem)
+{
+    if (IsFrontierRestrictedSpecies(species))
+        return TRUE;
+
+    if (heldItem == ITEM_SOUL_DEW
+        && (species == SPECIES_LATIOS || species == SPECIES_LATIAS))
+    {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+static u32 CountRestrictedInArray(const u16 *speciesArray, const u16 *itemsArray, u8 count)
 {
     u32 i, restricted = 0;
     for (i = 0; i < count; i++)
     {
-        if (IsFrontierRestrictedSpecies(speciesArray[i]))
+        if (IsFrontierRestrictedMon(speciesArray[i], itemsArray[i]))
             restricted++;
     }
     return restricted;
@@ -2011,9 +2026,9 @@ static void AppendIfValid(u16 species, u16 heldItem, u16 hp, u8 lvlMode, u8 monL
     //    return;
 
 // Restriction: at most 1 restricted species in the eligible set
-    if (IsFrontierRestrictedSpecies(species))
+    if (IsFrontierRestrictedMon(species, heldItem))
     {
-        if (CountRestrictedInArray(speciesArray, *count) >= 1)
+        if (CountRestrictedInArray(speciesArray, itemsArray, *count) >= 1)
             return;
     }
 
@@ -2188,7 +2203,7 @@ static void IncrementWinStreak(void)
 
 static void RestoreHeldItems(void)
 {
-    u8 i;
+    u32 i;
 
     for (i = 0; i < MAX_FRONTIER_PARTY_SIZE; i++)
     {

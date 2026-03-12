@@ -31,8 +31,8 @@ else
 EXE :=
 endif
 
-# VERSION: 1.5.2
-TITLE       := POKE EMRR152
+# VERSION: 1.5.3
+TITLE       := POKE EMRR153
 GAME_CODE   := BPEE
 MAKER_CODE  := 01
 REVISION    := 0

@@ -80,6 +80,7 @@ static const u8 sTitanicDescription[] = _("Anchored, unflinching, slow.");
 static const u8 sIronFistDescription[] = _("Boosts punching moves.");
 static const u8 sTechnicianDescription[] = _("Boosts weaker moves.");
 static const u8 sSnowWarningDescription[] = _("Summons hail in battle.");
+static const u8 sSolarPowerDescription[] = _("Boosts SP.ATK in sunshine.");
 
 const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
 {
@@ -165,6 +166,7 @@ const u8 gAbilityNames[ABILITIES_COUNT][ABILITY_NAME_LENGTH + 1] =
     [ABILITY_IRON_FIST] = _("IRON FIST"),
     [ABILITY_TECHNICIAN] = _("TECHNICIAN"),
     [ABILITY_SNOW_WARNING] = _("SNOW WARNING"),
+    [ABILITY_SOLAR_POWER] = _("SOLAR POWER"),
 };
 
 const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
@@ -251,4 +253,5 @@ const u8 *const gAbilityDescriptionPointers[ABILITIES_COUNT] =
     [ABILITY_IRON_FIST] = sIronFistDescription,
     [ABILITY_TECHNICIAN] = sTechnicianDescription,
     [ABILITY_SNOW_WARNING] = sSnowWarningDescription,
+    [ABILITY_SOLAR_POWER] = sSolarPowerDescription,
 };

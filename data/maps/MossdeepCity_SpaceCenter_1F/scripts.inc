@@ -79,7 +79,7 @@ MossdeepCity_SpaceCenter_1F_EventScript_NoLaunchesYet:: @ 8223012
 
 MossdeepCity_SpaceCenter_1F_EventScript_ShowLaunchNumber:: @ 822301B
 	msgbox MossdeepCity_SpaceCenter_1F_Text_SuccessfulLaunchNumber, MSGBOX_DEFAULT
-	compare VAR_RESULT, 7
+	compare VAR_RESULT, 2
 	goto_if_lt noJirachi
 	call_if_set FLAG_JIRACHI_DOOR, MossdeepCity_SpaceCenter_1F_EventScript_JirachiLocation
 	call_if_unset FLAG_JIRACHI_DOOR, MossdeepCity_SpaceCenter_1F_EventScript_JirachiUnlock

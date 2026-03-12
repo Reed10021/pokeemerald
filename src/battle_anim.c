@@ -1433,7 +1433,7 @@ const struct CompressedSpriteSheet gBattleAnimPicTable[] =
     {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_ATTACK_ORDER},   // Unused
     {gBattleAnimSpriteGfx_DragonPulse, 0x0100, ANIM_TAG_DRAGON_PULSE},
     {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WOOD_HAMMER},   // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_PSYCHO_CUT},     // Unused
+    {gBattleAnimSpriteGfx_PsychoCut, 0x0200, ANIM_TAG_PSYCHO_CUT},
     {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_POWER_GEM},       // Unused
     {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_STONE_EDGE},     // Unused
     {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_STEALTH_ROCK}, // Unused
@@ -1756,7 +1756,7 @@ const struct CompressedSpritePalette gBattleAnimPaletteTable[] =
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_ATTACK_ORDER}, // Unused
     {gBattleAnimSpritePal_DragonPulse, ANIM_TAG_DRAGON_PULSE},
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_WOOD_HAMMER},       // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_PSYCHO_CUT},        // Unused
+    {gBattleAnimSpritePal_PsychoCut, ANIM_TAG_PSYCHO_CUT},
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_POWER_GEM},         // Unused
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_STONE_EDGE},        // Unused
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_STEALTH_ROCK},      // Unused
@@ -1797,6 +1797,7 @@ const struct BattleAnimBackground gBattleAnimBackgroundTable[] =
     [BG_SOLARBEAM_OPPONENT] = {gBattleAnimBgImage_Impact, gBattleAnimBgPalette_Solarbeam, gBattleAnimBgTilemap_ImpactOpponent},
     [BG_SOLARBEAM_PLAYER] = {gBattleAnimBgImage_Impact, gBattleAnimBgPalette_Solarbeam, gBattleAnimBgTilemap_ImpactPlayer},
     [BG_SOLARBEAM_CONTESTS] = {gBattleAnimBgImage_Impact, gBattleAnimBgPalette_Solarbeam, gBattleAnimBgTilemap_ImpactContests},
+    [BG_TRICK_ROOM] = {gBattleAnimBgImage_TrickRoom, gBattleAnimBgPalette_TrickRoom, gBattleAnimBgTilemap_TrickRoom},
     [BG_AURA_SPHERE] = {gBattleAnimBgImage_FocusBlast, gBattleAnimBgPalette_AuraSphere, gBattleAnimBgTilemap_FocusBlast},
 };
 

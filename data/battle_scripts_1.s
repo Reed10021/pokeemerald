@@ -233,6 +233,7 @@ gBattleScriptsForMoveEffects:: @ 82D86A8
 	.4byte BattleScript_EffectGrowth
 	.4byte BattleScript_EffectPowerBasedOnTargetHp
 	.4byte BattleScript_EffectCloseCombat
+	.4byte BattleScript_EffectTrickRoom
 
 BattleScript_EffectSpeedUp::
 BattleScript_EffectSpecialDefenseUp::
@@ -2659,6 +2660,17 @@ BattleScript_EffectWaterSport::
 	waitmessage 0x40
 	goto BattleScript_MoveEnd
 
+BattleScript_EffectTrickRoom::
+	attackcanceler
+	attackstring
+	ppreduce
+	settypebasedhalvers BattleScript_ButItFailed
+	attackanimation
+	waitanimation
+	printfromtable gTrickRoomUsedStringIds
+	waitmessage 0x40
+	goto BattleScript_MoveEnd
+
 BattleScript_EffectPoisonFang::
 	setmoveeffect MOVE_EFFECT_TOXIC
 	goto BattleScript_EffectHit
@@ -2847,18 +2859,32 @@ BattleScript_GrowthDoMoveAnim::
 	setbyte sSTAT_ANIM_PLAYED, FALSE
 	playstatchangeanimation BS_ATTACKER, BIT_ATK | BIT_SPATK, 0
 	setstatchanger STAT_ATK, 1, FALSE
+	jumpifabilitypresent ABILITY_CLOUD_NINE, BattleScript_GrowthAtk
+	jumpifabilitypresent ABILITY_AIR_LOCK, BattleScript_GrowthAtk
+	jumpifhalfword CMP_COMMON_BITS, gBattleWeather, WEATHER_SUN_TEMPORARY | WEATHER_SUN_PERMANENT, BattleScript_GrowthAtk2
+BattleScript_GrowthAtk:
 	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_GrowthTrySpAtk
 	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, 0x2, BattleScript_GrowthTrySpAtk
 	printfromtable gStatUpStringIds
 	waitmessage 0x40
 BattleScript_GrowthTrySpAtk::
 	setstatchanger STAT_SPATK, 1, FALSE
+	jumpifabilitypresent ABILITY_CLOUD_NINE, BattleScript_GrowthSpAtk
+	jumpifabilitypresent ABILITY_AIR_LOCK, BattleScript_GrowthSpAtk
+	jumpifhalfword CMP_COMMON_BITS, gBattleWeather, WEATHER_SUN_TEMPORARY | WEATHER_SUN_PERMANENT, BattleScript_GrowthSpAtk2
+BattleScript_GrowthSpAtk:
 	statbuffchange MOVE_EFFECT_AFFECTS_USER | STAT_BUFF_ALLOW_PTR, BattleScript_GrowthEnd
 	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, 0x2, BattleScript_GrowthEnd
 	printfromtable gStatUpStringIds
 	waitmessage 0x40
 BattleScript_GrowthEnd::
 	goto BattleScript_MoveEnd
+BattleScript_GrowthAtk2:
+	setstatchanger STAT_ATK, 2, FALSE
+	goto BattleScript_GrowthAtk
+BattleScript_GrowthSpAtk2:
+	setstatchanger STAT_SPATK, 2, FALSE
+	goto BattleScript_GrowthSpAtk
 
 BattleScript_EffectPowerBasedOnTargetHp::
 	scaledamagebytargethp
@@ -3308,6 +3334,12 @@ BattleScript_ExtremeHeatContinues::
 BattleScript_SunlightFaded::
 	printstring STRINGID_SUNLIGHTFADED
 	waitmessage 0x40
+	end2
+
+BattleScript_TrickRoomEnds::
+	printstring STRINGID_TRICKROOMENDS
+	waitmessage 0x40
+	playanimation BS_ATTACKER, B_ANIM_TRICK_ROOM, NULL
 	end2
 
 BattleScript_OverworldWeatherStarts::
@@ -4053,6 +4085,17 @@ BattleScript_RainDishActivates::
 	datahpupdate BS_ATTACKER
 	end3
 
+BattleScript_SolarPowerActivates::
+	printstring STRINGID_PKMNHURTBY
+	waitmessage 0x40
+	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE | HITMARKER_x100000
+	healthbarupdate BS_ATTACKER
+	datahpupdate BS_ATTACKER
+	tryfaintmon BS_ATTACKER, FALSE, NULL
+	atk24 BattleScript_SolarPowerActivatesEnd
+BattleScript_SolarPowerActivatesEnd::
+	end3
+
 BattleScript_SandstreamActivates::
 	pause 0x20
 	printstring STRINGID_PKMNSXWHIPPEDUPSANDSTORM
@@ -4215,6 +4258,16 @@ BattleScript_FlashFireBoost::
 	attackstring
 	pause 0x20
 	printfromtable gFlashFireStringIds
+	waitmessage 0x40
+	goto BattleScript_MoveEnd
+
+BattleScript_LightningRodActivates_PPLoss::
+	ppreduce
+BattleScript_LightningRodActivates::
+	attackstring
+	pause 0x20
+	playanimation BS_TARGET, B_ANIM_STATS_CHANGE, sB_ANIM_ARG1
+	printstring STRINGID_PKMNRAISEDSPATKWITH
 	waitmessage 0x40
 	goto BattleScript_MoveEnd
 

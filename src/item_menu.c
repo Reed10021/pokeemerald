@@ -2593,7 +2593,8 @@ void PrintTMHMMoveData(u16 itemId)
             moveId == MOVE_MEMENTO || moveId == MOVE_MIMIC || moveId == MOVE_MUD_SPORT || moveId == MOVE_NIGHTMARE ||
             moveId == MOVE_PAIN_SPLIT || moveId == MOVE_RECYCLE || moveId == MOVE_REFRESH || moveId == MOVE_ROLE_PLAY ||
             moveId == MOVE_SKILL_SWAP || moveId == MOVE_SLACK_OFF || moveId == MOVE_SNATCH || moveId == MOVE_SOFT_BOILED ||
-            moveId == MOVE_SPIDER_WEB || moveId == MOVE_TAIL_GLOW || moveId == MOVE_WATER_SPORT || moveId == MOVE_WISH || moveId == MOVE_YAWN)
+            moveId == MOVE_SPIDER_WEB || moveId == MOVE_TAIL_GLOW || moveId == MOVE_WATER_SPORT || moveId == MOVE_WISH || 
+            moveId == MOVE_YAWN || moveId == MOVE_NASTY_PLOT || moveId == MOVE_TRICK_ROOM)
         {
             text = gText_ThreeDashes;
         }

@@ -1917,10 +1917,8 @@ bool8 ScrCmd_setwildbattlescaled(struct ScriptContext *ctx)
     u16 item = ScriptReadHalfword(ctx);
     u32 avgLevel = 0;
     u32 playerMonCount = 0;
-    u32 minMon = 100;
-    u32 maxMon = 0;
     s32 scaledLevel = 0; // resolve < 0 & > 100 edge cases before casting.
-    u32 levelArray[6] = { 0 };
+    u32 levelArray[PARTY_SIZE] = { 0 };
 
     {
         struct Pokemon* curMon;
@@ -1933,31 +1931,23 @@ bool8 ScrCmd_setwildbattlescaled(struct ScriptContext *ctx)
 
             temp = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
             levelArray[i] = temp;
-            if (maxMon < temp)
-                maxMon = temp;
-            if (minMon > temp)
-                minMon = temp;
             playerMonCount++;
         }
     }
     avgLevel = CalcGeneralizedMean(levelArray, playerMonCount);
 
-    if ((baseLevel-5) > avgLevel)
+    if ((baseLevel-4) >= avgLevel)
     {
         CreateScriptedWildMon(species, baseLevel, item);
         return FALSE;
     }
     else
     {
-        s32 scale;
+        s32 scale = (avgLevel - baseLevel) + 4;
 
-        if (maxMon - avgLevel > 12) // scale failsafe to help facilitate boss battles.
-            scale = (maxMon - baseLevel) + 3;
-        else
-            scale = (avgLevel - baseLevel) + 8;
-
+        // This shouldn't trigger, but just in case.
         if (scale < 0)
-            scale = 3;
+            scale = 4;
 
         scaledLevel = baseLevel + scale;
         if (scaledLevel < 0) {

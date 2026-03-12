@@ -442,13 +442,13 @@ gBattleAnims_Moves::
 	.4byte Move_NONE
 	.4byte Move_NONE
 	.4byte Move_NONE
-	.4byte Move_NONE
-	.4byte Move_NONE
+	.4byte Move_PSYCHO_CUT
+	.4byte Move_ZEN_HEADBUTT
 	.4byte Move_NONE
 	.4byte Move_FLASH_CANNON
 	.4byte Move_NONE
 	.4byte Move_NONE
-	.4byte Move_NONE
+	.4byte Move_TRICK_ROOM
 	.4byte Move_NONE
 	.4byte Move_NONE
 	.4byte Move_NONE
@@ -523,6 +523,7 @@ gBattleAnims_General::
 	.4byte General_IngrainHeal
 	.4byte General_WishHeal
 	.4byte General_TotemFlare
+	.4byte General_TrickRoom
 
 	.align 2
 gBattleAnims_Special::
@@ -10405,6 +10406,67 @@ Move_SHADOW_CLAW:
 	clearmonbg ANIM_TARGET
 	end
 
+Move_PSYCHO_CUT:
+	loadspritegfx ANIM_TAG_SPIRAL
+	loadspritegfx ANIM_TAG_PSYCHO_CUT
+	loadspritegfx ANIM_TAG_CROSS_IMPACT
+	monbg ANIM_ATK_PARTNER
+	loopsewithpan SE_M_FAINT_ATTACK, SOUND_PAN_ATTACKER, 15, 4
+	createvisualtask AnimTask_BlendParticle, 5, ANIM_TAG_CROSS_IMPACT, 0, 9, 9, RGB_PURPLE
+	createvisualtask AnimTask_SwayMon, ANIM_ATTACKER, 0, 6, 2048, 2, ANIM_ATTACKER
+	createsprite gPsychoCutSpiralSpriteTemplate, ANIM_ATTACKER, 2, 0, 0, 0, 0
+	createvisualtask AnimTask_BlendBattleAnimPal, 1, F_PAL_BG, 2, 0,  4, RGB_BLACK
+	createvisualtask AnimTask_BlendBattleAnimPal, 1, F_PAL_ATTACKER, 2, 0, 10, RGB(20, 12, 23)
+	delay 30
+	clearmonbg ANIM_ATK_PARTNER
+	waitforvisualfinish
+	monbg ANIM_TARGET
+	monbgprio_28 ANIM_TARGET
+	setalpha 12, 8
+	playsewithpan SE_M_RAZOR_WIND2, SOUND_PAN_ATTACKER
+	createsprite gPsychoCutSpriteTemplate, ANIM_TARGET, 2, 20, 0, -8, 0, 20
+	waitforvisualfinish
+	createvisualtask AnimTask_ShakeMon, 5, ANIM_TARGET, 7, 0, 9, 1
+	create_cross_impact_sprite ANIM_ATTACKER, 3, x=0, y=0, relative_to=1, duration=20
+	createvisualtask AnimTask_BlendBattleAnimPal, 1, F_PAL_BG, 2, 4,  0, RGB_BLACK
+	createvisualtask AnimTask_BlendBattleAnimPal, 1, F_PAL_ATTACKER, 2, 10, 0, RGB(20, 12, 23)
+	clearmonbg ANIM_TARGET
+	blendoff
+	waitforvisualfinish
+	end
+
+Move_ZEN_HEADBUTT:
+	loadspritegfx ANIM_TAG_CIRCLE_OF_LIGHT
+	loadspritegfx ANIM_TAG_WATER_IMPACT
+	monbg ANIM_ATTACKER
+	setalpha 12, 8
+	simple_palette_blend selector=F_PAL_BG, delay=2, initial_blend_y=0, target_blend_y=4, color=RGB_BLACK
+	waitforvisualfinish
+	createsprite gZenHeadbuttSpriteTemplate, ANIM_ATTACKER, 2, 0
+	delay 18
+	playsewithpan SE_M_MORNING_SUN, SOUND_PAN_ATTACKER
+	waitforvisualfinish
+	delay 2
+	playsewithpan SE_M_HEADBUTT, SOUND_PAN_ATTACKER
+	loadspritegfx ANIM_TAG_IMPACT
+	createsprite gBowMonSpriteTemplate, ANIM_ATTACKER, 1, 0
+	playsewithpan SE_M_HEADBUTT, SOUND_PAN_ATTACKER
+	waitforvisualfinish
+	delay 2
+	createsprite gBowMonSpriteTemplate, ANIM_ATTACKER, 1, 1
+	waitforvisualfinish
+	createvisualtask AnimTask_ShakeMonInPlace, 2, ANIM_ATTACKER, 2, 0, 4, 1
+	createvisualtask AnimTask_ShakeMon, 2, ANIM_TARGET, 5, 0, 6, 1
+	createsprite gBowMonSpriteTemplate, ANIM_ATTACKER, 1, 2
+	createsprite gAquaTailHitSpriteTemplate, ANIM_TARGET, 3, 0, 0, 1, 1
+	playsewithpan SE_M_VITAL_THROW2, SOUND_PAN_TARGET
+	waitforvisualfinish
+	simple_palette_blend selector=F_PAL_BG, delay=4, initial_blend_y=4, target_blend_y=0, color=RGB_BLACK
+	clearmonbg ANIM_ATTACKER
+	blendoff
+	delay 1
+	end
+
 Move_FLASH_CANNON:
 	loadspritegfx ANIM_TAG_HANDS_AND_FEET
 	loadspritegfx ANIM_TAG_CIRCLE_OF_LIGHT
@@ -10441,6 +10503,24 @@ Move_FLASH_CANNON:
 	waitforvisualfinish
 	clearmonbg ANIM_TARGET
 	end
+
+Move_TRICK_ROOM:
+	call InitRoomAnimation
+General_TrickRoom::
+	fadetobg BG_TRICK_ROOM
+	waitbgfadein
+	loopsewithpan SE_M_ATTRACT, SOUND_PAN_TARGET, 10, 3
+	delay 64
+	restorebg
+	waitbgfadein
+	blendoff
+	end
+InitRoomAnimation:
+	setalpha 8, 8
+	loopsewithpan SE_M_SUPERSONIC, SOUND_PAN_TARGET, 10, 2
+	createvisualtask AnimTask_ScaleMonAndRestore, 5, -6, -6, 15, ANIM_TARGET, 1
+	delay 10
+	return
 
 Move_CRUSH_GRIP:
 	loadspritegfx ANIM_TAG_EXPLOSION

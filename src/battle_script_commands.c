@@ -1360,6 +1360,13 @@ static void Cmd_accuracycheck(void)
             return;
         if (AccuracyCalcHelper(move))
             return;
+        if (type == TYPE_ELECTRIC
+            && GetBattlerSide(gBattlerAttacker) != GetBattlerSide(gBattlerTarget)
+            && gBattleMons[gBattlerTarget].ability == ABILITY_LIGHTNING_ROD)
+        {
+            JumpIfMoveFailed(7, move);
+            return;
+        }
 
         if (gBattleMons[gBattlerAttacker].ability == ABILITY_KEEN_EYE)
             evasionStage = DEFAULT_STAT_STAGE;
@@ -2794,7 +2801,7 @@ void SetMoveEffect(bool8 primary, u8 certain)
             BattleScriptPush(gBattlescriptCurrInstr + 1);
 
             if (sStatusFlagsForMoveEffects[gBattleCommunication[MOVE_EFFECT_BYTE]] == STATUS1_SLEEP)
-                gBattleMons[gEffectBattler].status1 |= STATUS1_SLEEP_TURN((Random() & 3) + 2); // 2-5 turns
+                gBattleMons[gEffectBattler].status1 |= STATUS1_SLEEP_TURN((Random() % 3) + 2); // 2-4 turns
             else
                 gBattleMons[gEffectBattler].status1 |= sStatusFlagsForMoveEffects[gBattleCommunication[MOVE_EFFECT_BYTE]];
 
@@ -4368,7 +4375,8 @@ static void Cmd_playanimation(void)
     else if (gBattlescriptCurrInstr[2] == B_ANIM_RAIN_CONTINUES
              || gBattlescriptCurrInstr[2] == B_ANIM_SUN_CONTINUES
              || gBattlescriptCurrInstr[2] == B_ANIM_SANDSTORM_CONTINUES
-             || gBattlescriptCurrInstr[2] == B_ANIM_HAIL_CONTINUES)
+             || gBattlescriptCurrInstr[2] == B_ANIM_HAIL_CONTINUES
+             || gBattlescriptCurrInstr[2] == B_ANIM_TRICK_ROOM)
     {
         BtlController_EmitBattleAnimation(0, gBattlescriptCurrInstr[2], *argumentPtr);
         MarkBattlerForControllerExec(gActiveBattler);
@@ -8246,9 +8254,13 @@ static void Cmd_metronome(void)
             continue;
         else if (gCurrentMove >= MOVE_AVALANCHE && gCurrentMove <= MOVE_ICE_SHARD)
             continue;
-        else if (gCurrentMove >= MOVE_THUNDER_FANG && gCurrentMove <= MOVE_MIRROR_SHOT)
+        else if (gCurrentMove >= MOVE_THUNDER_FANG && gCurrentMove <= MOVE_MUD_BOMB)
             continue;
-        else if (gCurrentMove >= MOVE_ROCK_CLIMB && gCurrentMove <= MOVE_LUNAR_DANCE)
+        else if (gCurrentMove == MOVE_MIRROR_SHOT)
+            continue;
+        else if (gCurrentMove >= MOVE_ROCK_CLIMB && gCurrentMove <= MOVE_DEFOG)
+            continue;
+        else if (gCurrentMove >= MOVE_DRACO_METEOR && gCurrentMove <= MOVE_LUNAR_DANCE)
             continue;
         else if (gCurrentMove >= MOVE_MAGMA_STORM && gCurrentMove <= MOVE_SHADOW_FORCE)
             continue;
@@ -10114,7 +10126,7 @@ static void Cmd_trycastformdatachange(void)
     }
 }
 
-static void Cmd_settypebasedhalvers(void) // water and mud sport
+static void Cmd_settypebasedhalvers(void) // mud sport, water sport, and trick room
 {
     bool8 worked = FALSE;
 
@@ -10127,7 +10139,7 @@ static void Cmd_settypebasedhalvers(void) // water and mud sport
             worked = TRUE;
         }
     }
-    else // water sport
+    else if (gBattleMoves[gCurrentMove].effect == EFFECT_WATER_SPORT)
     {
         if (!(gStatuses3[gBattlerAttacker] & STATUS3_WATERSPORT))
         {
@@ -10135,6 +10147,20 @@ static void Cmd_settypebasedhalvers(void) // water and mud sport
             gBattleCommunication[MULTISTRING_CHOOSER] = 1;
             worked = TRUE;
         }
+    }
+    else // trick room
+    {
+        if (gWishFutureKnock.trickRoomTimer == 0)
+        {
+            gWishFutureKnock.trickRoomTimer = 5;
+            gBattleCommunication[MULTISTRING_CHOOSER] = 0;
+        }
+        else
+        {
+            gWishFutureKnock.trickRoomTimer = 0;
+            gBattleCommunication[MULTISTRING_CHOOSER] = 1;
+        }
+        worked = TRUE;
     }
 
     if (worked)

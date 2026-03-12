@@ -219,6 +219,7 @@ AI_CheckBadMove_CheckEffect: @ 82DC045
 	if_effect EFFECT_DRAGON_DANCE, AI_CBM_DragonDance
 	if_effect EFFECT_GROWTH, AI_CBM_Growth
 	if_effect EFFECT_CLOSE_COMBAT, AI_CBM_HighRiskForDamage
+	if_effect EFFECT_TRICK_ROOM, AI_CBM_TrickRoom
 	end
 
 AI_CBM_Sleep: @ 82DC2D4
@@ -510,6 +511,18 @@ AI_CBM_SunnyDay: @ 82DC661
 	if_equal AI_WEATHER_SUN, Score_Minus8
 	end
 
+AI_CBM_TrickRoom:
+	get_who_strikes_first AI_USER, AI_TARGET
+	if_equal 0, Score_Minus10
+	if_equal 2, AI_CBM_TrickRoom_SpeedTie
+
+AI_CBM_TrickRoom_End:
+	end
+
+AI_CBM_TrickRoom_SpeedTie:
+	if_random_less_than 128, Score_Minus10
+	end
+
 AI_CBM_FutureSight: @ 82DC669
 	if_side_affecting AI_TARGET, SIDE_STATUS_FUTUREATTACK, Score_Minus12
 	if_side_affecting AI_USER, SIDE_STATUS_FUTUREATTACK, Score_Minus12
@@ -795,6 +808,7 @@ AI_CheckViability:
 	if_effect EFFECT_GROWTH, AI_CV_Growth
 	if_effect EFFECT_POWER_BASED_ON_TARGET_HP, AI_CV_PowerBasedOnTargetHP
 	if_effect EFFECT_CLOSE_COMBAT, AI_CV_CloseCombat
+	if_effect EFFECT_TRICK_ROOM, AI_CV_TrickRoom
 	end
 
 AI_CV_Sleep: @ 82DCA92
@@ -2248,6 +2262,23 @@ AI_CV_SunnyDay_ScoreDown1:
 AI_CV_SunnyDay_End:
 	end
 
+AI_CV_TrickRoom:
+	if_double_battle AI_CV_TrickRoom_End
+	if_hp_more_than AI_USER, 30, AI_CV_TrickRoom_CheckTurnOrder
+	count_usable_party_mons AI_USER
+	if_equal 0, AI_CV_TrickRoom_End
+
+AI_CV_TrickRoom_CheckTurnOrder:
+	get_who_strikes_first AI_USER, AI_TARGET
+	if_equal 1, AI_CV_TrickRoom_MoveAfterTarget
+	goto Score_Minus1
+
+AI_CV_TrickRoom_MoveAfterTarget:
+	if_random_less_than 192, Score_Plus3
+
+AI_CV_TrickRoom_End:
+	end
+
 AI_CV_BellyDrum:
 	if_hp_less_than AI_USER, 90, AI_CV_BellyDrum_ScoreDown2
 	goto AI_CV_BellyDrum_End
@@ -2984,6 +3015,7 @@ AI_SetupFirstTurn_SetupEffectsToEncourage:
     .byte EFFECT_CALM_MIND
     .byte EFFECT_CAMOUFLAGE
     .byte EFFECT_GROWTH
+    .byte EFFECT_TRICK_ROOM
     .byte -1
 
 AI_PreferStrongestMove:
@@ -3079,6 +3111,7 @@ AI_PreferBatonPassEnd:
 
 AI_DoubleBattle:
 	if_target_is_ally AI_TryOnAlly
+	if_effect EFFECT_TRICK_ROOM, AI_DoubleBattleTrickRoom
 	if_move MOVE_SKILL_SWAP, AI_DoubleBattleSkillSwap
 	get_curr_move_type
 	if_move MOVE_EARTHQUAKE, AI_DoubleBattleAllHittingGroundMove
@@ -3104,6 +3137,46 @@ AI_DoubleBattleCheckUserStatus2:
 	if_equal MOVE_POWER_DISCOURAGED, Score_Minus5
 	score +1
 	if_equal MOVE_MOST_POWERFUL, Score_Plus2
+	end
+
+AI_DoubleBattleTrickRoom:
+	if_hp_equal AI_USER_PARTNER, 0, Score_Minus30
+	if_hp_equal AI_TARGET, 0, Score_Minus30
+	if_hp_equal AI_TARGET_PARTNER, 0, Score_Minus30
+
+	get_who_strikes_first AI_USER, AI_TARGET
+	if_not_equal 0, AI_DoubleBattleTrickRoom_CheckAllAfter
+	get_who_strikes_first AI_USER, AI_TARGET_PARTNER
+	if_not_equal 0, AI_DoubleBattleTrickRoom_CheckAllAfter
+	get_who_strikes_first AI_USER_PARTNER, AI_TARGET
+	if_not_equal 0, AI_DoubleBattleTrickRoom_CheckAllAfter
+	get_who_strikes_first AI_USER_PARTNER, AI_TARGET_PARTNER
+	if_not_equal 0, AI_DoubleBattleTrickRoom_CheckAllAfter
+	get_who_strikes_first AI_USER, AI_USER_PARTNER
+	if_equal 2, AI_DoubleBattleTrickRoom_BothBeforeTie
+	goto Score_Minus30
+
+AI_DoubleBattleTrickRoom_BothBeforeTie:
+	if_random_less_than 64, Score_Minus5
+	goto Score_Minus30
+
+AI_DoubleBattleTrickRoom_CheckAllAfter:
+	get_who_strikes_first AI_USER, AI_TARGET
+	if_not_equal 1, Score_Minus5
+	get_who_strikes_first AI_USER, AI_TARGET_PARTNER
+	if_not_equal 1, Score_Minus5
+	get_who_strikes_first AI_USER_PARTNER, AI_TARGET
+	if_not_equal 1, Score_Minus5
+	get_who_strikes_first AI_USER_PARTNER, AI_TARGET_PARTNER
+	if_not_equal 1, Score_Minus5
+	get_who_strikes_first AI_USER, AI_USER_PARTNER
+	if_equal 2, AI_DoubleBattleTrickRoom_BothAfterTie
+	if_random_less_than 192, Score_Plus5
+	end
+
+AI_DoubleBattleTrickRoom_BothAfterTie:
+	if_random_less_than 128, Score_Minus5
+	if_random_less_than 192, Score_Plus5
 	end
 
 AI_DoubleBattleAllHittingGroundMove:

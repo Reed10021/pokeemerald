@@ -252,6 +252,8 @@ static const u8 sText_PkmnWaitsForTarget[] = _("{B_ATK_NAME_WITH_PREFIX} waits f
 static const u8 sText_PkmnSnatchedMove[] = _("{B_DEF_NAME_WITH_PREFIX} SNATCHED\n{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s move!");
 static const u8 sText_ElectricityWeakened[] = _("Electricity's power was\nweakened!");
 static const u8 sText_FireWeakened[] = _("Fire's power was\nweakened!");
+static const u8 sText_PkmnTwistedDimensions[] = _("{B_ATK_NAME_WITH_PREFIX} twisted\nthe dimensions!");
+static const u8 sText_TrickRoomEnds[] = _("The twisted dimensions\nreturned to normal!");
 static const u8 sText_XFoundOneY[] = _("{B_ATK_NAME_WITH_PREFIX} found\none {B_LAST_ITEM}!");
 static const u8 sText_SoothingAroma[] = _("A soothing aroma wafted\nthrough the area!");
 static const u8 sText_ItemsCantBeUsedNow[] = _("Items can't be used now.{PAUSE 64}");
@@ -279,6 +281,7 @@ static const u8 sText_PkmnProtectsAgainstTaunts[] = _("{B_DEF_NAME_WITH_PREFIX}'
 static const u8 sText_PkmnPreventsPoisoningWith[] = _("{B_EFF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nprevents poisoning!");
 static const u8 sText_PkmnPreventsConfusionWith[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nprevents confusion!");
 static const u8 sText_PkmnRaisedFirePowerWith[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nraised its FIRE power!");
+static const u8 sText_PkmnRaisedSpAtkWith[] = _("{B_DEF_NAME_WITH_PREFIX}'s {B_DEF_ABILITY}\nraised its SP. ATK!");
 static const u8 sText_PkmnAnchorsItselfWith[] = _("{B_DEF_NAME_WITH_PREFIX} anchors\nitself with {B_DEF_ABILITY}!");
 static const u8 sText_PkmnCutsAttackWith[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\ncuts {B_DEF_NAME_WITH_PREFIX}'s ATTACK!");
 static const u8 sText_PkmnPreventsStatLossWith[] = _("{B_SCR_ACTIVE_NAME_WITH_PREFIX}'s {B_SCR_ACTIVE_ABILITY}\nprevents stat loss!");
@@ -918,6 +921,9 @@ const u8 * const gBattleStringsTable[BATTLESTRINGS_COUNT] =
     [STRINGID_PKMNSITEMWHIPPEDUPHAILSTORM - 12] = sText_PkmnsItemWhippedUpHailstorm,
     [STRINGID_ENDUREDSTURDY - 12] = sText_PkmnEnduredSturdy,
     [STRINGID_PKMNPROTECTSAGAINSTTAUNTS - 12] = sText_PkmnProtectsAgainstTaunts,
+    [STRINGID_PKMNTWISTEDDIMENSIONS - 12] = sText_PkmnTwistedDimensions,
+    [STRINGID_TRICKROOMENDS - 12] = sText_TrickRoomEnds,
+    [STRINGID_PKMNRAISEDSPATKWITH - 12] = sText_PkmnRaisedSpAtkWith,
 };
 
 const u16 gMissStringIds[] =
@@ -1109,6 +1115,11 @@ const u16 gLeechSeedDrainStringIds[] =
 const u16 gSportsUsedStringIds[] =
 {
     STRINGID_ELECTRICITYWEAKENED, STRINGID_FIREWEAKENED
+};
+
+const u16 gTrickRoomUsedStringIds[] =
+{
+    STRINGID_PKMNTWISTEDDIMENSIONS, STRINGID_TRICKROOMENDS
 };
 
 const u16 gPartyStatusHealStringIds[] =

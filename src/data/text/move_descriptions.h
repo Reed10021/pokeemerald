@@ -1435,7 +1435,7 @@ static const u8 sAuraSphereDescription[] = _(
 
 static const u8 sRockPolishDescription[] = _(
     "Polishes the body to\n"
-    "sharply raise Speed.");
+    "sharply raise SPEED.");
 
 static const u8 sPoisonJabDescription[] = _(
     "A stabbing attack that\n"
@@ -1485,9 +1485,21 @@ static const u8 sShadowClawDescription[] = _(
     "Strikes with a shadow claw.\n"
     "High critical-hit ratio.");
 
+static const u8 sPsychoCutDescription[] = _(
+    "Tears with psychic blades.\n"
+    "High critical-hit ratio.");
+
+static const u8 sZenHeadbuttDescription[] = _(
+    "Hits with a strong head-\n"
+    "butt. May cause flinching.");
+
 static const u8 sFlashCannonDescription[] = _(
     "Releases a blast of light\n"
     "that may lower SP. DEF.");
+
+static const u8 sTrickRoomDescription[] = _(
+    "Slower POKéMON get to move\n"
+    "first for 5 turns.");
 
 static const u8 sCrushGripDescription[] = _(
     "The higher the foe's HP is,\n"
@@ -1875,9 +1887,14 @@ const u8 *const gMoveDescriptionPointers[MOVES_COUNT - 1] =
     [MOVE_AVALANCHE - 1] = sRevengeDescription,
     [MOVE_ICE_SHARD - 1] = sIceShardDescription,
     [MOVE_SHADOW_CLAW - 1] = sShadowClawDescription,
-    [MOVE_THUNDER_FANG-1 ... MOVE_MIRROR_SHOT-1] = sNullDescription,
+    [MOVE_THUNDER_FANG-1 ... MOVE_MUD_BOMB-1] = sNullDescription,
+    [MOVE_PSYCHO_CUT - 1] = sPsychoCutDescription,
+    [MOVE_ZEN_HEADBUTT - 1] = sZenHeadbuttDescription,
+    [MOVE_MIRROR_SHOT-1] = sNullDescription,
     [MOVE_FLASH_CANNON - 1] = sFlashCannonDescription,
-    [MOVE_ROCK_CLIMB-1 ... MOVE_LUNAR_DANCE-1] = sNullDescription,
+    [MOVE_ROCK_CLIMB-1 ... MOVE_DEFOG-1] = sNullDescription,
+    [MOVE_TRICK_ROOM - 1] = sTrickRoomDescription,
+    [MOVE_DRACO_METEOR-1 ... MOVE_LUNAR_DANCE-1] = sNullDescription,
     [MOVE_CRUSH_GRIP - 1] = sCrushGripDescription,
     [MOVE_MAGMA_STORM-1 ... MOVE_SHADOW_FORCE-1] = sNullDescription,
 };

@@ -372,6 +372,10 @@ u32 CalcGeneralizedMean(const u32* levels, u32 count)
     u32 sum = 0, i = 0, lv = 0, diff = 0, r = 0, mean = 0;
     u64 sum_pow = 0, avg_pow = 0;
 
+    // This shouldn't trigger, but just to be safe.
+    if (count == 0)
+        return 0;
+
     for (i = 0; i < count; ++i)
     {
         lv = levels[i];

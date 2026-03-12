@@ -33,7 +33,7 @@
 #define ABILITY_SYNCHRONIZE 28 // Gen 5+ implementation.
 #define ABILITY_CLEAR_BODY 29
 #define ABILITY_NATURAL_CURE 30
-#define ABILITY_LIGHTNING_ROD 31 // Currently grants immunity to electric type moves, but doesn't raise SP.ATK. Otherwise Gen 3 implementation.
+#define ABILITY_LIGHTNING_ROD 31 // Gen 5+ implementation.
 #define ABILITY_SERENE_GRACE 32 // Gen 5+ implementation.
 #define ABILITY_SWIFT_SWIM 33
 #define ABILITY_CHLOROPHYLL 34
@@ -85,7 +85,8 @@
 #define ABILITY_IRON_FIST 79 // Gen 4+ implementation.
 #define ABILITY_TECHNICIAN 80 // Gen 5+ implementation with a slight change - now powers up moves with <= 65 base power.
 #define ABILITY_SNOW_WARNING 81 // Gen 4-5 implementation - lasts whole battle unless changed.
+#define ABILITY_SOLAR_POWER 82 // Gen 4+ implementation.
 
-#define ABILITIES_COUNT 82
+#define ABILITIES_COUNT 83
 
 #endif  // GUARD_CONSTANTS_ABILITIES_H

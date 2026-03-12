@@ -431,13 +431,13 @@
 #define MOVE_FIRE_FANG    424 // Unused / Placeholder
 #define MOVE_SHADOW_SNEAK 425 // Unused / Placeholder
 #define MOVE_MUD_BOMB     426 // Unused / Placeholder
-#define MOVE_PSYCHO_CUT   427 // Unused / Placeholder
-#define MOVE_ZEN_HEADBUTT 428 // Unused / Placeholder
+#define MOVE_PSYCHO_CUT   427
+#define MOVE_ZEN_HEADBUTT 428
 #define MOVE_MIRROR_SHOT  429 // Unused / Placeholder
 #define MOVE_FLASH_CANNON 430
 #define MOVE_ROCK_CLIMB   431 // Unused / Placeholder
 #define MOVE_DEFOG        432 // Unused / Placeholder
-#define MOVE_TRICK_ROOM   433 // Unused / Placeholder
+#define MOVE_TRICK_ROOM   433
 #define MOVE_DRACO_METEOR 434 // Unused / Placeholder
 #define MOVE_DISCHARGE    435 // Unused / Placeholder
 #define MOVE_LAVA_PLUME   436 // Unused / Placeholder

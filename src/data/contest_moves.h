@@ -2997,7 +2997,25 @@ const struct ContestMove gContestMoves[MOVES_COUNT] =
         .comboMoves = {COMBO_STARTER_FOCUS_ENERGY},
     },
 
-    [MOVE_THUNDER_FANG ... MOVE_MIRROR_SHOT] = { 0 },
+    [MOVE_THUNDER_FANG ... MOVE_MUD_BOMB] = { 0 },
+
+    [MOVE_PSYCHO_CUT] =
+    {
+        .effect = CONTEST_EFFECT_HIGHLY_APPEALING,
+        .contestCategory = CONTEST_CATEGORY_COOL,
+        .comboStarterId = 0,
+        .comboMoves = {COMBO_STARTER_FOCUS_ENERGY},
+    },
+
+    [MOVE_ZEN_HEADBUTT] =
+    {
+        .effect = CONTEST_EFFECT_HIGHLY_APPEALING,
+        .contestCategory = CONTEST_CATEGORY_SMART,
+        .comboStarterId = 0,
+        .comboMoves = {0},
+    },
+
+    [MOVE_MIRROR_SHOT] = { 0 },
 
     [MOVE_FLASH_CANNON] =
     {
@@ -3007,7 +3025,17 @@ const struct ContestMove gContestMoves[MOVES_COUNT] =
         .comboMoves = {0},
     },
 
-    [MOVE_ROCK_CLIMB ... MOVE_LUNAR_DANCE] = { 0 },
+    [MOVE_ROCK_CLIMB ... MOVE_DEFOG] = { 0 },
+
+    [MOVE_TRICK_ROOM] =
+    {
+        .effect = CONTEST_EFFECT_SCRAMBLE_NEXT_TURN_ORDER,
+        .contestCategory = CONTEST_CATEGORY_SMART,
+        .comboStarterId = 0,
+        .comboMoves = {0},
+    },
+
+    [MOVE_DRACO_METEOR ... MOVE_LUNAR_DANCE] = { 0 },
 
     [MOVE_CRUSH_GRIP] =
     {

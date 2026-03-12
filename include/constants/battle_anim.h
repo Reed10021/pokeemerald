@@ -375,7 +375,8 @@
 #define BG_SOLARBEAM_OPPONENT 24
 #define BG_SOLARBEAM_PLAYER 25
 #define BG_SOLARBEAM_CONTESTS 26
-#define BG_AURA_SPHERE 27
+#define BG_TRICK_ROOM 27
+#define BG_AURA_SPHERE 28
 
 // table ids for general animations
 #define B_ANIM_CASTFORM_CHANGE          0x0
@@ -402,6 +403,7 @@
 #define B_ANIM_INGRAIN_HEAL             0x15
 #define B_ANIM_WISH_HEAL                0x16
 #define B_ANIM_TOTEM_FLARE              0x17
+#define B_ANIM_TRICK_ROOM               0x18
 
 // special animations table
 #define B_ANIM_LVL_UP                   0x0

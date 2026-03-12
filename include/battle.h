@@ -171,6 +171,7 @@ struct WishFutureKnock
     u8 wishCounter[MAX_BATTLERS_COUNT];
     u8 wishMonId[MAX_BATTLERS_COUNT];
     u8 weatherDuration;
+    u8 trickRoomTimer;
     u8 knockedOffMons[2]; // Each battler is represented by a bit. The array entry is dependent on the battler's side.
 };
 
@@ -449,7 +450,7 @@ struct BattleStruct
 
 #define IS_PHYSICAL_MOVE(move)(move == MOVE_CRABHAMMER || move == MOVE_SACRED_FIRE || move == MOVE_BLAZE_KICK || move == MOVE_FLARE_BLITZ || move == MOVE_OUTRAGE || move == MOVE_DRAGON_CLAW \
                             || move == MOVE_WATERFALL || move == MOVE_BITE ||move == MOVE_CRUNCH || move == MOVE_NEEDLE_ARM || move == MOVE_BULLET_SEED || move == MOVE_KNOCK_OFF || move == MOVE_AVALANCHE \
-                            || move == MOVE_ICE_SHARD || move == MOVE_SEED_BOMB)
+                            || move == MOVE_ICE_SHARD || move == MOVE_SEED_BOMB || move == MOVE_PSYCHO_CUT || move == MOVE_ZEN_HEADBUTT || move == MOVE_FLAME_WHEEL)
 #define IS_SPECIAL_MOVE(move)(move == MOVE_AEROBLAST || move == MOVE_SIGNAL_BEAM || move == MOVE_AIR_SLASH || move == MOVE_WEATHER_BALL || move == MOVE_TRI_ATTACK || move == MOVE_SHADOW_BALL \
                             || move == MOVE_AURA_SPHERE || move == MOVE_BUG_BUZZ  || move == MOVE_FLASH_CANNON)
 
@@ -728,6 +729,16 @@ extern u8 gUnknown_03005D7C[MAX_BATTLERS_COUNT];
 static inline bool32 IsBattlerAtMaxHp(u32 battler)
 {
     return gBattleMons[battler].hp == gBattleMons[battler].maxHP;
+}
+
+static inline bool32 IsOnPlayerSide(u32 battler)
+{
+    return GET_BATTLER_SIDE2(battler) == B_SIDE_PLAYER;
+}
+
+static inline bool32 IsBattlerAlly(u32 battlerAtk, u32 battlerDef)
+{
+    return GET_BATTLER_SIDE2(battlerAtk) == GET_BATTLER_SIDE2(battlerDef);
 }
 
 #endif // GUARD_BATTLE_H

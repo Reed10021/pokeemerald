@@ -54,6 +54,7 @@ static void RecordLastUsedMoveByTarget(void);
 static void BattleAI_DoAIProcessing(void);
 static void AIStackPushVar(const u8 *);
 static bool8 AIStackPop(void);
+static u8 BattleAI_GetWantedBattler(u8 wantedBattler);
 
 static void Cmd_if_random_less_than(void);
 static void Cmd_if_random_greater_than(void);
@@ -137,7 +138,7 @@ static void Cmd_get_move_type_from_result(void);
 static void Cmd_get_move_power_from_result(void);
 static void Cmd_get_move_effect_from_result(void);
 static void Cmd_get_protect_count(void);
-static void Cmd_nullsub_52(void);
+static void Cmd_get_who_strikes_first(void);
 static void Cmd_nullsub_53(void);
 static void Cmd_nullsub_54(void);
 static void Cmd_nullsub_55(void);
@@ -246,7 +247,7 @@ static const BattleAICmdFunc sBattleAICmdTable[] =
     Cmd_get_move_power_from_result,                 // 0x4F
     Cmd_get_move_effect_from_result,                // 0x50
     Cmd_get_protect_count,                          // 0x51
-    Cmd_nullsub_52,                                 // 0x52
+    Cmd_get_who_strikes_first,                      // 0x52
     Cmd_nullsub_53,                                 // 0x53
     Cmd_nullsub_54,                                 // 0x54
     Cmd_nullsub_55,                                 // 0x55
@@ -714,12 +715,7 @@ static void Cmd_score(void)
 
 static void Cmd_if_hp_less_than(void)
 {
-    u16 battlerId;
-
-    if (gAIScriptPtr[1] == AI_USER)
-        battlerId = sBattler_AI;
-    else
-        battlerId = gBattlerTarget;
+    u8 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
 
     if ((u32)(100 * gBattleMons[battlerId].hp / gBattleMons[battlerId].maxHP) < gAIScriptPtr[2])
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
@@ -729,12 +725,7 @@ static void Cmd_if_hp_less_than(void)
 
 static void Cmd_if_hp_more_than(void)
 {
-    u16 battlerId;
-
-    if (gAIScriptPtr[1] == AI_USER)
-        battlerId = sBattler_AI;
-    else
-        battlerId = gBattlerTarget;
+    u8 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
 
     if ((u32)(100 * gBattleMons[battlerId].hp / gBattleMons[battlerId].maxHP) > gAIScriptPtr[2])
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
@@ -744,12 +735,7 @@ static void Cmd_if_hp_more_than(void)
 
 static void Cmd_if_hp_equal(void)
 {
-    u16 battlerId;
-
-    if (gAIScriptPtr[1] == AI_USER)
-        battlerId = sBattler_AI;
-    else
-        battlerId = gBattlerTarget;
+    u8 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
 
     if ((u32)(100 * gBattleMons[battlerId].hp / gBattleMons[battlerId].maxHP) == gAIScriptPtr[2])
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
@@ -759,12 +745,7 @@ static void Cmd_if_hp_equal(void)
 
 static void Cmd_if_hp_not_equal(void)
 {
-    u16 battlerId;
-
-    if (gAIScriptPtr[1] == AI_USER)
-        battlerId = sBattler_AI;
-    else
-        battlerId = gBattlerTarget;
+    u8 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
 
     if ((u32)(100 * gBattleMons[battlerId].hp / gBattleMons[battlerId].maxHP) != gAIScriptPtr[2])
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
@@ -1265,7 +1246,7 @@ static void Cmd_if_not_equal_(void) // Same as if_not_equal.
 
 static void Cmd_if_user_goes(void)
 {
-    if (GetWhoStrikesFirst(sBattler_AI, gBattlerTarget, TRUE) == gAIScriptPtr[1])
+    if (GetWhoStrikesFirstForAI(sBattler_AI, gBattlerTarget, TRUE) == gAIScriptPtr[1])
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 2);
     else
         gAIScriptPtr += 6;
@@ -1273,7 +1254,7 @@ static void Cmd_if_user_goes(void)
 
 static void Cmd_if_user_doesnt_go(void)
 {
-    if (GetWhoStrikesFirst(sBattler_AI, gBattlerTarget, TRUE) != gAIScriptPtr[1])
+    if (GetWhoStrikesFirstForAI(sBattler_AI, gBattlerTarget, TRUE) != gAIScriptPtr[1])
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 2);
     else
         gAIScriptPtr += 6;
@@ -2155,14 +2136,19 @@ static void Cmd_get_protect_count(void)
     gAIScriptPtr += 2;
 }
 
-static void Cmd_nullsub_52(void)
+static void Cmd_get_who_strikes_first(void)
 {
+    u8 battler1 = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
+    u8 battler2 = BattleAI_GetWantedBattler(gAIScriptPtr[2]);
+
+    AI_THINKING_STRUCT->funcResult = GetWhoStrikesFirstForAI(battler1, battler2, TRUE);
+
+    gAIScriptPtr += 3;
 }
 
 static void Cmd_nullsub_53(void)
 {
 }
-
 static void Cmd_nullsub_54(void)
 {
 }

@@ -31,7 +31,7 @@ GraniteCave_B2F_EventScript_ForcedEncounter::
 	setflag FLAG_TRIGGER_SMART_WILD_AI
 	setflag FLAG_TRIGGER_TOTEM_POWER
 	setflag FLAG_FORCE_ANIMATIONS
-	setwildbattlescaled SPECIES_AGGRON, 30, ITEM_SITRUS_BERRY
+	setwildbattlescaled SPECIES_AGGRON, 40, ITEM_SITRUS_BERRY
 	special BattleSetup_StartLegendaryBattle
 	waitstate
 	specialvar VAR_RESULT, GetBattleOutcome
