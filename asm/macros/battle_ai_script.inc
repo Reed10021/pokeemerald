@@ -473,11 +473,11 @@
 	.byte \battler2
 	.endm
 
-	.macro nullsub_53
+	.macro get_trick_room
 	.byte 0x53
 	.endm
 
-	.macro nullsub_54
+	.macro get_gravity
 	.byte 0x54
 	.endm
 
@@ -551,6 +551,42 @@
 	.byte \battler
 	.2byte \param1
 	.4byte \param2
+	.endm
+
+	.macro if_move_would_be_bounced param0:req
+	.byte 0x63
+	.4byte \param0
+	.endm
+
+	.macro if_has_move_with_target battler:req, target:req, ptr:req
+	.byte 0x64
+	.byte \battler
+	.byte \target
+	.4byte \ptr
+	.endm
+
+	.macro if_move_is_blocked_by_prankster battler:req, ptr:req
+	.byte 0x65
+	.byte \battler
+	.4byte \ptr
+	.endm
+
+	.macro if_has_move_blocked_by_quick_guard battler:req, ptr:req
+	.byte 0x66
+	.byte \battler
+	.4byte \ptr
+	.endm
+
+	.macro if_move_target target:req, ptr:req
+	.byte 0x67
+	.byte \target
+	.4byte \ptr
+	.endm
+
+	.macro if_move_is_blocked_by_armor_tail battler:req, ptr:req
+	.byte 0x68
+	.byte \battler
+	.4byte \ptr
 	.endm
 	
 @ useful script macros

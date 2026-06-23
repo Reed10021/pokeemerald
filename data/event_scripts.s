@@ -579,6 +579,9 @@ gStdScripts_End:: @ 81DC2CC
 	.include "data/maps/ScorchedSlab_B1F/scripts.inc"
 	.include "data/maps/ScorchedSlab_B2F/scripts.inc"
 	.include "data/maps/ArtisanCave_B2F/scripts.inc"
+	.include "data/maps/Underwater_VictoryRoad/scripts.inc"
+	.include "data/maps/Underwater_RuinedChamber/scripts.inc"
+	.include "data/maps/RuinedChamber/scripts.inc"
 
 	.include "data/scripts/std_msgbox.inc"
 	.include "data/scripts/trainer_battle.inc"

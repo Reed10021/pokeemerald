@@ -191,7 +191,7 @@ u8 gLocalLinkPlayerId; // This is our player id in a multiplayer mode.
 u8 gFieldLinkPlayerCount;
 
 u8 gTimeOfDay;
-u8 gTimeUpdateCounter;
+s16 gTimeUpdateCounter;
 struct TimeBlendSettings currentTimeBlend;
 struct TimeBlendSettings cachedBlend;
 
@@ -1001,7 +1001,7 @@ void SetDefaultFlashLevel(void)
         gSaveBlock1Ptr->flashLevel = 1;
     else
         gSaveBlock1Ptr->flashLevel = gMaxFlashLevel - 1;
-    TryUseFlash();
+    QueueAutoFlash();
 }
 
 void Overworld_SetFlashLevel(s32 flashLevel)
@@ -1613,12 +1613,14 @@ void CB1_Overworld(void)
 }
 
 #define TINT_NIGHT Q_8_8(0.456) | Q_8_8(0.456) << 8 | Q_8_8(0.615) << 16
+#define DEFAULT_WEIGHT 256
+#define TIME_BLEND_WEIGHT(begin, end) (DEFAULT_WEIGHT - SAFE_DIV((DEFAULT_WEIGHT * ((hours - begin) * 60 + minutes)), ((end - begin) * 60)))
 
 const struct BlendSettings gTimeOfDayBlend[] =
 {
-    [TIME_OF_DAY_NIGHT] = {.coeff = 10, .blendColor = TINT_NIGHT, .isTint = TRUE},
-    [TIME_OF_DAY_TWILIGHT] = {.coeff = 4, .blendColor = 0xA8B0E0, .isTint = TRUE},
-    [TIME_OF_DAY_DAY] = {.coeff = 0, .blendColor = 0},
+    [TIME_OF_DAY_NIGHT]    =  {.coeff = 10, .blendColor = TINT_NIGHT, .isTint = TRUE},
+    [TIME_OF_DAY_TWILIGHT] =  {.coeff = 4,  .blendColor = 0xA8B0E0,   .isTint = TRUE},
+    [TIME_OF_DAY_DAY]      =  {.coeff = 0,  .blendColor = 0,          .isTint = FALSE},
 };
 
 u8 UpdateTimeOfDay(void)
@@ -1638,7 +1640,8 @@ u8 UpdateTimeOfDay(void)
     { // night->twilight
         currentTimeBlend.time0 = TIME_OF_DAY_NIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_TWILIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - TIME_NIGHT_BLEND) * 60 + minutes) / ((TIME_NIGHT_END - TIME_NIGHT_BLEND) * 60);
+        //currentTimeBlend.weight = 256 - 256 * ((hours - TIME_NIGHT_BLEND) * 60 + minutes) / ((TIME_NIGHT_END - TIME_NIGHT_BLEND) * 60);
+        currentTimeBlend.weight = TIME_BLEND_WEIGHT(TIME_NIGHT_BLEND, TIME_NIGHT_END);
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
     }
@@ -1646,7 +1649,8 @@ u8 UpdateTimeOfDay(void)
     { // twilight->day
         currentTimeBlend.time0 = TIME_OF_DAY_TWILIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_DAY;
-        currentTimeBlend.weight = 256 - 256 * ((hours - TIME_NIGHT_END) * 60 + minutes) / ((TIME_NIGHT_DAY_BLEND_END - TIME_NIGHT_END) * 60);
+        //currentTimeBlend.weight = 256 - 256 * ((hours - TIME_NIGHT_END) * 60 + minutes) / ((TIME_NIGHT_DAY_BLEND_END - TIME_NIGHT_END) * 60);
+        currentTimeBlend.weight = TIME_BLEND_WEIGHT(TIME_NIGHT_END, TIME_NIGHT_DAY_BLEND_END);
         currentTimeBlend.altWeight = (256 - currentTimeBlend.weight) / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
     }
@@ -1659,7 +1663,8 @@ u8 UpdateTimeOfDay(void)
     { // day->twilight
         currentTimeBlend.time0 = TIME_OF_DAY_DAY;
         currentTimeBlend.time1 = TIME_OF_DAY_TWILIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - TIME_DAY_BLEND_START) * 60 + minutes) / ((TIME_DAY_BLEND_END - TIME_DAY_BLEND_START) * 60);
+        //currentTimeBlend.weight = 256 - 256 * ((hours - TIME_DAY_BLEND_START) * 60 + minutes) / ((TIME_DAY_BLEND_END - TIME_DAY_BLEND_START) * 60);
+        currentTimeBlend.weight = TIME_BLEND_WEIGHT(TIME_DAY_BLEND_START, TIME_DAY_BLEND_END);
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2 + 128;
         gTimeOfDay = TIME_OF_DAY_DAY;
     }
@@ -1667,7 +1672,8 @@ u8 UpdateTimeOfDay(void)
     { // twilight->night
         currentTimeBlend.time0 = TIME_OF_DAY_TWILIGHT;
         currentTimeBlend.time1 = TIME_OF_DAY_NIGHT;
-        currentTimeBlend.weight = 256 - 256 * ((hours - TIME_DAY_BLEND_END) * 60 + minutes) / ((TIME_NIGHT_BLEND_END - TIME_DAY_BLEND_END) * 60);
+        //currentTimeBlend.weight = 256 - 256 * ((hours - TIME_DAY_BLEND_END) * 60 + minutes) / ((TIME_NIGHT_BLEND_END - TIME_DAY_BLEND_END) * 60);
+        currentTimeBlend.weight = TIME_BLEND_WEIGHT(TIME_DAY_BLEND_END, TIME_NIGHT_BLEND_END);
         currentTimeBlend.altWeight = currentTimeBlend.weight / 2;
         gTimeOfDay = TIME_OF_DAY_NIGHT;
     }
@@ -1758,23 +1764,20 @@ static void OverworldBasic(void)
     UpdatePaletteFade();
     UpdateTilesetAnimations();
     DoScheduledBgTilemapCopiesToVram();
-    if (++gTimeUpdateCounter >= 230
-        && !gPaletteFade.active
-        && gWeatherPtr->palProcessingState == WEATHER_PAL_STATE_IDLE) // Update blend every ~3 seconds
+    // Every minute if no palette fade is active, update time-of-day blending as needed.
+    if (!gPaletteFade.active && --gTimeUpdateCounter <= 0)
     {
-        gTimeUpdateCounter = 0;
+        cachedBlend.time0 = currentTimeBlend.time0;
+        cachedBlend.time1 = currentTimeBlend.time1;
+        cachedBlend.weight = currentTimeBlend.weight;
+        gTimeUpdateCounter = 60 * 60; // seconds per minute * 60
         UpdateTimeOfDay();
-        if (cachedBlend.time0 != currentTimeBlend.time0 || cachedBlend.time1 != currentTimeBlend.time1 || cachedBlend.weight != currentTimeBlend.weight)
+        if (MapHasNaturalLight(gMapHeader.mapType) &&
+            (cachedBlend.time0 != currentTimeBlend.time0
+         || cachedBlend.time1 != currentTimeBlend.time1 
+         || cachedBlend.weight != currentTimeBlend.weight))
         {
-            ApplyGammaShift(0, 32, gWeatherPtr->gammaIndex);
-            // Update cache only after we update the current blend.
-            cachedBlend.time0 = currentTimeBlend.time0;
-            cachedBlend.time1 = currentTimeBlend.time1;
-            cachedBlend.weight = currentTimeBlend.weight;
-            // Old method below. These two calls are already baked in to ApplyGammaShift, 
-            // and ApplyGammaShift plays better with weather.
-            //UpdateAltBgPalettes(PALETTES_BG);
-            //UpdatePalettesWithTime(PALETTES_ALL);
+            ApplyWeatherColorMapIfIdle(gWeatherPtr->gammaIndex);
         }
     }
 }
@@ -1838,6 +1841,7 @@ static bool8 RunFieldCallback(void)
 
 void CB2_NewGame(void)
 {
+    InitAutoFlash();
     FieldClearVBlankHBlankCallbacks();
     StopMapMusic();
     ResetSafariZoneFlag_();
@@ -2013,6 +2017,7 @@ void CB2_ContinueSavedGame(void)
 {
     u8 trainerHillMapId;
 
+    InitAutoFlash();
     FieldClearVBlankHBlankCallbacks();
     StopMapMusic();
     ResetSafariZoneFlag_();

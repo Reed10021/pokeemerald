@@ -508,10 +508,10 @@ PlayersHouse_1F_EventScript_GetSSTicketAndSeeLatiTV:: @ 8292AF2
 	msgbox PlayersHouse_1F_Text_WhatColorDidTheySay, MSGBOX_DEFAULT
 	multichoice 22, 8, MULTI_TV_LATI, 1
 	copyvar VAR_0x8004, VAR_RESULT
-	special InitRoamer
 	copyvar VAR_ROAMER_POKEMON, VAR_RESULT
-	copyvar VAR_TEMP_D, VAR_ROAMER_POKEMON
 	setvar VAR_ROAMER_POKEMON_BIRDS_BEASTS, 0
+	special InitRoamer
+	copyvar VAR_TEMP_D, VAR_ROAMER_POKEMON
 	addvar VAR_TEMP_D, SPECIES_LATIAS
 	playmoncry VAR_TEMP_D, 2
 	waitmoncry

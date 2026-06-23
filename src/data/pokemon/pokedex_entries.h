@@ -4655,4 +4655,640 @@ const struct PokedexEntry gPokedexEntries[] =
         .trainerScale = 610,
         .trainerOffset = 17,
     },
+
+    [NATIONAL_DEX_REGIELEKI] =
+    {
+        .categoryName = _("ELECTRON"),
+        .height = 12,
+        .weight = 1450,
+        .description = gRegielekiPokedexText,
+        .pokemonScale = 282,
+        .pokemonOffset = 4,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_REGIDRAGO] =
+    {
+        .categoryName = _("DRAGON ORB"),
+        .height = 21,
+        .weight = 2000,
+        .description = gRegidragoPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 365,
+        .trainerOffset = 7,
+    },
+
+    [NATIONAL_DEX_MELTAN] =
+    {
+        .categoryName = _("HEX NUT"),
+        .height = 2,
+        .weight = 80,
+        .description = gMeltanPokedexText,
+        .pokemonScale = 682,
+        .pokemonOffset = 24,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_MELMETAL] =
+    {
+        .categoryName = _("HEX NUT"),
+        .height = 25,
+        .weight = 8000,
+        .description = gMelmetalPokedexText,
+        .pokemonScale = 257,
+        .pokemonOffset = 4,
+        .trainerScale = 423,
+        .trainerOffset = 14,
+    },
+
+    [NATIONAL_DEX_LEAFEON] =
+    {
+        .categoryName = _("VERDANT"),
+        .height = 10,
+        .weight = 255,
+        .description = gLeafeonPokedexText,
+        .pokemonScale = 305,
+        .pokemonOffset = 8,
+        .trainerScale = 257,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_GLACEON] =
+    {
+        .categoryName = _("FRESH SNOW"),
+        .height = 8,
+        .weight = 259,
+        .description = gGlaceonPokedexText,
+        .pokemonScale = 366,
+        .pokemonOffset = 10,
+        .trainerScale = 257,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_WEAVILE] =
+    {
+        .categoryName = _("SHARP CLAW"),
+        .height = 11,
+        .weight = 340,
+        .description = gWeavilePokedexText,
+        .pokemonScale = 320,
+        .pokemonOffset = 7,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_MAGNEZONE] =
+    {
+        .categoryName = _("MAGNET AREA"),
+        .height = 12,
+        .weight = 1800,
+        .description = gMagnezonePokedexText,
+        .pokemonScale = 282,
+        .pokemonOffset = 4,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_ROSERADE] =
+    {
+        .categoryName = _("BOUQUET"),
+        .height = 9,
+        .weight = 145,
+        .description = gRoseradePokedexText,
+        .pokemonScale = 338,
+        .pokemonOffset = 10,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_LICKILICKY] =
+    {
+        .categoryName = _("LICKING"),
+        .height = 17,
+        .weight = 1400,
+        .description = gLickilickyPokedexText,
+        .pokemonScale = 259,
+        .pokemonOffset = 0,
+        .trainerScale = 290,
+        .trainerOffset = 1,
+    },
+
+    [NATIONAL_DEX_RHYPERIOR] =
+    {
+        .categoryName = _("DRILL"),
+        .height = 24,
+        .weight = 2828,
+        .description = gRhyperiorPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 3,
+        .trainerScale = 369,
+        .trainerOffset = 7,
+    },
+
+    [NATIONAL_DEX_TANGROWTH] =
+    {
+        .categoryName = _("VINE"),
+        .height = 20,
+        .weight = 1286,
+        .description = gTangrowthPokedexText,
+        .pokemonScale = 261,
+        .pokemonOffset = 1,
+        .trainerScale = 334,
+        .trainerOffset = 4,
+    },
+
+    [NATIONAL_DEX_AMBIPOM] =
+    {
+        .categoryName = _("LONG TAIL"),
+        .height = 12,
+        .weight = 203,
+        .description = gAmbipomPokedexText,
+        .pokemonScale = 282,
+        .pokemonOffset = 3,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_MISMAGIUS] =
+    {
+        .categoryName = _("MAGICAL"),
+        .height = 9,
+        .weight = 44,
+        .description = gMismagiusPokedexText,
+        .pokemonScale = 338,
+        .pokemonOffset = 8,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_HONCHKROW] =
+    {
+        .categoryName = _("BIG BOSS"),
+        .height = 9,
+        .weight = 273,
+        .description = gHonchkrowPokedexText,
+        .pokemonScale = 338,
+        .pokemonOffset = 8,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_ELECTIVIRE] =
+    {
+        .categoryName = _("THUNDERBOLT"),
+        .height = 18,
+        .weight = 1386,
+        .description = gElectivirePokedexText,
+        .pokemonScale = 267,
+        .pokemonOffset = 2,
+        .trainerScale = 286,
+        .trainerOffset = 1,
+    },
+
+    [NATIONAL_DEX_MAGMORTAR] =
+    {
+        .categoryName = _("BLAST"),
+        .height = 16,
+        .weight = 680,
+        .description = gMagmortarPokedexText,
+        .pokemonScale = 259,
+        .pokemonOffset = 1,
+        .trainerScale = 296,
+        .trainerOffset = 1,
+    },
+
+    [NATIONAL_DEX_TOGEKISS] =
+    {
+        .categoryName = _("JUBILEE"),
+        .height = 15,
+        .weight = 380,
+        .description = gTogekissPokedexText,
+        .pokemonScale = 268,
+        .pokemonOffset = 2,
+        .trainerScale = 271,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_YANMEGA] =
+    {
+        .categoryName = _("OGRE DARNER"),
+        .height = 19,
+        .weight = 515,
+        .description = gYanmegaPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 1,
+        .trainerScale = 326,
+        .trainerOffset = 4,
+    },
+
+    [NATIONAL_DEX_GLISCOR] =
+    {
+        .categoryName = _("FANG SCORP"),
+        .height = 20,
+        .weight = 425,
+        .description = gGliscorPokedexText,
+        .pokemonScale = 261,
+        .pokemonOffset = 1,
+        .trainerScale = 334,
+        .trainerOffset = 4,
+    },
+
+    [NATIONAL_DEX_MAMOSWINE] =
+    {
+        .categoryName = _("TWIN TUSK"),
+        .height = 25,
+        .weight = 2910,
+        .description = gMamoswinePokedexText,
+        .pokemonScale = 257,
+        .pokemonOffset = 6,
+        .trainerScale = 423,
+        .trainerOffset = 8,
+    },
+
+    [NATIONAL_DEX_PORYGON_Z] =
+    {
+        .categoryName = _("VIRTUAL"),
+        .height = 9,
+        .weight = 340,
+        .description = gPorygonZPokedexText,
+        .pokemonScale = 338,
+        .pokemonOffset = 8,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_GALLADE] =
+    {
+        .categoryName = _("BLADE"),
+        .height = 16,
+        .weight = 520,
+        .description = gGalladePokedexText,
+        .pokemonScale = 259,
+        .pokemonOffset = 1,
+        .trainerScale = 296,
+        .trainerOffset = 1,
+    },
+
+    [NATIONAL_DEX_PROBOPASS] =
+    {
+        .categoryName = _("COMPASS"),
+        .height = 14,
+        .weight = 3400,
+        .description = gProbopassPokedexText,
+        .pokemonScale = 265,
+        .pokemonOffset = 2,
+        .trainerScale = 262,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_DUSKNOIR] =
+    {
+        .categoryName = _("GRIPPER"),
+        .height = 22,
+        .weight = 1066,
+        .description = gDusknoirPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 0,
+        .trainerScale = 348,
+        .trainerOffset = 6,
+    },
+
+    [NATIONAL_DEX_FROSLASS] =
+    {
+        .categoryName = _("SNOW LAND"),
+        .height = 13,
+        .weight = 266,
+        .description = gFroslassPokedexText,
+        .pokemonScale = 272,
+        .pokemonOffset = 3,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_RIOLU] =
+    {
+        .categoryName = _("EMANATION"),
+        .height = 7,
+        .weight = 202,
+        .description = gRioluPokedexText,
+        .pokemonScale = 365,
+        .pokemonOffset = 13,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_LUCARIO] =
+    {
+        .categoryName = _("AURA"),
+        .height = 12,
+        .weight = 540,
+        .description = gLucarioPokedexText,
+        .pokemonScale = 282,
+        .pokemonOffset = 4,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_VANILLITE] =
+    {
+        .categoryName = _("FRESH SNOW"),
+        .height = 4,
+        .weight = 57,
+        .description = gVanillitePokedexText,
+        .pokemonScale = 491,
+        .pokemonOffset = 12,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_VANILLISH] =
+    {
+        .categoryName = _("ICY SNOW"),
+        .height = 11,
+        .weight = 410,
+        .description = gVanillishPokedexText,
+        .pokemonScale = 320,
+        .pokemonOffset = 7,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_VANILLUXE] =
+    {
+        .categoryName = _("SNOWSTORM"),
+        .height = 13,
+        .weight = 575,
+        .description = gVanilluxePokedexText,
+        .pokemonScale = 272,
+        .pokemonOffset = 3,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_JOLTIK] =
+    {
+        .categoryName = _("ATTACHING"),
+        .height = 1,
+        .weight = 6,
+        .description = gJoltikPokedexText,
+        .pokemonScale = 682,
+        .pokemonOffset = 24,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_GALVANTULA] =
+    {
+        .categoryName = _("ELE-SPIDER"),
+        .height = 8,
+        .weight = 143,
+        .description = gGalvantulaPokedexText,
+        .pokemonScale = 366,
+        .pokemonOffset = 10,
+        .trainerScale = 257,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_LITWICK] =
+    {
+        .categoryName = _("CANDLE"),
+        .height = 3,
+        .weight = 31,
+        .description = gLitwickPokedexText,
+        .pokemonScale = 530,
+        .pokemonOffset = 13,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_LAMPENT] =
+    {
+        .categoryName = _("LAMP"),
+        .height = 6,
+        .weight = 130,
+        .description = gLampentPokedexText,
+        .pokemonScale = 422,
+        .pokemonOffset = 12,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_CHANDELURE] =
+    {
+        .categoryName = _("LURING"),
+        .height = 10,
+        .weight = 343,
+        .description = gChandelurePokedexText,
+        .pokemonScale = 305,
+        .pokemonOffset = 7,
+        .trainerScale = 257,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_LARVESTA] =
+    {
+        .categoryName = _("TORCH"),
+        .height = 11,
+        .weight = 288,
+        .description = gLarvestaPokedexText,
+        .pokemonScale = 320,
+        .pokemonOffset = 10,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_VOLCARONA] =
+    {
+        .categoryName = _("SUN"),
+        .height = 16,
+        .weight = 460,
+        .description = gVolcaronaPokedexText,
+        .pokemonScale = 259,
+        .pokemonOffset = 1,
+        .trainerScale = 296,
+        .trainerOffset = 1,
+    },
+
+    [NATIONAL_DEX_GOOMY] =
+    {
+        .categoryName = _("SOFT TISSUE"),
+        .height = 3,
+        .weight = 28,
+        .description = gGoomyPokedexText,
+        .pokemonScale = 530,
+        .pokemonOffset = 13,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_SLIGGOO] =
+    {
+        .categoryName = _("SOFT TISSUE"),
+        .height = 8,
+        .weight = 175,
+        .description = gSliggooPokedexText,
+        .pokemonScale = 366,
+        .pokemonOffset = 7,
+        .trainerScale = 257,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_GOODRA] =
+    {
+        .categoryName = _("DRAGON"),
+        .height = 20,
+        .weight = 1505,
+        .description = gGoodraPokedexText,
+        .pokemonScale = 261,
+        .pokemonOffset = 1,
+        .trainerScale = 334,
+        .trainerOffset = 4,
+    },
+
+    [NATIONAL_DEX_SLIGGOO_HISUI] =
+    {
+        .categoryName = _("SNAIL"),
+        .height = 7,
+        .weight = 685,
+        .description = gSliggooHisuiPokedexText,
+        .pokemonScale = 366,
+        .pokemonOffset = 7,
+        .trainerScale = 257,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_GOODRA_HISUI] =
+    {
+        .categoryName = _("BUNKER"),
+        .height = 17,
+        .weight = 3341,
+        .description = gGoodraHisuiPokedexText,
+        .pokemonScale = 261,
+        .pokemonOffset = 1,
+        .trainerScale = 334,
+        .trainerOffset = 4,
+    },
+
+    [NATIONAL_DEX_SNOM] =
+    {
+        .categoryName = _("WORM"),
+        .height = 3,
+        .weight = 38,
+        .description = gSnomPokedexText,
+        .pokemonScale = 530,
+        .pokemonOffset = 13,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_FROSMOTH] =
+    {
+        .categoryName = _("FROST MOTH"),
+        .height = 13,
+        .weight = 420,
+        .description = gFrosmothPokedexText,
+        .pokemonScale = 272,
+        .pokemonOffset = 3,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_SIRFETCHD] =
+    {
+        .categoryName = _("WILD DUCK"),
+        .height = 8,
+        .weight = 1170,
+        .description = gSirfetchdPokedexText,
+        .pokemonScale = 366,
+        .pokemonOffset = 7,
+        .trainerScale = 257,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_ANNIHILAPE] =
+    {
+        .categoryName = _("RAGE MONKEY"),
+        .height = 12,
+        .weight = 560,
+        .description = gAnnihilapePokedexText,
+        .pokemonScale = 356,
+        .pokemonOffset = 17,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_KLEAVOR] =
+    {
+        .categoryName = _("AXE"),
+        .height = 18,
+        .weight = 890,
+        .description = gKleavorPokedexText,
+        .pokemonScale = 267,
+        .pokemonOffset = 2,
+        .trainerScale = 286,
+        .trainerOffset = 1,
+    },
+
+    [NATIONAL_DEX_FARIGIRAF] =
+    {
+        .categoryName = _("LONG NECK"),
+        .height = 32,
+        .weight = 1600,
+        .description = gFarigirafPokedexText,
+        .pokemonScale = 356,
+        .pokemonOffset = 17,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_DUDUNSPARCE] =
+    {
+        .categoryName = _("LAND SNAKE"),
+        .height = 36,
+        .weight = 392,
+        .description = gDudunsparcePokedexText,
+        .pokemonScale = 356,
+        .pokemonOffset = 17,
+        .trainerScale = 256,
+        .trainerOffset = 0,
+    },
+
+    [NATIONAL_DEX_OVERQWIL] =
+    {
+        .categoryName = _("PIN CLUSTER"),
+        .height = 25,
+        .weight = 605,
+        .description = gOverqwilPokedexText,
+        .pokemonScale = 257,
+        .pokemonOffset = 10,
+        .trainerScale = 423,
+        .trainerOffset = 8,
+    },
+
+    [NATIONAL_DEX_URSALUNA] =
+    {
+        .categoryName = _("PEAT"),
+        .height = 24,
+        .weight = 2900,
+        .description = gUrsalunaPokedexText,
+        .pokemonScale = 256,
+        .pokemonOffset = 3,
+        .trainerScale = 369,
+        .trainerOffset = 7,
+    },
+
+    [NATIONAL_DEX_WYRDEER] =
+    {
+        .categoryName = _("BIG HORN"),
+        .height = 18,
+        .weight = 951,
+        .description = gWyrdeerPokedexText,
+        .pokemonScale = 267,
+        .pokemonOffset = 2,
+        .trainerScale = 286,
+        .trainerOffset = 1,
+    },
 };

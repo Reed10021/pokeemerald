@@ -8,6 +8,7 @@
 #include "event_object_lock.h"
 #include "event_object_movement.h"
 #include "field_player_avatar.h"
+#include "field_move_items.h"
 #include "field_screen_effect.h"
 #include "field_special_scene.h"
 #include "field_weather.h"
@@ -357,7 +358,8 @@ static void Task_ExitDoor(u8 taskId)
         }
         break;
     case 4:
-        ScriptContext2_Disable();
+        if (!TryStartQueuedAutoFlash())
+            ScriptContext2_Disable();
         DestroyTask(taskId);
         break;
     }
@@ -395,7 +397,8 @@ static void Task_ExitNonAnimDoor(u8 taskId)
         }
         break;
     case 3:
-        ScriptContext2_Disable();
+        if (!TryStartQueuedAutoFlash())
+            ScriptContext2_Disable();
         DestroyTask(taskId);
         break;
     }
@@ -414,7 +417,8 @@ static void Task_ExitNonDoor(u8 taskId)
         if (WaitForWeatherFadeIn() && !gSysPcFromPokenav)
         {
             UnfreezeObjectEvents();
-            ScriptContext2_Disable();
+            if (!TryStartQueuedAutoFlash())
+                ScriptContext2_Disable();
             DestroyTask(taskId);
         }
         break;

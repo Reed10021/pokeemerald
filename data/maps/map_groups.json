@@ -436,7 +436,10 @@
     "TimelessForest",
     "ScorchedSlab_B1F",
     "ScorchedSlab_B2F",
-    "ArtisanCave_B2F"
+    "ArtisanCave_B2F",
+    "Underwater_VictoryRoad",
+    "Underwater_RuinedChamber",
+    "RuinedChamber"
   ],
   "gMapGroup25": [
     "SecretBase_RedCave1",

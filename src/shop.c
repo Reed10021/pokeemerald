@@ -44,8 +44,8 @@
 
 EWRAM_DATA struct MartInfo gMartInfo = {0};
 EWRAM_DATA struct ShopData *gShopDataPtr = NULL;
-EWRAM_DATA struct ListMenuItem *gUnknown_02039F74 = NULL;
-EWRAM_DATA u8 (*gUnknown_02039F78)[16] = {0};
+EWRAM_DATA struct ListMenuItem *sListMenuItems = NULL;
+EWRAM_DATA u8 (*sItemNames)[ITEM_NAME_LENGTH + 2] = {0};
 EWRAM_DATA u8 gMartPurchaseHistoryId = 0;
 EWRAM_DATA struct ItemSlot gMartPurchaseHistory[3] = {0};
 
@@ -154,7 +154,8 @@ static const struct ListMenuTemplate sShopBuyMenuListTemplate =
     .itemVerticalPadding = 0,
     .scrollMultiple = LIST_NO_MULTIPLE_SCROLL,
     .fontId = 7,
-    .cursorKind = 0
+    .cursorKind = 0,
+    .textNarrowWidth = 84
 };
 
 static const struct BgTemplate sShopBuyMenuBgTemplates[] =
@@ -510,8 +511,8 @@ static void CB2_InitBuyMenu(void)
 static void BuyMenuFreeMemory(void)
 {
     FREE_AND_SET_NULL(gShopDataPtr);
-    FREE_AND_SET_NULL(gUnknown_02039F74);
-    FREE_AND_SET_NULL(gUnknown_02039F78);
+    FREE_AND_SET_NULL(sListMenuItems);
+    FREE_AND_SET_NULL(sItemNames);
     FreeAllWindowBuffers();
 }
 
@@ -519,24 +520,24 @@ static bool32 BuyMenuBuildListMenuTemplate(void)
 {
     u32 i;
 
-    gUnknown_02039F74 = Alloc((gMartInfo.itemCount + 1) * sizeof(*gUnknown_02039F74));
-    gUnknown_02039F78 = Alloc((gMartInfo.itemCount + 1) * sizeof(*gUnknown_02039F78));
-    if (gUnknown_02039F74 == NULL || gUnknown_02039F78 == NULL)
+    sListMenuItems = Alloc((gMartInfo.itemCount + 1) * sizeof(*sListMenuItems));
+    sItemNames = Alloc((gMartInfo.itemCount + 1) * sizeof(*sItemNames));
+    if (sListMenuItems == NULL || sItemNames == NULL)
     {
-        FREE_AND_SET_NULL(gUnknown_02039F74);
-        FREE_AND_SET_NULL(gUnknown_02039F78);
+        FREE_AND_SET_NULL(sListMenuItems);
+        FREE_AND_SET_NULL(sItemNames);
         return FALSE;
     }
 
     for (i = 0; i < gMartInfo.itemCount; i++)
-        BuyMenuSetListEntry(&gUnknown_02039F74[i], gMartInfo.itemList[i], gUnknown_02039F78[i]);
+        BuyMenuSetListEntry(&sListMenuItems[i], gMartInfo.itemList[i], sItemNames[i]);
 
-    StringCopy(gUnknown_02039F78[i], gText_Cancel2);
-    gUnknown_02039F74[i].name = gUnknown_02039F78[i];
-    gUnknown_02039F74[i].id = -2;
+    StringCopy(sItemNames[i], gText_Cancel2);
+    sListMenuItems[i].name = sItemNames[i];
+    sListMenuItems[i].id = -2;
 
     gMultiuseListMenuTemplate = sShopBuyMenuListTemplate;
-    gMultiuseListMenuTemplate.items = gUnknown_02039F74;
+    gMultiuseListMenuTemplate.items = sListMenuItems;
     gMultiuseListMenuTemplate.totalItems = gMartInfo.itemCount + 1;
     if (gMultiuseListMenuTemplate.totalItems > 8)
         gMultiuseListMenuTemplate.maxShowed = 8;
@@ -615,7 +616,7 @@ static void BuyMenuPrintPriceInList(u8 windowId, s32 item, u8 y)
                 gStringVar1,
                 ItemId_GetPrice(item) >> (GetPriceReduction(POKENEWS_SLATEPORT) || GetPriceReduction(POKENEWS_LILYCOVE)),
                 STR_CONV_MODE_LEFT_ALIGN,
-                5);
+                7);
         }
         else
         {
@@ -623,7 +624,7 @@ static void BuyMenuPrintPriceInList(u8 windowId, s32 item, u8 y)
                 gStringVar1,
                 gDecorations[item].price,
                 STR_CONV_MODE_LEFT_ALIGN,
-                5);
+                7);
         }
 
         //StringExpandPlaceholders(gStringVar4, gText_PokedollarVar1);
@@ -1020,7 +1021,7 @@ static void Task_BuyMenu(u8 taskId)
                     {
                         //StringCopy(gStringVar2, gMoveNames[ItemIdToBattleMoveId(itemId)]);
                         //BuyMenuDisplayMessage(taskId, gText_Var1CertainlyHowMany2, Task_BuyHowManyDialogueInit);
-                        ConvertIntToDecimalStringN(gStringVar2, gShopDataPtr->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
+                        ConvertIntToDecimalStringN(gStringVar2, gShopDataPtr->totalCost, STR_CONV_MODE_LEFT_ALIGN, 7);
                         StringExpandPlaceholders(gStringVar4, gText_YouWantedVar1ThatllBeVar2);
                         tItemCount = 1;
                         gShopDataPtr->totalCost = (ItemId_GetPrice(tItemId) >> (GetPriceReduction(POKENEWS_SLATEPORT) || GetPriceReduction(POKENEWS_LILYCOVE))) * tItemCount;
@@ -1034,7 +1035,7 @@ static void Task_BuyMenu(u8 taskId)
                 else
                 {
                     StringCopy(gStringVar1, gDecorations[itemId].name);
-                    ConvertIntToDecimalStringN(gStringVar2, gShopDataPtr->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
+                    ConvertIntToDecimalStringN(gStringVar2, gShopDataPtr->totalCost, STR_CONV_MODE_LEFT_ALIGN, 7);
 
                     if (gMartInfo.martType == MART_TYPE_DECOR)
                         StringExpandPlaceholders(gStringVar4, gText_Var1IsItThatllBeVar2);
@@ -1099,7 +1100,7 @@ static void Task_BuyHowManyDialogueHandleInput(u8 taskId)
             PutWindowTilemap(1);
             CopyItemName(tItemId, gStringVar1);
             ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, BAG_ITEM_CAPACITY_DIGITS);
-            ConvertIntToDecimalStringN(gStringVar3, gShopDataPtr->totalCost, STR_CONV_MODE_LEFT_ALIGN, 6);
+            ConvertIntToDecimalStringN(gStringVar3, gShopDataPtr->totalCost, STR_CONV_MODE_LEFT_ALIGN, 7);
             BuyMenuDisplayMessage(taskId, gText_Var1AndYouWantedVar2, BuyMenuConfirmPurchase);
         }
         else if (JOY_NEW(B_BUTTON))

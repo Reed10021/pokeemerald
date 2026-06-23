@@ -31,6 +31,7 @@ struct FacilityMon
     u8 itemTableId;
     u8 evSpread;
     u8 nature;
+    u8 ability;
 };
 
 extern const u8 gTowerMaleFacilityClasses[30];
@@ -81,6 +82,7 @@ u8 GetFrontierEnemyMonLevel(u8 lvlMode);
 s32 GetHighestLevelInPlayerParty(void);
 u16 FacilityClassToGraphicsId(u8 facilityClass);
 bool32 ValidateBattleTowerRecord(u8 recordId); // unused
+void CreateMonWithEVSpreadNatureOTIDAbility(struct Pokemon *mon, u16 species, u8 level, u8 nature, u8 fixedIV, u8 evSpread, u8 frontierAbility, u32 otId);
 void sub_8166188(void);
 
 #endif //GUARD_BATTLE_TOWER_H

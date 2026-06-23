@@ -47,7 +47,7 @@ struct Decoration
     u8 permission;
     u8 shape;
     u8 category;
-    u16 price;
+    u32 price;
     const u8 *description;
     const u16 *tiles;
 };

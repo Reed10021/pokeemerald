@@ -93,11 +93,14 @@ struct BoxPokemon
     u8 isBadEgg:1;
     u8 hasSpecies:1;
     u8 isEgg:1;
-    u8 unused:5;
+    u8 blockBoxRS:1; // Unused, but Pokemon Box Ruby & Sapphire will refuse to deposit a Pokemon with this flag set
+    u8 hasHiddenAbility:1;
+    u8 unused:3;
     u8 otName[PLAYER_NAME_LENGTH];
     u8 markings;
     u16 checksum;
-    u16 unknown;
+    u16 hyperTrainingFlags:6; // Low bits of the old "unknown" variable.
+    u16 unknown:10;
 
     union
     {
@@ -151,12 +154,12 @@ struct BattlePokemon
     /*0x16*/ u32 spAttackIV:5;
     /*0x17*/ u32 spDefenseIV:5;
     /*0x17*/ u32 isEgg:1;
-    /*0x17*/ u32 abilityNum:1;
+    /*0x17*/ u32 unused:1;
     /*0x18*/ s8 statStages[NUM_BATTLE_STATS];
     /*0x20*/ u8 ability;
     /*0x21*/ u8 type1;
     /*0x22*/ u8 type2;
-    /*0x23*/ u8 unknown;
+    /*0x23*/ u8 abilityNum;
     /*0x24*/ u8 pp[MAX_MON_MOVES];
     /*0x28*/ u16 hp;
     /*0x2A*/ u8 level;
@@ -184,24 +187,24 @@ struct BaseStats
  /* 0x06 */ u8 type1;
  /* 0x07 */ u8 type2;
  /* 0x08 */ u8 catchRate;
- /* 0x09 */ u8 expYield;
- /* 0x0A */ u16 evYield_HP:2;
- /* 0x0A */ u16 evYield_Attack:2;
- /* 0x0A */ u16 evYield_Defense:2;
- /* 0x0A */ u16 evYield_Speed:2;
- /* 0x0B */ u16 evYield_SpAttack:2;
- /* 0x0B */ u16 evYield_SpDefense:2;
- /* 0x0C */ u16 item1;
- /* 0x0E */ u16 item2;
- /* 0x10 */ u8 genderRatio;
- /* 0x11 */ u8 eggCycles;
- /* 0x12 */ u8 friendship;
- /* 0x13 */ u8 growthRate;
- /* 0x14 */ u8 eggGroup1;
- /* 0x15 */ u8 eggGroup2;
- /* 0x16 */ u8 abilities[2];
- /* 0x18 */ u8 safariZoneFleeRate;
- /* 0x19 */ u8 bodyColor : 7;
+ /* 0x09 */ u16 expYield;
+ /* 0x0B */ u16 evYield_HP:2;
+ /* 0x0B */ u16 evYield_Attack:2;
+ /* 0x0B */ u16 evYield_Defense:2;
+ /* 0x0B */ u16 evYield_Speed:2;
+ /* 0x0C */ u16 evYield_SpAttack:2;
+ /* 0x0C */ u16 evYield_SpDefense:2;
+ /* 0x0D */ u16 item1;
+ /* 0x0F */ u16 item2;
+ /* 0x11 */ u8 genderRatio;
+ /* 0x12 */ u8 eggCycles;
+ /* 0x13 */ u8 friendship;
+ /* 0x14 */ u8 growthRate;
+ /* 0x15 */ u8 eggGroup1;
+ /* 0x16 */ u8 eggGroup2;
+ /* 0x17 */ u8 abilities[NUM_ABILITY_SLOTS];
+ /* 0x1A */ u8 safariZoneFleeRate;
+ /* 0x20 */ u8 bodyColor : 7;
             u8 noFlip : 1;
 };
 
@@ -210,12 +213,15 @@ struct BattleMove
     u8 effect;
     u8 power;
     u8 type;
+    u8 category;
     u8 accuracy;
     u8 pp;
     u8 secondaryEffectChance;
     u8 target;
     s8 priority;
     u8 flags;
+    bool8 punchingMove;
+    bool8 sharpnessMove;
 };
 
 struct SpindaSpot
@@ -224,10 +230,10 @@ struct SpindaSpot
     u16 image[16];
 };
 
-struct __attribute__((packed)) LevelUpMove
+struct LevelUpMove
 {
-    u16 move:9;
-    u16 level:7;
+    u16 move;
+    u16 level;
 };
 
 struct Evolution
@@ -250,7 +256,7 @@ extern const struct BaseStats gBaseStats[];
 extern const u8 *const gItemEffectTable[];
 extern const struct Evolution gEvolutionTable[][EVOS_PER_MON];
 extern const u32 gExperienceTables[][MAX_LEVEL + 1];
-extern const u16 *const gLevelUpLearnsets[];
+extern const struct LevelUpMove *const gLevelUpLearnsets[];
 extern const u8 gPPUpGetMask[];
 extern const u8 gPPUpSetMask[];
 extern const u8 gPPUpAddMask[];
@@ -284,6 +290,10 @@ u16 GetUnionRoomTrainerClass(void);
 void CreateObedientEnemyMon(void);
 void CreateObedientFatefulEncounterEnemyMon(void);
 void CalculateMonStats(struct Pokemon *mon);
+u16 GetMonHyperTrainingFlags(struct Pokemon *mon);
+bool8 IsMonStatHyperTrained(struct Pokemon *mon, u8 statId);
+u8 GetMonRawIV(struct Pokemon *mon, u8 statId);
+u8 GetMonEffectiveIV(struct Pokemon *mon, u8 statId);
 void BoxMonToMon(const struct BoxPokemon *src, struct Pokemon *dest);
 u8 GetLevelFromMonExp(struct Pokemon *mon);
 u8 GetLevelFromBoxMonExp(struct BoxPokemon *boxMon);
@@ -297,6 +307,7 @@ u16 MonTryLearningNewMove(struct Pokemon *mon, bool8 firstMove);
 void DeleteFirstMoveAndGiveMoveToMon(struct Pokemon *mon, u16 move);
 void DeleteFirstMoveAndGiveMoveToBoxMon(struct BoxPokemon *boxMon, u16 move);
 s32 CalculateBaseDamage(struct BattlePokemon *attacker, struct BattlePokemon *defender, u32 move, u16 sideStatus, u16 powerOverride, u8 typeOverride, u8 bankAtk, u8 bankDef);
+bool32 ShouldApplyAnalyticBoost(u8 battlerIdAtk);
 u16 GetPreEvolution(u16 species);
 
 u8 CountAliveMonsInBattle(u8 caseId);
@@ -322,6 +333,7 @@ u32 GetBoxMonData();
 u16 CalculateBoxMonChecksum(struct BoxPokemon* boxMon);
 void EncryptBoxMon(struct BoxPokemon* boxMon);
 void DecryptBoxMon(struct BoxPokemon* boxMon);
+bool32 RepackBoxMonToPersonality(struct BoxPokemon *boxMon, u32 newPersonality);
 
 void SetMonData(struct Pokemon *mon, s32 field, const void *dataArg);
 void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg);
@@ -333,7 +345,10 @@ u8 CalculateEnemyPartyCount(void);
 u8 GetMonsStateToDoubles(void);
 u8 GetMonsStateToDoubles_2(void);
 u8 GetAbilityBySpecies(u16 species, u8 abilityNum);
+u8 GetAbilityNumBySpeciesAndPersonality(u16 species, u32 personality);
+u8 GetHiddenPowerType(u8 hpIV, u8 atkIV, u8 defIV, u8 speedIV, u8 spAtkIV, u8 spDefIV);
 u8 GetMonAbility(struct Pokemon *mon);
+void TrySetMonHiddenAbility(struct Pokemon *mon);
 void CreateSecretBaseEnemyParty(struct SecretBase *secretBaseRecord);
 u8 GetSecretBaseTrainerPicIndex(void);
 u8 GetSecretBaseTrainerClass(void);

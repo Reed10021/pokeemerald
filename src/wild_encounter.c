@@ -378,10 +378,12 @@ static void CreateWildMon(u16 species, u8 level)
             gender = MON_FEMALE;
 
         CreateMonWithGenderNatureLetter(&gEnemyParty[0], species, level, 32, gender, PickWildMonNature(), 0);
+        TrySetMonHiddenAbility(&gEnemyParty[0]);
         return;
     }
 
     CreateMonWithNature(&gEnemyParty[0], species, level, 32, PickWildMonNature());
+    TrySetMonHiddenAbility(&gEnemyParty[0]);
 }
 
 enum

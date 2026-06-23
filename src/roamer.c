@@ -90,16 +90,27 @@ static void CreateInitialRoamerMon(u16 pokemonSelector)
         case 7:
             (&gSaveBlock1Ptr->roamer)->species = SPECIES_SUICUNE;
             break;
+        // Fix any old special cases
+        case SPECIES_LATIAS:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIAS;
+            VarSet(VAR_ROAMER_POKEMON, 0);
+            break;
+        case SPECIES_LATIOS:
+            (&gSaveBlock1Ptr->roamer)->species = SPECIES_LATIOS;
+            VarSet(VAR_ROAMER_POKEMON, 1);
+                break;
     }
     (&gSaveBlock1Ptr->roamer)->active = TRUE;
 
     GetSetPokedexFlag(SpeciesToNationalPokedexNum((&gSaveBlock1Ptr->roamer)->species), FLAG_SET_SEEN);
 
     CreateMon(&gEnemyParty[0], (&gSaveBlock1Ptr->roamer)->species, 50, 0x20, 0, 0, OT_ID_PLAYER_ID, 0);
+    TrySetMonHiddenAbility(&gEnemyParty[0]);
     (&gSaveBlock1Ptr->roamer)->level = 50;
     (&gSaveBlock1Ptr->roamer)->status = 0;
     (&gSaveBlock1Ptr->roamer)->ivs = GetMonData(&gEnemyParty[0], MON_DATA_IVS);
     (&gSaveBlock1Ptr->roamer)->personality = GetMonData(&gEnemyParty[0], MON_DATA_PERSONALITY);
+    (&gSaveBlock1Ptr->roamer)->hiddenAbility = GetMonData(&gEnemyParty[0], MON_DATA_HAS_HIDDEN_ABILITY);
     (&gSaveBlock1Ptr->roamer)->hp = GetMonData(&gEnemyParty[0], MON_DATA_MAX_HP);
     (&gSaveBlock1Ptr->roamer)->cool = GetMonData(&gEnemyParty[0], MON_DATA_COOL);
     (&gSaveBlock1Ptr->roamer)->beauty = GetMonData(&gEnemyParty[0], MON_DATA_BEAUTY);
@@ -137,6 +148,15 @@ bool16 CheckShinyRoamer(void)
         gSpecialVar_Result = shinyValue < SHINY_ODDS;
         return shinyValue < SHINY_ODDS;
     }
+}
+
+//GetSpeciesFromRoamer without altering gSpecialVar_Result.
+u16 GetRoamingSpecies(void)
+{
+    if (!(&gSaveBlock1Ptr->roamer)->active)
+        return SPECIES_NONE;
+    else
+        return (&gSaveBlock1Ptr->roamer)->species;
 }
 
 u16 GetSpeciesFromRoamer(void)
@@ -258,6 +278,7 @@ void CreateRoamerMonInstance(void)
     SetMonData(mon, MON_DATA_CUTE, &gSaveBlock1Ptr->roamer.cute);
     SetMonData(mon, MON_DATA_SMART, &gSaveBlock1Ptr->roamer.smart);
     SetMonData(mon, MON_DATA_TOUGH, &gSaveBlock1Ptr->roamer.tough);
+    SetMonData(mon, MON_DATA_HAS_HIDDEN_ABILITY, &roamer->hiddenAbility);
 
     if(roamer->species == SPECIES_LATIAS || roamer->species == SPECIES_LATIOS)
         SetMonData(mon, MON_DATA_HELD_ITEM, &soulDew);

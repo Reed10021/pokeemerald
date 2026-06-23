@@ -64,6 +64,8 @@ BattleFrontier_Mart_Pokemart: @ 8267AE4
 	.2byte ITEM_SERIOUS_MINT
 	.2byte ITEM_TIMID_MINT
 	.2byte ITEM_ABILITY_CAPSULE
+	.2byte ITEM_ABILITY_PATCH
+	.2byte ITEM_BOTTLE_CAP
 	.2byte ITEM_NONE
 	release
 	end

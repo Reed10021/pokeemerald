@@ -23,6 +23,13 @@
 #define TYPE_DARK             17
 #define NUMBER_OF_MON_TYPES   18
 
+// Move damage categories
+#define DAMAGE_CATEGORY_TYPE      0
+#define DAMAGE_CATEGORY_PHYSICAL  1
+#define DAMAGE_CATEGORY_SPECIAL   2
+#define DAMAGE_CATEGORY_VARIABLE  3
+#define DAMAGE_CATEGORY_STATUS    4
+
 // Pokemon egg groups
 #define EGG_GROUP_NONE          0
 #define EGG_GROUP_MONSTER       1
@@ -84,14 +91,13 @@
 #define NUM_NATURE_STATS NUM_STATS - 1 // excludes HP
 #define NUM_BATTLE_STATS NUM_STATS + 2 // includes Accuracy and Evasion
 
+#define MAX_STAT_IV       31
 #define MIN_STAT_STAGE     0
 #define DEFAULT_STAT_STAGE 6
 #define MAX_STAT_STAGE    12
 
 // Shiny odds
 #define SHINY_ODDS 8 // Actual probability is SHINY_ODDS/65536
-//Normal Odds: 8
-//Edited Odds: 3500
 
 // Flags for Get(Box)MonData / Set(Box)MonData
 #define MON_DATA_PERSONALITY        0
@@ -104,7 +110,8 @@
 #define MON_DATA_OT_NAME            7
 #define MON_DATA_MARKINGS           8
 #define MON_DATA_CHECKSUM           9
-#define MON_DATA_ENCRYPT_SEPARATOR 10
+#define MON_DATA_HYPER_TRAINING_FLAGS 10
+#define MON_DATA_ENCRYPT_SEPARATOR    MON_DATA_HYPER_TRAINING_FLAGS
 #define MON_DATA_SPECIES           11
 #define MON_DATA_HELD_ITEM         12
 #define MON_DATA_MOVE1             13
@@ -183,6 +190,18 @@
 #define MON_DATA_SPEED2            86
 #define MON_DATA_SPATK2            87
 #define MON_DATA_SPDEF2            88
+#define MON_DATA_HAS_HIDDEN_ABILITY 89
+
+#define MON_HYPER_TRAINED_HP       (1 << STAT_HP)
+#define MON_HYPER_TRAINED_ATK      (1 << STAT_ATK)
+#define MON_HYPER_TRAINED_DEF      (1 << STAT_DEF)
+#define MON_HYPER_TRAINED_SPEED    (1 << STAT_SPEED)
+#define MON_HYPER_TRAINED_SPATK    (1 << STAT_SPATK)
+#define MON_HYPER_TRAINED_SPDEF    (1 << STAT_SPDEF)
+#define MON_HYPER_TRAINED_ALL      ((1 << NUM_STATS) - 1)
+
+#define NUM_ABILITY_SLOTS          3
+#define ABILITY_NUM_HIDDEN         2
 
 #define MIN_LEVEL 1
 #define MAX_LEVEL 100
@@ -202,12 +221,12 @@
 #define MON_ALREADY_KNOWS_MOVE  0xFFFE
 #define MON_HAS_MAX_MOVES       0xFFFF
 
-#define LEVEL_UP_MOVE_ID   0x01FF
-#define LEVEL_UP_MOVE_LV   0xFE00
-#define LEVEL_UP_END       0xFFFF
+#define LEVEL_UP_MOVE_END       0xFFFF
 
-#define MAX_LEVEL_UP_MOVES       30
+#define MAX_LEVEL_UP_MOVES       50
 #define MAX_LEVEL_DIFF_PRE_EV    5
+
+// EGG_MOVES_ARRAY_COUNT
 
 #define MON_MALE       0x00
 #define MON_FEMALE     0xFE
@@ -279,16 +298,20 @@
 #define EVO_TRADE            0x0005 // Pokémon is traded
 #define EVO_TRADE_ITEM       0x0006 // Pokémon is traded while it's holding the specified item
 #define EVO_ITEM             0x0007 // specified item is used on Pokémon
-#define EVO_LEVEL_ATK_GT_DEF 0x0008 // Pokémon reaches the specified level with attack > defense
-#define EVO_LEVEL_ATK_EQ_DEF 0x0009 // Pokémon reaches the specified level with attack = defense
-#define EVO_LEVEL_ATK_LT_DEF 0x000a // Pokémon reaches the specified level with attack < defense
-#define EVO_LEVEL_SILCOON    0x000b // Pokémon reaches the specified level with a Silcoon personality value
-#define EVO_LEVEL_CASCOON    0x000c // Pokémon reaches the specified level with a Cascoon personality value
-#define EVO_LEVEL_NINJASK    0x000d // Pokémon reaches the specified level (special value for Ninjask)
-#define EVO_LEVEL_SHEDINJA   0x000e // Pokémon reaches the specified level (special value for Shedinja)
-#define EVO_BEAUTY           0x000f // Pokémon levels up with beauty ≥ specified value
+#define EVO_ITEM_MALE        0x0008 // specified item is used on a male Pokémon
+#define EVO_ITEM_FEMALE      0x0009 // specified item is used on a female Pokémon
+#define EVO_LEVEL_ATK_GT_DEF 0x000a // Pokémon reaches the specified level with attack > defense
+#define EVO_LEVEL_ATK_EQ_DEF 0x000b // Pokémon reaches the specified level with attack = defense
+#define EVO_LEVEL_ATK_LT_DEF 0x000c // Pokémon reaches the specified level with attack < defense
+#define EVO_LEVEL_SILCOON    0x000d // Pokémon reaches the specified level with a Silcoon personality value
+#define EVO_LEVEL_CASCOON    0x000e // Pokémon reaches the specified level with a Cascoon personality value
+#define EVO_LEVEL_NINJASK    0x000f // Pokémon reaches the specified level (special value for Ninjask)
+#define EVO_LEVEL_SHEDINJA   0x0010 // Pokémon reaches the specified level (special value for Shedinja)
+#define EVO_BEAUTY           0x0011 // Pokémon levels up with beauty ≥ specified value
+#define EVO_IF_IN_MAP        0x0012 // Pokémon levels up while the player is on the specified map
+#define EVO_LEVEL_RAIN       0x0013 // Pokémon levels up while the map weather is rain.
 
-#define EVOS_PER_MON 5
+#define EVOS_PER_MON 9
 
 #define NUM_MALE_LINK_FACILITY_CLASSES   8
 #define NUM_FEMALE_LINK_FACILITY_CLASSES 8

@@ -349,7 +349,6 @@ gSpecials:: @ 81DBA64
 	def_special MonOTNameNotPlayer
 	def_special BufferLottoTicketNumber
 	def_special TryHideBattleTowerReporter
-	def_special DoesPartyHaveEnigmaBerry
 	def_special GenerateContestRand
 	def_special SetChampionSaveWarp
 	def_special TryPutTreasureInvestigatorsOnAir
@@ -548,3 +547,4 @@ gSpecials:: @ 81DBA64
 	def_special PickLotteryCornerTicketSecondChance
 	def_special GetWeatherInstituteShards
 	def_special ResetEvs
+	def_special GetPartyRegigigas

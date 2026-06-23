@@ -100,9 +100,9 @@ MeteorFalls_StevensCave_Text_StevenDefeat: @ 823B32D
 	.string "I had no idea you'd become so strong…$"
 
 MeteorFalls_StevensCave_Text_LetMeGiveYouSomething:
-	.string "STEVEN: Phew…that was a great battle,\n"
+	.string "STEVEN: Phew…that was a great battle\n"
 	.string "{PLAYER}{KUN}.\p"
-	.string "You and your POKéMON performed\l"
+	.string "You and your POKéMON performed\n"
 	.string "admirably. To celebrate your victory,\l"
 	.string "you can have this ticket.$"
 

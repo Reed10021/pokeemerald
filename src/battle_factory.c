@@ -162,24 +162,24 @@ static const u8 sFixedIVTable[][2] =
 static const u16 sInitialRentalMonRanges[][2] =
 {
     // Level 50
-    {FRONTIER_MON_GRIMER,     FRONTIER_MON_FURRET_1},   // 110 - 199
-    {FRONTIER_MON_DELCATTY_1, FRONTIER_MON_CLOYSTER_1}, // 162 - 266
-    {FRONTIER_MON_DELCATTY_2, FRONTIER_MON_CLOYSTER_2}, // 267 - 371
-    {FRONTIER_MON_DUGTRIO_1,  FRONTIER_MON_SLAKING_1},  // 372 - 467
-    {FRONTIER_MON_DUGTRIO_2,  FRONTIER_MON_SLAKING_2},  // 468 - 563
-    {FRONTIER_MON_DUGTRIO_3,  FRONTIER_MON_SLAKING_3},  // 564 - 659
-    {FRONTIER_MON_DUGTRIO_4,  FRONTIER_MON_SLAKING_4},  // 660 - 755
-    {FRONTIER_MON_DUGTRIO_1,  FRONTIER_MONS_HIGH_TIER}, // 372 - 849
+    {FRONTIER_MON_GRIMER,     FRONTIER_MON_FURRET_1},      // 110 - 206
+    {FRONTIER_MON_DELCATTY_1, FRONTIER_MON_CLOYSTER_1},    // 169 - 278
+    {FRONTIER_MON_DELCATTY_2, FRONTIER_MON_PROBOPASS_1},   // 279 - 392
+    {FRONTIER_MON_DUGTRIO_1,  FRONTIER_MON_LEAFEON_1},     // 395 - 505
+    {FRONTIER_MON_DUGTRIO_2,  FRONTIER_MON_HONCHKROW_1},   // 506 - 611
+    {FRONTIER_MON_DUGTRIO_3,  FRONTIER_MON_GOODRA_HISUI_1},// 612 - 723
+    {FRONTIER_MON_DUGTRIO_4,  FRONTIER_MON_GOODRA_HISUI_2},// 724 - 844
+    {FRONTIER_MON_DUGTRIO_1,  FRONTIER_MONS_HIGH_TIER},    // 395 - 968
 
     // Open level
-    {FRONTIER_MON_DUGTRIO_1, FRONTIER_MON_SLAKING_1}, // 372 - 467
-    {FRONTIER_MON_DUGTRIO_2, FRONTIER_MON_SLAKING_2}, // 468 - 563
-    {FRONTIER_MON_DUGTRIO_3, FRONTIER_MON_SLAKING_3}, // 564 - 659
-    {FRONTIER_MON_DUGTRIO_4, FRONTIER_MON_SLAKING_4}, // 660 - 755
-    {FRONTIER_MON_DUGTRIO_1, NUM_FRONTIER_MONS - 1},  // 372 - 881
-    {FRONTIER_MON_DUGTRIO_1, NUM_FRONTIER_MONS - 1},  // 372 - 881
-    {FRONTIER_MON_DUGTRIO_1, NUM_FRONTIER_MONS - 1},  // 372 - 881
-    {FRONTIER_MON_DUGTRIO_1, NUM_FRONTIER_MONS - 1},  // 372 - 881
+    {FRONTIER_MON_DUGTRIO_1, FRONTIER_MON_LEAFEON_1},      // 395 - 505
+    {FRONTIER_MON_DUGTRIO_2, FRONTIER_MON_HONCHKROW_1},    // 506 - 611
+    {FRONTIER_MON_DUGTRIO_3, FRONTIER_MON_GOODRA_HISUI_1}, // 612 - 723
+    {FRONTIER_MON_DUGTRIO_4, FRONTIER_MON_GOODRA_HISUI_2}, // 724 - 844
+    {FRONTIER_MON_DUGTRIO_1, NUM_FRONTIER_MONS - 1},       // 395 - 1029
+    {FRONTIER_MON_DUGTRIO_1, NUM_FRONTIER_MONS - 1},       // 395 - 1029
+    {FRONTIER_MON_DUGTRIO_1, NUM_FRONTIER_MONS - 1},       // 395 - 1029
+    {FRONTIER_MON_DUGTRIO_1, NUM_FRONTIER_MONS - 1},       // 395 - 1029
 };
 
 // code
@@ -760,13 +760,14 @@ void FillFactoryBrainParty(void)
 
         species[i] = gFacilityTrainerMons[monId].species;
         heldItems[i] = gBattleFrontierHeldItems[gFacilityTrainerMons[monId].itemTableId];
-        CreateMonWithEVSpreadNatureOTID(&gEnemyParty[i],
-                                             gFacilityTrainerMons[monId].species,
-                                             monLevel,
-                                             gFacilityTrainerMons[monId].nature,
-                                             fixedIV,
-                                             gFacilityTrainerMons[monId].evSpread,
-                                             otId);
+        CreateMonWithEVSpreadNatureOTIDAbility(&gEnemyParty[i],
+                                               gFacilityTrainerMons[monId].species,
+                                               monLevel,
+                                               gFacilityTrainerMons[monId].nature,
+                                               fixedIV,
+                                               gFacilityTrainerMons[monId].evSpread,
+                                               gFacilityTrainerMons[monId].ability,
+                                               otId);
 
         friendship = 0;
         for (k = 0; k < MAX_MON_MOVES; k++)

@@ -73,7 +73,7 @@ extern u8 gLocalLinkPlayerId;
 extern u8 gFieldLinkPlayerCount;
 extern bool8 gSysPcFromPokenav;
 extern u8 gTimeOfDay;
-extern u8 gTimeUpdateCounter;
+extern s16 gTimeUpdateCounter;
 extern struct TimeBlendSettings currentTimeBlend;
 
 // Exported ROM declarations

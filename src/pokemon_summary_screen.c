@@ -2,6 +2,7 @@
 #include "main.h"
 #include "battle.h"
 #include "battle_anim.h"
+#include "battle_util.h"
 #include "frontier_util.h"
 #include "battle_message.h"
 #include "battle_tent.h"
@@ -276,6 +277,8 @@ static void PrintMoveNameAndPP(u8 a);
 static void PrintContestMoves(u8 taskId);
 static void Task_PrintContestMoves(u8 taskId);
 static void PrintContestMoveDescription(u8 a);
+static bool8 IsSummaryScreenInBattle(void);
+static u8 GetCurrentMonBattlePartyId(void);
 static void PrintMoveDetails(u16 a);
 static void PrintNewMoveDetailsOrCancelText(void);
 static void AddAndFillMoveNamesWindow(void);
@@ -305,6 +308,7 @@ static void DestroyMoveSelectorSprites(u8 firstArrayId);
 static void SetMainMoveSelectorColor(u8 whichColor);
 static void KeepMoveSelectorVisible(u8 firstSpriteId);
 static void BufferStat(u8 *dst, s8 natureMod, u32 stat, u32 strId, u32 n);
+static void BufferHyperTrainedIVStat(u8 *dst, u8 statId, u32 stat, u32 strId, u32 n);
 static void BufferIvOrEvStats(u8 mode);
 
 // const rom data
@@ -1154,9 +1158,28 @@ static const struct SpriteTemplate sSpriteTemplate_StatusCondition =
 };
 static const u16 sSummaryMarkingsPalette[] = INCBIN_U16("graphics/interface/summary_markings.gbapal");
 
-static void PrintTextOnWindow(u8 windowId, const u8* string, u8 x, u8 y, u8 lineSpacing, u8 colorId)
+static void PrintTextOnWindowWithFont(u8 windowId, const u8 *string, u8 x, u8 y, u8 lineSpacing, u8 colorId, u32 fontId)
 {
-    AddTextPrinterParameterized4(windowId, 1, x, y, 0, lineSpacing, sTextColors[colorId], 0, string);
+    AddTextPrinterParameterized4(windowId, fontId, x, y, 0, lineSpacing, sTextColors[colorId], 0, string);
+}
+
+static void PrintTextOnWindow(u8 windowId, const u8 *string, u8 x, u8 y, u8 lineSpacing, u8 colorId)
+{
+    PrintTextOnWindowWithFont(windowId, string, x, y, lineSpacing, colorId, FONT_NORMAL);
+}
+
+static void PrintTextOnWindowToFit(u8 windowId, const u8 *string, u8 x, u8 y, u8 lineSpacing, u8 colorId)
+{
+    u32 width = GetWindowAttribute(windowId, WINDOW_WIDTH) * 8;
+    u32 fontId;
+
+    if (width > x)
+        width -= x;
+    else
+        width = 0;
+
+    fontId = GetFontIdToFit(string, FONT_NORMAL, 0, width);
+    PrintTextOnWindowWithFont(windowId, string, x, y, lineSpacing, colorId, fontId);
 }
 
 static u8 ShowSplitIcon(u32 split)
@@ -3496,6 +3519,8 @@ static void Task_PrintSkillsPage(u8 taskId)
 static void PrintHeldItemName(void)
 {
     const u8 *text;
+    u32 fontId;
+    u8 windowId;
     int x;
 
     if (sMonSummaryScreen->summary.item == ITEM_ENIGMA_BERRY
@@ -3514,8 +3539,10 @@ static void PrintHeldItemName(void)
         text = gStringVar1;
     }
 
-    x = GetStringCenterAlignXOffset(1, text, 72) + 6;
-    PrintTextOnWindow(AddWindowFromTemplateList(sPageSkillsTemplate, PSS_DATA_WINDOW_SKILLS_HELD_ITEM), text, x, 1, 0, 0);
+    windowId = AddWindowFromTemplateList(sPageSkillsTemplate, PSS_DATA_WINDOW_SKILLS_HELD_ITEM);
+    fontId = GetFontIdToFit(text, FONT_NORMAL, 0, GetWindowAttribute(windowId, WINDOW_WIDTH) * 8 - 8);
+    x = GetStringCenterAlignXOffset(fontId, text, 72) + 6;
+    PrintTextOnWindowWithFont(windowId, text, x, 1, 0, 0, fontId);
 }
 
 static void PrintRibbonCount(void)
@@ -3619,6 +3646,18 @@ static void BufferIvOrEvStats(u8 mode)
         PrintRightColumnStats();
         break;
     case 1:
+        BufferHyperTrainedIVStat(gStringVar1, STAT_HP, hp, 0, 7);
+        BufferHyperTrainedIVStat(gStringVar2, STAT_ATK, atk, 1, 7);
+        BufferHyperTrainedIVStat(gStringVar3, STAT_DEF, def, 2, 7);
+        DynamicPlaceholderTextUtil_ExpandPlaceholders(gStringVar4, sStatsLeftColumnLayoutIVEV);
+        PrintLeftColumnStats();
+
+        BufferHyperTrainedIVStat(gStringVar1, STAT_SPATK, spA, 0, 3);
+        BufferHyperTrainedIVStat(gStringVar2, STAT_SPDEF, spD, 1, 3);
+        BufferHyperTrainedIVStat(gStringVar3, STAT_SPEED, spe, 2, 3);
+        DynamicPlaceholderTextUtil_ExpandPlaceholders(gStringVar4, sStatsRightColumnLayout);
+        PrintRightColumnStats();
+        break;
     case 2:
         BufferStat(gStringVar1, 0, hp, 0, 7);
         BufferStat(gStringVar2, 0, atk, 1, 7);
@@ -3780,7 +3819,7 @@ static void PrintMoveNameAndPP(u8 moveIndex)
     if (move != 0)
     {
         pp = CalculatePPWithBonus(move, summary->ppBonuses, moveIndex);
-        PrintTextOnWindow(moveNameWindowId, gMoveNames[move], 0, moveIndex * 16 + 1, 0, 1);
+        PrintTextOnWindowToFit(moveNameWindowId, gMoveNames[move], 0, moveIndex * 16 + 1, 0, 1);
         ConvertIntToDecimalStringN(gStringVar1, summary->pp[moveIndex], STR_CONV_MODE_RIGHT_ALIGN, 2);
         ConvertIntToDecimalStringN(gStringVar2, pp, STR_CONV_MODE_RIGHT_ALIGN, 2);
         DynamicPlaceholderTextUtil_Reset();
@@ -3802,73 +3841,188 @@ static void PrintMoveNameAndPP(u8 moveIndex)
     PrintTextOnWindow(ppValueWindowId, text, x, moveIndex * 16 + 1, 0, ppState);
 }
 
+static u32 GetSummaryMoveWeather(void)
+{
+    struct PokeSummary *summary = &sMonSummaryScreen->summary;
+    u8 ability;
+
+    if (!gMain.inBattle)
+        return 0;
+
+    ability = GetAbilityBySpecies(summary->species, summary->abilityNum);
+    if (ability == ABILITY_MEGA_SOL)
+        return WEATHER_SUN_ANY;
+
+    if (summary->species == SPECIES_CASTFORM && (ability == ABILITY_FORECAST || ability == ABILITY_OVERCAST))
+    {
+        if (!WEATHER_HAS_EFFECT || !(gBattleWeather & WEATHER_ANY))
+            return 0;
+
+        if (ability == ABILITY_OVERCAST)
+        {
+            if (gBattleWeather & WEATHER_SUN_ANY)
+                return WEATHER_SANDSTORM_ANY;
+            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
+                return WEATHER_RAIN_ANY;
+            else if (gBattleWeather & WEATHER_HAIL_ANY)
+                return WEATHER_SUN_ANY;
+            else if (gBattleWeather & WEATHER_RAIN_ANY)
+                return WEATHER_HAIL_ANY;
+        }
+
+        return gBattleWeather;
+    }
+
+    if (WEATHER_HAS_EFFECT)
+        return gBattleWeather;
+
+    return 0;
+}
+
+static u32 GetSummaryCastformWeather(void)
+{
+    struct PokeSummary *summary = &sMonSummaryScreen->summary;
+    u8 ability = GetAbilityBySpecies(summary->species, summary->abilityNum);
+
+    if (summary->species != SPECIES_CASTFORM)
+        return 0;
+    if (ability != ABILITY_FORECAST && ability != ABILITY_OVERCAST)
+        return 0;
+
+    return GetSummaryMoveWeather();
+}
+
+static u8 GetWeatherTypeFromWeather(u32 moveWeather)
+{
+    if (moveWeather & WEATHER_RAIN_ANY)
+        return TYPE_WATER;
+    else if (moveWeather & WEATHER_SANDSTORM_ANY)
+        return TYPE_ROCK;
+    else if (moveWeather & WEATHER_SUN_ANY)
+        return TYPE_FIRE;
+    else if (moveWeather & WEATHER_HAIL_ANY)
+        return TYPE_ICE;
+
+    return TYPE_NORMAL;
+}
+
+static u8 GetCastformFormFromWeather(u32 moveWeather)
+{
+    if (moveWeather & WEATHER_SUN_ANY)
+        return 1;
+    else if (moveWeather & WEATHER_RAIN_ANY)
+        return 2;
+    else if (moveWeather & WEATHER_HAIL_ANY)
+        return 3;
+    else if (moveWeather & WEATHER_SANDSTORM_ANY)
+        return 4;
+
+    return 0;
+}
+
+static u8 GetSummaryMoveType(u16 move)
+{
+    struct PokeSummary *summary = &sMonSummaryScreen->summary;
+    struct Pokemon *mon = &sMonSummaryScreen->currentMon;
+    u8 type;
+
+    if (move == MOVE_HIDDEN_POWER)
+    {
+        type = GetHiddenPowerType(GetMonData(mon, MON_DATA_HP_IV),
+                                  GetMonData(mon, MON_DATA_ATK_IV),
+                                  GetMonData(mon, MON_DATA_DEF_IV),
+                                  GetMonData(mon, MON_DATA_SPEED_IV),
+                                  GetMonData(mon, MON_DATA_SPATK_IV),
+                                  GetMonData(mon, MON_DATA_SPDEF_IV));
+    }
+    else if (move == MOVE_WEATHER_BALL)
+    {
+        type = GetWeatherTypeFromWeather(GetSummaryMoveWeather());
+    }
+    else
+    {
+        type = gBattleMoves[move].type;
+    }
+
+    if (type == TYPE_NORMAL
+        && gBattleMoves[move].type == TYPE_NORMAL
+        && GetAbilityBySpecies(summary->species, summary->abilityNum) == ABILITY_DRAGONIZE)
+    {
+        type = TYPE_DRAGON;
+    }
+
+    return type;
+}
+
 static void PrintMovePowerAndAccuracy(u16 moveIndex)
 {
     const u8 *text;
-    u8 monFriendship = GetMonData(&gPlayerParty[sMonSummaryScreen->curMonIndex], MON_DATA_FRIENDSHIP);
+    bool8 hasDisplayablePower;
+    u8 battlePartyId;
+    u8 monFriendship = GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_FRIENDSHIP);
+    u8 moveType = GetSummaryMoveType(moveIndex);
+    u32 moveWeather = GetSummaryMoveWeather();
+    u16 power = gBattleMoves[moveIndex].power;
 
     if (moveIndex != 0)
     {
         FillWindowPixelRect(PSS_LABEL_WINDOW_MOVES_POWER_ACC, PIXEL_FILL(0), 53, 0, 19, 32);
 
-        if (moveIndex == MOVE_HIDDEN_POWER) {
-            ConvertIntToDecimalStringN(gStringVar1, 80, STR_CONV_MODE_RIGHT_ALIGN, 3);
-            text = gStringVar1;
-        } else if (moveIndex == MOVE_RETURN) {
-            ConvertIntToDecimalStringN(gStringVar1, (10 * monFriendship / 25), STR_CONV_MODE_RIGHT_ALIGN, 3);
-            text = gStringVar1;
-        } else if (moveIndex == MOVE_FRUSTRATION) {
-            ConvertIntToDecimalStringN(gStringVar1, (10 * (MAX_FRIENDSHIP - monFriendship) / 25), STR_CONV_MODE_RIGHT_ALIGN, 3);
-            text = gStringVar1;
-        } else if (moveIndex == MOVE_WEATHER_BALL) {
-            u8 power = gBattleMoves[moveIndex].power;
-            if (gMain.inBattle)
-            {
-                if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_ANY))
-                {
-                    power *= 2;
-                }
-            }
+        if (moveIndex == MOVE_HIDDEN_POWER)
+            power = 80;
+        else if (moveIndex == MOVE_RETURN)
+            power = (10 * monFriendship) / 25;
+        else if (moveIndex == MOVE_FRUSTRATION)
+            power = (10 * (MAX_FRIENDSHIP - monFriendship)) / 25;
+        else if (moveIndex == MOVE_WEATHER_BALL && moveWeather & WEATHER_ANY)
+            power *= 2;
+        else if (moveIndex == MOVE_RAGE_FIST
+              && IsSummaryScreenInBattle()
+              && (battlePartyId = GetCurrentMonBattlePartyId()) < PARTY_SIZE)
+            power += 50 * GetPartyRageFistCounter(B_SIDE_PLAYER, battlePartyId);
+
+        if (GetAbilityBySpecies(sMonSummaryScreen->summary.species, sMonSummaryScreen->summary.abilityNum) == ABILITY_DRAGONIZE
+            && IsMoveChangedByDragonize(moveIndex, moveType))
+        {
+            power = (120 * power) / 100;
+        }
+
+        hasDisplayablePower = gBattleMoves[moveIndex].power >= 2
+            || moveIndex == MOVE_HIDDEN_POWER
+            || moveIndex == MOVE_RETURN
+            || moveIndex == MOVE_FRUSTRATION
+            || moveIndex == MOVE_WEATHER_BALL;
+
+        if (hasDisplayablePower)
+        {
             ConvertIntToDecimalStringN(gStringVar1, power, STR_CONV_MODE_RIGHT_ALIGN, 3);
             text = gStringVar1;
-        } else {
-            if (gBattleMoves[moveIndex].power < 2)
-            {
-                text = gText_ThreeDashes;
-            }
-            else
-            {
-                ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[moveIndex].power, STR_CONV_MODE_RIGHT_ALIGN, 3);
-                text = gStringVar1;
-            }
+        }
+        else
+        {
+            text = gText_ThreeDashes;
         }
 
         PrintTextOnWindow(PSS_LABEL_WINDOW_MOVES_POWER_ACC, text, 53, 1, 0, 0);
 
-        if (gBattleMoves[moveIndex].accuracy == 0 ||
-            moveIndex == MOVE_ASSIST || moveIndex == MOVE_BLOCK || moveIndex == MOVE_CAMOUFLAGE || moveIndex == MOVE_CHARGE ||
-            moveIndex == MOVE_CONVERSION_2 || moveIndex == MOVE_FOLLOW_ME || moveIndex == MOVE_GRUDGE || moveIndex == MOVE_HELPING_HAND ||
-            moveIndex == MOVE_IMPRISON || moveIndex == MOVE_INGRAIN || moveIndex == MOVE_MAGIC_COAT || moveIndex == MOVE_MEAN_LOOK ||
-            moveIndex == MOVE_MEMENTO || moveIndex == MOVE_MIMIC || moveIndex == MOVE_MUD_SPORT || moveIndex == MOVE_NIGHTMARE ||
-            moveIndex == MOVE_PAIN_SPLIT || moveIndex == MOVE_RECYCLE || moveIndex == MOVE_REFRESH || moveIndex == MOVE_ROLE_PLAY ||
-            moveIndex == MOVE_SKILL_SWAP || moveIndex == MOVE_SLACK_OFF || moveIndex == MOVE_SNATCH || moveIndex == MOVE_SOFT_BOILED ||
-            moveIndex == MOVE_SPIDER_WEB || moveIndex == MOVE_TAIL_GLOW || moveIndex == MOVE_WATER_SPORT || moveIndex == MOVE_WISH || 
-            moveIndex == MOVE_YAWN || moveIndex == MOVE_NASTY_PLOT || moveIndex == MOVE_TRICK_ROOM)
+        if (gBattleMoves[moveIndex].accuracy == 0)
         {
             text = gText_ThreeDashes;
         }
         else
         {
             u8 accuracy = gBattleMoves[moveIndex].accuracy;
-            if (gMain.inBattle)
+            if (moveWeather & WEATHER_ANY)
             {
                 if (moveIndex == MOVE_THUNDER)
                 {
-                    if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_RAIN_ANY))
+                    if (moveWeather & WEATHER_RAIN_ANY)
                         accuracy = 100;
+                    else if (moveWeather & WEATHER_SUN_ANY)
+                        accuracy = 50;
                 }
                 else if (moveIndex == MOVE_BLIZZARD) {
-                    if (WEATHER_HAS_EFFECT && (gBattleWeather & WEATHER_HAIL_ANY))
+                    if (moveWeather & WEATHER_HAIL_ANY)
                         accuracy = 100;
                 }
             }
@@ -3948,13 +4102,52 @@ static void PrintContestMoveDescription(u8 moveSlot)
 
 u8 GetBattleMoveSplit(u16 move)
 {
-    if (gBattleMoves[move].power == 0 || gBattleMoves[move].type == TYPE_MYSTERY) {
+    if (gBattleMoves[move].category == DAMAGE_CATEGORY_STATUS)
+    {
         return 2; // status move
     }
-    else {
-        return IS_TYPE_SPECIAL(move, gBattleMoves[move].type); //IS_TYPE_SPECIAL
-        // If type is special, true, return 1. Else false, return 0.
+
+    return IsMoveTypeSpecial(move, gBattleMoves[move].type);
+    // If type is special, true, return 1. Else false, return 0.
+}
+
+static u8 GetCurrentMonMoveSplit(u16 move)
+{
+    u8 moveType = GetSummaryMoveType(move);
+
+    if (gBattleMoves[move].category == DAMAGE_CATEGORY_STATUS)
+        return 2;
+
+    if (gBattleMoves[move].category == DAMAGE_CATEGORY_VARIABLE)
+    {
+        if (GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK) > GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK))
+            return 0;
+        else
+            return 1;
     }
+
+    return IsMoveTypeSpecial(move, moveType);
+}
+
+static bool8 IsSummaryScreenInBattle(void)
+{
+    return gMain.inBattle
+        && !sMonSummaryScreen->isBoxMon
+        && sMonSummaryScreen->mode == PSS_MODE_LOCK_MOVES
+        && sMonSummaryScreen->monList.mons == gPlayerParty;
+}
+
+static u8 GetCurrentMonBattlePartyId(void)
+{
+    u32 battlePartyId;
+
+    for (battlePartyId = 0; battlePartyId < PARTY_SIZE; battlePartyId++)
+    {
+        if (GetPartyIdFromBattlePartyId(battlePartyId) == sMonSummaryScreen->curMonIndex)
+            return battlePartyId;
+    }
+
+    return PARTY_SIZE;
 }
 
 static void PrintMoveDetails(u16 move)
@@ -3965,22 +4158,7 @@ static void PrintMoveDetails(u16 move)
     {
         if (sMonSummaryScreen->currPageIndex == PSS_MODE_BOX)
         {
-            if (move == MOVE_HIDDEN_POWER)
-            {
-                u8 typeBits = ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_HP_IV) & 1) << 0)
-                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_ATK_IV) & 1) << 1)
-                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_DEF_IV) & 1) << 2)
-                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPEED_IV) & 1) << 3)
-                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPATK_IV) & 1) << 4)
-                    | ((GetMonData(&sMonSummaryScreen->currentMon, MON_DATA_SPDEF_IV) & 1) << 5);
-
-                u8 type = (15 * typeBits) / 63 + 1;
-                if (type >= TYPE_MYSTERY)
-                    type++;
-                ShowSplitIcon(IS_TYPE_SPECIAL(move, type));
-            }
-            else
-                ShowSplitIcon(GetBattleMoveSplit(move));
+            ShowSplitIcon(GetCurrentMonMoveSplit(move));
             PrintMovePowerAndAccuracy(move);
             PrintTextOnWindow(windowId, gMoveDescriptionPointers[move - 1], 6, 1, 0, 0);
         }
@@ -4012,9 +4190,9 @@ static void PrintNewMoveDetailsOrCancelText(void)
         u16 move = sMonSummaryScreen->newMove;
 
         if (sMonSummaryScreen->currPageIndex == PSS_PAGE_BATTLE_MOVES)
-            PrintTextOnWindow(windowId1, gMoveNames[move], 0, 65, 0, 6);
+            PrintTextOnWindowToFit(windowId1, gMoveNames[move], 0, 65, 0, 6);
         else
-            PrintTextOnWindow(windowId1, gMoveNames[move], 0, 65, 0, 5);
+            PrintTextOnWindowToFit(windowId1, gMoveNames[move], 0, 65, 0, 5);
 
         ConvertIntToDecimalStringN(gStringVar1, gBattleMoves[move].pp, STR_CONV_MODE_RIGHT_ALIGN, 2);
         DynamicPlaceholderTextUtil_Reset();
@@ -4078,7 +4256,7 @@ static void SetSpriteInvisibility(u8 spriteArrayId, bool8 invisible)
 
 static void HidePageSpecificSprites(void)
 {
-    // Keeps Pok�mon, caught ball and status sprites visible.
+    // Keeps Pokemon, caught ball and status sprites visible.
     u8 i;
 
     for (i = SPRITE_ARR_ID_TYPE; i < ARRAY_COUNT(sMonSummaryScreen->spriteIds); i++)
@@ -4140,23 +4318,9 @@ static void SetMonTypeIcons(void)
     else
     {
         u8 type1 = gBaseStats[summary->species].type1;
-        if (gMain.inBattle)
-        {
-            if (WEATHER_HAS_EFFECT && 
-                summary->species == SPECIES_CASTFORM && 
-                ((gBaseStats[summary->species].abilities[0] == ABILITY_FORECAST && summary->abilityNum == 0) ||
-                 (gBaseStats[summary->species].abilities[1] == ABILITY_FORECAST && summary->abilityNum == 1)))
-            {
-                if (gBattleWeather & WEATHER_RAIN_ANY)
-                    type1 = TYPE_WATER;
-                else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-                    type1 = TYPE_ROCK;
-                else if (gBattleWeather & WEATHER_SUN_ANY)
-                    type1 = TYPE_FIRE;
-                else if (gBattleWeather & WEATHER_HAIL_ANY)
-                    type1 = TYPE_ICE;
-            }
-        }
+        if (summary->species == SPECIES_CASTFORM)
+            type1 = GetWeatherTypeFromWeather(GetSummaryCastformWeather());
+
         SetTypeSpritePosAndPal(type1, 120, 48, SPRITE_ARR_ID_TYPE);
         if (gBaseStats[summary->species].type1 != gBaseStats[summary->species].type2)
         {
@@ -4174,42 +4338,10 @@ static void SetMoveTypeIcons(void)
 {
     u8 i;
     struct PokeSummary *summary = &sMonSummaryScreen->summary;
-    struct Pokemon* mon = &sMonSummaryScreen->currentMon;
-    u16 species = GetMonData(mon, MON_DATA_SPECIES);
     for (i = 0; i < MAX_MON_MOVES; i++)
     {
         if (summary->moves[i] != MOVE_NONE) {
-            if (summary->moves[i] == MOVE_HIDDEN_POWER) {
-                u8 typeBits = ((GetMonData(mon, MON_DATA_HP_IV) & 1) << 0)
-                    | ((GetMonData(mon, MON_DATA_ATK_IV) & 1) << 1)
-                    | ((GetMonData(mon, MON_DATA_DEF_IV) & 1) << 2)
-                    | ((GetMonData(mon, MON_DATA_SPEED_IV) & 1) << 3)
-                    | ((GetMonData(mon, MON_DATA_SPATK_IV) & 1) << 4)
-                    | ((GetMonData(mon, MON_DATA_SPDEF_IV) & 1) << 5);
-
-                u8 type = (15 * typeBits) / 63 + 1;
-                if (type >= TYPE_MYSTERY)
-                    type++;
-                SetTypeSpritePosAndPal(type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
-            } else if(summary->moves[i] == MOVE_WEATHER_BALL) {
-                u8 type = gBattleMoves[summary->moves[i]].type;
-                if (gMain.inBattle)
-                {
-                    if (WEATHER_HAS_EFFECT)
-                    {
-                        if (gBattleWeather & WEATHER_RAIN_ANY)
-                            type = TYPE_WATER;
-                        else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-                            type = TYPE_ROCK;
-                        else if (gBattleWeather & WEATHER_SUN_ANY)
-                            type = TYPE_FIRE;
-                        else if (gBattleWeather & WEATHER_HAIL_ANY)
-                            type = TYPE_ICE;
-                    }
-                }
-                SetTypeSpritePosAndPal(type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
-            } else
-                SetTypeSpritePosAndPal(gBattleMoves[summary->moves[i]].type, 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
+            SetTypeSpritePosAndPal(GetSummaryMoveType(summary->moves[i]), 85, 32 + (i * 16), i + SPRITE_ARR_ID_TYPE);
         }
         else
             SetSpriteInvisibility(i + SPRITE_ARR_ID_TYPE, TRUE);
@@ -4231,9 +4363,6 @@ static void SetContestMoveTypeIcons(void)
 
 static void SetNewMoveTypeIcon(void)
 {
-    struct Pokemon* mon = &sMonSummaryScreen->currentMon;
-    u16 species = GetMonData(mon, MON_DATA_SPECIES);
-
     if (sMonSummaryScreen->newMove == MOVE_NONE)
     {
         SetSpriteInvisibility(SPRITE_ARR_ID_TYPE + 4, TRUE);
@@ -4242,38 +4371,7 @@ static void SetNewMoveTypeIcon(void)
     {
         if (sMonSummaryScreen->currPageIndex == PSS_PAGE_BATTLE_MOVES)
         {
-            if (sMonSummaryScreen->newMove == MOVE_HIDDEN_POWER) {
-                u8 typeBits = ((GetMonData(mon, MON_DATA_HP_IV) & 1) << 0)
-                    | ((GetMonData(mon, MON_DATA_ATK_IV) & 1) << 1)
-                    | ((GetMonData(mon, MON_DATA_DEF_IV) & 1) << 2)
-                    | ((GetMonData(mon, MON_DATA_SPEED_IV) & 1) << 3)
-                    | ((GetMonData(mon, MON_DATA_SPATK_IV) & 1) << 4)
-                    | ((GetMonData(mon, MON_DATA_SPDEF_IV) & 1) << 5);
-
-                u8 type = (15 * typeBits) / 63 + 1;
-                if (type >= TYPE_MYSTERY)
-                    type++;
-                SetTypeSpritePosAndPal(type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
-            }
-            else if (sMonSummaryScreen->newMove == MOVE_WEATHER_BALL) {
-                u8 type = gBattleMoves[sMonSummaryScreen->newMove].type;
-                if (gMain.inBattle)
-                {
-                    if (WEATHER_HAS_EFFECT)
-                    {
-                        if (gBattleWeather & WEATHER_RAIN_ANY)
-                            type = TYPE_WATER;
-                        else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-                            type = TYPE_ROCK;
-                        else if (gBattleWeather & WEATHER_SUN_ANY)
-                            type = TYPE_FIRE;
-                        else if (gBattleWeather & WEATHER_HAIL_ANY)
-                            type = TYPE_ICE;
-                    }
-                }
-                SetTypeSpritePosAndPal(type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
-            } else
-                SetTypeSpritePosAndPal(gBattleMoves[sMonSummaryScreen->newMove].type, 85, 96, SPRITE_ARR_ID_TYPE + 4);
+            SetTypeSpritePosAndPal(GetSummaryMoveType(sMonSummaryScreen->newMove), 85, 96, SPRITE_ARR_ID_TYPE + 4);
         }
         else
             SetTypeSpritePosAndPal(NUMBER_OF_MON_TYPES + gContestMoves[sMonSummaryScreen->newMove].contestCategory, 85, 96, SPRITE_ARR_ID_TYPE + 4);
@@ -4339,36 +4437,14 @@ static u8 LoadMonGfxAndSprite(struct Pokemon *mon, s16 *state)
         pal = GetMonSpritePalStructFromOtIdPersonality(summary->species2, summary->OTID, summary->pid);
         if (gMain.inBattle)
         {
-            if (WEATHER_HAS_EFFECT &&
-                summary->species == SPECIES_CASTFORM &&
-                ((gBaseStats[summary->species].abilities[0] == ABILITY_FORECAST && summary->abilityNum == 0) ||
-                 (gBaseStats[summary->species].abilities[1] == ABILITY_FORECAST && summary->abilityNum == 1)))
+            u8 castformForm = GetCastformFormFromWeather(GetSummaryCastformWeather());
+
+            if (summary->species == SPECIES_CASTFORM && castformForm != 0)
             {
                 const void* lzPaletteData = GetMonSpritePalFromSpeciesAndPersonality(summary->species2, summary->OTID, summary->pid);
                 struct SpritePalette pal2 = { 0 };
                 LZDecompressWram(lzPaletteData, sMonSummaryScreen->castformPalette[0]);
-
-                if (gBattleWeather & WEATHER_RAIN_ANY)
-                {
-                    pal2.data = sMonSummaryScreen->castformPalette[2];
-                }
-                else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-                {
-                    pal2.data = sMonSummaryScreen->castformPalette[4];
-                }
-                else if (gBattleWeather & WEATHER_SUN_ANY)
-                {
-                    pal2.data = sMonSummaryScreen->castformPalette[1];
-                }
-                else if (gBattleWeather & WEATHER_HAIL_ANY)
-                {
-                    pal2.data = sMonSummaryScreen->castformPalette[3];
-                }
-                else
-                {
-                    pal2.data = sMonSummaryScreen->castformPalette[0];
-                }
-
+                pal2.data = sMonSummaryScreen->castformPalette[castformForm];
                 pal2.tag = pal->tag;
                 LoadDynamicSpritePalette(&pal2);
                 SetMultiuseSpriteTemplateToPokemon(pal->tag, 1);
@@ -4414,27 +4490,10 @@ static u8 CreateMonSprite(struct Pokemon *unused)
 
     if (gMain.inBattle)
     {
-        if (WEATHER_HAS_EFFECT && summary->species == SPECIES_CASTFORM &&
-            ((gBaseStats[summary->species].abilities[0] == ABILITY_FORECAST && summary->abilityNum == 0) ||
-             (gBaseStats[summary->species].abilities[1] == ABILITY_FORECAST && summary->abilityNum == 1)))
-        {
-            if (gBattleWeather & WEATHER_RAIN_ANY)
-            {
-                StartSpriteAnim(&gSprites[spriteId], 2);
-            }
-            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-            {
-                StartSpriteAnim(&gSprites[spriteId], 4);
-            }
-            else if (gBattleWeather & WEATHER_SUN_ANY)
-            {
-                StartSpriteAnim(&gSprites[spriteId], 1);
-            }
-            else if (gBattleWeather & WEATHER_HAIL_ANY)
-            {
-                StartSpriteAnim(&gSprites[spriteId], 3);
-            }
-        }
+        u8 castformForm = GetCastformFormFromWeather(GetSummaryCastformWeather());
+
+        if (summary->species == SPECIES_CASTFORM && castformForm != 0)
+            StartSpriteAnim(&gSprites[spriteId], castformForm);
     }
 
     return spriteId;
@@ -4645,5 +4704,29 @@ static void BufferStat(u8 *dst, s8 natureMod, u32 stat, u32 strId, u32 n)
         txtPtr = StringCopy(dst, sTextNatureDown);
 
     ConvertIntToDecimalStringN(txtPtr, stat, STR_CONV_MODE_RIGHT_ALIGN, n);
+    DynamicPlaceholderTextUtil_SetPlaceholderPtr(strId, dst);
+}
+
+static void BufferHyperTrainedIVStat(u8 *dst, u8 statId, u32 stat, u32 strId, u32 n)
+{
+    static const u8 sTextHyperTrained[] = _("{COLOR}{06}");
+    u8 *digitsStart;
+    u8 *txtPtr;
+
+    if (!IsMonStatHyperTrained(&sMonSummaryScreen->currentMon, statId))
+    {
+        BufferStat(dst, 0, stat, strId, n);
+        return;
+    }
+
+    digitsStart = StringCopy(dst, sTextHyperTrained);
+    ConvertIntToDecimalStringN(digitsStart, stat, STR_CONV_MODE_RIGHT_ALIGN, n);
+
+    for (txtPtr = digitsStart; *txtPtr == 0x77; txtPtr++) //ConvertIntToDecimalStringN uses CHAR_SPACER/0x77 as spaces.
+        ;
+
+    if (txtPtr > digitsStart)
+        txtPtr[-1] = CHAR_PLUS;
+
     DynamicPlaceholderTextUtil_SetPlaceholderPtr(strId, dst);
 }

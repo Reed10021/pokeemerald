@@ -32,6 +32,10 @@
 #define AI_TRICK_ROOM_OFF 0
 #define AI_TRICK_ROOM_ON 1
 
+// gravity state
+#define AI_GRAVITY_OFF 0
+#define AI_GRAVITY_ON 1
+
 // get_how_powerful_move_is
 #define MOVE_POWER_DISCOURAGED  0
 #define MOVE_NOT_MOST_POWERFUL  1

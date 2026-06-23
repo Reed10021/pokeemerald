@@ -192,8 +192,11 @@ static const u8 sMapName_SafariZoneNorth[] = _("SAFARI ZONE NORTH");
 static const u8 sMapName_SafariZoneNorthEast[] = _("SAFARI ZONE NE");
 static const u8 sMapName_SafariZoneSouthEast[] = _("SAFARI ZONE SE");
 
+static const u8 sMapName_ShoalIceCave[] = _("SHOAL ICE CAVE");
+
 static const u8 sMapName_PurityCave[] = _("PURITY CAVE");
 static const u8 sMapName_TimelessForest[] = _("TIMELESS FOREST");
+static const u8 sMapName_RuinedChamber[] = _("RUINED CHAMBER");
 
 static const u8 * const gBattlePyramid_MapHeaderStrings[] =
 {
@@ -357,12 +360,20 @@ static void ShowMapNamePopUpWindow(void)
                 mapDisplayHeaderSource = sMapName_SafariZoneSouthEast;
                 StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
                 break;
+            case LAYOUT_SHOAL_CAVE_LOW_TIDE_ICE_ROOM:
+                mapDisplayHeaderSource = sMapName_ShoalIceCave;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
             case LAYOUT_PURITY_CAVE:
                 mapDisplayHeaderSource = sMapName_PurityCave;
                 StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
                 break;
             case LAYOUT_TIMELESS_FOREST:
                 mapDisplayHeaderSource = sMapName_TimelessForest;
+                StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
+                break;
+            case LAYOUT_RUINED_CHAMBER:
+                mapDisplayHeaderSource = sMapName_RuinedChamber;
                 StringCopy(withoutPrefixPtr, mapDisplayHeaderSource);
                 break;
             default:

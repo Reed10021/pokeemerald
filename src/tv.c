@@ -547,7 +547,7 @@ static const struct {
     },
     {
         .species = SPECIES_LARVITAR,
-        .moves = {MOVE_SWORDS_DANCE, MOVE_EARTHQUAKE, MOVE_METEOR_MASH, MOVE_FURY_CUTTER},
+        .moves = {MOVE_SWORDS_DANCE, MOVE_EARTHQUAKE, MOVE_CLOSE_COMBAT, MOVE_FURY_CUTTER},
         .level = 23,
         .location = MAP_NUM(ROUTE113)
     },
@@ -615,13 +615,13 @@ static const struct {
     },
     {
         .species = SPECIES_TOTODILE,
-        .moves = {MOVE_DRAGON_DANCE, MOVE_WATERFALL, MOVE_METEOR_MASH, MOVE_THRASH},
+        .moves = {MOVE_DRAGON_DANCE, MOVE_WATERFALL, MOVE_CLOSE_COMBAT, MOVE_THRASH},
         .level = 5,
         .location = MAP_NUM(ROUTE101)
     },
     {
         .species = SPECIES_TOTODILE,
-        .moves = {MOVE_DRAGON_DANCE, MOVE_HYDRO_CANNON, MOVE_FURY_CUTTER, MOVE_METEOR_MASH},
+        .moves = {MOVE_DRAGON_DANCE, MOVE_AVALANCHE, MOVE_FURY_CUTTER, MOVE_OUTRAGE},
         .level = 25,
         .location = MAP_NUM(WATER_PATH)
     },
@@ -720,6 +720,54 @@ static const struct {
         .moves = {MOVE_PAY_DAY, MOVE_SHADOW_CLAW, MOVE_SWORDS_DANCE, MOVE_FLARE_BLITZ},
         .level = 19,
         .location = MAP_NUM(ROUTE117)
+    },
+    {
+        .species = SPECIES_LICKITUNG,
+        .moves = {MOVE_WIDE_GUARD, MOVE_EARTH_POWER, MOVE_SWORDS_DANCE, MOVE_NASTY_PLOT},
+        .level = 24,
+        .location = MAP_NUM(ROUTE119)
+    },
+    {
+        .species = SPECIES_MELTAN,
+        .moves = {MOVE_METEOR_MASH, MOVE_SHADOW_CLAW, MOVE_SWORDS_DANCE, MOVE_FLARE_BLITZ},
+        .level = 26,
+        .location = MAP_NUM(ROUTE121)
+    },
+    {
+        .species = SPECIES_RIOLU,
+        .moves = {MOVE_HELPING_HAND, MOVE_METEOR_MASH, MOVE_WIDE_GUARD, MOVE_FLARE_BLITZ},
+        .level = 29,
+        .location = MAP_NUM(ROUTE123)
+    },
+    {
+        .species = SPECIES_VANILLITE,
+        .moves = {MOVE_HELPING_HAND, MOVE_ENERGY_BALL, MOVE_DARK_PULSE, MOVE_FREEZE_DRY},
+        .level = 32,
+        .location = MAP_NUM(ROUTE124)
+    },
+    {
+        .species = SPECIES_JOLTIK,
+        .moves = {MOVE_DISCHARGE, MOVE_THUNDER, MOVE_BUG_BUZZ, MOVE_TAILWIND},
+        .level = 28,
+        .location = MAP_NUM(ROUTE119)
+    },
+    {
+        .species = SPECIES_GALVANTULA,
+        .moves = {MOVE_ELECTRO_BALL, MOVE_SIGNAL_BEAM, MOVE_WIDE_GUARD, MOVE_TAILWIND},
+        .level = 38,
+        .location = MAP_NUM(ROUTE120)
+    },
+    {
+        .species = SPECIES_LITWICK,
+        .moves = {MOVE_ENERGY_BALL, MOVE_TRICK_ROOM, MOVE_FLAME_CHARGE, MOVE_ACID_ARMOR},
+        .level = 6,
+        .location = MAP_NUM(ROUTE101)
+    },
+    {
+        .species = SPECIES_GOOMY,
+        .moves = {MOVE_THUNDERBOLT, MOVE_DRAGON_PULSE, MOVE_SLUDGE_WAVE, MOVE_LIFE_DEW},
+        .level = 8,
+        .location = MAP_NUM(WATER_PATH)
     }
 };
 
@@ -2239,13 +2287,7 @@ static void InterviewAfter_DummyShow4(void)
     show = &gSaveBlock1Ptr->tvShows[sCurTVShowSlot];
 }
 
-//#define outbreakPokemonSpecies2 ((u16*)gSaveBlock1Ptr->field_3598)[184] // 368 + 369 u16
-//#define outbreakLocationMapNum2 gSaveBlock1Ptr->field_3598[370] // u8
-//#define outbreakLocationMapGroup2 gSaveBlock1Ptr->field_3598[371] // u8
-//#define outbreakPokemonMoves2 ((u16*)gSaveBlock1Ptr->field_3598) // 372 + 373, 374 + 375, 376 + 377, 378 + 379 u16
-//#define outbreakPokemonLevel2 gSaveBlock1Ptr->field_3598[380] // u8
-//#define outbreakPokemonProbability2 gSaveBlock1Ptr->field_3598[381] // u8
-//#define outbreakDaysLeft2 ((u16*)gSaveBlock1Ptr->field_3598)[191] // 382 + 383 u16
+
 
 static void sub_80ED718(void)
 {
@@ -2258,18 +2300,8 @@ static void sub_80ED718(void)
     u16 oldOldOldOutbreak = VarGet(VAR_THREE_DAYS_AGO_OUTBREAK);
     TVShow *show;
 
-
-//    if (FlagGet(FLAG_SYS_GAME_CLEAR))
     {
-        //for (i = 0; i < LAST_TVSHOW_IDX; i ++)
-        //{
-        //    if (gSaveBlock1Ptr->tvShows[i].common.kind == TVSHOW_MASS_OUTBREAK)
-        //    {
-        //        return;
-        //    }
-        //}
-
-        // Don't overwrite existing outbreak. Probably what the above code was meant to do, but they botched it.
+        // Don't overwrite existing outbreak. Probably what the original code was meant to do, but they botched it.
         // The function of this is to not generate an outbreak if we've 1. already generated one, or 2. received an outbreak from record mixing.
         existingOutbreak = FindExistingOutbreak(gSaveBlock1Ptr->tvShows);
         // If we found an existing active outbreak show or if the saveblock outbreakSpecies is not SPECIES_NONE (active outbreak) don't create an outbreak.
@@ -2280,45 +2312,11 @@ static void sub_80ED718(void)
 
         if (gSaveBlock1Ptr->outbreakPokemonSpecies != SPECIES_NONE)
         {
-            //if (FlagGet(FLAG_SYS_GAME_CLEAR))
-            //{
-            //    if (outbreakPokemonSpecies2 != SPECIES_NONE)
-            //        return;
-            //}
-            //else
                 return;
         }
 
         // Old code to generate an outbreak with different chances depending on badge count.
         // It is now commented out to more closely match my FR/LG outbreaks (one always every day).
-
-        //for (i = FLAG_BADGE01_GET, nBadges = 0; i < FLAG_BADGE01_GET + NUM_BADGES; i++)
-        //{
-        //    if (FlagGet(i))
-        //    {
-        //        nBadges++;
-        //    }
-        //}
-
-        //switch (nBadges)
-        //{
-        //    case 0:
-        //    case 1:
-        //    case 2:
-        //    case 3:
-        //        if (rbernoulli(3, 20)) // FFFF * (firstnum) / (secondnum) >= Random()
-        //            return;
-        //        break;
-        //    default:
-        //    case 4:
-        //    case 5:
-        //    case 6:
-        //    case 7:
-        //    case 8:
-        //        // generate an outbreak every day.
-        //        break;
-        //}
-
         // We didn't return, so generate news.
         {
             sCurTVShowSlot = FindEmptyTVSlotWithinFirstFiveShowsOfArray(gSaveBlock1Ptr->tvShows);

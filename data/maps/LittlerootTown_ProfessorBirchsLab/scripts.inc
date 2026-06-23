@@ -359,7 +359,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_TakeYourTime:: @ 81FA061
 LittlerootTown_ProfessorBirchsLab_EventScript_GiveCyndaquil:: @ 81FA06C
 	bufferspeciesname 0, SPECIES_CYNDAQUIL
 	setvar VAR_TEMP_1, SPECIES_CYNDAQUIL
-	givemon SPECIES_CYNDAQUIL, 5, ITEM_NONE
+	givemon SPECIES_CYNDAQUIL, 5, ITEM_GOLD_BOTTLE_CAP
 	compare VAR_RESULT, 0
 	goto_if_eq LittlerootTown_ProfessorBirchsLab_EventScript_SendCyndaquilToParty
 	compare VAR_RESULT, 1
@@ -395,6 +395,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_CyndaquilTransferredToPC:: @ 81FA0
 	end
 
 LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedCyndaquil:: @ 81FA0FD
+	closemessage
 	hidemonpic
 	delay 45
 	playse SE_M_ROCK_THROW
@@ -409,6 +410,8 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedCyndaquil:: @ 81FA0FD
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
 	playse SE_PIN
 	applymovement LOCALID_BIRCH, Common_Movement_ExclamationMark
+	playse SE_PIN
+	applymovement LOCALID_RIVAL, Common_Movement_ExclamationMark
 	delay 20
 	msgbox LittlerootTown_ProfessorBirchsLab_Text_GrassyPatchWaiting, MSGBOX_DEFAULT
 	setvar VAR_DEX_UPGRADE_JOHTO_STARTER_STATE, 6
@@ -419,7 +422,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedCyndaquil:: @ 81FA0FD
 LittlerootTown_ProfessorBirchsLab_EventScript_GiveTotodile:: @ 81FA10D
 	bufferspeciesname 0, SPECIES_TOTODILE
 	setvar VAR_TEMP_1, SPECIES_TOTODILE
-	givemon SPECIES_TOTODILE, 5, ITEM_NONE
+	givemon SPECIES_TOTODILE, 5, ITEM_GOLD_BOTTLE_CAP
 	compare VAR_RESULT, 0
 	goto_if_eq LittlerootTown_ProfessorBirchsLab_EventScript_SendTotodileToParty
 	compare VAR_RESULT, 1
@@ -455,6 +458,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_TotodileTransferredToPC:: @ 81FA19
 	end
 
 LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedTotodile:: @ 81FA19E
+	closemessage
 	hidemonpic
 	delay 45
 	playse SE_DOOR
@@ -463,6 +467,8 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedTotodile:: @ 81FA19E
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
 	playse SE_PIN
 	applymovement LOCALID_BIRCH, Common_Movement_ExclamationMark
+	playse SE_PIN
+	applymovement LOCALID_RIVAL, Common_Movement_ExclamationMark
 	delay 20
 	playse SE_DOOR
 	waitse
@@ -476,7 +482,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedTotodile:: @ 81FA19E
 LittlerootTown_ProfessorBirchsLab_EventScript_GiveChikorita:: @ 81FA1AE
 	bufferspeciesname 0, SPECIES_CHIKORITA
 	setvar VAR_TEMP_1, SPECIES_CHIKORITA
-	givemon SPECIES_CHIKORITA, 5, ITEM_NONE
+	givemon SPECIES_CHIKORITA, 5, ITEM_GOLD_BOTTLE_CAP
 	compare VAR_RESULT, 0
 	goto_if_eq LittlerootTown_ProfessorBirchsLab_EventScript_SendChikoritaToParty
 	compare VAR_RESULT, 1
@@ -512,6 +518,7 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ChikoritaTransferredToPC:: @ 81FA2
 	end
 
 LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedChikorita:: @ 81FA23F
+	closemessage
 	hidemonpic
 	delay 45
 	playse SE_DOOR
@@ -520,6 +527,8 @@ LittlerootTown_ProfessorBirchsLab_EventScript_ReceivedChikorita:: @ 81FA23F
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_ExclamationMark
 	playse SE_PIN
 	applymovement LOCALID_BIRCH, Common_Movement_ExclamationMark
+	playse SE_PIN
+	applymovement LOCALID_RIVAL, Common_Movement_ExclamationMark
 	delay 20
 	playse SE_DOOR
 	waitse

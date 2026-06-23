@@ -26,6 +26,8 @@ static void AnimTask_ShakeTerrain(u8);
 static void AnimTask_ShakeBattlers(u8);
 static void SetBattlersXOffsetForShake(struct Task *);
 static void sub_81156D0(u8);
+static void SpriteCB_Geyser(struct Sprite* sprite);
+static void SpriteCB_GeyserTarget(struct Sprite* sprite);
 
 static const union AffineAnimCmd sAffineAnim_Bonemerang[] =
 {
@@ -136,6 +138,157 @@ const struct SpriteTemplate gDirtMoundSpriteTemplate =
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = AnimDigDirtMound,
 };
+
+const struct SpriteTemplate gSpinningVineSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_PUNISHMENT_BLADES,
+    .paletteTag = ANIM_TAG_LEAF,
+    .oam = &gOamData_AffineNormal_ObjNormal_32x32,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = sAffineAnims_SpinningBone,
+    .callback = AnimBoneHitProjectile,
+};
+
+// High Horsepower
+const struct SpriteTemplate gHighHorsepowerHorseshoeTemplate =
+{
+    .tileTag = ANIM_TAG_HORSESHOE_SIDE_FIST,
+    .paletteTag = ANIM_TAG_HORSESHOE_SIDE_FIST,
+    .oam = &gOamData_AffineDouble_ObjNormal_32x32,
+    .anims = gAnims_HandsAndFeet,
+    .images = NULL,
+    .affineAnims = gAffineAnims_MegaPunchKick,
+    .callback = AnimSpinningKickOrPunch
+};
+
+static const union AffineAnimCmd sSpriteAffineAnim_LargeHailRock[] =
+{
+    AFFINEANIMCMD_FRAME(256, 256, 0, 1), //Double sprite size
+    AFFINEANIMCMD_END,
+};
+static const union AffineAnimCmd* const sSpriteAffineAnimTable_LargeHailRock[] =
+{
+    sSpriteAffineAnim_LargeHailRock,
+};
+
+// Continental Crush
+const struct SpriteTemplate gContinentalCrushNeedleArmSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_ROCKS,
+    .paletteTag = ANIM_TAG_ROCKS,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAnims_FlyingRock,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimNeedleArmSpike
+};
+const struct SpriteTemplate gContinentalCrushBigRockStompSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_REALLY_BIG_ROCK,
+    .paletteTag = ANIM_TAG_REALLY_BIG_ROCK,
+    .oam = &gOamData_AffineDouble_ObjNormal_64x64,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = sSpriteAffineAnimTable_LargeHailRock,
+    .callback = SpriteCB_FallingObject
+};
+const struct SpriteTemplate gContinentalCrushFocusEnergySpriteTemplate =
+{
+    .tileTag = ANIM_TAG_FOCUS_ENERGY,
+    .paletteTag = ANIM_TAG_ROCKS,
+    .oam = &gOamData_AffineOff_ObjNormal_16x32,
+    .anims = gEndureEnergyAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimEndureEnergy
+};
+const struct SpriteTemplate gContinentalCrushGrowingRockSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_REALLY_BIG_ROCK,
+    .paletteTag = ANIM_TAG_REALLY_BIG_ROCK,
+    .oam = &gOamData_AffineNormal_ObjNormal_64x64,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gAffineAnims_GrowingElectricOrb,
+    .callback = AnimGrowingChargeOrb
+};
+const struct SpriteTemplate gContinentalCrushEruptionSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_ROCKS,
+    .paletteTag = ANIM_TAG_ROCKS,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimEruptionFallingRock
+};
+
+// Headlong Rush
+static const union AffineAnimCmd sSpriteAffineAnim_DrainPunchFist[] = {
+    AFFINEANIMCMD_FRAME(256, 256, 0, 1), //Double sprite size
+    AFFINEANIMCMD_FRAME(-32, -32, 0, 8),
+    AFFINEANIMCMD_END,
+};
+
+static const union AffineAnimCmd* const sSpriteAffineAnimTable_DrainPunchFist[] = {
+    sSpriteAffineAnim_DrainPunchFist,
+};
+const struct SpriteTemplate gSpriteTemplate_HeadlongRushImpact = {
+    .tileTag = ANIM_TAG_IMPACT,
+    .paletteTag = ANIM_TAG_IMPACT,
+    .oam = &gOamData_AffineDouble_ObjBlend_32x32,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = sSpriteAffineAnimTable_DrainPunchFist,
+    .callback = AnimHitSplatBasic
+};
+
+const struct SpriteTemplate gSpriteTemplate_MaxQuakeDirtGeyser = {
+    .tileTag = ANIM_TAG_MUD_SAND,
+    .paletteTag = ANIM_TAG_MUD_SAND,
+    .oam = &gOamData_AffineOff_ObjNormal_16x16,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimMudSportDirt
+};
+
+const struct SpriteTemplate gSpriteTemplate_MaxQuakeRockGeyser = {
+    .tileTag = ANIM_TAG_ROCKS,
+    .paletteTag = ANIM_TAG_ROCKS,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAnims_FlyingRock,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_Geyser
+};
+
+//Launches an object upwards like they were being shot from a geyser
+//arg 0: null
+//arg 1: initial x pixel offset
+//arg 2: initial y pixel offset
+static void SpriteCB_Geyser(struct Sprite* sprite)
+{
+    sprite->pos1.x = GetBattlerSpriteCoord(gBattleAnimAttacker, BATTLER_COORD_X_2) + gBattleAnimArgs[1];
+    sprite->pos1.y = GetBattlerSpriteCoord(gBattleAnimAttacker, BATTLER_COORD_Y_PIC_OFFSET) + gBattleAnimArgs[2];
+
+    sprite->data[0] = gBattleAnimArgs[1] > 0 ? 1 : -1;
+    sprite->callback = AnimMudSportDirtRising;
+}
+
+//Launches an object upwards like they were being shot from a geyser
+//arg 0: null
+//arg 1: initial x pixel offset
+//arg 2: initial y pixel offset
+static void SpriteCB_GeyserTarget(struct Sprite* sprite)
+{
+    sprite->pos1.x = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X_2) + gBattleAnimArgs[1];
+    sprite->pos1.y = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y_PIC_OFFSET) + gBattleAnimArgs[2];
+
+    sprite->data[0] = gBattleAnimArgs[1] > 0 ? 1 : -1;
+    sprite->callback = AnimMudSportDirtRising;
+}
 
 // Moves a bone projectile towards the target mon, which moves like
 // a boomerang. After hitting the target mon, it comes back to the user.

@@ -2,6 +2,7 @@
 #define GUARD_CONSTANTS_BATTLE_SCRIPT_COMMANDS_H
 
 // Battle Scripting and BattleCommunication addresses
+// The following correspond to the struct members of BattleScripting by adding their offset
 #define sPAINSPLIT_HP gBattleScripting
 #define sBIDE_DMG gBattleScripting + 4
 #define sMULTIHIT_STRING gBattleScripting + 8
@@ -22,16 +23,16 @@
 #define sBATTLE_STYLE gBattleScripting + 0x1D
 #define sLVLBOX_STATE gBattleScripting + 0x1E
 #define sLEARNMOVE_STATE gBattleScripting + 0x1F
-#define sFIELD_20 gBattleScripting + 0x20
+#define sPURSUIT_DOUBLES_ATTACKER gBattleScripting + 0x20
 #define sRESHOW_MAIN_STATE gBattleScripting + 0x21
 #define sRESHOW_HELPER_STATE gBattleScripting + 0x22
-#define sFIELD_23 gBattleScripting + 0x23
+#define sLVLUP_HP gBattleScripting + 0x23
 #define sWINDOWS_TYPE gBattleScripting + 0x24
 #define sMULTIPLAYER_ID gBattleScripting + 0x25
 #define sSPECIAL_TRAINER_BATTLE_TYPE gBattleScripting + 0x26
-
 #define sMON_CAUGHT                  (gBattleScripting + 0x27) // monCaught
 #define sEXP_ON_CATCH                (gBattleScripting + 0x28) // expOnCatch
+#define sSAVED_BATTLER gBattleScripting + 0x29
 
 #define cEFFECT_CHOOSER gBattleCommunication + 3
 #define cMULTISTRING_CHOOSER gBattleCommunication + 5
@@ -41,15 +42,19 @@
 #define BS_ATTACKER                 1
 #define BS_EFFECT_BATTLER           2
 #define BS_FAINTED                  3
-#define BS_BATTLER_0                7
 #define BS_ATTACKER_WITH_PARTNER    4 // for Cmd_updatestatusicon
+#define BS_FAINTED_LINK_MULTIPLE_1  5 // for openpartyscreen
+#define BS_FAINTED_LINK_MULTIPLE_2  6 // for openpartyscreen
+#define BS_BATTLER_0                7
 #define BS_ATTACKER_SIDE            8 // for Cmd_jumpifability
 #define BS_NOT_ATTACKER_SIDE        9 // for Cmd_jumpifability
 #define BS_SCRIPTING                10
 #define BS_PLAYER1                  11
 #define BS_OPPONENT1                12
-#define BS_PLAYER2                  13
+#define BS_PLAYER2                  13 // for Cmd_updatestatusicon
 #define BS_OPPONENT2                14
+#define BS_ABILITY_BATTLER          15
+#define BS_ATTACKER_PARTNER         16
 
 // Cmd_accuracycheck
 #define NO_ACC_CALC 0xFFFE
@@ -93,8 +98,10 @@
 #define DMG_CHANGE_SIGN            0
 #define DMG_RECOIL_FROM_MISS       1
 #define DMG_DOUBLED                2
+#define DMG_MULTIPLY_BY_CRIT       3
 
 // Cmd_jumpifcantswitch
+#define SWITCH_IGNORE_INGRAIN            0x40
 #define SWITCH_IGNORE_ESCAPE_PREVENTION   0x80
 
 // Cmd_statbuffchange
@@ -122,19 +129,21 @@
 #define MOVEEND_DEFROST                           1
 #define MOVEEND_SYNCHRONIZE_TARGET                2
 #define MOVEEND_ON_DAMAGE_ABILITIES               3
-#define MOVEEND_IMMUNITY_ABILITIES                4
-#define MOVEEND_SYNCHRONIZE_ATTACKER              5
-#define MOVEEND_CHOICE_MOVE                       6
-#define MOVEEND_CHANGED_ITEMS                     7
-#define MOVEEND_ATTACKER_INVISIBLE                8
-#define MOVEEND_ATTACKER_VISIBLE                  9
-#define MOVEEND_TARGET_VISIBLE                    10
-#define MOVEEND_ITEM_EFFECTS_ALL                  11
-#define MOVEEND_KINGSROCK_SHELLBELL               12
-#define MOVEEND_SUBSTITUTE                        13
-#define MOVEEND_UPDATE_LAST_MOVES                 14
-#define MOVEEND_MIRROR_MOVE                       15
-#define MOVEEND_NEXT_TARGET                       16
-#define MOVEEND_COUNT                             17
+#define MOVEEND_POISON_TOUCH                      4
+#define MOVEEND_IMMUNITY_ABILITIES                5
+#define MOVEEND_SYNCHRONIZE_ATTACKER              6
+#define MOVEEND_CHOICE_MOVE                       7
+#define MOVEEND_CHANGED_ITEMS                     8
+#define MOVEEND_ATTACKER_INVISIBLE                9
+#define MOVEEND_ATTACKER_VISIBLE                  10
+#define MOVEEND_TARGET_VISIBLE                    11
+#define MOVEEND_ITEM_EFFECTS_ALL                  12
+#define MOVEEND_KINGSROCK_SHELLBELL               13
+#define MOVEEND_SUBSTITUTE                        14
+#define MOVEEND_UPDATE_LAST_MOVES                 15
+#define MOVEEND_MIRROR_MOVE                       16
+#define MOVEEND_NEXT_TARGET                       17
+#define MOVEEND_BOUNCED_MOVE_RESUME               18
+#define MOVEEND_COUNT                             19
 
 #endif // GUARD_CONSTANTS_BATTLE_SCRIPT_COMMANDS_H

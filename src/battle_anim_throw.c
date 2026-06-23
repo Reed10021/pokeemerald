@@ -2516,16 +2516,27 @@ void AnimTask_SetAttackerTargetLeftPos(u8 taskId)
 
 void AnimTask_GetTrappedMoveAnimId(u8 taskId)
 {
-    if (gBattleSpritesDataPtr->animationData->animArg == MOVE_FIRE_SPIN)
+    switch (gBattleSpritesDataPtr->animationData->animArg)
+    {
+    case MOVE_FIRE_SPIN:
         gBattleAnimArgs[0] = TRAP_ANIM_FIRE_SPIN;
-    else if (gBattleSpritesDataPtr->animationData->animArg == MOVE_WHIRLPOOL)
+        break;
+    case MOVE_WHIRLPOOL:
         gBattleAnimArgs[0] = TRAP_ANIM_WHIRLPOOL;
-    else if (gBattleSpritesDataPtr->animationData->animArg == MOVE_CLAMP)
+        break;
+    case MOVE_CLAMP:
         gBattleAnimArgs[0] = TRAP_ANIM_CLAMP;
-    else if (gBattleSpritesDataPtr->animationData->animArg == MOVE_SAND_TOMB)
+        break;
+    case MOVE_SAND_TOMB:
         gBattleAnimArgs[0] = TRAP_ANIM_SAND_TOMB;
-    else
+        break;
+    case MOVE_THUNDER_CAGE:
+        gBattleAnimArgs[0] = TRAP_ANIM_THUNDER_CAGE;
+        break;
+    default:
         gBattleAnimArgs[0] = TRAP_ANIM_BIND;
+        break;
+    }
 
     DestroyAnimVisualTask(taskId);
 }

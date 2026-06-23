@@ -45,6 +45,70 @@ const u16 gUnknown_08597418 = RGB(31, 31, 31);
 const u8 gUnknown_0859741A[] = {REG_OFFSET_BG0CNT, REG_OFFSET_BG1CNT, REG_OFFSET_BG2CNT, REG_OFFSET_BG3CNT};
 const u8 gUnknown_0859741E[] = {REG_OFFSET_BG0CNT, REG_OFFSET_BG1CNT, REG_OFFSET_BG2CNT, REG_OFFSET_BG3CNT};
 
+static const union AffineAnimCmd sSquishTargetAffineAnimCmds[] =
+{
+    AFFINEANIMCMD_FRAME(0, 64, 0, 16), //Flatten
+    AFFINEANIMCMD_FRAME(0, 0, 0, 64),
+    AFFINEANIMCMD_FRAME(0, -64, 0, 16),
+    AFFINEANIMCMD_END,
+};
+
+static const union AffineAnimCmd sSquishTargetShortAffineAnimCmds[] =
+{
+    AFFINEANIMCMD_FRAME(0, 64, 0, 4), //Flatten
+    AFFINEANIMCMD_FRAME(0, 0, 0, 16),
+    AFFINEANIMCMD_FRAME(0, -64, 0, 4),
+    AFFINEANIMCMD_END,
+};
+
+static void AnimTask_WaitAffineAnim(u8 taskId)
+{
+    struct Task* task = &gTasks[taskId];
+
+    if (!RunAffineAnimFromTaskData(task))
+        DestroyAnimVisualTask(taskId);
+}
+
+void AnimTask_SquishTarget(u8 taskId)
+{
+    struct Task* task = &gTasks[taskId];
+    u8 spriteId = GetAnimBattlerSpriteId(ANIM_TARGET);
+
+    PrepareAffineAnimInTaskData(task, spriteId, sSquishTargetAffineAnimCmds);
+    task->func = AnimTask_WaitAffineAnim;
+}
+
+void AnimTask_SquishTargetShort(u8 taskId)
+{
+    struct Task* task = &gTasks[taskId];
+    u8 spriteId = GetAnimBattlerSpriteId(ANIM_TARGET);
+
+    PrepareAffineAnimInTaskData(task, spriteId, sSquishTargetShortAffineAnimCmds);
+    task->func = AnimTask_WaitAffineAnim;
+}
+
+//Creates purple flames that surround the target.
+//No args.
+void AnimTask_PurpleFlamesOnTarget(u8 taskId)
+{
+    struct Task *task = &gTasks[taskId];
+
+    task->data[0] = 0;
+    task->data[1] = 16;
+    task->data[9] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X_2);
+    task->data[10] = GetBattlerYCoordWithElevation(gBattleAnimTarget);
+    task->data[11] = (GetBattlerSpriteCoordAttr(gBattleAnimTarget, BATTLER_COORD_ATTR_WIDTH) / 2) + 8;
+    task->data[7] = 0;
+    task->data[5] = GetBattlerSpriteBGPriority(gBattleAnimTarget);
+    task->data[6] = GetBattlerSpriteSubpriority(gBattleAnimTarget) - 2;
+    task->data[3] = 0;
+    task->data[4] = 16;
+    SetGpuReg(REG_OFFSET_BLDCNT, (BLDCNT_EFFECT_BLEND | BLDCNT_TGT2_ALL));
+    SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(0, 0x10));
+    task->data[8] = 0;
+    task->func = AnimTask_GrudgeFlames_Step;
+}
+
 void AnimTask_BlendBattleAnimPal(u8 taskId)
 {
     u32 selectedPalettes = UnpackSelectedBattleAnimPalettes(gBattleAnimArgs[0]);
@@ -77,18 +141,18 @@ void AnimTask_BlendBattleAnimPalExclude(u8 taskId)
     case ANIM_TARGET:
         animBattlers[0] = gBattleAnimTarget;
         break;
-    case 4:
+    case ANIM_PLAYER_LEFT:
         animBattlers[0] = gBattleAnimAttacker;
         animBattlers[1] = gBattleAnimTarget;
         break;
-    case 5:
+    case ANIM_OPPONENT_LEFT:
         animBattlers[0] = 0xFF;
         break;
-    case 6:
+    case ANIM_PLAYER_RIGHT:
         selectedPalettes = 0;
         animBattlers[0] = BATTLE_PARTNER(gBattleAnimAttacker);
         break;
-    case 7:
+    case ANIM_OPPONENT_RIGHT:
         selectedPalettes = 0;
         animBattlers[0] = BATTLE_PARTNER(gBattleAnimTarget);
         break;
@@ -1068,4 +1132,10 @@ static void AnimTask_WaitAndRestoreVisibility(u8 taskId)
         gBattleSpritesDataPtr->battlerData[gBattleAnimAttacker].invisible = (u8)gTasks[taskId].data[0] & 1;
         DestroyTask(taskId);
     }
+}
+
+void AnimTask_SetAnimTargetToAttackerOpposite(u8 taskId)
+{
+    gBattleAnimTarget = BATTLE_OPPOSITE(gBattleAnimAttacker);
+    DestroyAnimVisualTask(taskId);
 }

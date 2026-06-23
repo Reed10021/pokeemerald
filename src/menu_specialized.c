@@ -206,7 +206,8 @@ static const struct ListMenuTemplate sMoveRelearnerMovesListTemplate =
     .itemVerticalPadding = 0,
     .scrollMultiple = LIST_NO_MULTIPLE_SCROLL,
     .fontId = 1,
-    .cursorKind = 0
+    .cursorKind = 0,
+    .textNarrowWidth = 68
 };
 
 bool8 sub_81D1C44(u8 count)
@@ -776,15 +777,7 @@ static void MoveRelearnerLoadBattleMoveDescription(u32 chosenMove)
     }
     AddTextPrinterParameterized(0, 1, str, 0x6A, 0x19, TEXT_SPEED_FF, NULL);
 
-    if (move->accuracy == 0 ||
-        chosenMove == MOVE_ASSIST || chosenMove == MOVE_BLOCK || chosenMove == MOVE_CAMOUFLAGE || chosenMove == MOVE_CHARGE ||
-        chosenMove == MOVE_CONVERSION_2 || chosenMove == MOVE_FOLLOW_ME || chosenMove == MOVE_GRUDGE || chosenMove == MOVE_HELPING_HAND ||
-        chosenMove == MOVE_IMPRISON || chosenMove == MOVE_INGRAIN || chosenMove == MOVE_MAGIC_COAT || chosenMove == MOVE_MEAN_LOOK ||
-        chosenMove == MOVE_MEMENTO || chosenMove == MOVE_MIMIC || chosenMove == MOVE_MUD_SPORT || chosenMove == MOVE_NIGHTMARE ||
-        chosenMove == MOVE_PAIN_SPLIT || chosenMove == MOVE_RECYCLE || chosenMove == MOVE_REFRESH || chosenMove == MOVE_ROLE_PLAY ||
-        chosenMove == MOVE_SKILL_SWAP || chosenMove == MOVE_SLACK_OFF || chosenMove == MOVE_SNATCH || chosenMove == MOVE_SOFT_BOILED ||
-        chosenMove == MOVE_SPIDER_WEB || chosenMove == MOVE_TAIL_GLOW || chosenMove == MOVE_WATER_SPORT || chosenMove == MOVE_WISH || 
-        chosenMove == MOVE_YAWN || chosenMove == MOVE_NASTY_PLOT || chosenMove == MOVE_TRICK_ROOM)
+    if (move->accuracy == 0)
     {
         str = gText_ThreeDashes;
     }

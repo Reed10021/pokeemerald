@@ -407,6 +407,9 @@
 #define MAP_SCORCHED_SLAB_B1F                        (110 | (24 << 8))
 #define MAP_SCORCHED_SLAB_B2F                        (111 | (24 << 8))
 #define MAP_ARTISAN_CAVE_B2F                         (112 | (24 << 8))
+#define MAP_UNDERWATER_VICTORY_ROAD                  (113 | (24 << 8))
+#define MAP_UNDERWATER_RUINED_CHAMBER                (114 | (24 << 8))
+#define MAP_RUINED_CHAMBER                           (115 | (24 << 8))
 
 // Map Group 25
 #define MAP_SECRET_BASE_RED_CAVE1           (0 | (25 << 8))

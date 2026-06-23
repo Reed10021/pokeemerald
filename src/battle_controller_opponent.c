@@ -564,7 +564,7 @@ static void OpponentHandleGetMonData(void)
 
 static u32 GetOpponentMonData(u8 monId, u8 *dst)
 {
-    struct BattlePokemon battleMon;
+    struct BattlePokemon battleMon = {0};
     struct MovePpInfo moveData;
     u8 nickname[20];
     u8 *src;
@@ -870,7 +870,7 @@ static u32 GetOpponentMonData(u8 monId, u8 *dst)
 
 static void OpponentHandleGetRawMonData(void)
 {
-    struct BattlePokemon battleMon;
+    struct BattlePokemon battleMon = {0};
     u8 *src = (u8 *)&gEnemyParty[gBattlerPartyIndexes[gActiveBattler]] + gBattleBufferA[gActiveBattler][1];
     u8 *dst = (u8 *)&battleMon + gBattleBufferA[gActiveBattler][1];
     u8 i;

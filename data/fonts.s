@@ -74,3 +74,35 @@ gFont2JapaneseGlyphs:: @ 866C8E4
 	.align 2
 gFont2JapaneseGlyphWidths:: @ 86748E4
 	.include "graphics/fonts/font2_japanese_widths.inc"
+
+	.align 2
+gFontNarrowerLatinGlyphs::
+	.incbin "graphics/fonts/narrower.latfont"
+
+	.align 2
+gFontNarrowerLatinGlyphWidths::
+	.include "graphics/fonts/narrower_latin_widths.inc"
+
+	.align 2
+gFontSmallNarrowerLatinGlyphs::
+	.incbin "graphics/fonts/small_narrower.latfont"
+
+	.align 2
+gFontSmallNarrowerLatinGlyphWidths::
+	.include "graphics/fonts/small_narrower_latin_widths.inc"
+
+	.align 2
+gFontShortNarrowLatinGlyphs::
+	.incbin "graphics/fonts/short_narrow.latfont"
+
+	.align 2
+gFontShortNarrowLatinGlyphWidths::
+	.include "graphics/fonts/short_narrow_latin_widths.inc"
+
+	.align 2
+gFontShortNarrowerLatinGlyphs::
+	.incbin "graphics/fonts/short_narrower.latfont"
+
+	.align 2
+gFontShortNarrowerLatinGlyphWidths::
+	.include "graphics/fonts/short_narrower_latin_widths.inc"

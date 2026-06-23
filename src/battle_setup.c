@@ -1247,6 +1247,11 @@ const u8 *BattleSetup_ConfigureTrainerBattle(const u8 *data)
         SetMapVarsToTrainer();
         gTrainerBattleOpponent_A = GetRematchTrainerId(gTrainerBattleOpponent_A);
         return EventScript_TryDoRematchBattle;
+    case TRAINER_BATTLE_REMATCH_CONTINUE_SCRIPT:
+        TrainerBattleLoadArgs(sContinueScriptBattleParams, data);
+        SetMapVarsToTrainer();
+        gTrainerBattleOpponent_A = GetRematchTrainerId(gTrainerBattleOpponent_A);
+        return EventScript_TryDoRematchBattleContinueScript;
     case TRAINER_BATTLE_PYRAMID:
         if (gApproachingTrainerId == 0)
         {

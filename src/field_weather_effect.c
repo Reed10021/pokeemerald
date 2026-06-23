@@ -17,6 +17,7 @@
 
 // EWRAM
 EWRAM_DATA static u8 gCurrentAbnormalWeather = 0;
+EWRAM_DATA static u8 gCurrentScatteredStormWeather = 0;
 EWRAM_DATA static u16 gUnusedWeatherRelated = 0;
 
 // CONST
@@ -2701,6 +2702,71 @@ static void CreateAbnormalWeatherTask(void)
     }
 }
 
+static bool8 IsScatteredStormWeather(u8 weather)
+{
+    switch (weather)
+    {
+    case WEATHER_RAIN:
+    case WEATHER_RAIN_THUNDERSTORM:
+    case WEATHER_SHADE:
+    case WEATHER_THUNDER_LIGHTNING:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
+static u8 GetRandomScatteredStormWeather(u8 currentWeather)
+{
+    static const u8 sScatteredStormWeathers[] =
+    {
+        WEATHER_RAIN,
+        WEATHER_RAIN_THUNDERSTORM,
+        WEATHER_SHADE,
+        WEATHER_THUNDER_LIGHTNING,
+    };
+    u8 weather;
+
+    do
+    {
+        weather = sScatteredStormWeathers[Random() % ARRAY_COUNT(sScatteredStormWeathers)];
+    } while (weather == currentWeather && currentWeather != WEATHER_NONE);
+
+    return weather;
+}
+
+static u16 GetScatteredStormWeatherDelay(void)
+{
+    return 1100 + (Random() % 1701);
+}
+
+static void Task_DoScatteredStormWeather(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+
+    if (data[15]-- <= 0)
+    {
+        gCurrentScatteredStormWeather = GetRandomScatteredStormWeather(gCurrentScatteredStormWeather);
+        SetNextWeather(gCurrentScatteredStormWeather);
+        data[15] = GetScatteredStormWeatherDelay();
+    }
+}
+
+static void CreateScatteredStormWeatherTask(void)
+{
+    u32 taskId = CreateTaskIfSpace(Task_DoScatteredStormWeather, 0);
+    s16 *data;
+
+    if (taskId >= NUM_TASKS)
+        return;
+
+    if (!IsScatteredStormWeather(gCurrentScatteredStormWeather))
+        gCurrentScatteredStormWeather = GetRandomScatteredStormWeather(WEATHER_NONE);
+
+    data = gTasks[taskId].data;
+    data[15] = GetScatteredStormWeatherDelay();
+}
+
 static u8 TranslateWeatherNum(u8);
 static void UpdateRainCounter(u8, u8);
 
@@ -2726,13 +2792,13 @@ void SetSav1WeatherFromCurrMapHeader(void)
 void SetWeather(u32 weather)
 {
     SetSav1Weather(weather);
-    SetNextWeather(GetSav1Weather());
+    DoCurrentWeather();
 }
 
 void SetWeather_Unused(u32 weather)
 {
     SetSav1Weather(weather);
-    SetCurrentAndNextWeather(GetSav1Weather());
+    ResumePausedWeather();
 }
 
 void DoCurrentWeather(void)
@@ -2742,9 +2808,35 @@ void DoCurrentWeather(void)
 
     if (weather == WEATHER_ABNORMAL)
     {
+        if (FuncIsActiveTask(Task_DoScatteredStormWeather))
+        {
+            taskId = FindTaskIdByFunc(Task_DoScatteredStormWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
+        gCurrentScatteredStormWeather = WEATHER_NONE;
         if (!FuncIsActiveTask(Task_DoAbnormalWeather))
             CreateAbnormalWeatherTask();
         weather = gCurrentAbnormalWeather;
+    }
+    else if (weather == WEATHER_SCATTERED_STORMS)
+    {
+        if (FuncIsActiveTask(Task_DoAbnormalWeather))
+        {
+            taskId = FindTaskIdByFunc(Task_DoAbnormalWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
+        gCurrentAbnormalWeather = WEATHER_DOWNPOUR;
+        if (FuncIsActiveTask(Task_DoScatteredStormWeather))
+        {
+            taskId = FindTaskIdByFunc(Task_DoScatteredStormWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
+        gCurrentScatteredStormWeather = GetRandomScatteredStormWeather(WEATHER_NONE);
+        CreateScatteredStormWeatherTask();
+        weather = gCurrentScatteredStormWeather;
     }
     else
     {
@@ -2754,7 +2846,14 @@ void DoCurrentWeather(void)
             if (taskId < NUM_TASKS)
                 DestroyTask((u8)taskId);
         }
+        if (FuncIsActiveTask(Task_DoScatteredStormWeather))
+        {
+            taskId = FindTaskIdByFunc(Task_DoScatteredStormWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
         gCurrentAbnormalWeather = WEATHER_DOWNPOUR;
+        gCurrentScatteredStormWeather = WEATHER_NONE;
     }
     SetNextWeather(weather);
 }
@@ -2766,9 +2865,31 @@ void ResumePausedWeather(void)
 
     if (weather == WEATHER_ABNORMAL)
     {
+        if (FuncIsActiveTask(Task_DoScatteredStormWeather))
+        {
+            taskId = FindTaskIdByFunc(Task_DoScatteredStormWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
+        gCurrentScatteredStormWeather = WEATHER_NONE;
         if (!FuncIsActiveTask(Task_DoAbnormalWeather))
             CreateAbnormalWeatherTask();
         weather = gCurrentAbnormalWeather;
+    }
+    else if (weather == WEATHER_SCATTERED_STORMS)
+    {
+        if (FuncIsActiveTask(Task_DoAbnormalWeather))
+        {
+            taskId = FindTaskIdByFunc(Task_DoAbnormalWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
+        gCurrentAbnormalWeather = WEATHER_DOWNPOUR;
+        if (!IsScatteredStormWeather(gCurrentScatteredStormWeather))
+            gCurrentScatteredStormWeather = GetRandomScatteredStormWeather(WEATHER_NONE);
+        if (!FuncIsActiveTask(Task_DoScatteredStormWeather))
+            CreateScatteredStormWeatherTask();
+        weather = gCurrentScatteredStormWeather;
     }
     else
     {
@@ -2778,7 +2899,14 @@ void ResumePausedWeather(void)
             if (taskId < NUM_TASKS)
                 DestroyTask((u8)taskId);
         }
+        if (FuncIsActiveTask(Task_DoScatteredStormWeather))
+        {
+            taskId = FindTaskIdByFunc(Task_DoScatteredStormWeather);
+            if (taskId < NUM_TASKS)
+                DestroyTask((u8)taskId);
+        }
         gCurrentAbnormalWeather = WEATHER_DOWNPOUR;
+        gCurrentScatteredStormWeather = WEATHER_NONE;
     }
     SetCurrentAndNextWeather(weather);
 }
@@ -2807,7 +2935,7 @@ static const u8 sWeatherCycleRoute105[] =
     WEATHER_DROUGHT,
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_RAIN,
-    WEATHER_THUNDER_LIGHTNING,
+    WEATHER_SCATTERED_STORMS,
     WEATHER_SUNNY,
     WEATHER_RAIN,
 };
@@ -2816,16 +2944,16 @@ static const u8 sWeatherCycleRoute106_107[] =
     WEATHER_DROUGHT,
     WEATHER_THUNDER_LIGHTNING,
     WEATHER_RAIN,
-    WEATHER_THUNDER_LIGHTNING,
+    WEATHER_SCATTERED_STORMS,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
 };
-static const u8 sWeatherCycleRoute108_109[] =  // and Dewford town
+static const u8 sWeatherCycleRoute108_109[] =  // and Dewford Town, Abandoned Ship Deck
 {
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_RAIN_THUNDERSTORM,
-    WEATHER_THUNDER_LIGHTNING,
+    WEATHER_SCATTERED_STORMS,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
 };
@@ -2838,7 +2966,7 @@ static const u8 sWeatherCycleRoute103_110[] = // And Green Path, Water Path
     WEATHER_SUNNY,
     WEATHER_RAIN,
 };
-static const u8 sWeatherCycleTimelessForest[] =
+static const u8 sWeatherCycleTimelessForest[] = // Forested area on Water Path, next to 103/110
 {
     WEATHER_SHADE,
     WEATHER_RAIN,
@@ -2858,10 +2986,10 @@ static const u8 sWeatherCycleRoute111_112[] =
 };
 static const u8 sWeatherCycleRoute114_115[] =
 {
+    WEATHER_SUNNY,
+    WEATHER_SCATTERED_STORMS,
+    WEATHER_SCATTERED_STORMS,
     WEATHER_VOLCANIC_ASH,
-    WEATHER_RAIN,
-    WEATHER_VOLCANIC_ASH,
-    WEATHER_SNOW,
     WEATHER_SUNNY,
     WEATHER_SNOW,
 };
@@ -2892,13 +3020,13 @@ static const u8 sWeatherCycleRoute120[] =
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_DOWNPOUR,
 };
-static const u8 sWeatherCycleRoute121_122[] =
+static const u8 sWeatherCycleRoute121_122[] = // and Mt. Pyre, Safari Zone
 {
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_RAIN_THUNDERSTORM,
     WEATHER_SUNNY,
-    WEATHER_THUNDER_LIGHTNING,
+    WEATHER_SCATTERED_STORMS,
     WEATHER_DOWNPOUR,
 };
 static const u8 sWeatherCycleRoute123[] = //and 118
@@ -2910,7 +3038,7 @@ static const u8 sWeatherCycleRoute123[] = //and 118
     WEATHER_THUNDER_LIGHTNING,
     WEATHER_DOWNPOUR,
 };
-static const u8 sWeatherCycleRoute124_125[] =
+static const u8 sWeatherCycleRoute124_125[] = // and Shoal Cave (ice pokemon dominate the area, affecting the weather)
 {
     WEATHER_SUNNY,
     WEATHER_SNOW,
@@ -2959,7 +3087,7 @@ static const u8 sWeatherCyclePacifidlog[] =
 {
     WEATHER_SUNNY,
     WEATHER_RAIN,
-    WEATHER_RAIN_THUNDERSTORM,
+    WEATHER_SCATTERED_STORMS,
     WEATHER_DROUGHT,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
@@ -2967,17 +3095,17 @@ static const u8 sWeatherCyclePacifidlog[] =
 static const u8 sWeatherCycleLilycove[] =
 {
     WEATHER_SUNNY,
-    WEATHER_SNOW,
+    WEATHER_RAIN,
     WEATHER_RAIN,
     WEATHER_SUNNY,
-    WEATHER_SNOW,
+    WEATHER_SCATTERED_STORMS,
     WEATHER_THUNDER_LIGHTNING,
 };
-static const u8 sWeatherCyclePetalburgWoods[] =
+static const u8 sWeatherCyclePetalburgWoods[] = // Forested area on route 104
 {
     WEATHER_SHADE,
     WEATHER_RAIN_THUNDERSTORM,
-    WEATHER_SHADE,
+    WEATHER_THUNDER_LIGHTNING,
     WEATHER_SHADE,
     WEATHER_SHADE,
     WEATHER_RAIN,
@@ -2987,10 +3115,20 @@ static const u8 sWeatherCycleBattleFrontier[] =
 {
     WEATHER_SUNNY,
     WEATHER_RAIN,
-    WEATHER_DOWNPOUR,
+    WEATHER_SCATTERED_STORMS,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
     WEATHER_SUNNY,
+};
+
+static const u8 sWeatherCycleRustboro[] =
+{
+    WEATHER_SUNNY,
+    WEATHER_SCATTERED_STORMS,
+    WEATHER_SCATTERED_STORMS,
+    WEATHER_SUNNY,
+    WEATHER_SUNNY,
+    WEATHER_RAIN,
 };
 
 static u8 TranslateWeatherNum(u8 weather)
@@ -3014,6 +3152,8 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_UNDERWATER_BUBBLES: return WEATHER_UNDERWATER_BUBBLES;
     case WEATHER_ABNORMAL:           return WEATHER_ABNORMAL;
     case WEATHER_EXTREME_HEAT:       return WEATHER_EXTREME_HEAT;
+    case WEATHER_THUNDER_LIGHTNING:  return WEATHER_THUNDER_LIGHTNING;
+    case WEATHER_SCATTERED_STORMS:   return WEATHER_SCATTERED_STORMS;
     case WEATHER_ROUTE102_104_CYCLE: return sWeatherCycleRoute102_104[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE105_CYCLE:     return sWeatherCycleRoute105[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_ROUTE106_107_CYCLE: return sWeatherCycleRoute106_107[gSaveBlock1Ptr->weatherCycleStage];
@@ -3034,9 +3174,10 @@ static u8 TranslateWeatherNum(u8 weather)
     case WEATHER_PACIFIDLOG_CYCLE:       return sWeatherCyclePacifidlog[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_LILYCOVE_CYCLE:         return sWeatherCycleLilycove[gSaveBlock1Ptr->weatherCycleStage];
     case WEATHER_PETALBURGWOODS_CYCLE:   return sWeatherCyclePetalburgWoods[gSaveBlock1Ptr->weatherCycleStage];
-    case WEATHER_TIMELESS_FOREST:    return sWeatherCycleTimelessForest[gSaveBlock1Ptr->weatherCycleStage];
-    case WEATHER_ROUTE101_CYCLE:     return sWeatherCycleRoute101[gSaveBlock1Ptr->weatherCycleStage];
-    case WEATHER_BATTLE_FRONTIER_CYCLE: return sWeatherCycleBattleFrontier[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_TIMELESS_FOREST:        return sWeatherCycleTimelessForest[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_ROUTE101_CYCLE:         return sWeatherCycleRoute101[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_BATTLE_FRONTIER_CYCLE:  return sWeatherCycleBattleFrontier[gSaveBlock1Ptr->weatherCycleStage];
+    case WEATHER_RUSTBORO_CYCLE:         return sWeatherCycleRustboro[gSaveBlock1Ptr->weatherCycleStage];
     default:                         return WEATHER_NONE;
     }
 }

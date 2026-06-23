@@ -12,7 +12,6 @@
 static void sub_81138D4(struct Sprite *);
 static void AnimBite(struct Sprite *);
 static void AnimTearDrop(struct Sprite *);
-static void AnimClawSlash(struct Sprite *);
 static void AnimTask_AttackerFadeToInvisible_Step(u8);
 static void AnimTask_AttackerFadeFromInvisible_Step(u8);
 static void sub_8113950(struct Sprite *);
@@ -170,7 +169,7 @@ static const union AnimCmd sAnim_ClawSlash_1[] =
     ANIMCMD_END,
 };
 
-static const union AnimCmd *const sAnims_ClawSlash[] =
+const union AnimCmd *const gAnims_ClawSlash[] =
 {
     sAnim_ClawSlash_0,
     sAnim_ClawSlash_1,
@@ -181,7 +180,7 @@ const struct SpriteTemplate gClawSlashSpriteTemplate =
     .tileTag = ANIM_TAG_CLAW_SLASH,
     .paletteTag = ANIM_TAG_CLAW_SLASH,
     .oam = &gOamData_AffineOff_ObjNormal_32x32,
-    .anims = sAnims_ClawSlash,
+    .anims = gAnims_ClawSlash,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = AnimClawSlash,
@@ -796,7 +795,7 @@ void sub_8114470(u8 taskId)
 }
 
 // Animates a deep slash from a claw. Used by Metal Claw, Dragon Claw, and Crush Claw
-static void AnimClawSlash(struct Sprite *sprite)
+void AnimClawSlash(struct Sprite *sprite)
 {
     sprite->pos1.x += gBattleAnimArgs[0];
     sprite->pos1.y += gBattleAnimArgs[1];
@@ -943,19 +942,19 @@ void AnimTask_SetGreyscaleOrOriginalPal(u8 taskId)
     case ANIM_DEF_PARTNER:
         spriteId = GetAnimBattlerSpriteId(gBattleAnimArgs[0]);
         break;
-    case 4:
+    case ANIM_PLAYER_LEFT:
         position = B_POSITION_PLAYER_LEFT;
         calcSpriteId = TRUE;
         break;
-    case 5:
+    case ANIM_PLAYER_RIGHT:
         position = B_POSITION_PLAYER_RIGHT;
         calcSpriteId = TRUE;
         break;
-    case 6:
+    case ANIM_OPPONENT_LEFT:
         position = B_POSITION_OPPONENT_LEFT;
         calcSpriteId = TRUE;
         break;
-    case 7:
+    case ANIM_OPPONENT_RIGHT:
         position = B_POSITION_OPPONENT_RIGHT;
         calcSpriteId = TRUE;
         break;

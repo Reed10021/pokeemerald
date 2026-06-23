@@ -76,6 +76,10 @@ static void ScriptCmd_visible(void);
 static void ScriptCmd_doublebattle_2D(void);
 static void ScriptCmd_doublebattle_2E(void);
 static void ScriptCmd_stopsound(void);
+static void ScriptCmd_createvisualtaskontargets(void);
+static void ScriptCmd_createspriteontargets(void);
+static void ScriptCmd_createspriteontargets_onpos(void);
+static void ScriptCmd_jumpifmovetypeequal(void);
 
 static void RunAnimScriptCommand(void);
 static void task_pA_ma0A_obj_to_bg_pal(u8 taskId);
@@ -1416,34 +1420,75 @@ const struct CompressedSpriteSheet gBattleAnimPicTable[] =
     {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_BLUE_RING_2},
     {gBattleAnimSpriteGfx_WhiteStreak, 0x0200, ANIM_TAG_WHITE_STREAK},
     {gBattleAnimSpriteGfx_PurpleJab, 0x0100, ANIM_TAG_PURPLE_JAB},
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_TOXIC_SPIKES},   // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_ENERGY_BALL},    // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_SEED_BROWN},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_FEINT},          // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_MEGA_STONE},      // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_MEGA_SYMBOL},    // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_MEGA_PARTICLES}, // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_TRUMP_CARD},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_TRUMP_CARD_PARTICLES}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_TOXIC_SPIKES},   // Unused
+    {gBattleAnimSpriteGfx_EnergyBall, 0x0200, ANIM_TAG_ENERGY_BALL},
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_SEED_BROWN},     // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_FEINT},          // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_MEGA_STONE},      // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_MEGA_SYMBOL},    // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_MEGA_PARTICLES}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_TRUMP_CARD},     // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_TRUMP_CARD_PARTICLES}, // Unused
     {gBattleAnimSpriteGfx_Acupressure, 0x0200, ANIM_TAG_ACUPRESSURE},
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WRING_OUT},      // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_COLORED_ORBS},   // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WORRY_SEED},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_SMALL_CLOUD},    // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_ATTACK_ORDER},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_WRING_OUT},      // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_COLORED_ORBS},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_WORRY_SEED},     // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_SMALL_CLOUD},    // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_ATTACK_ORDER},   // Unused
     {gBattleAnimSpriteGfx_DragonPulse, 0x0100, ANIM_TAG_DRAGON_PULSE},
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WOOD_HAMMER},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_WOOD_HAMMER},   // Unused
     {gBattleAnimSpriteGfx_PsychoCut, 0x0200, ANIM_TAG_PSYCHO_CUT},
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_POWER_GEM},       // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_STONE_EDGE},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_STEALTH_ROCK}, // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0080, ANIM_TAG_POISON_JAB},     // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_GREEN_POISON_BUBBLE}, // Unused
+    {gBattleAnimSpriteGfx_PowerGem, 0x0080, ANIM_TAG_POWER_GEM},
+    {gBattleAnimSpriteGfx_StoneEdge, 0x0A00, ANIM_TAG_STONE_EDGE},
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_STEALTH_ROCK}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_POISON_JAB},     // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_GREEN_POISON_BUBBLE}, // Unused
     {gBattleAnimSpriteGfx_FlashCannonBall, 0x200, ANIM_TAG_FLASH_CANNON_BALL}, 
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_WATER_GUN},        // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_PUNISHMENT_BLADES}, // Unused
-    {gBattleAnimSpriteGfx_GoldRing, 0x0100, ANIM_TAG_QUICK_GUARD_HAND}, // Unused
-
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_WATER_GUN},        // Unused
+    {gBattleAnimSpriteGfx_Punishment, 0xa00, ANIM_TAG_PUNISHMENT_BLADES},
+    {gBattleAnimSpriteGfx_QuickGuard, 0x200, ANIM_TAG_QUICK_GUARD_HAND},
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_SHELL_RIGHT}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_SHELL_LEFT}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_RAZOR_SHELL}, // Unused
+    {gBattleAnimSpriteGfx_HydroPump, 0x200, ANIM_TAG_HYDRO_PUMP},
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_BRINE}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_GEAR}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_ASSURANCE_HAND},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_WISHIWASHI_FISH},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_ZYGARDE_HEXES},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_AURA_SPHERE},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_OMEGA_STONE},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_ALPHA_STONE}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_BERRY_NORMAL},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_BERRY_EATEN},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_DRAGON_ASCENT},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_PINK_DIAMOND},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_STEAM_ERUPTION}, // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_CONFIDE}, // Unused
+    {gBattleAnimSpriteGfx_Arrows, 0x480, ANIM_TAG_VERTICAL_HEX},
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_UNAVAILABLE_1},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_UNAVAILABLE_2},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_POWER_TRICK},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_CHAIN_LINK},  // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_ANCHOR},   // Unused
+    {gBattleAnimSpriteGfx_HorseshoeFist, 0x800, ANIM_TAG_HORSESHOE_SIDE_FIST},
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_DRAGON_ASCENT_FOE},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_CRAFTY_SHIELD},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_BLACEPHALON_HEAD},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_FAIRY_LOCK_CHAINS},   // Unused
+    {gBattleAnimSpriteGfx_LightningRain, 0x700, ANIM_TAG_IONS},
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_CHOP},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_HEART_STAMP},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_HORN_LEECH},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_STEAMROLLER},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_HOOPA_HAND},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_HOOPA_RING},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_METAL_BITS},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_SMALL_ROCK},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_SPIRIT_ARROW},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_ULTRA_BURST_SYMBOL},   // Unused
+    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_Z_MOVE_SYMBOL},   // Unused
+    {gBattleAnimSpriteGfx_BigRock, 0x800, ANIM_TAG_REALLY_BIG_ROCK},
 };
 
 const struct CompressedSpritePalette gBattleAnimPaletteTable[] =
@@ -1739,33 +1784,75 @@ const struct CompressedSpritePalette gBattleAnimPaletteTable[] =
     {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_BLUE_RING_2},
     {gBattleAnimSpritePal_WhiteStreak, ANIM_TAG_WHITE_STREAK},
     {gBattleAnimSpritePal_PurpleJab, ANIM_TAG_PURPLE_JAB},
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_TOXIC_SPIKES},   // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_ENERGY_BALL},    // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_SEED_BROWN},     // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_FEINT},          // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_MEGA_STONE},     // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_MEGA_SYMBOL},    // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_MEGA_PARTICLES}, // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_TRUMP_CARD},     // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_TRUMP_CARD_PARTICLES}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_TOXIC_SPIKES},   // Unused
+    {gBattleAnimSpritePal_EnergyBall, ANIM_TAG_ENERGY_BALL},
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_SEED_BROWN},     // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_FEINT},          // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_MEGA_STONE},     // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_MEGA_SYMBOL},    // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_MEGA_PARTICLES}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_TRUMP_CARD},     // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_TRUMP_CARD_PARTICLES}, // Unused
     {gBattleAnimSpritePal_Acupressure, ANIM_TAG_ACUPRESSURE},
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_WRING_OUT},    // Unused 
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_COLORED_ORBS}, // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_WORRY_SEED},   // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_SMALL_CLOUD},  // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_ATTACK_ORDER}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_WRING_OUT},    // Unused 
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_COLORED_ORBS}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_WORRY_SEED},   // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_SMALL_CLOUD},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_ATTACK_ORDER}, // Unused
     {gBattleAnimSpritePal_DragonPulse, ANIM_TAG_DRAGON_PULSE},
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_WOOD_HAMMER},       // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_WOOD_HAMMER},       // Unused
     {gBattleAnimSpritePal_PsychoCut, ANIM_TAG_PSYCHO_CUT},
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_POWER_GEM},         // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_STONE_EDGE},        // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_STEALTH_ROCK},      // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_POISON_JAB},        // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_GREEN_POISON_BUBBLE}, // Unused
+    {gBattleAnimSpritePal_PowerGem, ANIM_TAG_POWER_GEM},
+    {gBattleAnimSpritePal_StoneEdge, ANIM_TAG_STONE_EDGE},
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_STEALTH_ROCK},      // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_POISON_JAB},        // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_GREEN_POISON_BUBBLE}, // Unused
     {gBattleAnimSpritePal_FlashCannonBall, ANIM_TAG_FLASH_CANNON_BALL},
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_WATER_GUN},         // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_PUNISHMENT_BLADES}, // Unused
-    {gBattleAnimSpritePal_BlueRing2, ANIM_TAG_QUICK_GUARD_HAND},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_WATER_GUN},         // Unused
+    {gBattleAnimSpritePal_Punishment, ANIM_TAG_PUNISHMENT_BLADES},
+    {gBattleAnimSpritePal_QuickGuard, ANIM_TAG_QUICK_GUARD_HAND},
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_SHELL_RIGHT},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_SHELL_LEFT},   // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_RAZOR_SHELL},  // Unused
+    {gBattleAnimSpritePal_HydroPump, ANIM_TAG_HYDRO_PUMP},
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_BRINE}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_GEAR}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_ASSURANCE_HAND},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_WISHIWASHI_FISH},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_ZYGARDE_HEXES},   // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_AURA_SPHERE},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_OMEGA_STONE},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_ALPHA_STONE}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_BERRY_NORMAL},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_BERRY_EATEN},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_DRAGON_ASCENT},   // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_PINK_DIAMOND},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_STEAM_ERUPTION}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_CONFIDE}, // Unused
+    {gBattleAnimSpritePal_FusionFlare, ANIM_TAG_VERTICAL_HEX},
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_UNAVAILABLE_1},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_UNAVAILABLE_2},   // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_POWER_TRICK},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_CHAIN_LINK},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_ANCHOR},   // Unused
+    {gBattleAnimSpritePal_HorseshoeFist, ANIM_TAG_HORSESHOE_SIDE_FIST},
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_DRAGON_ASCENT_FOE},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_CRAFTY_SHIELD},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_BLACEPHALON_HEAD},   // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_FAIRY_LOCK_CHAINS},  // Unused
+    {gBattleAnimSpritePal_LightningRain, ANIM_TAG_IONS},
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_CHOP}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_HEART_STAMP},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_HORN_LEECH},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_STEAMROLLER},   // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_HOOPA_HAND},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_HOOPA_RING}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_METAL_BITS}, // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_SMALL_ROCK},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_SPIRIT_ARROW},  // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_ULTRA_BURST_SYMBOL},   // Unused
+    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_Z_MOVE_SYMBOL},  // Unused
+    {gBattleAnimSpritePal_BigRock, ANIM_TAG_REALLY_BIG_ROCK},
 };
 
 const struct BattleAnimBackground gBattleAnimBackgroundTable[] =
@@ -1798,6 +1885,10 @@ const struct BattleAnimBackground gBattleAnimBackgroundTable[] =
     [BG_SOLARBEAM_PLAYER] = {gBattleAnimBgImage_Impact, gBattleAnimBgPalette_Solarbeam, gBattleAnimBgTilemap_ImpactPlayer},
     [BG_SOLARBEAM_CONTESTS] = {gBattleAnimBgImage_Impact, gBattleAnimBgPalette_Solarbeam, gBattleAnimBgTilemap_ImpactContests},
     [BG_TRICK_ROOM] = {gBattleAnimBgImage_TrickRoom, gBattleAnimBgPalette_TrickRoom, gBattleAnimBgTilemap_TrickRoom},
+    [BG_ROCK_WRECKER] = {gBattleAnimBgImage_Hurricane, gBattleAnimBgPalette_RockWrecker, gBattleAnimBgTilemap_Hurricane},
+    [BG_HURRICANE] = {gBattleAnimBgImage_Hurricane, gBattleAnimBgPalette_Hurricane, gBattleAnimBgTilemap_Hurricane},
+    [BG_FOCUS_BLAST] = {gBattleAnimBgImage_FocusBlast, gBattleAnimBgPalette_FocusBlast, gBattleAnimBgTilemap_FocusBlast},
+    [BG_GUNK_SHOT] = {gBattleAnimBgImage_FocusBlast, gBattleAnimBgPalette_GunkShot, gBattleAnimBgTilemap_FocusBlast},
     [BG_AURA_SPHERE] = {gBattleAnimBgImage_FocusBlast, gBattleAnimBgPalette_AuraSphere, gBattleAnimBgTilemap_FocusBlast},
 };
 
@@ -1850,7 +1941,11 @@ static void (* const sScriptCmdTable[])(void) =
     ScriptCmd_visible,
     ScriptCmd_doublebattle_2D,
     ScriptCmd_doublebattle_2E,
-    ScriptCmd_stopsound
+    ScriptCmd_stopsound,
+    ScriptCmd_createvisualtaskontargets,   // 0x30
+    ScriptCmd_createspriteontargets,       // 0x31
+    ScriptCmd_createspriteontargets_onpos, // 0x32
+    ScriptCmd_jumpifmovetypeequal          // 0x33
 };
 
 // code
@@ -2016,6 +2111,125 @@ static void RunAnimScriptCommand(void)
     {
         sScriptCmdTable[sBattleAnimScriptPtr[0]]();
     } while (gAnimFramesToWait == 0 && gAnimScriptActive);
+}
+
+static s16 GetSubpriorityForMoveAnim(u8 argVar)
+{
+    s16 subpriority;
+
+    if (argVar & ANIMSPRITE_IS_TARGET)
+    {
+        argVar ^= ANIMSPRITE_IS_TARGET;
+        if (argVar >= 64)
+            argVar -= 64;
+        else
+            argVar *= -1;
+
+        subpriority = GetBattlerSpriteSubpriority(gBattleAnimTarget) + (s8)(argVar);
+    }
+    else
+    {
+        if (argVar >= 64)
+            argVar -= 64;
+        else
+            argVar *= -1;
+
+        subpriority = GetBattlerSpriteSubpriority(gBattleAnimAttacker) + (s8)(argVar);
+    }
+
+    if (subpriority < 3)
+        subpriority = 3;
+
+    return subpriority;
+}
+
+static u8 GetBattleAnimMoveTargets(u8 battlerArgIndex, u8* targets)
+{
+    u8 numTargets = 0;
+    s16 battlerAnimId = gBattleAnimArgs[battlerArgIndex];   // ANIM_xx input
+    u8 i;
+    u8 ignoredTgt;
+    u8 target = gBattleMoves[gCurrentMove].target;
+
+    switch (battlerAnimId)
+    {
+    case ANIM_ATTACKER:
+    case ANIM_ATK_PARTNER:
+        ignoredTgt = gBattlerTarget;
+        break;
+    case ANIM_TARGET:
+    case ANIM_DEF_PARTNER:
+    default:
+        ignoredTgt = gBattlerAttacker;
+        break;
+    }
+
+    switch (target)
+    {
+    case MOVE_TARGET_FOES_AND_ALLY:
+        if (battlerAnimId == ANIM_ATTACKER)
+        {
+            targets[numTargets++] = gBattleAnimAttacker;
+        }
+        else
+        {
+            for (i = 0; i < gBattlersCount; i++)
+            {
+                if (i != gBattleAnimAttacker && IS_ALIVE_AND_PRESENT(i))
+                    targets[numTargets++] = i + MAX_BATTLERS_COUNT; // anim ids for battler ids
+            }
+        }
+        break;
+    case MOVE_TARGET_BOTH: // all opponents
+        for (i = 0; i < gBattlersCount; i++)
+        {
+            if (i != ignoredTgt && !IsBattlerAlly(i, ignoredTgt) && IS_ALIVE_AND_PRESENT(i))
+                targets[numTargets++] = i + MAX_BATTLERS_COUNT;
+        }
+        break;
+    default:
+        targets[0] = gBattleAnimArgs[battlerArgIndex]; // original
+        numTargets = 1;
+        break;
+    }
+
+    return numTargets;
+}
+
+static void CreateSpriteOnTargets(const struct SpriteTemplate* template, u8 argVar, u8 battlerArgIndex, u8 argsCount, bool32 overwriteAnimTgt)
+{
+    u32 i;
+    u8 battler;
+    u8 targets[MAX_BATTLERS_COUNT];
+    int ntargets;
+    s16 subpriority;
+
+    for (i = 0; i < argsCount; i++)
+    {
+        gBattleAnimArgs[i] = T1_READ_16(sBattleAnimScriptPtr);
+        sBattleAnimScriptPtr += 2;
+    }
+
+    subpriority = GetSubpriorityForMoveAnim(argVar);
+
+    ntargets = GetBattleAnimMoveTargets(battlerArgIndex, targets);
+    if (ntargets == 0)
+        return;
+
+    for (i = 0; i < ntargets; i++)
+    {
+        battler = GetAnimBattlerId(targets[i]);
+        if (overwriteAnimTgt)
+            gBattleAnimArgs[battlerArgIndex] = targets[i];
+
+        if (CreateSpriteAndAnimate(template,
+            GetBattlerSpriteCoord(battler, BATTLER_COORD_X_2),
+            GetBattlerSpriteCoord(battler, BATTLER_COORD_Y_PIC_OFFSET),
+            subpriority) != MAX_SPRITES) // Don't increment the task count if the sprite couldn't be created(i.e. there are too many created sprites).
+        {
+            gAnimVisualTaskCount++;
+        }
+    }
 }
 
 static void ScriptCmd_loadspritegfx(void)
@@ -2320,6 +2534,24 @@ static void ScriptCmd_monbg(void)
     sBattleAnimScriptPtr++;
     gAnimFramesToWait = 1;
     gAnimScriptCallback = WaitAnimFrameCount;
+}
+
+u8 GetAnimBattlerId(u8 wantedBattler)
+{
+    switch (wantedBattler)
+    {
+    case ANIM_ATTACKER:
+    default:
+        return gBattleAnimAttacker;
+    case ANIM_TARGET:
+        return gBattleAnimTarget;
+    case ANIM_ATK_PARTNER:
+        return BATTLE_PARTNER(gBattleAnimAttacker);
+    case ANIM_DEF_PARTNER:
+        return BATTLE_PARTNER(gBattleAnimTarget);
+    case ANIM_PLAYER_LEFT ... ANIM_OPPONENT_RIGHT:
+        return wantedBattler - MAX_BATTLERS_COUNT;
+    }
 }
 
 bool8 IsBattlerSpriteVisible(u8 battlerId)
@@ -2943,7 +3175,7 @@ s8 BattleAnimAdjustPanning(s8 pan)
 {
     if (!IsContest() && gBattleSpritesDataPtr->healthBoxesData[gBattleAnimAttacker].statusAnimActive)
     {
-        if (GetBattlerSide(gBattleAnimAttacker) != B_SIDE_PLAYER)
+        if (!IsOnPlayerSide(gBattleAnimAttacker))
             pan = SOUND_PAN_TARGET;
         else
             pan = SOUND_PAN_ATTACKER;
@@ -2953,9 +3185,9 @@ s8 BattleAnimAdjustPanning(s8 pan)
         if (gBattleAnimAttacker != gBattleAnimTarget || gBattleAnimAttacker != 2 || pan != SOUND_PAN_TARGET)
             pan *= -1;
     }
-    else if (GetBattlerSide(gBattleAnimAttacker) == B_SIDE_PLAYER)
+    else if (IsOnPlayerSide(gBattleAnimAttacker))
     {
-        if (GetBattlerSide(gBattleAnimTarget) == B_SIDE_PLAYER)
+        if (IsOnPlayerSide(gBattleAnimTarget))
         {
             if (pan == SOUND_PAN_TARGET)
                 pan = SOUND_PAN_ATTACKER;
@@ -2963,7 +3195,7 @@ s8 BattleAnimAdjustPanning(s8 pan)
                 pan *= -1;
         }
     }
-    else if (GetBattlerSide(gBattleAnimTarget) == B_SIDE_OPPONENT)
+    else if (!IsOnPlayerSide(gBattleAnimTarget))
     {
         if (pan == SOUND_PAN_ATTACKER)
             pan = SOUND_PAN_TARGET;
@@ -3507,4 +3739,106 @@ static void ScriptCmd_stopsound(void)
     m4aMPlayStop(&gMPlayInfo_SE1);
     m4aMPlayStop(&gMPlayInfo_SE2);
     sBattleAnimScriptPtr++;
+}
+
+static void ScriptCmd_createvisualtaskontargets(void)
+{
+    TaskFunc taskFunc;
+    u8 taskPriority;
+    u8 taskId;
+    u8 numArgs;
+    u8 battlerArgIndex; // index in gBattleAnimArgs that has the battlerId
+    s32 i;
+    u8 targets[MAX_BATTLERS_COUNT] = { 0 };
+
+    sBattleAnimScriptPtr++;
+
+    taskFunc = (TaskFunc)T2_READ_32(sBattleAnimScriptPtr);
+    sBattleAnimScriptPtr += 4;
+
+    taskPriority = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    battlerArgIndex = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    numArgs = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    // copy task arguments
+    for (i = 0; i < numArgs; i++)
+    {
+        gBattleAnimArgs[i] = T1_READ_16(sBattleAnimScriptPtr);
+        sBattleAnimScriptPtr += 2;
+    }
+
+    numArgs = GetBattleAnimMoveTargets(battlerArgIndex, targets);
+    if (numArgs == 0)
+        return;
+
+    for (i = 0; i < numArgs; i++)
+    {
+        gBattleAnimArgs[battlerArgIndex] = targets[i];
+        taskId = CreateTask(taskFunc, taskPriority);
+        taskFunc(taskId);
+        gAnimVisualTaskCount++;
+    }
+}
+
+// DOES overwrite gBattleAnimArgs
+static void ScriptCmd_createspriteontargets(void)
+{
+    const struct SpriteTemplate* template;
+    u8 argVar;
+    u8 argsCount;
+    u8 battlerArgIndex;
+
+    sBattleAnimScriptPtr++;
+    template = (const struct SpriteTemplate*)(T2_READ_32(sBattleAnimScriptPtr));
+    sBattleAnimScriptPtr += 4;
+
+    argVar = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    battlerArgIndex = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    argsCount = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    CreateSpriteOnTargets(template, argVar, battlerArgIndex, argsCount, TRUE);
+}
+
+// will NOT overwrite gBattleAnimArgs
+static void ScriptCmd_createspriteontargets_onpos(void)
+{
+    const struct SpriteTemplate* template;
+    u8 argVar;
+    u8 argsCount;
+    u8 battlerArgIndex;
+
+    sBattleAnimScriptPtr++;
+    template = (const struct SpriteTemplate*)(T2_READ_32(sBattleAnimScriptPtr));
+    sBattleAnimScriptPtr += 4;
+
+    argVar = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    battlerArgIndex = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    argsCount = sBattleAnimScriptPtr[0];
+    sBattleAnimScriptPtr++;
+
+    CreateSpriteOnTargets(template, argVar, battlerArgIndex, argsCount, FALSE);
+}
+
+static void ScriptCmd_jumpifmovetypeequal(void)
+{
+    const u8 *type = sBattleAnimScriptPtr + 1;
+    sBattleAnimScriptPtr += 2;
+    if (*type != GetBattlerMoveType(gBattlerAttacker, gCurrentMove, gBattleStruct->dynamicMoveType))
+        sBattleAnimScriptPtr += 4;
+    else
+        sBattleAnimScriptPtr = T2_READ_PTR(sBattleAnimScriptPtr);
 }

@@ -1508,10 +1508,8 @@ void UpdateLightSprite(struct Sprite* sprite)
     if (gTimeOfDay != TIME_OF_DAY_NIGHT)
     {
         sprite->invisible = TRUE;
-        return;
     }
-
-    if (gTimeOfDay == TIME_OF_DAY_NIGHT)
+    else
     {
         hours = gLocalTime.hours;
         minutes = gLocalTime.minutes;

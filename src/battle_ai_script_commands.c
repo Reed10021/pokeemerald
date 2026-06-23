@@ -4,6 +4,7 @@
 #include "battle_ai_script_commands.h"
 #include "battle_factory.h"
 #include "battle_setup.h"
+#include "battle_util.h"
 #include "event_data.h"
 #include "data.h"
 #include "item.h"
@@ -15,6 +16,7 @@
 #include "constants/battle_ai.h"
 #include "constants/battle_move_effects.h"
 #include "constants/moves.h"
+#include "constants/pokemon.h"
 #include "constants/species.h"
 
 #define AI_ACTION_DONE          0x0001
@@ -55,6 +57,15 @@ static void BattleAI_DoAIProcessing(void);
 static void AIStackPushVar(const u8 *);
 static bool8 AIStackPop(void);
 static u8 BattleAI_GetWantedBattler(u8 wantedBattler);
+static u8 BattleAI_GetAbility(u8 battlerId);
+static u8 BattleAI_GetAbilityIfKnownOrImpossible(u8 battlerId, u8 abilityToCheck);
+static bool8 BattleAI_BattlerCanMagicBounceMove(u8 battlerId, u16 move);
+static bool8 BattleAI_IsMovePriorityBoostedByPrankster(u8 battlerId, u16 move);
+static s8 BattleAI_GetMovePriority(u8 battlerId, u16 move);
+static bool8 BattleAI_IsMoveBlockedByPrankster(u16 move, u8 battlerId);
+static bool8 BattleAI_IsMoveBlockedByArmorTail(u16 move, u8 battlerId);
+static bool8 BattleAI_IsMoveBlockedByQuickGuard(u8 battlerId, u16 move);
+static u8 BattleAI_GetWhoStrikesFirstConsideringMove(u8 battler1, u8 battler2);
 
 static void Cmd_if_random_less_than(void);
 static void Cmd_if_random_greater_than(void);
@@ -139,8 +150,8 @@ static void Cmd_get_move_power_from_result(void);
 static void Cmd_get_move_effect_from_result(void);
 static void Cmd_get_protect_count(void);
 static void Cmd_get_who_strikes_first(void);
-static void Cmd_nullsub_53(void);
-static void Cmd_nullsub_54(void);
+static void Cmd_get_trick_room(void);
+static void Cmd_get_gravity(void);
 static void Cmd_nullsub_55(void);
 static void Cmd_nullsub_56(void);
 static void Cmd_nullsub_57(void);
@@ -155,6 +166,12 @@ static void Cmd_is_of_type(void);
 static void Cmd_if_target_is_ally(void);
 static void Cmd_if_flash_fired(void);
 static void Cmd_if_holds_item(void);
+static void Cmd_if_move_would_be_bounced(void);
+static void Cmd_if_has_move_with_target(void);
+static void Cmd_if_move_is_blocked_by_prankster(void);
+static void Cmd_if_move_is_blocked_by_armor_tail(void);
+static void Cmd_if_has_move_blocked_by_quick_guard(void);
+static void Cmd_if_move_target(void);
 
 // ewram
 EWRAM_DATA const u8 *gAIScriptPtr = NULL;
@@ -248,8 +265,8 @@ static const BattleAICmdFunc sBattleAICmdTable[] =
     Cmd_get_move_effect_from_result,                // 0x50
     Cmd_get_protect_count,                          // 0x51
     Cmd_get_who_strikes_first,                      // 0x52
-    Cmd_nullsub_53,                                 // 0x53
-    Cmd_nullsub_54,                                 // 0x54
+    Cmd_get_trick_room,                             // 0x53
+    Cmd_get_gravity,                                // 0x54
     Cmd_nullsub_55,                                 // 0x55
     Cmd_nullsub_56,                                 // 0x56
     Cmd_nullsub_57,                                 // 0x57
@@ -264,6 +281,12 @@ static const BattleAICmdFunc sBattleAICmdTable[] =
     Cmd_check_ability,                              // 0x60
     Cmd_if_flash_fired,                             // 0x61
     Cmd_if_holds_item,                              // 0x62
+    Cmd_if_move_would_be_bounced,                   // 0x63
+    Cmd_if_has_move_with_target,                    // 0x64
+    Cmd_if_move_is_blocked_by_prankster,            // 0x65
+    Cmd_if_has_move_blocked_by_quick_guard,         // 0x66
+    Cmd_if_move_target,                             // 0x67
+    Cmd_if_move_is_blocked_by_armor_tail,           // 0x68
 };
 
 static const u16 sDiscouragedPowerfulMoveEffects[] =
@@ -278,6 +301,7 @@ static const u16 sDiscouragedPowerfulMoveEffects[] =
     EFFECT_SPIT_UP,
     EFFECT_FOCUS_PUNCH,
     EFFECT_SUPERPOWER,
+    EFFECT_HAMMER_ARM,
     EFFECT_ERUPTION,
     EFFECT_OVERHEAT,
     0xFFFF
@@ -827,14 +851,10 @@ static void Cmd_if_not_status2(void)
 
 static void Cmd_if_status3(void)
 {
-    u16 battlerId;
+    u8 battlerId;
     u32 status;
 
-    if (gAIScriptPtr[1] == AI_USER)
-        battlerId = sBattler_AI;
-    else
-        battlerId = gBattlerTarget;
-
+    battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
     status = T1_READ_32(gAIScriptPtr + 2);
 
     if (gStatuses3[battlerId] & status)
@@ -845,14 +865,10 @@ static void Cmd_if_status3(void)
 
 static void Cmd_if_not_status3(void)
 {
-    u16 battlerId;
+    u8 battlerId;
     u32 status;
 
-    if (gAIScriptPtr[1] == AI_USER)
-        battlerId = sBattler_AI;
-    else
-        battlerId = gBattlerTarget;
-
+    battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
     status = T1_READ_32(gAIScriptPtr + 2);
 
     if (!(gStatuses3[battlerId] & status))
@@ -1095,6 +1111,11 @@ static void Cmd_get_turn_count(void)
     gAIScriptPtr += 1;
 }
 
+static u8 BattleAI_GetMoveType(u8 battlerId, u16 move)
+{
+    return GetBattlerMoveType(battlerId, move, 0);
+}
+
 static void Cmd_get_type(void)
 {
     u8 typeVar = gAIScriptPtr[1];
@@ -1114,7 +1135,7 @@ static void Cmd_get_type(void)
         AI_THINKING_STRUCT->funcResult = gBattleMons[gBattlerTarget].type2;
         break;
     case AI_TYPE_MOVE: // type of move being pointed to
-        AI_THINKING_STRUCT->funcResult = gBattleMoves[AI_THINKING_STRUCT->moveConsidered].type;
+        AI_THINKING_STRUCT->funcResult = BattleAI_GetMoveType(sBattler_AI, AI_THINKING_STRUCT->moveConsidered);
         break;
     }
     gAIScriptPtr += 2;
@@ -1134,6 +1155,261 @@ static u8 BattleAI_GetWantedBattler(u8 wantedBattler)
     case AI_TARGET_PARTNER:
         return gBattlerTarget ^ BIT_FLANK;
     }
+}
+
+static u8 BattleAI_GetAbility(u8 battlerId)
+{
+    u32 species = gBattleMons[battlerId].species;
+    u32 possibleAbilities[NUM_ABILITY_SLOTS];
+    u32 numAbilities = 0;
+    u32 i;
+
+    // The AI knows its own or partner's ability.
+    if (GetBattlerSide(battlerId) == GetBattlerSide(sBattler_AI))
+        return gBattleMons[battlerId].ability;
+
+    if (BATTLE_HISTORY->abilities[battlerId] != ABILITY_NONE)
+        return BATTLE_HISTORY->abilities[battlerId];
+
+    // These abilities are effectively public as soon as they matter in battle.
+    if (gBattleMons[battlerId].ability == ABILITY_SHADOW_TAG
+     || gBattleMons[battlerId].ability == ABILITY_MAGNET_PULL
+     || gBattleMons[battlerId].ability == ABILITY_ARENA_TRAP)
+    {
+        return gBattleMons[battlerId].ability;
+    }
+
+    // AI has no knowledge of opponent, so it guesses which ability.
+    for (i = 0; i < NUM_ABILITY_SLOTS; i++)
+    {
+        if (gBaseStats[species].abilities[i] != ABILITY_NONE)
+            possibleAbilities[numAbilities++] = gBaseStats[species].abilities[i];
+    }
+
+    if (numAbilities == 0)
+        return ABILITY_NONE;
+
+    return (u8)possibleAbilities[Random() % numAbilities];
+}
+
+static u8 BattleAI_GetAbilityIfKnownOrImpossible(u8 battlerId, u8 abilityToCheck)
+{
+    u32 species = gBattleMons[battlerId].species;
+    u32 firstPossibleAbility = ABILITY_NONE;
+    u32 numAbilities = 0;
+    bool32 canHaveAbility = FALSE;
+    u32 i;
+
+    if (GetBattlerSide(battlerId) == GetBattlerSide(sBattler_AI))
+        return gBattleMons[battlerId].ability;
+
+    if (BATTLE_HISTORY->abilities[battlerId] != ABILITY_NONE)
+        return BATTLE_HISTORY->abilities[battlerId];
+
+    // abilities that prevent fleeing.
+    if (gBattleMons[battlerId].ability == ABILITY_SHADOW_TAG
+     || gBattleMons[battlerId].ability == ABILITY_MAGNET_PULL
+     || gBattleMons[battlerId].ability == ABILITY_ARENA_TRAP)
+    {
+        return gBattleMons[battlerId].ability;
+    }
+
+    for (i = 0; i < NUM_ABILITY_SLOTS; i++)
+    {
+        if (gBaseStats[species].abilities[i] == ABILITY_NONE)
+            continue;
+        if (gBaseStats[species].abilities[i] == abilityToCheck)
+            canHaveAbility = TRUE;
+        if (firstPossibleAbility == ABILITY_NONE)
+            firstPossibleAbility = gBaseStats[species].abilities[i];
+        numAbilities++;
+    }
+
+    if (canHaveAbility)
+    {
+        if (numAbilities == 1)
+            return abilityToCheck;
+        return ABILITY_NONE;
+    }
+
+    return firstPossibleAbility;
+}
+
+static bool8 BattleAI_BattlerCanMagicBounceMove(u8 battlerId, u16 move)
+{
+    if (BattleAI_GetAbility(sBattler_AI) == ABILITY_MOLD_BREAKER)
+        return FALSE;
+    if (BattleAI_GetAbility(battlerId) != ABILITY_MAGIC_BOUNCE)
+        return FALSE;
+    if (gBattleMons[battlerId].hp == 0)
+        return FALSE;
+    if (gAbsentBattlerFlags & gBitTable[battlerId])
+        return FALSE;
+    if (gStatuses3[battlerId] & STATUS3_SEMI_INVULNERABLE)
+        return FALSE;
+    if (gProtectStructs[battlerId].protected && (gBattleMoves[move].flags & FLAG_PROTECT_AFFECTED))
+        return FALSE;
+
+    return TRUE;
+}
+
+static bool8 BattleAI_IsMovePriorityBoostedByPrankster(u8 battlerId, u16 move)
+{
+    if (move == MOVE_NONE || gBattleMoves[move].category != DAMAGE_CATEGORY_STATUS)
+        return FALSE;
+
+    if (GetBattlerSide(battlerId) == GetBattlerSide(sBattler_AI))
+        return gBattleMons[battlerId].ability == ABILITY_PRANKSTER;
+
+    return BattleAI_GetAbilityIfKnownOrImpossible(battlerId, ABILITY_PRANKSTER) == ABILITY_PRANKSTER;
+}
+
+static s8 BattleAI_GetMovePriority(u8 battlerId, u16 move)
+{
+    s8 priority;
+
+    if (move == MOVE_NONE)
+        return 0;
+
+    priority = gBattleMoves[move].priority;
+
+    if (BattleAI_IsMovePriorityBoostedByPrankster(battlerId, move))
+        priority++;
+
+    return priority;
+}
+
+static bool8 BattleAI_IsMoveBlockedByPrankster(u16 move, u8 battlerId)
+{
+    if (!BattleAI_IsMovePriorityBoostedByPrankster(sBattler_AI, move))
+        return FALSE;
+
+    if (GetBattlerSide(sBattler_AI) == GetBattlerSide(battlerId))
+        return FALSE;
+
+    if (!IS_BATTLER_OF_TYPE(battlerId, TYPE_DARK))
+        return FALSE;
+
+    if (move == MOVE_PERISH_SONG)
+        return TRUE;
+
+    switch (gBattleMoves[move].target)
+    {
+    case MOVE_TARGET_DEPENDS:
+    case MOVE_TARGET_OPPONENTS_FIELD:
+        return FALSE;
+    default:
+        return TRUE;
+    }
+}
+
+static bool8 BattleAI_IsMoveBlockedByArmorTail(u16 move, u8 battlerId)
+{
+    u8 battlers[2];
+    s32 i;
+
+    if (move == MOVE_NONE || BattleAI_GetMovePriority(sBattler_AI, move) <= 0)
+        return FALSE;
+
+    switch (gBattleMoves[move].target)
+    {
+    case MOVE_TARGET_USER:
+        // Perish Song is the one self-targeting exception Armor Tail can still block.
+        if (move == MOVE_PERISH_SONG)
+            break;
+        return FALSE;
+    case MOVE_TARGET_OPPONENTS_FIELD:
+    case MOVE_TARGET_FOES_AND_ALLY:
+        return FALSE;
+    }
+
+    if (GetBattlerSide(sBattler_AI) == GetBattlerSide(battlerId))
+        return FALSE;
+
+    battlers[0] = battlerId;
+    battlers[1] = BATTLE_PARTNER(battlerId);
+
+    for (i = 0; i < ARRAY_COUNT(battlers); i++)
+    {
+        u8 armorTailBattler = battlers[i];
+
+        if (armorTailBattler >= gBattlersCount)
+            continue;
+        if (GetBattlerSide(armorTailBattler) != GetBattlerSide(battlerId))
+            continue;
+        if (!IsBattlerAlive(armorTailBattler))
+            continue;
+        if (DoesBattlerIgnoreAbility(sBattler_AI, armorTailBattler, ABILITY_ARMOR_TAIL))
+            continue;
+        if (BattleAI_GetAbilityIfKnownOrImpossible(armorTailBattler, ABILITY_ARMOR_TAIL) == ABILITY_ARMOR_TAIL)
+            return TRUE;
+    }
+
+    return FALSE;
+}
+
+static bool8 BattleAI_IsMoveBlockedByQuickGuard(u8 battlerId, u16 move)
+{
+    if (move == MOVE_NONE || BattleAI_GetMovePriority(battlerId, move) <= 0)
+        return FALSE;
+
+    switch (gBattleMoves[move].target)
+    {
+    case MOVE_TARGET_USER:
+        return FALSE;
+    default:
+        return TRUE;
+    }
+}
+
+static u8 BattleAI_GetWhoStrikesFirstConsideringMove(u8 battler1, u8 battler2)
+{
+    u32 speedBattler1 = GetBattlerTotalSpeedStat(battler1, TRUE);
+    u32 speedBattler2 = GetBattlerTotalSpeedStat(battler2, TRUE);
+    bool32 trickRoomShouldFlip = FALSE;
+    s8 priority1 = 0;
+    s8 priority2 = 0;
+    u8 strikesFirst = 0;
+
+    if (gWishFutureKnock.trickRoomTimer != 0
+        && speedBattler1 != UINT_MAX
+        && speedBattler2 != UINT_MAX)
+        trickRoomShouldFlip = TRUE;
+
+    if (battler1 == sBattler_AI)
+        priority1 = BattleAI_GetMovePriority(battler1, AI_THINKING_STRUCT->moveConsidered);
+    if (battler2 == sBattler_AI)
+        priority2 = BattleAI_GetMovePriority(battler2, AI_THINKING_STRUCT->moveConsidered);
+
+    if (priority1 != 0 || priority2 != 0)
+    {
+        if (priority1 == priority2)
+        {
+            if (speedBattler1 == speedBattler2)
+                strikesFirst = 2;
+            else if (speedBattler1 < speedBattler2)
+                strikesFirst = 1;
+
+            if (trickRoomShouldFlip && strikesFirst != 2)
+                strikesFirst ^= 1;
+        }
+        else if (priority1 < priority2)
+        {
+            strikesFirst = 1;
+        }
+    }
+    else
+    {
+        if (speedBattler1 == speedBattler2)
+            strikesFirst = 2;
+        else if (speedBattler1 < speedBattler2)
+            strikesFirst = 1;
+
+        if (trickRoomShouldFlip && strikesFirst != 2)
+            strikesFirst ^= 1;
+    }
+
+    return strikesFirst;
 }
 
 static void Cmd_is_of_type(void)
@@ -1246,7 +1522,7 @@ static void Cmd_if_not_equal_(void) // Same as if_not_equal.
 
 static void Cmd_if_user_goes(void)
 {
-    if (GetWhoStrikesFirstForAI(sBattler_AI, gBattlerTarget, TRUE) == gAIScriptPtr[1])
+    if (BattleAI_GetWhoStrikesFirstConsideringMove(sBattler_AI, gBattlerTarget) == gAIScriptPtr[1])
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 2);
     else
         gAIScriptPtr += 6;
@@ -1254,7 +1530,7 @@ static void Cmd_if_user_goes(void)
 
 static void Cmd_if_user_doesnt_go(void)
 {
-    if (GetWhoStrikesFirstForAI(sBattler_AI, gBattlerTarget, TRUE) != gAIScriptPtr[1])
+    if (BattleAI_GetWhoStrikesFirstConsideringMove(sBattler_AI, gBattlerTarget) != gAIScriptPtr[1])
         gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 2);
     else
         gAIScriptPtr += 6;
@@ -1328,110 +1604,16 @@ static void Cmd_get_considered_move_effect(void)
 
 static void Cmd_get_ability(void)
 {
-    u8 battlerId;
+    u8 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
 
-    if (gAIScriptPtr[1] == AI_USER)
-        battlerId = sBattler_AI;
-    else
-        battlerId = gBattlerTarget;
-
-    if (gActiveBattler != battlerId)
-    {
-        if (BATTLE_HISTORY->abilities[battlerId] != 0)
-        {
-            AI_THINKING_STRUCT->funcResult = BATTLE_HISTORY->abilities[battlerId];
-            gAIScriptPtr += 2;
-            return;
-        }
-
-        // abilities that prevent fleeing.
-        if (gBattleMons[battlerId].ability == ABILITY_SHADOW_TAG
-        || gBattleMons[battlerId].ability == ABILITY_MAGNET_PULL
-        || gBattleMons[battlerId].ability == ABILITY_ARENA_TRAP)
-        {
-            AI_THINKING_STRUCT->funcResult = gBattleMons[battlerId].ability;
-            gAIScriptPtr += 2;
-            return;
-        }
-
-        if (gBaseStats[gBattleMons[battlerId].species].abilities[0] != ABILITY_NONE)
-        {
-            if (gBaseStats[gBattleMons[battlerId].species].abilities[1] != ABILITY_NONE)
-            {
-                // AI has no knowledge of opponent, so it guesses which ability.
-                if (Random() & 1)
-                    AI_THINKING_STRUCT->funcResult = gBaseStats[gBattleMons[battlerId].species].abilities[0];
-                else
-                    AI_THINKING_STRUCT->funcResult = gBaseStats[gBattleMons[battlerId].species].abilities[1];
-            }
-            else
-            {
-                AI_THINKING_STRUCT->funcResult = gBaseStats[gBattleMons[battlerId].species].abilities[0]; // It's definitely ability 1.
-            }
-        }
-        else
-        {
-            AI_THINKING_STRUCT->funcResult = gBaseStats[gBattleMons[battlerId].species].abilities[1]; // AI can't actually reach this part since no pokemon has ability 2 and no ability 1.
-        }
-    }
-    else
-    {
-        // The AI knows its own ability.
-        AI_THINKING_STRUCT->funcResult = gBattleMons[battlerId].ability;
-    }
-
+    AI_THINKING_STRUCT->funcResult = BattleAI_GetAbility(battlerId);
     gAIScriptPtr += 2;
 }
 
 static void Cmd_check_ability(void)
 {
     u32 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
-    u32 ability = gAIScriptPtr[2];
-
-    if (gAIScriptPtr[1] == AI_TARGET || gAIScriptPtr[1] == AI_TARGET_PARTNER)
-    {
-        if (BATTLE_HISTORY->abilities[battlerId] != ABILITY_NONE)
-        {
-            ability = BATTLE_HISTORY->abilities[battlerId];
-            AI_THINKING_STRUCT->funcResult = ability;
-        }
-        // Abilities that prevent fleeing.
-        else if (gBattleMons[battlerId].ability == ABILITY_SHADOW_TAG
-        || gBattleMons[battlerId].ability == ABILITY_MAGNET_PULL
-        || gBattleMons[battlerId].ability == ABILITY_ARENA_TRAP)
-        {
-            ability = gBattleMons[battlerId].ability;
-        }
-        else if (gBaseStats[gBattleMons[battlerId].species].abilities[0] != ABILITY_NONE)
-        {
-            if (gBaseStats[gBattleMons[battlerId].species].abilities[1] != ABILITY_NONE)
-            {
-                u8 abilityDummyVariable = ability; // Needed to match.
-                if (gBaseStats[gBattleMons[battlerId].species].abilities[0] != abilityDummyVariable
-                && gBaseStats[gBattleMons[battlerId].species].abilities[1] != abilityDummyVariable)
-                {
-                    ability = gBaseStats[gBattleMons[battlerId].species].abilities[0];
-                }
-                else
-                {
-                    ability = ABILITY_NONE;
-                }
-            }
-            else
-            {
-                ability = gBaseStats[gBattleMons[battlerId].species].abilities[0];
-            }
-        }
-        else
-        {
-            ability = gBaseStats[gBattleMons[battlerId].species].abilities[1]; // AI can't actually reach this part since no pokemon has ability 2 and no ability 1.
-        }
-    }
-    else
-    {
-        // The AI knows its own or partner's ability.
-        ability = gBattleMons[battlerId].ability;
-    }
+    u32 ability = BattleAI_GetAbilityIfKnownOrImpossible(battlerId, gAIScriptPtr[2]);
 
     if (ability == 0)
         AI_THINKING_STRUCT->funcResult = 2; // Unable to answer.
@@ -1441,6 +1623,45 @@ static void Cmd_check_ability(void)
         AI_THINKING_STRUCT->funcResult = 0; // Pokemon doesn't have the ability we wanted to check.
 
     gAIScriptPtr += 3;
+}
+
+static void Cmd_if_move_would_be_bounced(void)
+{
+    const u8 *jumpPtr = T1_READ_PTR(gAIScriptPtr + 1);
+    u16 move = AI_THINKING_STRUCT->moveConsidered;
+    u8 battlerId = gBattlerTarget;
+    bool8 wouldBeBounced = FALSE;
+
+    if (gBattleMoves[move].flags & FLAG_MAGICCOAT_AFFECTED)
+    {
+        if (gBattleMoves[move].target == MOVE_TARGET_OPPONENTS_FIELD)
+        {
+            u8 side = GetBattlerSide(battlerId);
+
+            for (battlerId = side; battlerId < gBattlersCount; battlerId += 2)
+            {
+                if (BattleAI_BattlerCanMagicBounceMove(battlerId, move))
+                {
+                    wouldBeBounced = TRUE;
+                    break;
+                }
+            }
+        }
+        else if (gBattleMoves[move].target == MOVE_TARGET_BOTH)
+        {
+            wouldBeBounced = BattleAI_BattlerCanMagicBounceMove(battlerId, move)
+                          || BattleAI_BattlerCanMagicBounceMove(battlerId ^ BIT_FLANK, move);
+        }
+        else
+        {
+            wouldBeBounced = BattleAI_BattlerCanMagicBounceMove(battlerId, move);
+        }
+    }
+
+    if (wouldBeBounced)
+        gAIScriptPtr = jumpPtr;
+    else
+        gAIScriptPtr += 5;
 }
 
 static void Cmd_get_highest_type_effectiveness(void)
@@ -1606,7 +1827,7 @@ static void Cmd_if_status_not_in_party(void)
 
         if (species != SPECIES_NONE && species != SPECIES_EGG && hp != 0 && status == statusToCompareTo)
         {
-            gAIScriptPtr += 10; // UB: Still bugged in Emerald. Uncomment the return statement to fix.
+            gAIScriptPtr += 10; // UB (fixed): Still bugged in Emerald. Uncomment the return statement to fix.
             return;
         }
     }
@@ -2136,6 +2357,92 @@ static void Cmd_get_protect_count(void)
     gAIScriptPtr += 2;
 }
 
+static void Cmd_if_has_move_with_target(void)
+{
+    s32 i;
+    u32 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
+    bool32 useHistory = (GetBattlerSide(battlerId) != GetBattlerSide(sBattler_AI));
+
+    if (!IsBattlerAlive(battlerId))
+    {
+        gAIScriptPtr += 7;
+        return;
+    }
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        u32 move = useHistory ? BATTLE_HISTORY->usedMoves[battlerId].moves[i]
+                              : gBattleMons[battlerId].moves[i];
+
+        if (move != MOVE_NONE && gBattleMoves[move].target == gAIScriptPtr[2])
+            break;
+    }
+
+    if (i == MAX_MON_MOVES)
+        gAIScriptPtr += 7;
+    else
+        gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 3);
+}
+
+static void Cmd_if_move_is_blocked_by_prankster(void)
+{
+    u8 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
+    u16 move = AI_THINKING_STRUCT->moveConsidered;
+
+    if (BattleAI_IsMoveBlockedByPrankster(move, battlerId))
+        gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 2);
+    else
+        gAIScriptPtr += 6;
+}
+
+static void Cmd_if_move_is_blocked_by_armor_tail(void)
+{
+    u8 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
+    u16 move = AI_THINKING_STRUCT->moveConsidered;
+
+    if (BattleAI_IsMoveBlockedByArmorTail(move, battlerId))
+        gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 2);
+    else
+        gAIScriptPtr += 6;
+}
+
+static void Cmd_if_has_move_blocked_by_quick_guard(void)
+{
+    s32 i;
+    u8 battlerId = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
+    bool32 useHistory = (GetBattlerSide(battlerId) != GetBattlerSide(sBattler_AI));
+
+    if (!IsBattlerAlive(battlerId))
+    {
+        gAIScriptPtr += 6;
+        return;
+    }
+
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        u16 move = useHistory ? BATTLE_HISTORY->usedMoves[battlerId].moves[i]
+                              : gBattleMons[battlerId].moves[i];
+
+        if (BattleAI_IsMoveBlockedByQuickGuard(battlerId, move))
+            break;
+    }
+
+    if (i == MAX_MON_MOVES)
+        gAIScriptPtr += 6;
+    else
+        gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 2);
+}
+
+static void Cmd_if_move_target(void)
+{
+    u16 move = AI_THINKING_STRUCT->moveConsidered;
+
+    if (move != MOVE_NONE && gBattleMoves[move].target == gAIScriptPtr[1])
+        gAIScriptPtr = T1_READ_PTR(gAIScriptPtr + 2);
+    else
+        gAIScriptPtr += 6;
+}
+
 static void Cmd_get_who_strikes_first(void)
 {
     u8 battler1 = BattleAI_GetWantedBattler(gAIScriptPtr[1]);
@@ -2146,11 +2453,16 @@ static void Cmd_get_who_strikes_first(void)
     gAIScriptPtr += 3;
 }
 
-static void Cmd_nullsub_53(void)
+static void Cmd_get_trick_room(void)
 {
+    AI_THINKING_STRUCT->funcResult = (gWishFutureKnock.trickRoomTimer != 0) ? AI_TRICK_ROOM_ON : AI_TRICK_ROOM_OFF;
+    gAIScriptPtr += 1;
 }
-static void Cmd_nullsub_54(void)
+
+static void Cmd_get_gravity(void)
 {
+    AI_THINKING_STRUCT->funcResult = (gWishFutureKnock.gravityTimer != 0) ? AI_GRAVITY_ON : AI_GRAVITY_OFF;
+    gAIScriptPtr += 1;
 }
 
 static void Cmd_nullsub_55(void)

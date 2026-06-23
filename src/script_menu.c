@@ -3,6 +3,7 @@
 #include "event_data.h"
 #include "field_effect.h"
 #include "field_specials.h"
+#include "field_weather.h"
 #include "item.h"
 #include "menu.h"
 #include "palette.h"
@@ -35,6 +36,7 @@ static void CreateLilycoveSSTidalMultichoice(void);
 static bool8 IsPicboxClosed(void);
 static void CreateStartMenuForPokenavTutorial(void);
 static void InitMultichoiceNoWrap(bool8 ignoreBPress, u8 unusedCount, u8 windowId, u8 multichoiceId);
+static void RefreshObjectEventSpritePalettesWithWeather(void);
 
 bool8 ScriptMenu_Multichoice(u8 left, u8 top, u8 multichoiceId, bool8 ignoreBPress)
 {
@@ -159,6 +161,9 @@ static void Task_HandleMultichoiceInput(u8 taskId)
 
     if (!gPaletteFade.active)
     {
+        if (tMultichoiceId == MULTI_PC)
+            RefreshObjectEventSpritePalettesWithWeather();
+
         if (sProcessInputDelay)
         {
             sProcessInputDelay--;
@@ -193,6 +198,32 @@ static void Task_HandleMultichoiceInput(u8 taskId)
                 EnableBothScriptContexts();
             }
         }
+    }
+}
+
+static void RefreshObjectEventSpritePalettesWithWeather(void)
+{
+    u16 refreshedPalettes = 0;
+    u32 i;
+
+    for (i = 0; i < OBJECT_EVENTS_COUNT; i++)
+    {
+        u8 spriteId;
+        u8 paletteNum;
+
+        if (!gObjectEvents[i].active)
+            continue;
+
+        spriteId = gObjectEvents[i].spriteId;
+        if (spriteId >= MAX_SPRITES || !gSprites[spriteId].inUse)
+            continue;
+
+        paletteNum = gSprites[spriteId].oam.paletteNum;
+        if (refreshedPalettes & (1 << paletteNum))
+            continue;
+
+        refreshedPalettes |= 1 << paletteNum;
+        UpdateSpritePaletteWithWeather(paletteNum, FALSE);
     }
 }
 

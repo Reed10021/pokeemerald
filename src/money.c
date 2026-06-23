@@ -10,7 +10,7 @@
 #include "strings.h"
 #include "decompress.h"
 
-#define MAX_MONEY 9999999 // 4000000 // 999999
+#define MAX_MONEY 9999999
 
 EWRAM_DATA static u8 sMoneyBoxWindowId = 0;
 EWRAM_DATA static u8 sMoneyLabelSpriteId = 0;
@@ -72,6 +72,16 @@ static const struct CompressedSpritePalette sSpritePalette_MoneyLabel =
 u32 GetMoney(u32* moneyPtr)
 {
     return *moneyPtr ^ gSaveBlock2Ptr->encryptionKey;
+}
+
+u32 GetAvailableMoneySpace(u32* moneyPtr)
+{
+    u32 money = GetMoney(moneyPtr);
+
+    if (money >= MAX_MONEY)
+        return 0;
+
+    return MAX_MONEY - money;
 }
 
 void SetMoney(u32* moneyPtr, u32 newValue)

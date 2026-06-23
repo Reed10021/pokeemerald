@@ -45,6 +45,7 @@
 #include "strings.h"
 #include "string_util.h"
 #include "task.h"
+#include "text.h"
 #include "text_window.h"
 #include "menu_helpers.h"
 #include "window.h"
@@ -119,6 +120,9 @@ void sub_81AD350(u8);
 static void BagMenu_PrintItemCantBeHeld(u8);
 static void DisplayCurrentMoneyWindow(void);
 static void DisplaySellItemPriceAndConfirm(u8);
+static u32 GetItemSellPrice(u16 itemId);
+static u16 GetMaxSellQuantity(u16 itemId, u16 ownedQuantity);
+static u32 GetSellTotal(u16 itemId, u16 quantity);
 void sub_81AD730(u8);
 void sub_81AD6E4(u8);
 static void RemoveMoneyWindow(void);
@@ -551,7 +555,7 @@ struct ListBuffer1 {
 };
 
 struct ListBuffer2 {
-    s8 name[MAX_POCKET_ITEMS][24];
+    s8 name[MAX_POCKET_ITEMS][ITEM_NAME_LENGTH + 10];
 };
 
 struct TempWallyStruct {
@@ -933,30 +937,62 @@ void LoadBagItemListBuffers(u8 pocketId)
     gMultiuseListMenuTemplate.maxShowed = gBagMenu->numShownItems[pocketId];
 }
 
+static u32 GetBagItemMessageWidth(void)
+{
+    u32 width = GetWindowAttribute(1, WINDOW_WIDTH) * 8;
+
+    if (width > 16)
+        width -= 16;
+    else
+        width = 0;
+
+    return width;
+}
+
+static void CopyBagItemNameToMessageBuffer(u16 itemId)
+{
+    u8 *end = CopyItemName(itemId, gStringVar1);
+
+    WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, GetBagItemMessageWidth());
+}
+
+static void CopyBagItemNameToMessageBufferHandlePlural(u16 itemId, u32 quantity)
+{
+    u8 *end = CopyItemNameHandlePlural(itemId, gStringVar1, quantity);
+
+    WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, GetBagItemMessageWidth());
+}
+
 void GetItemName(s8 *dest, u16 itemId)
 {
+    u8 *end;
+    u8 *itemName = (u8 *)dest;
+
     switch (gBagPositionStruct.pocket)
     {
         case TMHM_POCKET:
-            StringCopy(gStringVar2, gMoveNames[ItemIdToBattleMoveId(itemId)]);
+            end = StringCopy(gStringVar2, gMoveNames[ItemIdToBattleMoveId(itemId)]);
+            PrependFontIdToFit(gStringVar2, end, FONT_NARROW, 65);
             if (itemId >= ITEM_HM01)
             {
                 ConvertIntToDecimalStringN(gStringVar1, itemId - ITEM_HM01 + 1, STR_CONV_MODE_LEADING_ZEROS, 1);
-                StringExpandPlaceholders(dest, gText_ClearTo11Var1Clear5Var2);
+                StringExpandPlaceholders(itemName, gText_ClearTo11Var1Clear5Var2);
             }
             else
             {
                 ConvertIntToDecimalStringN(gStringVar1, itemId - ITEM_TM01 + 1, STR_CONV_MODE_LEADING_ZEROS, 2);
-                StringExpandPlaceholders(dest, gText_NumberVar1Clear7Var2);
+                StringExpandPlaceholders(itemName, gText_NumberVar1Clear7Var2);
             }
             break;
         case BERRIES_POCKET:
             ConvertIntToDecimalStringN(gStringVar1, itemId - ITEM_CHERI_BERRY + 1, STR_CONV_MODE_LEADING_ZEROS, 2);
-            CopyItemName(itemId, gStringVar2);
-            StringExpandPlaceholders(dest, gText_NumberVar1Clear7Var2);
+            end = CopyItemName(itemId, gStringVar2);
+            PrependFontIdToFit(gStringVar2, end, FONT_NARROW, 61);
+            StringExpandPlaceholders(itemName, gText_NumberVar1Clear7Var2);
             break;
         default:
-            CopyItemName(itemId, dest);
+            end = CopyItemName(itemId, itemName);
+            PrependFontIdToFit(itemName, end, FONT_NARROW, 88);
             break;
     }
 }
@@ -1487,7 +1523,7 @@ void BagMenu_SwapItems(u8 taskId)
     ListMenuSetUnkIndicatorsStructField(data[0], 16, 1);
     data[1] = gBagPositionStruct.scrollPosition[gBagPositionStruct.pocket] + gBagPositionStruct.cursorPosition[gBagPositionStruct.pocket];
     gBagMenu->itemOriginalLocation = data[1];
-    CopyItemName(BagGetItemIdByPocketPosition(gBagPositionStruct.pocket + 1, data[1]), gStringVar1);
+    CopyBagItemNameToMessageBuffer(BagGetItemIdByPocketPosition(gBagPositionStruct.pocket + 1, data[1]));
     StringExpandPlaceholders(gStringVar4, gText_MoveVar1Where);
     FillWindowPixelBuffer(1, PIXEL_FILL(0));
     BagMenu_Print(1, 1, gStringVar4, 3, 1, 0, 0, 0, 0);
@@ -1640,7 +1676,7 @@ void OpenContextMenu(u8 unused)
         default:
             if (MenuHelpers_LinkSomething() == TRUE || InUnionRoom() == TRUE)
             {
-                if (gBagPositionStruct.pocket == KEYITEMS_POCKET || !sub_8122148(gSpecialVar_ItemId))
+                if (gBagPositionStruct.pocket == KEYITEMS_POCKET)
                 {
                     gBagMenu->contextMenuItemsPtr = sContextMenuItems_Cancel;
                     gBagMenu->contextMenuNumItems = ARRAY_COUNT(sContextMenuItems_Cancel);
@@ -1722,7 +1758,7 @@ void OpenContextMenu(u8 unused)
     }
     else
     {
-        CopyItemName(gSpecialVar_ItemId, gStringVar1);
+        CopyBagItemNameToMessageBuffer(gSpecialVar_ItemId);
         StringExpandPlaceholders(gStringVar4, gText_Var1IsSelected);
         FillWindowPixelBuffer(1, PIXEL_FILL(0));
         BagMenu_Print(1, 1, gStringVar4, 3, 1, 0, 0, 0, 0);
@@ -1887,7 +1923,7 @@ void ItemMenu_Toss(u8 taskId)
     }
     else
     {
-        CopyItemName(gSpecialVar_ItemId, gStringVar1);
+        CopyBagItemNameToMessageBufferHandlePlural(gSpecialVar_ItemId, 2);
         StringExpandPlaceholders(gStringVar4, gText_TossHowManyVar1s);
         FillWindowPixelBuffer(1, PIXEL_FILL(0));
         BagMenu_Print(1, 1, gStringVar4, 3, 1, 0, 0, 0, 0);
@@ -1900,7 +1936,7 @@ void BagMenu_TossItems(u8 taskId)
 {
     s16* data = gTasks[taskId].data;
 
-    CopyItemName(gSpecialVar_ItemId, gStringVar1);
+    CopyBagItemNameToMessageBufferHandlePlural(gSpecialVar_ItemId, tItemCount);
     ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, 3);
     StringExpandPlaceholders(gStringVar4, gText_ConfirmTossItems);
     FillWindowPixelBuffer(1, PIXEL_FILL(0));
@@ -1943,7 +1979,7 @@ void BagMenu_ConfirmToss(u8 taskId)
 {
     s16* data = gTasks[taskId].data;
 
-    CopyItemName(gSpecialVar_ItemId, gStringVar1);
+    CopyBagItemNameToMessageBufferHandlePlural(gSpecialVar_ItemId, tItemCount);
     ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, 3);
     StringExpandPlaceholders(gStringVar4, gText_ThrewAwayVar2Var1s);
     FillWindowPixelBuffer(1, PIXEL_FILL(0));
@@ -2054,12 +2090,6 @@ void Task_ItemContext_FieldGive(u8 taskId)
     {
         DisplayItemMessage(taskId, 1, gText_CantWriteMail, sub_81AD350);
     }
-    else if (!sub_8122148(gSpecialVar_ItemId))
-    {
-        CopyItemName(gSpecialVar_ItemId, gStringVar1);
-        StringExpandPlaceholders(gStringVar4, gText_Var1CantBeHeldHere);
-        DisplayItemMessage(taskId, 1, gStringVar4, sub_81AD350);
-    }
     else if (gBagPositionStruct.pocket != KEYITEMS_POCKET && !ItemId_GetImportance(gSpecialVar_ItemId))
     {
         Task_FadeAndCloseBagMenu(taskId);
@@ -2080,9 +2110,45 @@ void Task_ItemContext_ItemPC_2(u8 taskId)
         BagMenu_PrintItemCantBeHeld(taskId);
 }
 
+static u32 GetItemSellPrice(u16 itemId)
+{
+    return ItemId_GetPrice(itemId) / 2;
+}
+
+static u16 GetMaxSellQuantity(u16 itemId, u16 ownedQuantity)
+{
+    u32 sellPrice = GetItemSellPrice(itemId);
+    u32 maxQuantity;
+
+    if (sellPrice == 0)
+        return 0;
+
+    maxQuantity = GetAvailableMoneySpace(&gSaveBlock1Ptr->money) / sellPrice;
+
+    if (maxQuantity > ownedQuantity)
+        return ownedQuantity;
+
+    return maxQuantity;
+}
+
+static u32 GetSellTotal(u16 itemId, u16 quantity)
+{
+    u32 sellPrice = GetItemSellPrice(itemId);
+    u32 moneyRoom = GetAvailableMoneySpace(&gSaveBlock1Ptr->money);
+
+    if (quantity == 0 || sellPrice == 0)
+        return 0;
+
+    if (sellPrice > moneyRoom / quantity)
+        return moneyRoom;
+
+    return sellPrice * quantity;
+}
+
 void Task_ItemContext_Sell(u8 taskId)
 {
     s16* data = gTasks[taskId].data;
+    u16 maxSellQuantity;
 
     if (ItemId_GetPrice(gSpecialVar_ItemId) == 0 || ItemId_GetPocket(gSpecialVar_ItemId) == POCKET_TM_HM)
     {
@@ -2090,8 +2156,13 @@ void Task_ItemContext_Sell(u8 taskId)
         StringExpandPlaceholders(gStringVar4, gText_CantBuyKeyItem);
         DisplayItemMessage(taskId, 1, gStringVar4, BagMenu_InitListsMenu);
     }
+    else if ((maxSellQuantity = GetMaxSellQuantity(gSpecialVar_ItemId, data[2])) == 0)
+    {
+        DisplayItemMessage(taskId, 1, gText_NoRoomForThatMuchMoney, BagMenu_InitListsMenu);
+    }
     else
     {
+        data[2] = maxSellQuantity;
         tItemCount = 1;
         if (data[2] == 1)
         {
@@ -2111,7 +2182,7 @@ static void DisplaySellItemPriceAndConfirm(u8 taskId)
 {
     s16* data = gTasks[taskId].data;
 
-    ConvertIntToDecimalStringN(gStringVar1, (ItemId_GetPrice(gSpecialVar_ItemId) / 2) * tItemCount, STR_CONV_MODE_LEFT_ALIGN, 7);
+    ConvertUIntToDecimalStringN(gStringVar1, GetSellTotal(gSpecialVar_ItemId, tItemCount), STR_CONV_MODE_LEFT_ALIGN, 7);
     StringExpandPlaceholders(gStringVar4, gText_ICanPayVar1);
     DisplayItemMessage(taskId, 1, gStringVar4, sub_81AD6E4);
 }
@@ -2136,7 +2207,7 @@ void sub_81AD730(u8 taskId)
     s16* data = gTasks[taskId].data;
     u8 windowId = BagMenu_AddWindow(8);
 
-    PrintItemSoldAmount(windowId, 1, (ItemId_GetPrice(gSpecialVar_ItemId) / 2) * tItemCount);
+    PrintItemSoldAmount(windowId, 1, GetSellTotal(gSpecialVar_ItemId, tItemCount));
     DisplayCurrentMoneyWindow();
     gTasks[taskId].func = Task_SellHowManyDialogueHandleInput;
 }
@@ -2147,7 +2218,7 @@ static void Task_SellHowManyDialogueHandleInput(u8 taskId)
 
     if (AdjustQuantityAccordingToDPadInput(&tItemCount, data[2]) == TRUE)
     {
-        PrintItemSoldAmount(gBagMenu->windowPointers[8], tItemCount, (ItemId_GetPrice(gSpecialVar_ItemId) / 2) * tItemCount);
+        PrintItemSoldAmount(gBagMenu->windowPointers[8], tItemCount, GetSellTotal(gSpecialVar_ItemId, tItemCount));
     }
     else if (JOY_NEW(A_BUTTON))
     {
@@ -2170,8 +2241,8 @@ void BagMenu_ConfirmSell(u8 taskId)
 {
     s16* data = gTasks[taskId].data;
 
-    CopyItemName(gSpecialVar_ItemId, gStringVar2);
-    ConvertIntToDecimalStringN(gStringVar1, (ItemId_GetPrice(gSpecialVar_ItemId) / 2) * tItemCount, STR_CONV_MODE_LEFT_ALIGN, 7);
+    CopyItemNameHandlePlural(gSpecialVar_ItemId, gStringVar2, tItemCount);
+    ConvertUIntToDecimalStringN(gStringVar1, GetSellTotal(gSpecialVar_ItemId, tItemCount), STR_CONV_MODE_LEFT_ALIGN, 7);
     StringExpandPlaceholders(gStringVar4, gText_TurnedOverVar1ForVar2);
     DisplayItemMessage(taskId, 1, gStringVar4, BagMenu_Sell_UpdateItemListAndMoney);
 }
@@ -2181,10 +2252,11 @@ static void BagMenu_Sell_UpdateItemListAndMoney(u8 taskId)
     s16* data = gTasks[taskId].data;
     u16* scrollPos = &gBagPositionStruct.scrollPosition[gBagPositionStruct.pocket];
     u16* cursorPos = &gBagPositionStruct.cursorPosition[gBagPositionStruct.pocket];
+    u32 sellTotal = GetSellTotal(gSpecialVar_ItemId, tItemCount);
 
     PlaySE(SE_SHOP);
     RemoveBagItem(gSpecialVar_ItemId, tItemCount);
-    AddMoney(&gSaveBlock1Ptr->money, (ItemId_GetPrice(gSpecialVar_ItemId) / 2) * tItemCount);
+    AddMoney(&gSaveBlock1Ptr->money, sellTotal);
     DestroyListMenuTask(data[0], scrollPos, cursorPos);
     UpdatePocketItemList(gBagPositionStruct.pocket);
     SetInitialScrollAndCursorPositions(gBagPositionStruct.pocket);
@@ -2216,7 +2288,7 @@ void Task_ItemContext_Deposit(u8 taskId)
     }
     else
     {
-        CopyItemName(gSpecialVar_ItemId, gStringVar1);
+        CopyBagItemNameToMessageBufferHandlePlural(gSpecialVar_ItemId, 2);
         StringExpandPlaceholders(gStringVar4, gText_DepositHowManyVar1);
         FillWindowPixelBuffer(1, PIXEL_FILL(0));
         BagMenu_Print(1, 1, gStringVar4, 3, 1, 0, 0, 0, 0);
@@ -2261,7 +2333,7 @@ static void BagMenu_TryDepositItem(u8 taskId)
     }
     else if (AddPCItem(gSpecialVar_ItemId, tItemCount) == TRUE)
     {
-        CopyItemName(gSpecialVar_ItemId, gStringVar1);
+        CopyBagItemNameToMessageBufferHandlePlural(gSpecialVar_ItemId, tItemCount);
         ConvertIntToDecimalStringN(gStringVar2, tItemCount, STR_CONV_MODE_LEFT_ALIGN, 3);
         StringExpandPlaceholders(gStringVar4, gText_DepositedVar2Var1s);
         BagMenu_Print(1, 1, gStringVar4, 3, 1, 0, 0, 0, 0);
@@ -2586,15 +2658,7 @@ void PrintTMHMMoveData(u16 itemId)
             text = gStringVar1;
         }
         BagMenu_Print(4, 1, text, 7, 12, 0, 0, -1, 4);
-        if (gBattleMoves[moveId].accuracy == 0 ||
-            moveId == MOVE_ASSIST || moveId == MOVE_BLOCK || moveId == MOVE_CAMOUFLAGE || moveId == MOVE_CHARGE ||
-            moveId == MOVE_CONVERSION_2 || moveId == MOVE_FOLLOW_ME || moveId == MOVE_GRUDGE || moveId == MOVE_HELPING_HAND ||
-            moveId == MOVE_IMPRISON || moveId == MOVE_INGRAIN || moveId == MOVE_MAGIC_COAT || moveId == MOVE_MEAN_LOOK ||
-            moveId == MOVE_MEMENTO || moveId == MOVE_MIMIC || moveId == MOVE_MUD_SPORT || moveId == MOVE_NIGHTMARE ||
-            moveId == MOVE_PAIN_SPLIT || moveId == MOVE_RECYCLE || moveId == MOVE_REFRESH || moveId == MOVE_ROLE_PLAY ||
-            moveId == MOVE_SKILL_SWAP || moveId == MOVE_SLACK_OFF || moveId == MOVE_SNATCH || moveId == MOVE_SOFT_BOILED ||
-            moveId == MOVE_SPIDER_WEB || moveId == MOVE_TAIL_GLOW || moveId == MOVE_WATER_SPORT || moveId == MOVE_WISH || 
-            moveId == MOVE_YAWN || moveId == MOVE_NASTY_PLOT || moveId == MOVE_TRICK_ROOM)
+        if (gBattleMoves[moveId].accuracy == 0)
         {
             text = gText_ThreeDashes;
         }
@@ -2780,10 +2844,11 @@ enum ItemSortType
     ITEM_TYPE_HEALTH_RECOVERY,
     ITEM_TYPE_STATUS_RECOVERY,
     ITEM_TYPE_PP_RECOVERY,
-    ITEM_TYPE_ABILITY_MODIFIER,
-    ITEM_TYPE_MINT,
     ITEM_TYPE_STAT_BOOST_DRINK,
     ITEM_TYPE_STAT_BOOST_FEATHER,
+    ITEM_TYPE_MINT,
+    ITEM_TYPE_ABILITY_MODIFIER,
+    ITEM_TYPE_HYPER_TRAINING,
     ITEM_TYPE_EVOLUTION_STONE,
     ITEM_TYPE_EVOLUTION_ITEM,
     ITEM_TYPE_BATTLE_ITEM,
@@ -2892,11 +2957,6 @@ static const u8 sBagMenuSortTypeType[] =
 
 static const u16 sItemsByType[ITEMS_COUNT] =
 {
-    [ITEM_REPEL] = ITEM_TYPE_FIELD_USE,
-    [ITEM_SUPER_REPEL] = ITEM_TYPE_FIELD_USE,
-    [ITEM_MAX_REPEL] = ITEM_TYPE_FIELD_USE,
-    [ITEM_ESCAPE_ROPE] = ITEM_TYPE_FIELD_USE,
-
     [ITEM_POTION] = ITEM_TYPE_HEALTH_RECOVERY,
     [ITEM_FULL_RESTORE] = ITEM_TYPE_HEALTH_RECOVERY,
     [ITEM_MAX_POTION] = ITEM_TYPE_HEALTH_RECOVERY,
@@ -2937,7 +2997,10 @@ static const u16 sItemsByType[ITEMS_COUNT] =
     [ITEM_ZINC] = ITEM_TYPE_STAT_BOOST_DRINK,
     [ITEM_PP_MAX] = ITEM_TYPE_STAT_BOOST_DRINK,
 
-    [ITEM_MACHO_BRACE] = ITEM_TYPE_STAT_BOOST_HELD_ITEM,
+    [ITEM_REPEL] = ITEM_TYPE_FIELD_USE,
+    [ITEM_SUPER_REPEL] = ITEM_TYPE_FIELD_USE,
+    [ITEM_MAX_REPEL] = ITEM_TYPE_FIELD_USE,
+    [ITEM_ESCAPE_ROPE] = ITEM_TYPE_FIELD_USE,
 
     [ITEM_SUN_STONE] = ITEM_TYPE_EVOLUTION_STONE,
     [ITEM_MOON_STONE] = ITEM_TYPE_EVOLUTION_STONE,
@@ -2945,6 +3008,12 @@ static const u16 sItemsByType[ITEMS_COUNT] =
     [ITEM_THUNDER_STONE] = ITEM_TYPE_EVOLUTION_STONE,
     [ITEM_WATER_STONE] = ITEM_TYPE_EVOLUTION_STONE,
     [ITEM_LEAF_STONE] = ITEM_TYPE_EVOLUTION_STONE,
+    [ITEM_ICE_STONE] = ITEM_TYPE_EVOLUTION_STONE,
+    [ITEM_SHINY_STONE] = ITEM_TYPE_EVOLUTION_STONE,
+    [ITEM_DAWN_STONE] = ITEM_TYPE_EVOLUTION_STONE,
+    [ITEM_DUSK_STONE] = ITEM_TYPE_EVOLUTION_STONE,
+
+    [ITEM_MACHO_BRACE] = ITEM_TYPE_STAT_BOOST_HELD_ITEM,
 
     [ITEM_KINGS_ROCK] = ITEM_TYPE_EVOLUTION_ITEM,
     [ITEM_DEEP_SEA_TOOTH] = ITEM_TYPE_EVOLUTION_ITEM,
@@ -2998,6 +3067,10 @@ static const u16 sItemsByType[ITEMS_COUNT] =
     [ITEM_DRAGON_FANG] = ITEM_TYPE_HELD_ITEM,
     [ITEM_SILK_SCARF] = ITEM_TYPE_HELD_ITEM,
     [ITEM_SHELL_BELL] = ITEM_TYPE_HELD_ITEM,
+
+    [ITEM_SEA_INCENSE] = ITEM_TYPE_INCENSE,
+    [ITEM_LAX_INCENSE] = ITEM_TYPE_INCENSE,
+
     [ITEM_LUCKY_PUNCH] = ITEM_TYPE_HELD_ITEM,
     [ITEM_METAL_POWDER] = ITEM_TYPE_HELD_ITEM,
     [ITEM_THICK_CLUB] = ITEM_TYPE_HELD_ITEM,
@@ -3010,21 +3083,27 @@ static const u16 sItemsByType[ITEMS_COUNT] =
     [ITEM_CHOICE_SCARF] = ITEM_TYPE_HELD_ITEM,
     [ITEM_MUSCLE_BAND] = ITEM_TYPE_HELD_ITEM,
     [ITEM_WISE_GLASSES] = ITEM_TYPE_HELD_ITEM,
-
-    [ITEM_SEA_INCENSE] = ITEM_TYPE_INCENSE,
-    [ITEM_LAX_INCENSE] = ITEM_TYPE_INCENSE,
-
-    [ITEM_RED_ORB] = ITEM_TYPE_MEGA_STONE,
-    [ITEM_BLUE_ORB] = ITEM_TYPE_MEGA_STONE,
+    [ITEM_EXPERT_BELT] = ITEM_TYPE_HELD_ITEM,
+    [ITEM_FLAME_ORB] = ITEM_TYPE_HELD_ITEM,
+    [ITEM_TOXIC_ORB] = ITEM_TYPE_HELD_ITEM,
+    [ITEM_LIFE_ORB] = ITEM_TYPE_HELD_ITEM,
+    [ITEM_EVIOLITE] = ITEM_TYPE_HELD_ITEM,
 
     [ITEM_BLUE_FLUTE] = ITEM_TYPE_STATUS_RECOVERY,
     [ITEM_YELLOW_FLUTE] = ITEM_TYPE_STATUS_RECOVERY,
     [ITEM_RED_FLUTE] = ITEM_TYPE_STATUS_RECOVERY,
+
     [ITEM_BLACK_FLUTE] = ITEM_TYPE_FLUTE,
     [ITEM_WHITE_FLUTE] = ITEM_TYPE_FLUTE,
 
     [ITEM_SHOAL_SALT] = ITEM_TYPE_SELLABLE,
     [ITEM_SHOAL_SHELL] = ITEM_TYPE_SELLABLE,
+
+    [ITEM_RED_SHARD] = ITEM_TYPE_SHARD,
+    [ITEM_BLUE_SHARD] = ITEM_TYPE_SHARD,
+    [ITEM_YELLOW_SHARD] = ITEM_TYPE_SHARD,
+    [ITEM_GREEN_SHARD] = ITEM_TYPE_SHARD,
+
     [ITEM_TINY_MUSHROOM] = ITEM_TYPE_SELLABLE,
     [ITEM_BIG_MUSHROOM] = ITEM_TYPE_SELLABLE,
     [ITEM_PEARL] = ITEM_TYPE_SELLABLE,
@@ -3033,15 +3112,6 @@ static const u16 sItemsByType[ITEMS_COUNT] =
     [ITEM_STAR_PIECE] = ITEM_TYPE_SELLABLE,
     [ITEM_NUGGET] = ITEM_TYPE_SELLABLE,
     [ITEM_HEART_SCALE] = ITEM_TYPE_SELLABLE,
-
-    [ITEM_RED_SHARD] = ITEM_TYPE_SHARD,
-    [ITEM_BLUE_SHARD] = ITEM_TYPE_SHARD,
-    [ITEM_YELLOW_SHARD] = ITEM_TYPE_SHARD,
-    [ITEM_GREEN_SHARD] = ITEM_TYPE_SHARD,
-
-    [ITEM_HELIX_FOSSIL] = ITEM_TYPE_FOSSIL,
-    [ITEM_DOME_FOSSIL] = ITEM_TYPE_FOSSIL,
-    [ITEM_OLD_AMBER] = ITEM_TYPE_FOSSIL,
 
     [ITEM_ORANGE_MAIL] = ITEM_TYPE_MAIL,
     [ITEM_HARBOR_MAIL] = ITEM_TYPE_MAIL,
@@ -3056,29 +3126,9 @@ static const u16 sItemsByType[ITEMS_COUNT] =
     [ITEM_FAB_MAIL] = ITEM_TYPE_MAIL,
     [ITEM_RETRO_MAIL] = ITEM_TYPE_MAIL,
 
-    [ITEM_ADAMANT_MINT] = ITEM_TYPE_MINT,
-    [ITEM_BOLD_MINT]    = ITEM_TYPE_MINT,
-    [ITEM_BRAVE_MINT]   = ITEM_TYPE_MINT,
-    [ITEM_CALM_MINT]    = ITEM_TYPE_MINT,
-    [ITEM_CAREFUL_MINT] = ITEM_TYPE_MINT,
-    [ITEM_GENTLE_MINT]  = ITEM_TYPE_MINT,
-    [ITEM_HASTY_MINT]   = ITEM_TYPE_MINT,
-    [ITEM_IMPISH_MINT]  = ITEM_TYPE_MINT,
-    [ITEM_JOLLY_MINT]   = ITEM_TYPE_MINT,
-    [ITEM_LAX_MINT]     = ITEM_TYPE_MINT,
-    [ITEM_LONELY_MINT]  = ITEM_TYPE_MINT,
-    [ITEM_MILD_MINT]    = ITEM_TYPE_MINT,
-    [ITEM_MODEST_MINT]  = ITEM_TYPE_MINT,
-    [ITEM_NAIVE_MINT]   = ITEM_TYPE_MINT,
-    [ITEM_NAUGHTY_MINT] = ITEM_TYPE_MINT,
-    [ITEM_QUIET_MINT]   = ITEM_TYPE_MINT,
-    [ITEM_RASH_MINT]    = ITEM_TYPE_MINT,
-    [ITEM_RELAXED_MINT] = ITEM_TYPE_MINT,
-    [ITEM_SASSY_MINT]   = ITEM_TYPE_MINT,
-    [ITEM_SERIOUS_MINT] = ITEM_TYPE_MINT,
-    [ITEM_TIMID_MINT]   = ITEM_TYPE_MINT,
-
-    [ITEM_ABILITY_CAPSULE] = ITEM_TYPE_ABILITY_MODIFIER,
+    [ITEM_HELIX_FOSSIL] = ITEM_TYPE_FOSSIL,
+    [ITEM_DOME_FOSSIL] = ITEM_TYPE_FOSSIL,
+    [ITEM_OLD_AMBER] = ITEM_TYPE_FOSSIL,
 
     [ITEM_MACH_BIKE] = ITEM_TYPE_IMPORTANT_FIELD_USE,
     [ITEM_ACRO_BIKE] = ITEM_TYPE_IMPORTANT_FIELD_USE,
@@ -3099,6 +3149,35 @@ static const u16 sItemsByType[ITEMS_COUNT] =
     [ITEM_SUPER_ROD] = ITEM_TYPE_FIELD_USE_KEY_ITEM,
     [ITEM_WAILMER_PAIL] = ITEM_TYPE_FIELD_USE_KEY_ITEM,
     [ITEM_POKEBLOCK_CASE] = ITEM_TYPE_FIELD_USE_KEY_ITEM,
+    [ITEM_RED_ORB] = ITEM_TYPE_MEGA_STONE,
+    [ITEM_BLUE_ORB] = ITEM_TYPE_MEGA_STONE,
+
+    [ITEM_ADAMANT_MINT] = ITEM_TYPE_MINT,
+    [ITEM_BOLD_MINT] = ITEM_TYPE_MINT,
+    [ITEM_BRAVE_MINT] = ITEM_TYPE_MINT,
+    [ITEM_CALM_MINT] = ITEM_TYPE_MINT,
+    [ITEM_CAREFUL_MINT] = ITEM_TYPE_MINT,
+    [ITEM_GENTLE_MINT] = ITEM_TYPE_MINT,
+    [ITEM_HASTY_MINT] = ITEM_TYPE_MINT,
+    [ITEM_IMPISH_MINT] = ITEM_TYPE_MINT,
+    [ITEM_JOLLY_MINT] = ITEM_TYPE_MINT,
+    [ITEM_LAX_MINT] = ITEM_TYPE_MINT,
+    [ITEM_LONELY_MINT] = ITEM_TYPE_MINT,
+    [ITEM_MILD_MINT] = ITEM_TYPE_MINT,
+    [ITEM_MODEST_MINT] = ITEM_TYPE_MINT,
+    [ITEM_NAIVE_MINT] = ITEM_TYPE_MINT,
+    [ITEM_NAUGHTY_MINT] = ITEM_TYPE_MINT,
+    [ITEM_QUIET_MINT] = ITEM_TYPE_MINT,
+    [ITEM_RASH_MINT] = ITEM_TYPE_MINT,
+    [ITEM_RELAXED_MINT] = ITEM_TYPE_MINT,
+    [ITEM_SASSY_MINT] = ITEM_TYPE_MINT,
+    [ITEM_SERIOUS_MINT] = ITEM_TYPE_MINT,
+    [ITEM_TIMID_MINT] = ITEM_TYPE_MINT,
+
+    [ITEM_ABILITY_CAPSULE] = ITEM_TYPE_ABILITY_MODIFIER,
+    [ITEM_ABILITY_PATCH] = ITEM_TYPE_ABILITY_MODIFIER,
+    [ITEM_BOTTLE_CAP] = ITEM_TYPE_HYPER_TRAINING,
+    [ITEM_GOLD_BOTTLE_CAP] = ITEM_TYPE_HYPER_TRAINING,
 };
 
 static void AddBagSortSubMenu(void)

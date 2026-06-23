@@ -46,6 +46,8 @@ LilycoveCity_DepartmentStore_3F_Pokemart_Vitamins: @ 821FC7C
 	.2byte ITEM_SERIOUS_MINT
 	.2byte ITEM_TIMID_MINT
 	.2byte ITEM_ABILITY_CAPSULE
+	.2byte ITEM_ABILITY_PATCH
+	.2byte ITEM_BOTTLE_CAP
 	.2byte ITEM_NONE
 	release
 	end
@@ -63,6 +65,11 @@ LilycoveCity_DepartmentStore_3F_EventScript_ClerkRight:: @ 821FC8C
 	.align 2
 LilycoveCity_DepartmentStore_3F_Pokemart_StatBoosters: @ 821FCA4
 	.2byte ITEM_FOCUS_SASH
+	.2byte ITEM_EVIOLITE
+	.2byte ITEM_ICE_STONE
+	.2byte ITEM_SHINY_STONE
+	.2byte ITEM_DAWN_STONE
+	.2byte ITEM_DUSK_STONE
 	.2byte ITEM_X_SPEED
 	.2byte ITEM_X_SPECIAL
 	.2byte ITEM_X_ATTACK

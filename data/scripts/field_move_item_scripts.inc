@@ -90,6 +90,9 @@ EventScript_UseFlashToolText::
     end
 
 EventScript_UseSurfTool::
+	checkitem ITEM_HM_SURFBOARD, 1
+	compare VAR_RESULT, TRUE
+	goto_if_ne EventScript_UseUpgradedSurfTool
     bufferitemname 1, ITEM_HM_SURFBOARD
     msgbox Text_PlayerUsedFieldTool, MSGBOX_DEFAULT
 EventScript_UseSurfFieldEffect::

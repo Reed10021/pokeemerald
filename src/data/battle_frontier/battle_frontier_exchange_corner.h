@@ -28,13 +28,13 @@ static const u16 sFrontierExchangeCorner_Decor2[] =
 
 static const u16 sFrontierExchangeCorner_Vitamins[] =
 { 
-    ITEM_RARE_CANDY,
     ITEM_PROTEIN, 
     ITEM_CALCIUM, 
     ITEM_IRON, 
     ITEM_ZINC, 
     ITEM_CARBOS, 
     ITEM_HP_UP, 
+    ITEM_RARE_CANDY,
     ITEM_ADAMANT_MINT,
     ITEM_BOLD_MINT,
     ITEM_BRAVE_MINT,
@@ -56,17 +56,25 @@ static const u16 sFrontierExchangeCorner_Vitamins[] =
     ITEM_SASSY_MINT,
     ITEM_SERIOUS_MINT,
     ITEM_TIMID_MINT,
+    ITEM_ABILITY_CAPSULE,
+    ITEM_BOTTLE_CAP,
+    ITEM_ABILITY_PATCH,
+    ITEM_GOLD_BOTTLE_CAP,
     0xFFFF 
 };
 
 static const u16 sFrontierExchangeCorner_HoldItems[] =
 { 
     ITEM_FOCUS_SASH,
-    ITEM_ABILITY_CAPSULE,
+    ITEM_EVIOLITE,
+    ITEM_FLAME_ORB,
+    ITEM_TOXIC_ORB,
+    ITEM_LIFE_ORB,
     ITEM_WEATHER_ORB,
     ITEM_PUNCHING_GLOVE,
     ITEM_MUSCLE_BAND,
     ITEM_WISE_GLASSES,
+    ITEM_EXPERT_BELT,
     ITEM_LEFTOVERS, 
     ITEM_WHITE_HERB, 
     ITEM_QUICK_CLAW, 
@@ -111,13 +119,13 @@ static const u8 *const sFrontierExchangeCorner_Decor2Descriptions[] =
 
 static const u8 *const sFrontierExchangeCorner_VitaminsDescriptions[] = 
 {
-    BattleFrontier_ExchangeServiceCorner_Text_RareCandyDesc,
     BattleFrontier_ExchangeServiceCorner_Text_ProteinDesc,
     BattleFrontier_ExchangeServiceCorner_Text_CalciumDesc,
     BattleFrontier_ExchangeServiceCorner_Text_IronDesc,
     BattleFrontier_ExchangeServiceCorner_Text_ZincDesc,
     BattleFrontier_ExchangeServiceCorner_Text_CarbosDesc,
     BattleFrontier_ExchangeServiceCorner_Text_HPUpDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_RareCandyDesc,
     BattleFrontier_ExchangeServiceCorner_Text_AdamantMintDesc,
     BattleFrontier_ExchangeServiceCorner_Text_BoldMintDesc,
     BattleFrontier_ExchangeServiceCorner_Text_BraveMintDesc,
@@ -139,17 +147,25 @@ static const u8 *const sFrontierExchangeCorner_VitaminsDescriptions[] =
     BattleFrontier_ExchangeServiceCorner_Text_SassyMintDesc,
     BattleFrontier_ExchangeServiceCorner_Text_SeriousMintDesc,
     BattleFrontier_ExchangeServiceCorner_Text_TimidMintDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_AbilityCapsuleDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_BottleCapDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_AbilityPatchDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_GoldBottleCapDesc,
     gText_Exit
 };
 
 static const u8 *const sFrontierExchangeCorner_HoldItemsDescriptions[] = 
 {
     BattleFrontier_ExchangeServiceCorner_Text_FocusSashDesc,
-    BattleFrontier_ExchangeServiceCorner_Text_AbilityCapsuleDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_EvioliteDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_FlameOrbDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_ToxicOrbDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_LifeOrbDesc,
     BattleFrontier_ExchangeServiceCorner_Text_WeatherOrbDesc,
     BattleFrontier_ExchangeServiceCorner_Text_PunchingGloveDesc,
     BattleFrontier_ExchangeServiceCorner_Text_MuscleBandDesc,
     BattleFrontier_ExchangeServiceCorner_Text_WiseGlassesDesc,
+    BattleFrontier_ExchangeServiceCorner_Text_ExpertBeltDesc,
     BattleFrontier_ExchangeServiceCorner_Text_LeftoversDesc,
     BattleFrontier_ExchangeServiceCorner_Text_WhiteHerbDesc,
     BattleFrontier_ExchangeServiceCorner_Text_QuickClawDesc,

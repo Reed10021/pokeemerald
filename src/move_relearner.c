@@ -945,6 +945,22 @@ static void CreateLearnableMovesList(void)
     sMoveRelearnerStruct->numToShowAtOnce = LoadMoveRelearnerMovesList(sMoveRelearnerStruct->menuItems, sMoveRelearnerStruct->numMenuChoices);
 }
 
+static u8 GetMoveRelearnerSplit(u16 move)
+{
+    if (gBattleMoves[move].category == DAMAGE_CATEGORY_STATUS)
+        return 2;
+
+    if (gBattleMoves[move].category == DAMAGE_CATEGORY_VARIABLE)
+    {
+        if (GetMonData(&gPlayerParty[sMoveRelearnerStruct->partyMon], MON_DATA_ATK) > GetMonData(&gPlayerParty[sMoveRelearnerStruct->partyMon], MON_DATA_SPATK))
+            return 0;
+        else
+            return 1;
+    }
+
+    return GetBattleMoveSplit(move);
+}
+
 void MoveRelearnerShowHideHearts(s32 moveId)
 {
     u16 numHearts;
@@ -960,7 +976,7 @@ void MoveRelearnerShowHideHearts(s32 moveId)
         if (moveId != LIST_CANCEL)
         {
             gSprites[sMoveRelearnerStruct->splitIconSpriteId].invisible = FALSE;
-            StartSpriteAnim(&gSprites[sMoveRelearnerStruct->splitIconSpriteId], GetBattleMoveSplit(moveId));
+            StartSpriteAnim(&gSprites[sMoveRelearnerStruct->splitIconSpriteId], GetMoveRelearnerSplit(moveId));
         }
         else 
         {

@@ -70,7 +70,14 @@ static void CB2_ReshowBattleScreenAfterMenu(void)
         LoadBattleTextboxAndBackground();
         break;
     case 3:
+        DestroyBattleMenuExtraSprites();
         ResetSpriteData();
+        gBattleStruct->moveInfoSpriteId = MAX_SPRITES;
+        gBattleStruct->lastUsedBallSpriteIds[0] = MAX_SPRITES;
+        gBattleStruct->lastUsedBallSpriteIds[1] = MAX_SPRITES;
+        gBattleStruct->lastUsedBallBtnAck = FALSE;
+        gBattleStruct->lastUsedBallSwapped = FALSE;
+        gLastUsedBallMenuPresent = FALSE;
         break;
     case 4:
         FreeAllSpritePalettes();

@@ -813,3 +813,19 @@ ShoalCave_LowTideIceRoom_EventScript_ItemHailstormShard::
 Altering_Cave_EventScript_ItemWaterStone::
 	finditem ITEM_WATER_STONE
 	end
+
+MeteorFalls_1F_1R_EventScript_ItemIceStone::
+	finditem ITEM_ICE_STONE
+	end
+
+Route123_EventScript_ItemDuskStone::
+	finditem ITEM_DUSK_STONE
+	end
+
+Route123_EventScript_ItemShinyStone::
+	finditem ITEM_SHINY_STONE
+	end
+
+Route122_EventScript_ItemDawnStone::
+	finditem ITEM_DAWN_STONE
+	end

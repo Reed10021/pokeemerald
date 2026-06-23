@@ -5,7 +5,7 @@
 #define WEATHER_SUNNY_CLOUDS            1
 #define WEATHER_SUNNY                   2
 #define WEATHER_RAIN                    3
-#define WEATHER_SNOW                    4   // Unused
+#define WEATHER_SNOW                    4
 #define WEATHER_RAIN_THUNDERSTORM       5
 #define WEATHER_FOG_HORIZONTAL          6
 #define WEATHER_VOLCANIC_ASH            7
@@ -19,7 +19,7 @@
 #define WEATHER_ABNORMAL                15  // The alternating weather during Groudon/Kyogre conflict 
 #define WEATHER_EXTREME_HEAT            16
 #define WEATHER_THUNDER_LIGHTNING       17 // Weather with occasional thunder, but no rain.
-#define WEATHER_SCATTERED_STORMS        18 // Changes intermittently and randomly between rain, thunderstorms, shade, and thunder & lightning.
+#define WEATHER_SCATTERED_STORMS        18 // Over time, changes intermittently and randomly between rain, thunderstorms, shade, and thunder & lightning.
 
 #define WEATHER_ROUTE119_CYCLE          20
 #define WEATHER_ROUTE123_CYCLE          21
@@ -44,6 +44,7 @@
 #define WEATHER_TIMELESS_FOREST         40
 #define WEATHER_ROUTE101_CYCLE          41
 #define WEATHER_BATTLE_FRONTIER_CYCLE   42
+#define WEATHER_RUSTBORO_CYCLE          43
 
 // These are used in maps' coord_weather_event entries.
 // They are not a one-to-one mapping with the engine's

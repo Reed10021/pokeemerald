@@ -1044,7 +1044,7 @@ void BtlController_EmitPause(u8 bufferId, u8 toWait, void *data)
     PrepareBufferDataTransfer(bufferId, sBattleBuffersTransferData, toWait * 3 + 2);
 }
 
-void BtlController_EmitMoveAnimation(u8 bufferId, u16 move, u8 turnOfMove, u16 movePower, s32 dmg, u8 friendship, struct DisableStruct *disableStructPtr, u8 multihit)
+void BtlController_EmitMoveAnimation(u8 bufferId, u16 move, u8 turnOfMove, u16 movePower, s32 dmg, u8 friendship, u16 moveWeather, struct DisableStruct *disableStructPtr, u8 multihit)
 {
     sBattleBuffersTransferData[0] = CONTROLLER_MOVEANIMATION;
     sBattleBuffersTransferData[1] = move;
@@ -1058,16 +1058,8 @@ void BtlController_EmitMoveAnimation(u8 bufferId, u16 move, u8 turnOfMove, u16 m
     sBattleBuffersTransferData[9] = (dmg & 0xFF000000) >> 24;
     sBattleBuffersTransferData[10] = friendship;
     sBattleBuffersTransferData[11] = multihit;
-    if (WEATHER_HAS_EFFECT)
-    {
-        sBattleBuffersTransferData[12] = gBattleWeather;
-        sBattleBuffersTransferData[13] = (gBattleWeather & 0xFF00) >> 8;
-    }
-    else
-    {
-        sBattleBuffersTransferData[12] = 0;
-        sBattleBuffersTransferData[13] = 0;
-    }
+    sBattleBuffersTransferData[12] = moveWeather;
+    sBattleBuffersTransferData[13] = (moveWeather & 0xFF00) >> 8;
     sBattleBuffersTransferData[14] = 0;
     sBattleBuffersTransferData[15] = 0;
     memcpy(&sBattleBuffersTransferData[16], disableStructPtr, sizeof(struct DisableStruct));

@@ -78,6 +78,7 @@ void BattleTurnPassed(void);
 u8 IsRunningFromBattleImpossible(void);
 void SwitchPartyOrder(u8 battlerId);
 void SwapTurnOrder(u8 id1, u8 id2);
+u32 GetBattlerTotalSpeedStat(u8 battler, bool32 includeQuickClaw);
 u8 GetWhoStrikesFirst(u8 battlerId1, u8 battlerId2, bool8 ignoreChosenMoves);
 u8 GetWhoStrikesFirstForAI(u8 battlerId1, u8 battlerId2, bool8 ignoreChosenMoves);
 void RunBattleScriptCommands_PopCallbacksStack(void);

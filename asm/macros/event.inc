@@ -694,6 +694,10 @@
 	.elseif \type == TRAINER_BATTLE_HILL
 		.4byte \pointer1 @ text
 		.4byte \pointer2 @ text
+	.elseif \type == TRAINER_BATTLE_REMATCH_CONTINUE_SCRIPT
+		.4byte \pointer1 @ text
+		.4byte \pointer2 @ text
+		.4byte \pointer3 @ event script
 	.endif
 	.endm
 
@@ -723,9 +727,13 @@
 	.endif
 	.endm
 
-	@ Starts a rematch battle, takes a trainer, intro text and loss text
-	.macro trainerbattle_rematch trainer:req, intro_text:req, lose_text:req
+	@ Starts a rematch battle, takes a trainer, intro text and loss text, and an optional event script.
+	.macro trainerbattle_rematch trainer:req, intro_text:req, lose_text:req, event_script=FALSE
+	.if \event_script == FALSE
 	trainerbattle TRAINER_BATTLE_REMATCH, \trainer, 0, \intro_text, \lose_text
+	.else
+	trainerbattle TRAINER_BATTLE_REMATCH_CONTINUE_SCRIPT, \trainer, 0, \intro_text, \lose_text, \event_script
+	.endif
 	.endm
 
 	@ Starts a rematch double battle, takes a trainer, intro text, loss text, and text for when you have too few pokemon

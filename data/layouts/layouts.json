@@ -4480,6 +4480,36 @@
       "secondary_tileset": "gTileset_Cave",
       "border_filepath": "data/layouts/ArtisanCave_B2F/border.bin",
       "blockdata_filepath": "data/layouts/ArtisanCave_B2F/map.bin"
+    },
+    {
+      "id": "LAYOUT_UNDERWATER_VICTORY_ROAD",
+      "name": "Underwater_VictoryRoad_Layout",
+      "width": 22,
+      "height": 12,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/Underwater_VictoryRoad/border.bin",
+      "blockdata_filepath": "data/layouts/Underwater_VictoryRoad/map.bin"
+    },
+    {
+      "id": "LAYOUT_UNDERWATER_RUINED_CHAMBER",
+      "name": "Underwater_RuinedChamber_Layout",
+      "width": 22,
+      "height": 48,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Underwater",
+      "border_filepath": "data/layouts/Underwater_RuinedChamber/border.bin",
+      "blockdata_filepath": "data/layouts/Underwater_RuinedChamber/map.bin"
+    },
+    {
+      "id": "LAYOUT_RUINED_CHAMBER",
+      "name": "RuinedChamber_Layout",
+      "width": 22,
+      "height": 46,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Cave",
+      "border_filepath": "data/layouts/RuinedChamber/border.bin",
+      "blockdata_filepath": "data/layouts/RuinedChamber/map.bin"
     }
   ]
 }

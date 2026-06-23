@@ -1,13 +1,11 @@
 #include "global.h"
 #include "item.h"
-#include "berry.h"
 #include "string_util.h"
 #include "text.h"
 #include "event_data.h"
 #include "malloc.h"
 #include "secret_base.h"
 #include "item_menu.h"
-#include "strings.h"
 #include "load_save.h"
 #include "item_use.h"
 #include "battle_pyramid.h"
@@ -24,7 +22,8 @@ extern u16 gUnknown_0203CF30[];
 #endif
 static bool8 CheckPyramidBagHasItem(u16 itemId, u16 count);
 static bool8 CheckPyramidBagHasSpace(u16 itemId, u16 count);
-
+static bool32 DoesItemHavePluralName(u16 itemId);
+static const u8* GetItemPluralName(u16 itemId);
 // EWRAM variables
 EWRAM_DATA struct BagPocket gBagPockets[POCKETS_COUNT] = {0};
 
@@ -89,50 +88,26 @@ void SetBagItemsPointers(void)
     gBagPockets[MEDICINE_POCKET].capacity = BAG_MEDICINE_COUNT;
 }
 
-void CopyItemName(u16 itemId, u8 *dst)
+u8 *CopyItemName(u16 itemId, u8 *dst)
 {
-    StringCopy(dst, ItemId_GetName(itemId));
+    return StringCopy(dst, ItemId_GetName(itemId));
 }
 
-const u8 sText_s[] = _("s");
+const u8 sText_s[] = _("S");
 
-void CopyItemNameHandlePlural(u16 itemId, u8 *dst, u32 quantity)
+u8 *CopyItemNameHandlePlural(u16 itemId, u8 *dst, u32 quantity)
 {
     if (quantity == 1)
+        return StringCopy(dst, ItemId_GetName(itemId));
+    else if (DoesItemHavePluralName(itemId))
     {
-        StringCopy(dst, ItemId_GetName(itemId));
+        return StringCopy(dst, GetItemPluralName(itemId));
     }
     else
     {
-        if (itemId == ITEM_POKE_BALL)
-        {
-            StringCopy(dst, gText_PokeBalls);
-        }
-        else if (itemId >= ITEM_CHERI_BERRY && itemId <= ITEM_ENIGMA_BERRY)
-        {
-            GetBerryCountString(dst, gBerries[itemId - ITEM_CHERI_BERRY].name, quantity);
-        }
-        else
-        {
-            u8* end = StringCopy(dst, ItemId_GetName(itemId));
-            StringCopy(end, sText_s);
-        }
+        u8* end = StringCopy(dst, ItemId_GetName(itemId));
+        return StringCopy(end, sText_s);
     }
-}
-
-void GetBerryCountString(u8 *dst, const u8 *berryName, u32 quantity)
-{
-    const u8 *berryString;
-    u8 *txtPtr;
-
-    if (quantity < 2)
-        berryString = gText_Berry;
-    else
-        berryString = gText_Berries;
-
-    txtPtr = StringCopy(dst, berryName);
-    *txtPtr = CHAR_SPACE;
-    StringCopy(txtPtr + 1, berryString);
 }
 
 bool8 IsBagPocketNonEmpty(u8 pocket)
@@ -393,6 +368,22 @@ bool8 RemoveBagItem(u32 itemId, u32 count)
         {
             if (itemPocket->itemSlots[i].itemId == itemId)
                 totalQuantity += GetBagItemQuantity(&itemPocket->itemSlots[i].quantity);
+        }
+
+        // Check for any old mints or abiltiy capsules in the items pocket before they changed to the medicine pocket.
+        if (totalQuantity == 0 && (itemId >= ITEM_ADAMANT_MINT && itemId <= ITEM_ABILITY_CAPSULE))
+        {
+            struct BagPocket* itemPocket2 = &gBagPockets[ITEMS_POCKET];
+            for (i = 0; i < itemPocket2->capacity; i++)
+            {
+                if (itemPocket2->itemSlots[i].itemId == itemId)
+                {
+                    // Found some, update pocket and itemPocket so they get picked up and removed.
+                    totalQuantity += GetBagItemQuantity(&itemPocket2->itemSlots[i].quantity);
+                    itemPocket = &gBagPockets[ITEMS_POCKET];
+                    pocket = ITEMS_POCKET;
+                }
+            }
         }
 
         if (totalQuantity < count)
@@ -964,6 +955,21 @@ static u16 SanitizeItemId(u16 itemId)
         return itemId;
 }
 
+static bool32 DoesItemHavePluralName(u16 itemId)
+{
+    const u8* pluralName = gItems[SanitizeItemId(itemId)].pluralName;
+
+    if (pluralName[0] != CHAR_SPACE)
+        return TRUE;
+
+    return FALSE;
+}
+
+static const u8 *GetItemPluralName(u16 itemId)
+{
+    return gItems[SanitizeItemId(itemId)].pluralName;
+}
+
 const u8 *ItemId_GetName(u16 itemId)
 {
     return gItems[SanitizeItemId(itemId)].name;
@@ -974,7 +980,7 @@ u16 ItemId_GetId(u16 itemId)
     return gItems[SanitizeItemId(itemId)].itemId;
 }
 
-u16 ItemId_GetPrice(u16 itemId)
+u32 ItemId_GetPrice(u16 itemId)
 {
     return gItems[SanitizeItemId(itemId)].price;
 }

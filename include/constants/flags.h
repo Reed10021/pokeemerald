@@ -510,8 +510,8 @@
 #define FLAG_DEFEATED_HO_OH                  0x1DC
 #define FLAG_DEFEATED_LUGIA                  0x1DD
 
-#define FLAG_UNUSED_0x1DE                    0x1DE // Unused Flag
-#define FLAG_UNUSED_0x1DF                    0x1DF // Unused Flag
+#define FLAG_DEFEATED_REGIELEKI              0x1DE // Was unused flag
+#define FLAG_DEFEATED_REGIDRAGO              0x1DF // Was unused flag
 #define FLAG_UNUSED_0x1E0                    0x1E0 // Unused Flag
 #define FLAG_UNUSED_0x1E1                    0x1E1 // Unused Flag
 #define FLAG_UNUSED_0x1E2                    0x1E2 // Unused Flag
@@ -651,12 +651,14 @@
 #define FLAG_HIDDEN_ITEM_ROUTE_128_HEART_SCALE_3             (FLAG_HIDDEN_ITEMS_START + 0x5E)
 
 #define FLAG_HIDDEN_ITEM_ROUTE_116_WISE_GLASSES              (FLAG_HIDDEN_ITEMS_START + 0x70) //0x264
-#define FLAG_HIDDEN_ITEM_ROUTE_115_MUSCLE_BAND              (FLAG_HIDDEN_ITEMS_START + 0x71) //0x265
+#define FLAG_HIDDEN_ITEM_ROUTE_115_MUSCLE_BAND               (FLAG_HIDDEN_ITEMS_START + 0x71) //0x265
+#define FLAG_HIDDEN_ITEM_ROUTE_123_EXPERT_BELT               (FLAG_HIDDEN_ITEMS_START + 0x72) //0x266
+#define FLAG_HIDDEN_ITEM_ROUTE_123_EVIOLITE                  (FLAG_HIDDEN_ITEMS_START + 0x73) //0x267
 
 //#define FLAG_UNUSED_0x264  0x264 // Unused Flag
 //#define FLAG_UNUSED_0x265  0x265 // Unused Flag
-#define FLAG_UNUSED_0x266  0x266 // Unused Flag
-#define FLAG_UNUSED_0x267  0x267 // Unused Flag
+//#define FLAG_UNUSED_0x266  0x266 // Unused Flag
+//#define FLAG_UNUSED_0x267  0x267 // Unused Flag
 #define FLAG_UNUSED_0x268  0x268 // Unused Flag
 #define FLAG_UNUSED_0x269  0x269 // Unused Flag
 #define FLAG_UNUSED_0x26A  0x26A // Unused Flag
@@ -1255,10 +1257,10 @@
 #define FLAG_ABANDONED_SHIP_HIDDEN_FLOOR_ROOM_4_ENCOUNTER           0x4B3 // Was unused Flag
 #define FLAG_ITEM_WEATHER_INSTITUTE_WEATHER_ORB_AWARDED             0x4B4 // Was unused Flag
 #define FLAG_ITEM_ALTERING_CAVE_WATER_STONE                         0x4B5 // Was unused Flag
-#define FLAG_UNUSED_0x4B6                                           0x4B6 // Unused Flag
-#define FLAG_UNUSED_0x4B7                                           0x4B7 // Unused Flag
-#define FLAG_UNUSED_0x4B8                                           0x4B8 // Unused Flag
-#define FLAG_UNUSED_0x4B9                                           0x4B9 // Unused Flag
+#define FLAG_ITEM_METEOR_FALLS_1F_1R_ICE_STONE                      0x4B6 // Was unused Flag
+#define FLAG_ITEM_ROUTE_123_DUSK_STONE                              0x4B7 // Was unused Flag
+#define FLAG_ITEM_ROUTE_123_SHINY_STONE                             0x4B8 // Was unused Flag
+#define FLAG_ITEM_ROUTE_122_DAWN_STONE                              0x4B9 // Was unused Flag
 #define FLAG_UNUSED_0x4BA                                           0x4BA // Unused Flag
 #define FLAG_UNUSED_0x4BB                                           0x4BB // Unused Flag
 #define FLAG_UNUSED_0x4BC                                           0x4BC // Unused Flag

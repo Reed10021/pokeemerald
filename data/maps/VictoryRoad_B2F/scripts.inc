@@ -1,5 +1,10 @@
 VictoryRoad_B2F_MapScripts:: @ 82368D4
+	map_script MAP_SCRIPT_ON_RESUME, VictoryRoad_B2F_OnResume
 	.byte 0
+
+VictoryRoad_B2F_OnResume:
+	setdivewarp MAP_UNDERWATER_VICTORY_ROAD, 255, 16, 7
+	end
 
 VictoryRoad_B2F_EventScript_Vito:: @ 82368D5
 	trainerbattle_single TRAINER_VITO, VictoryRoad_B2F_Text_VitoIntro, VictoryRoad_B2F_Text_VitoDefeat

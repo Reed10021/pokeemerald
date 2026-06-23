@@ -1114,8 +1114,8 @@ static void PrintTimeOnCard(void)
         minutes = gSaveBlock2Ptr->playTimeMinutes;
     }
 
-    if (hours > 999)
-        hours = 999;
+    if (hours > 64999)
+        hours = 64999;
     if (minutes > 59)
         minutes = 59;
     width = GetStringWidth(1, gText_Colon2, 0);
@@ -1130,13 +1130,13 @@ static void PrintTimeOnCard(void)
         x = 128;
         y = 89;
     }
-    totalWidth = width + 30;
+    totalWidth = width + 42;
     x -= totalWidth;
 
     FillWindowPixelRect(1, PIXEL_FILL(0), x, y, totalWidth, 15);
-    ConvertIntToDecimalStringN(gStringVar4, hours, STR_CONV_MODE_RIGHT_ALIGN, 3);
+    ConvertIntToDecimalStringN(gStringVar4, hours, STR_CONV_MODE_RIGHT_ALIGN, 5);
     AddTextPrinterParameterized3(1, 1, x, y, sTrainerCardTextColors, TEXT_SPEED_FF, gStringVar4);
-    x += 18;
+    x += 30;
     AddTextPrinterParameterized3(1, 1, x, y, sTimeColonTextColors[sData->timeColonInvisible], TEXT_SPEED_FF, gText_Colon2);
     x += width;
     ConvertIntToDecimalStringN(gStringVar4, minutes, STR_CONV_MODE_LEADING_ZEROS, 2);

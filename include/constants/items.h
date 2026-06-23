@@ -108,10 +108,10 @@
 #define ITEM_THUNDER_STONE 96
 #define ITEM_WATER_STONE 97
 #define ITEM_LEAF_STONE 98
-#define ITEM_063 99
-#define ITEM_064 100
-#define ITEM_065 101
-#define ITEM_066 102
+#define ITEM_ICE_STONE 99
+#define ITEM_SHINY_STONE 100
+#define ITEM_DAWN_STONE 101
+#define ITEM_DUSK_STONE 102
 
 // Unusable
 #define ITEM_TINY_MUSHROOM 103
@@ -252,11 +252,11 @@
 #define ITEM_CHOICE_SCARF 230
 #define ITEM_MUSCLE_BAND 231
 #define ITEM_WISE_GLASSES 232
-#define ITEM_0E9 233
-#define ITEM_0EA 234
-#define ITEM_0EB 235
-#define ITEM_0EC 236
-#define ITEM_0ED 237
+#define ITEM_EXPERT_BELT 233
+#define ITEM_FLAME_ORB 234
+#define ITEM_TOXIC_ORB 235
+#define ITEM_LIFE_ORB 236
+#define ITEM_EVIOLITE 237
 #define ITEM_0EE 238
 #define ITEM_0EF 239
 #define ITEM_0F0 240
@@ -492,8 +492,11 @@
 #define ITEM_TIMID_MINT          397
 
 #define ITEM_ABILITY_CAPSULE     398
+#define ITEM_ABILITY_PATCH       399
+#define ITEM_BOTTLE_CAP          400
+#define ITEM_GOLD_BOTTLE_CAP     401
 
-#define ITEMS_COUNT              399
+#define ITEMS_COUNT              402
 #define ITEM_FIELD_ARROW ITEMS_COUNT
 
 #define FIRST_BERRY_INDEX             ITEM_CHERI_BERRY

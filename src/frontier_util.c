@@ -48,6 +48,17 @@ struct FrontierBrainMon
     u16 moves[MAX_MON_MOVES];
 };
 
+struct FrontierBrainMonWithAbility
+{
+    u16 species;
+    u16 heldItem;
+    u8 fixedIV;
+    u8 abilityNum;
+    u8 nature;
+    u8 evs[NUM_STATS];
+    u16 moves[MAX_MON_MOVES];
+};
+
 // This file's functions.
 static void GetChallengeStatus(void);
 static void GetFrontierData(void);
@@ -80,6 +91,8 @@ static void ShowFactoryResultsWindow(u8);
 static void ShowArenaResultsWindow(void);
 static void ShowPyramidResultsWindow(void);
 static void ShowLinkContestResultsWindow(void);
+static bool8 DoesFrontierBrainBattleModeQualify(s32 facility, s32 battleMode);
+static void CreateTowerDoublesAnabelPokemon(s32 symbol, s32 monLevel);
 static void CopyFrontierBrainText(bool8 playerWonText);
 
 // const rom data
@@ -497,6 +510,87 @@ static const struct FrontierBrainMon sFrontierBrainsMons[][2][FRONTIER_PARTY_SIZ
     },
 };
 
+// Battle Tower doubles shares Anabel's symbol progression, but uses a dedicated 4-mon roster.
+static const struct FrontierBrainMonWithAbility sAnabelTowerDoublesMons[][FRONTIER_DOUBLES_PARTY_SIZE] =
+{
+    {
+        {
+            .species = SPECIES_ALAKAZAM,
+            .heldItem = ITEM_LIFE_ORB,
+            .fixedIV = 24,
+            .abilityNum = ABILITY_NUM_HIDDEN,
+            .nature = NATURE_TIMID,
+            .evs = {4, 0, 0, 252, 252, 0},
+            .moves = {MOVE_PSYCHIC, MOVE_FIRE_PUNCH, MOVE_ICE_PUNCH, MOVE_THUNDER_PUNCH},
+        },
+        {
+            .species = SPECIES_ENTEI,
+            .heldItem = ITEM_CHARCOAL,
+            .fixedIV = 24,
+            .abilityNum = ABILITY_NUM_HIDDEN,
+            .nature = NATURE_JOLLY,
+            .evs = {4, 252, 0, 252, 0, 0},
+            .moves = {MOVE_SACRED_FIRE, MOVE_STONE_EDGE, MOVE_EXTREME_SPEED, MOVE_PROTECT},
+        },
+        {
+            .species = SPECIES_SNORLAX,
+            .heldItem = ITEM_CHESTO_BERRY,
+            .fixedIV = 24,
+            .abilityNum = 1,
+            .nature = NATURE_ADAMANT,
+            .evs = {252, 252, 0, 0, 0, 4},
+            .moves = {MOVE_CURSE, MOVE_BODY_SLAM, MOVE_HAMMER_ARM, MOVE_REST},
+        },
+        {
+            .species = SPECIES_MISMAGIUS,
+            .heldItem = ITEM_LEFTOVERS,
+            .fixedIV = 24,
+            .abilityNum = 0,
+            .nature = NATURE_TIMID,
+            .evs = {252, 0, 0, 252, 4, 0},
+            .moves = {MOVE_SHADOW_BALL, MOVE_WILL_O_WISP, MOVE_TRICK_ROOM, MOVE_HELPING_HAND},
+        },
+    },
+    {
+        {
+            .species = SPECIES_SALAMENCE,
+            .heldItem = ITEM_LUM_BERRY,
+            .fixedIV = 31,
+            .abilityNum = 0,
+            .nature = NATURE_JOLLY,
+            .evs = {4, 252, 0, 252, 0, 0},
+            .moves = {MOVE_TAILWIND, MOVE_DRAGON_CLAW, MOVE_FIRE_FANG, MOVE_STONE_EDGE},
+        },
+        {
+            .species = SPECIES_LUCARIO,
+            .heldItem = ITEM_LIFE_ORB,
+            .fixedIV = 31,
+            .abilityNum = 1,
+            .nature = NATURE_JOLLY,
+            .evs = {4, 252, 0, 252, 0, 0},
+            .moves = {MOVE_CLOSE_COMBAT, MOVE_METEOR_MASH, MOVE_BULLET_PUNCH, MOVE_DETECT},
+        },
+        {
+            .species = SPECIES_LATIOS,
+            .heldItem = ITEM_EXPERT_BELT,
+            .fixedIV = 31,
+            .abilityNum = 0,
+            .nature = NATURE_TIMID,
+            .evs = {4, 0, 0, 252, 252, 0},
+            .moves = {MOVE_PSYCHIC, MOVE_DRAGON_PULSE, MOVE_AURA_SPHERE, MOVE_RECOVER},
+        },
+        {
+            .species = SPECIES_RAIKOU,
+            .heldItem = ITEM_LEFTOVERS,
+            .fixedIV = 31,
+            .abilityNum = ABILITY_NUM_HIDDEN,
+            .nature = NATURE_TIMID,
+            .evs = {4, 0, 0, 252, 252, 0},
+            .moves = {MOVE_THUNDERBOLT, MOVE_SCALD, MOVE_AURA_SPHERE, MOVE_REFLECT},
+        },
+    },
+};
+
 static const u8 sBattlePointAwards[][NUM_FRONTIER_FACILITIES][FRONTIER_MODE_COUNT] =
 {
     {
@@ -682,6 +776,7 @@ const u16 gFrontierBannedSpecies[] =
     SPECIES_MEW, SPECIES_MEWTWO, SPECIES_HO_OH, SPECIES_LUGIA, SPECIES_CELEBI,
     SPECIES_KYOGRE, SPECIES_GROUDON, SPECIES_RAYQUAZA, SPECIES_DEOXYS, SPECIES_JIRACHI,
     SPECIES_DEOXYS_ATTACK, SPECIES_DEOXYS_DEFENSE, SPECIES_DEOXYS_SPEED, SPECIES_REGIGIGAS,
+    SPECIES_MELMETAL,
     0xFFFF
 };
 
@@ -1656,6 +1751,26 @@ static void Script_GetFrontierBrainStatus(void)
     gSpecialVar_Result = GetFrontierBrainStatus();
 }
 
+static bool8 DoesFrontierBrainBattleModeQualify(s32 facility, s32 battleMode)
+{
+    if (battleMode == FRONTIER_MODE_SINGLES)
+        return TRUE;
+
+    if (battleMode != FRONTIER_MODE_DOUBLES)
+        return FALSE;
+
+    switch (facility)
+    {
+    case FRONTIER_FACILITY_TOWER:
+    case FRONTIER_FACILITY_DOME:
+    case FRONTIER_FACILITY_PALACE:
+    case FRONTIER_FACILITY_FACTORY:
+        return TRUE;
+    default:
+        return FALSE;
+    }
+}
+
 u8 GetFrontierBrainStatus(void)
 {
     s32 status = FRONTIER_BRAIN_NOT_READY;
@@ -1665,7 +1780,7 @@ u8 GetFrontierBrainStatus(void)
     s32 winStreak = winStreakNoModifier + sFrontierBrainStreakAppearances[facility][3];
     s32 symbolsCount;
 
-    if (battleMode != FRONTIER_MODE_SINGLES)
+    if (!DoesFrontierBrainBattleModeQualify(facility, battleMode))
         return FRONTIER_BRAIN_NOT_READY;
 
     symbolsCount = GetPlayerSymbolCountForFacility(facility);
@@ -2532,24 +2647,73 @@ void SetFrontierBrainObjEventGfx_2(void)
 
 #define FRONTIER_BRAIN_OTID 61226
 
+static void CreateTowerDoublesAnabelPokemon(s32 symbol, s32 monLevel)
+{
+    s32 i, j;
+    u8 friendship;
+    u32 personality;
+
+    for (i = 0; i < FRONTIER_DOUBLES_PARTY_SIZE; i++)
+    {
+        const struct FrontierBrainMonWithAbility *brainMon = &sAnabelTowerDoublesMons[symbol][i];
+
+        do
+        {
+            do
+            {
+                personality = Random32();
+            } while (IsShinyOtIdPersonality(FRONTIER_BRAIN_OTID, personality));
+        } while (brainMon->nature != GetNatureFromPersonality(personality));
+
+        CreateMon(&gEnemyParty[i],
+                  brainMon->species,
+                  monLevel,
+                  brainMon->fixedIV,
+                  TRUE, personality,
+                  OT_ID_PRESET, FRONTIER_BRAIN_OTID);
+        SetMonData(&gEnemyParty[i], MON_DATA_ABILITY_NUM, &brainMon->abilityNum);
+        SetMonData(&gEnemyParty[i], MON_DATA_HELD_ITEM, &brainMon->heldItem);
+        for (j = 0; j < NUM_STATS; j++)
+            SetMonData(&gEnemyParty[i], MON_DATA_HP_EV + j, &brainMon->evs[j]);
+        friendship = MAX_FRIENDSHIP;
+        for (j = 0; j < MAX_MON_MOVES; j++)
+        {
+            SetMonMoveSlot(&gEnemyParty[i], brainMon->moves[j], j);
+            if (brainMon->moves[j] == MOVE_FRUSTRATION)
+                friendship = 0;
+        }
+        SetMonData(&gEnemyParty[i], MON_DATA_FRIENDSHIP, &friendship);
+        CalculateMonStats(&gEnemyParty[i]);
+    }
+}
+
 void CreateFrontierBrainPokemon(void)
 {
     s32 i, j;
+    s32 battleMode = VarGet(VAR_FRONTIER_BATTLE_MODE);
     s32 selectedMonBits;
     s32 monPartyId;
     s32 monLevel = 0;
     u8 friendship;
+    u8 abilityNum;
     s32 facility = VarGet(VAR_FRONTIER_FACILITY);
     s32 symbol = GetFronterBrainSymbol();
+    u32 personality;
+
+    ZeroEnemyPartyMons();
+    monLevel = SetFacilityPtrsGetLevel();
+    if (facility == FRONTIER_FACILITY_TOWER && battleMode == FRONTIER_MODE_DOUBLES)
+    {
+        CreateTowerDoublesAnabelPokemon(symbol, monLevel);
+        return;
+    }
 
     if (facility == FRONTIER_FACILITY_DOME)
         selectedMonBits = GetDomeTrainerSelectedMons(TrainerIdToDomeTournamentId(TRAINER_FRONTIER_BRAIN));
     else
         selectedMonBits = (1 << FRONTIER_PARTY_SIZE) - 1; // all 3 mons selected
 
-    ZeroEnemyPartyMons();
     monPartyId = 0;
-    monLevel = SetFacilityPtrsGetLevel();
     for (i = 0; i < FRONTIER_PARTY_SIZE; selectedMonBits >>= 1, i++)
     {
         if (!(selectedMonBits & 1))
@@ -2558,15 +2722,17 @@ void CreateFrontierBrainPokemon(void)
         {
             do
             {
-                j = Random32(); //Should be one while loop, but that doesn't match
-            } while (IsShinyOtIdPersonality(FRONTIER_BRAIN_OTID, j));
-        } while (sFrontierBrainsMons[facility][symbol][i].nature != GetNatureFromPersonality(j));
+                personality = Random32(); //Should be one while loop, but that doesn't match
+            } while (IsShinyOtIdPersonality(FRONTIER_BRAIN_OTID, personality));
+        } while (sFrontierBrainsMons[facility][symbol][i].nature != GetNatureFromPersonality(personality));
         CreateMon(&gEnemyParty[monPartyId],
                   sFrontierBrainsMons[facility][symbol][i].species,
                   monLevel,
                   sFrontierBrainsMons[facility][symbol][i].fixedIV,
-                  TRUE, j,
+                  TRUE, personality,
                   OT_ID_PRESET, FRONTIER_BRAIN_OTID);
+        abilityNum = GetAbilityNumBySpeciesAndPersonality(sFrontierBrainsMons[facility][symbol][i].species, personality);
+        SetMonData(&gEnemyParty[monPartyId], MON_DATA_ABILITY_NUM, &abilityNum);
         SetMonData(&gEnemyParty[monPartyId], MON_DATA_HELD_ITEM, &sFrontierBrainsMons[facility][symbol][i].heldItem);
         for (j = 0; j < NUM_STATS; j++)
             SetMonData(&gEnemyParty[monPartyId], MON_DATA_HP_EV + j, &sFrontierBrainsMons[facility][symbol][i].evs[j]);

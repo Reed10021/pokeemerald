@@ -25,6 +25,7 @@
 #include "random.h"
 #include "recorded_battle.h"
 #include "reshow_battle_screen.h"
+#include "battle_util.h"
 #include "sound.h"
 #include "string_util.h"
 #include "task.h"
@@ -33,6 +34,7 @@
 #include "window.h"
 #include "constants/abilities.h"
 #include "constants/battle_anim.h"
+#include "constants/battle_move_effects.h"
 #include "constants/hold_effects.h"
 #include "constants/items.h"
 #include "constants/moves.h"
@@ -198,6 +200,69 @@ static const u8 sTargetIdentities[] = {B_POSITION_PLAYER_LEFT, B_POSITION_PLAYER
 
 // unknown unused data
 static const u8 sUnknown_0831C5FC[] = {0x48, 0x48, 0x20, 0x5a, 0x50, 0x50, 0x50, 0x58};
+static const u16 sBallCycleOrder[] =
+{
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_SAFARI_BALL,
+    ITEM_ULTRA_BALL,
+    ITEM_MASTER_BALL,
+    ITEM_NET_BALL,
+    ITEM_DIVE_BALL,
+    ITEM_NEST_BALL,
+    ITEM_REPEAT_BALL,
+    ITEM_TIMER_BALL,
+    ITEM_LUXURY_BALL,
+    ITEM_PREMIER_BALL,
+};
+
+static u8 GetWeatherBallTypeFromWeather(u32 moveWeather)
+{
+    if (moveWeather & WEATHER_RAIN_ANY)
+        return TYPE_WATER;
+    else if (moveWeather & WEATHER_SANDSTORM_ANY)
+        return TYPE_ROCK;
+    else if (moveWeather & WEATHER_SUN_ANY)
+        return TYPE_FIRE;
+    else if (moveWeather & WEATHER_HAIL_ANY)
+        return TYPE_ICE;
+
+    return TYPE_NORMAL;
+}
+
+static u8 GetDisplayedMoveType(u16 move)
+{
+    u8 type;
+
+    if (move == MOVE_HIDDEN_POWER)
+    {
+        struct Pokemon *mon = &gPlayerParty[gBattlerPartyIndexes[gActiveBattler]];
+
+        type = GetHiddenPowerType(GetMonData(mon, MON_DATA_HP_IV),
+                                  GetMonData(mon, MON_DATA_ATK_IV),
+                                  GetMonData(mon, MON_DATA_DEF_IV),
+                                  GetMonData(mon, MON_DATA_SPEED_IV),
+                                  GetMonData(mon, MON_DATA_SPATK_IV),
+                                  GetMonData(mon, MON_DATA_SPDEF_IV));
+    }
+    else if (move == MOVE_WEATHER_BALL)
+    {
+        type = GetWeatherBallTypeFromWeather(GetBattlerMoveWeather(gActiveBattler));
+    }
+    else
+    {
+        type = gBattleMoves[move].type;
+    }
+
+    if (type == TYPE_NORMAL
+        && gBattleMoves[move].type == TYPE_NORMAL
+        && gBattleMons[gActiveBattler].ability == ABILITY_DRAGONIZE)
+    {
+        type = TYPE_DRAGON;
+    }
+
+    return type;
+}
 
 void nullsub_21(void)
 {
@@ -243,6 +308,40 @@ static void CompleteOnBankSpritePosX_0(void)
         PlayerBufferExecCompleted();
 }
 
+static u16 GetPrevBall(u16 ballId)
+{
+    s32 i;
+    s32 index = ItemIdToBallId(ballId);
+
+    for (i = 0; i < ARRAY_COUNT(sBallCycleOrder); i++)
+    {
+        index--;
+        if (index < 0)
+            index = ARRAY_COUNT(sBallCycleOrder) - 1;
+        if (CheckBagHasItem(sBallCycleOrder[index], 1))
+            return sBallCycleOrder[index];
+    }
+
+    return ballId;
+}
+
+static u16 GetNextBall(u16 ballId)
+{
+    s32 i;
+    s32 index = ItemIdToBallId(ballId);
+
+    for (i = 0; i < ARRAY_COUNT(sBallCycleOrder); i++)
+    {
+        index++;
+        if (index >= ARRAY_COUNT(sBallCycleOrder))
+            index = 0;
+        if (CheckBagHasItem(sBallCycleOrder[index], 1))
+            return sBallCycleOrder[index];
+    }
+
+    return ballId;
+}
+
 static void HandleInputChooseAction(void)
 {
     u16 itemId = gBattleBufferA[gActiveBattler][2] | (gBattleBufferA[gActiveBattler][3] << 8);
@@ -255,9 +354,70 @@ static void HandleInputChooseAction(void)
     else
         gPlayerDpadHoldFrames = 0;
 
+    if (!gLastUsedBallMenuPresent)
+    {
+        gBattleStruct->lastUsedBallBtnAck = FALSE;
+    }
+    else if (JOY_NEW(R_BUTTON))
+    {
+        gBattleStruct->lastUsedBallBtnAck = TRUE;
+        gBattleStruct->lastUsedBallSwapped = FALSE;
+        ArrowsChangeColorLastBallCycle(TRUE);
+    }
+
+    if (gBattleStruct->lastUsedBallBtnAck)
+    {
+        if (JOY_HELD(R_BUTTON) && (JOY_NEW(DPAD_DOWN) || JOY_NEW(DPAD_RIGHT)))
+        {
+            bool32 sameBall = FALSE;
+            u16 nextBall = GetNextBall(gBallToDisplay);
+
+            gBattleStruct->lastUsedBallSwapped = TRUE;
+            if (gBallToDisplay == nextBall)
+                sameBall = TRUE;
+            else
+                gBallToDisplay = nextBall;
+            SwapBallToDisplay(sameBall);
+            PlaySE(SE_SELECT);
+        }
+        else if (JOY_HELD(R_BUTTON) && (JOY_NEW(DPAD_UP) || JOY_NEW(DPAD_LEFT)))
+        {
+            bool32 sameBall = FALSE;
+            u16 prevBall = GetPrevBall(gBallToDisplay);
+
+            gBattleStruct->lastUsedBallSwapped = TRUE;
+            if (gBallToDisplay == prevBall)
+                sameBall = TRUE;
+            else
+                gBallToDisplay = prevBall;
+            SwapBallToDisplay(sameBall);
+            PlaySE(SE_SELECT);
+        }
+        else if (JOY_NEW(B_BUTTON) || (!JOY_HELD(R_BUTTON) && gBattleStruct->lastUsedBallSwapped))
+        {
+            gBattleStruct->lastUsedBallBtnAck = FALSE;
+            gBattleStruct->lastUsedBallSwapped = FALSE;
+            ArrowsChangeColorLastBallCycle(FALSE);
+        }
+        else if (!JOY_HELD(R_BUTTON))
+        {
+            gBattleStruct->lastUsedBallBtnAck = FALSE;
+            ArrowsChangeColorLastBallCycle(FALSE);
+            if (CanThrowLastUsedBall())
+            {
+                PlaySE(SE_SELECT);
+                TryHideLastUsedBall();
+                BtlController_EmitTwoReturnValues(1, B_ACTION_THROW_BALL, 0);
+                PlayerBufferExecCompleted();
+            }
+        }
+        return;
+    }
+
     if (JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
+        TryHideLastUsedBall();
 
         switch (gActionSelectionCursor[gActiveBattler])
         {
@@ -332,6 +492,7 @@ static void HandleInputChooseAction(void)
                     return;
             }
             PlaySE(SE_SELECT);
+            TryHideLastUsedBall();
             BtlController_EmitTwoReturnValues(1, B_ACTION_CANCEL_PARTNER, 0);
             PlayerBufferExecCompleted();
         }
@@ -388,6 +549,7 @@ static void HandleInputChooseTarget(void)
         PlaySE(SE_SELECT);
         gSprites[gBattlerSpriteIds[gMultiUsePlayerCursor]].callback = SpriteCb_HideAsMoveTarget;
         gBattlerControllerFuncs[gActiveBattler] = HandleInputChooseMove;
+        TryToAddMoveInfoWindow();
         DoBounceEffect(gActiveBattler, BOUNCE_HEALTHBOX, 7, 1);
         DoBounceEffect(gActiveBattler, BOUNCE_MON, 7, 1);
         EndBounceEffect(gMultiUsePlayerCursor, BOUNCE_HEALTHBOX);
@@ -494,6 +656,7 @@ static void HandleInputChooseMove(void)
     {
         u8 moveTarget;
 
+        TryToHideMoveInfoWindow();
         PlaySE(SE_SELECT);
         if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_CURSE)
         {
@@ -555,6 +718,7 @@ static void HandleInputChooseMove(void)
     }
     else if ((JOY_NEW(B_BUTTON) || gPlayerDpadHoldFrames > 59) && !sDescriptionSubmenu)
     {
+        TryToHideMoveInfoWindow();
         PlaySE(SE_SELECT);
         BtlController_EmitTwoReturnValues(1, 10, 0xFFFF);
         PlayerBufferExecCompleted();
@@ -621,6 +785,7 @@ static void HandleInputChooseMove(void)
     {
         if (gNumberOfMovesToChoose > 1 && !(gBattleTypeFlags & BATTLE_TYPE_LINK))
         {
+            TryToHideMoveInfoWindow();
             MoveSelectionCreateCursorAt(gMoveSelectionCursor[gActiveBattler], 29);
 
             if (gMoveSelectionCursor[gActiveBattler] != 0)
@@ -636,7 +801,7 @@ static void HandleInputChooseMove(void)
 
     if (sDescriptionSubmenu)
     {
-        if (JOY_NEW(START_BUTTON) || JOY_NEW(A_BUTTON) || JOY_NEW(B_BUTTON))
+        if (JOY_NEW(R_BUTTON) || JOY_NEW(A_BUTTON) || JOY_NEW(B_BUTTON))
         {
             sDescriptionSubmenu = FALSE;
             FillWindowPixelBuffer(27, PIXEL_FILL(0));
@@ -647,9 +812,10 @@ static void HandleInputChooseMove(void)
             MoveSelectionDisplayMoveType();
         }
     }
-    else if (JOY_NEW(START_BUTTON)) //AdditionalBattleInfo
+    else if (JOY_NEW(R_BUTTON))
     {
         sDescriptionSubmenu = TRUE;
+        PlaySE(SE_SELECT);
         MoveSelectionDisplayMoveDescription();
     }
 }
@@ -803,6 +969,7 @@ static void HandleMoveSwitching(void)
         MoveSelectionDisplayPpString();
         MoveSelectionDisplayPpNumber();
         MoveSelectionDisplayMoveType();
+        TryToAddMoveInfoWindow();
     }
     else if (JOY_NEW(B_BUTTON | SELECT_BUTTON))
     {
@@ -813,6 +980,7 @@ static void HandleMoveSwitching(void)
         MoveSelectionDisplayPpString();
         MoveSelectionDisplayPpNumber();
         MoveSelectionDisplayMoveType();
+        TryToAddMoveInfoWindow();
     }
     else if (JOY_NEW(DPAD_LEFT))
     {
@@ -1483,8 +1651,9 @@ static void MoveSelectionDisplayMoveDescription(void)
     u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
     u16 pwr = gBattleMoves[move].power;
     u16 acc = gBattleMoves[move].accuracy;
-    s16 pri = gBattleMoves[move].priority;
-    u32 type = gBattleMoves[move].type;
+    s16 pri = GetBattlerMovePriority(gActiveBattler, move);
+    u32 type = GetDisplayedMoveType(move);
+    u32 moveWeather = GetBattlerMoveWeather(gActiveBattler);
     u8 pwr_num[3], acc_num[3], pri_num[3], i;
     u8 acc_flag = 0;
     u8 prw_flag = 0;
@@ -1497,36 +1666,14 @@ static void MoveSelectionDisplayMoveDescription(void)
     LoadMessageBoxAndBorderGfx();
     DrawStdWindowFrame(27, FALSE);
     if (move == MOVE_HIDDEN_POWER) {
-        u8 typeBits = ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_HP_IV) & 1) << 0)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_ATK_IV) & 1) << 1)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_DEF_IV) & 1) << 2)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPEED_IV) & 1) << 3)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPATK_IV) & 1) << 4)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPDEF_IV) & 1) << 5);
-
-        type = (15 * typeBits) / 63 + 1;
-        if (type >= TYPE_MYSTERY)
-            type++;
         pwr = 80;
     } else if (move == MOVE_RETURN) {
         pwr = (10 * GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP)) / 25;
     } else if (move == MOVE_FRUSTRATION) {
         pwr = (10 * (MAX_FRIENDSHIP - GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_FRIENDSHIP))) / 25;
     } else if (move == MOVE_WEATHER_BALL) {
-        if (WEATHER_HAS_EFFECT)
-        {
-            if(gBattleWeather & WEATHER_ANY)
-                pwr *= 2;
-
-            if (gBattleWeather & WEATHER_RAIN_ANY)
-                type = TYPE_WATER;
-            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-                type = TYPE_ROCK;
-            else if (gBattleWeather & WEATHER_SUN_ANY)
-                type = TYPE_FIRE;
-            else if (gBattleWeather & WEATHER_HAIL_ANY)
-                type = TYPE_ICE;
-        }
+        if (moveWeather & WEATHER_ANY)
+            pwr *= 2;
     } else if (move == MOVE_FURY_CUTTER) {
         for (i = 0; i < gDisableStructs[gActiveBattler].furyCutterCounter; i++)
         {
@@ -1534,6 +1681,8 @@ static void MoveSelectionDisplayMoveDescription(void)
                 break;
             pwr *= 2;
         }
+    } else if (move == MOVE_RAGE_FIST) {
+        pwr += 50 * GetBattlerRageFistCounter(gActiveBattler);
     }
 
     if (pwr < 2)
@@ -1549,15 +1698,23 @@ static void MoveSelectionDisplayMoveDescription(void)
         pwr = (150 * pwr) / 100;
     if (type == TYPE_BUG && gBattleMons[gActiveBattler].ability == ABILITY_SWARM && gBattleMons[gActiveBattler].hp <= (gBattleMons[gActiveBattler].maxHP / 3))
         pwr = (150 * pwr) / 100;
-    if (gBattleMons[gActiveBattler].ability == ABILITY_IRON_FIST && IS_PUNCHING_MOVE(move))
-        pwr = (120 * pwr) / 100;
     if (gBattleMons[gActiveBattler].ability == ABILITY_TECHNICIAN && pwr <= 65)
         pwr = (150 * pwr) / 100;
+    if (gBattleMons[gActiveBattler].ability == ABILITY_SHARPNESS && IS_SHARPNESS_MOVE(move))
+        pwr = (150 * pwr) / 100;
+    if (gBattleMons[gActiveBattler].ability == ABILITY_IRON_FIST && IS_PUNCHING_MOVE(move))
+        pwr = (120 * pwr) / 100;
+    if (type == TYPE_ELECTRIC && gBattleMons[gActiveBattler].ability == ABILITY_TRANSISTOR)
+        pwr = (150 * pwr) / 100;
+    if (type == TYPE_DRAGON && gBattleMons[gActiveBattler].ability == ABILITY_DRAGONS_MAW)
+        pwr = (150 * pwr) / 100;
+    if (gBattleMons[gActiveBattler].ability == ABILITY_DRAGONIZE && IsMoveChangedByDragonize(move, type))
+        pwr = (120 * pwr) / 100;
     if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_PUNCHING_GLOVE && IS_PUNCHING_MOVE(move))
         pwr = (115 * pwr) / 100;
-    if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_MUSCLE_BAND && IS_TYPE_PHYSICAL(move, type))
+    if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_MUSCLE_BAND && IsBattlerMoveTypePhysical(gActiveBattler, move, type))
         pwr = (110 * pwr) / 100;
-    if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_WISE_GLASSES && IS_TYPE_SPECIAL(move, type))
+    if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_WISE_GLASSES && IsBattlerMoveTypeSpecial(gActiveBattler, move, type))
         pwr = (110 * pwr) / 100;
     //if (ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item) == HOLD_EFFECT_CHOICE_BAND)
     //    pwr = (150 * pwr) / 100;
@@ -1567,36 +1724,35 @@ static void MoveSelectionDisplayMoveDescription(void)
     if (type == TYPE_FIRE && AbilityBattleEffects(ABILITYEFFECT_FIELD_SPORT, 0, 0, 0xFE, 0))
         pwr /= 2;
 
-    if (acc < 2 ||
-        move == MOVE_ASSIST || move == MOVE_BLOCK || move == MOVE_CAMOUFLAGE || move == MOVE_CHARGE ||
-        move == MOVE_CONVERSION_2 || move == MOVE_FOLLOW_ME || move == MOVE_GRUDGE || move == MOVE_HELPING_HAND ||
-        move == MOVE_IMPRISON || move == MOVE_INGRAIN || move == MOVE_MAGIC_COAT || move == MOVE_MEAN_LOOK ||
-        move == MOVE_MEMENTO || move == MOVE_MIMIC || move == MOVE_MUD_SPORT || move == MOVE_NIGHTMARE ||
-        move == MOVE_PAIN_SPLIT || move == MOVE_RECYCLE || move == MOVE_REFRESH || move == MOVE_ROLE_PLAY ||
-        move == MOVE_SKILL_SWAP || move == MOVE_SLACK_OFF || move == MOVE_SNATCH || move == MOVE_SOFT_BOILED ||
-        move == MOVE_SPIDER_WEB || move == MOVE_TAIL_GLOW || move == MOVE_WATER_SPORT || move == MOVE_WISH || move == MOVE_YAWN)
+    if (acc == 0)
         StringCopy(acc_num, gText_BattleSwitchWhich5);
     else
         acc_flag = 1;
 
-    if (WEATHER_HAS_EFFECT)
+    if (moveWeather & WEATHER_ANY)
     {
         if (move == MOVE_THUNDER) {
-            if (gBattleWeather & WEATHER_RAIN_ANY)
+            if (moveWeather & WEATHER_RAIN_ANY)
                 acc = 100;
-            else if (gBattleWeather & WEATHER_SUN_ANY)
+            else if (moveWeather & WEATHER_SUN_ANY)
                 acc = 50;
         }
         else if (move == MOVE_BLIZZARD) {
-            if (gBattleWeather & WEATHER_HAIL_ANY)
+            if (moveWeather & WEATHER_HAIL_ANY)
                 acc = 100;
         }
-        else if (move == MOVE_SOLAR_BEAM) {
-            if (gBattleWeather & (WEATHER_RAIN_ANY | WEATHER_SANDSTORM_ANY | WEATHER_HAIL_ANY))
+        else if (gBattleMoves[move].effect == EFFECT_SOLARBEAM) {
+            if (moveWeather & (WEATHER_RAIN_ANY | WEATHER_SANDSTORM_ANY | WEATHER_HAIL_ANY))
                 pwr /= 2;
         }
+        else if (move == MOVE_HURRICANE) {
+            if (moveWeather & WEATHER_RAIN_ANY || moveWeather & WEATHER_HAIL_ANY)
+                acc = 100;
+            else if (moveWeather & WEATHER_SUN_ANY)
+                acc = 50;
+        }
 
-        if (gBattleWeather & WEATHER_SUN_ANY) {
+        if (moveWeather & WEATHER_SUN_ANY) {
             switch (type)
             {
             case TYPE_FIRE:
@@ -1607,7 +1763,7 @@ static void MoveSelectionDisplayMoveDescription(void)
                 break;
             }
         }
-        else if (gBattleWeather & WEATHER_RAIN_ANY) {
+        else if (moveWeather & WEATHER_RAIN_ANY) {
             switch (type)
             {
             case TYPE_FIRE:
@@ -1622,7 +1778,7 @@ static void MoveSelectionDisplayMoveDescription(void)
 
     if (gBattleMons[gActiveBattler].ability == ABILITY_COMPOUND_EYES)
         acc = (acc * 130) / 100; // 1.3 compound eyes boost
-    if (gBattleMons[gActiveBattler].ability == ABILITY_HUSTLE && IS_TYPE_PHYSICAL(move, type))
+    if (gBattleMons[gActiveBattler].ability == ABILITY_HUSTLE && IsBattlerMoveTypePhysical(gActiveBattler, move, type))
         acc = (acc * 80) / 100; // 1.2 hustle loss
 
     if (acc > 100)
@@ -1691,7 +1847,7 @@ u8 TypeEffectiveness(u8 targetId)
 {
     struct ChooseMoveStruct* moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][4]);
     u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
-    u8 moveFlags = AI_TypeCalc(move, gBattleMons[targetId].type1, gBattleMons[targetId].type2, gBattleMons[targetId].ability);
+    u8 moveFlags = AI_TypeCalcByBattler(move, targetId);
     u8 moveCategory = GetBattleMoveSplit(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]);
 
     if (moveCategory == 2) { // Status Move
@@ -1716,7 +1872,7 @@ static void MoveSelectionDisplayMoveTypeDoubles(u8 targetId)
 {
 	u8 *txtPtr;
 	struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
-    u8 type = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type;
+    u8 type = GetDisplayedMoveType(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]);
 
 	txtPtr = StringCopy(gDisplayedStringBattle, gText_MoveInterfaceType);
 	txtPtr[0] = EXT_CTRL_CODE_BEGIN;
@@ -1726,30 +1882,6 @@ static void MoveSelectionDisplayMoveTypeDoubles(u8 targetId)
 	txtPtr[0] = 1;
 	txtPtr++;
 
-    if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_HIDDEN_POWER) {
-        u8 typeBits = ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_HP_IV) & 1) << 0)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_ATK_IV) & 1) << 1)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_DEF_IV) & 1) << 2)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPEED_IV) & 1) << 3)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPATK_IV) & 1) << 4)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPDEF_IV) & 1) << 5);
-
-        type = (15 * typeBits) / 63 + 1;
-        if (type >= TYPE_MYSTERY)
-            type++;
-    } else if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_WEATHER_BALL) {
-        if (WEATHER_HAS_EFFECT)
-        {
-            if (gBattleWeather & WEATHER_RAIN_ANY)
-                type = TYPE_WATER;
-            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-                type = TYPE_ROCK;
-            else if (gBattleWeather & WEATHER_SUN_ANY)
-                type = TYPE_FIRE;
-            else if (gBattleWeather & WEATHER_HAIL_ANY)
-                type = TYPE_ICE;
-        }
-    }
     StringCopy(txtPtr, gTypeNames[type]);
 	BattlePutTextOnWindow(gDisplayedStringBattle, TypeEffectiveness(targetId));
 }
@@ -1761,7 +1893,7 @@ static void MoveSelectionDisplayMoveType(void)
     u8 targetId = GetBattlerAtPosition(BATTLE_OPPOSITE(GetBattlerPosition(gActiveBattler)));
     u8 typeColor = 10;
     struct ChooseMoveStruct *moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
-    u8 type = gBattleMoves[moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]].type;
+    u8 type = GetDisplayedMoveType(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]);
     u8 moveTarget;
 
     if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_CURSE)
@@ -1789,56 +1921,16 @@ static void MoveSelectionDisplayMoveType(void)
     *(txtPtr)++ = EXT_CTRL_CODE_SIZE;
     *(txtPtr)++ = 1;
 
-    if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_HIDDEN_POWER) {
-        u8 typeBits = ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_HP_IV) & 1) << 0)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_ATK_IV) & 1) << 1)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_DEF_IV) & 1) << 2)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPEED_IV) & 1) << 3)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPATK_IV) & 1) << 4)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPDEF_IV) & 1) << 5);
-
-        type = (15 * typeBits) / 63 + 1;
-        if (type >= TYPE_MYSTERY)
-            type++;
-    } else if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_WEATHER_BALL) {
-        if (WEATHER_HAS_EFFECT)
-        {
-            if (gBattleWeather & WEATHER_RAIN_ANY)
-                type = TYPE_WATER;
-            else if (gBattleWeather & WEATHER_SANDSTORM_ANY)
-                type = TYPE_ROCK;
-            else if (gBattleWeather & WEATHER_SUN_ANY)
-                type = TYPE_FIRE;
-            else if (gBattleWeather & WEATHER_HAIL_ANY)
-                type = TYPE_ICE;
-        }
-    }
     StringCopy(txtPtr, gTypeNames[type]);
     BattlePutTextOnWindow(gDisplayedStringBattle, typeColor);
     MoveSelectionDisplaySplitIcon();
 }
 
 static void MoveSelectionDisplaySplitIcon(void) {
-    struct ChooseMoveStruct* moveInfo;
-    u8 moveCategory;
-
-    moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
-    if (moveInfo->moves[gMoveSelectionCursor[gActiveBattler]] == MOVE_HIDDEN_POWER)
-    {
-        u8 typeBits = ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_HP_IV) & 1) << 0)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_ATK_IV) & 1) << 1)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_DEF_IV) & 1) << 2)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPEED_IV) & 1) << 3)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPATK_IV) & 1) << 4)
-            | ((GetMonData(&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]], MON_DATA_SPDEF_IV) & 1) << 5);
-
-        u8 type = (15 * typeBits) / 63 + 1;
-        if (type >= TYPE_MYSTERY)
-            type++;
-        moveCategory = IS_TYPE_SPECIAL(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]], type);
-    }
-    else
-        moveCategory = GetBattleMoveSplit(moveInfo->moves[gMoveSelectionCursor[gActiveBattler]]);
+    struct ChooseMoveStruct* moveInfo = (struct ChooseMoveStruct*)(&gBattleBufferA[gActiveBattler][MAX_BATTLERS_COUNT]);
+    u16 move = moveInfo->moves[gMoveSelectionCursor[gActiveBattler]];
+    u8 type = GetDisplayedMoveType(move);
+    u8 moveCategory = GetBattlerMoveSplit(gActiveBattler, move, type);
     LoadPalette(sSplitIcons_Battle_Pal, 10 * 0x10, 0x20);
     BlitBitmapToWindow(8, sSplitIcons_Battle_Gfx + 0x80 * moveCategory, 0, 0, 16, 16);
     PutWindowTilemap(8);
@@ -1944,7 +2036,7 @@ static void PlayerHandleGetMonData(void)
 
 static u32 CopyPlayerMonData(u8 monId, u8 *dst)
 {
-    struct BattlePokemon battleMon;
+    struct BattlePokemon battleMon = {0};
     struct MovePpInfo moveData;
     u8 nickname[20];
     u8 *src;
@@ -2250,7 +2342,7 @@ static u32 CopyPlayerMonData(u8 monId, u8 *dst)
 
 void PlayerHandleGetRawMonData(void)
 {
-    struct BattlePokemon battleMon;
+    struct BattlePokemon battleMon = {0};
     u8 *src = (u8 *)&gPlayerParty[gBattlerPartyIndexes[gActiveBattler]] + gBattleBufferA[gActiveBattler][1];
     u8 *dst = (u8 *)&battleMon + gBattleBufferA[gActiveBattler][1];
     u8 i;
@@ -2914,6 +3006,8 @@ static void PlayerHandleChooseAction(void)
     ActionSelectionCreateCursorAt(gActionSelectionCursor[gActiveBattler], 0);
     BattleStringExpandPlaceholdersToDisplayedString(gText_WhatWillPkmnDo);
     BattlePutTextOnWindow(gDisplayedStringBattle, 1);
+    TryToHideMoveInfoWindow();
+    TryRestoreLastUsedBall();
 }
 
 static void PlayerHandleUnknownYesNoBox(void)
@@ -2964,6 +3058,7 @@ static void PlayerHandleChooseMove(void)
     else
     {
         InitMoveSelectionsVarsAndStrings();
+        TryToAddMoveInfoWindow();
         gBattlerControllerFuncs[gActiveBattler] = HandleChooseMoveAfterDma3;
     }
 }
@@ -3030,8 +3125,8 @@ static void PlayerHandleHealthBarUpdate(void)
     hpVal = gBattleBufferA[gActiveBattler][2] | (gBattleBufferA[gActiveBattler][3] << 8);
 
     // gPlayerPartyLostHP used by Battle Dome, but never read
-    if (hpVal > 0)
-        gPlayerPartyLostHP += hpVal;
+    //if (hpVal > 0)
+        //gPlayerPartyLostHP += hpVal;
 
     if (hpVal != INSTANT_HP_BAR_DROP)
     {

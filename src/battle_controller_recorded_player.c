@@ -526,7 +526,7 @@ static void RecordedPlayerHandleGetMonData(void)
 
 static u32 CopyRecordedPlayerMonData(u8 monId, u8 *dst)
 {
-    struct BattlePokemon battleMon;
+    struct BattlePokemon battleMon = {0};
     struct MovePpInfo moveData;
     u8 nickname[20];
     u8 *src;

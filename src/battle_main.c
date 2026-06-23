@@ -132,6 +132,8 @@ static void HandleEndTurn_RanFromBattle(void);
 static void HandleEndTurn_MonFled(void);
 static void HandleEndTurn_FinishBattle(void);
 static u32 partyMonHoldDoublePrizeEffect(void);
+static u8 GetWhoStrikesFirstInternal(u8 battler1, u8 battler2, bool8 ignoreChosenMoves, bool8 useRandomTieBreak, bool8 includeQuickClaw);
+static u8 GetWhoStrikesFirstForSwitchIn(u8 battler1, u8 battler2);
 
 
 // EWRAM vars
@@ -181,6 +183,9 @@ EWRAM_DATA s32 gBattleMoveDamage = 0;
 EWRAM_DATA s32 gHpDealt = 0;
 EWRAM_DATA s32 gTakenDmg[MAX_BATTLERS_COUNT] = {0};
 EWRAM_DATA u16 gLastUsedItem = 0;
+EWRAM_DATA u16 gLastThrownBall = 0;
+EWRAM_DATA u16 gBallToDisplay = 0;
+EWRAM_DATA bool8 gCanShowLastUsedBallMenu = FALSE;
 EWRAM_DATA u8 gLastUsedAbility = 0;
 EWRAM_DATA u8 gBattlerAttacker = 0;
 EWRAM_DATA u8 gBattlerTarget = 0;
@@ -225,6 +230,7 @@ EWRAM_DATA u16 gIntroSlideFlags = 0;
 EWRAM_DATA u8 gSentPokesToOpponent[2] = {0};
 EWRAM_DATA u16 gDynamicBasePower = 0;
 EWRAM_DATA u16 gExpShareExp = 0;
+EWRAM_DATA static bool8 sSwitchInAbilitiesOrderInitialized = FALSE;
 EWRAM_DATA struct BattleEnigmaBerry gEnigmaBerries[MAX_BATTLERS_COUNT] = {0};
 EWRAM_DATA struct BattleScripting gBattleScripting = {0};
 EWRAM_DATA struct BattleStruct *gBattleStruct = NULL;
@@ -236,6 +242,7 @@ EWRAM_DATA u8 gMoveSelectionCursor[MAX_BATTLERS_COUNT] = {0};
 EWRAM_DATA u8 gBattlerStatusSummaryTaskId[MAX_BATTLERS_COUNT] = {0};
 EWRAM_DATA u8 gBattlerInMenuId = 0;
 EWRAM_DATA bool8 gDoingBattleAnim = FALSE;
+EWRAM_DATA bool8 gLastUsedBallMenuPresent = FALSE;
 EWRAM_DATA u32 gTransformedPersonalities[MAX_BATTLERS_COUNT] = {0};
 EWRAM_DATA u8 gPlayerDpadHoldFrames = 0;
 EWRAM_DATA struct BattleSpriteData *gBattleSpritesDataPtr = NULL;
@@ -547,6 +554,7 @@ static void (* const sTurnActionsFuncsTable[])(void) =
     [B_ACTION_TRY_FINISH] = HandleAction_TryFinish,
     [B_ACTION_FINISHED] = HandleAction_ActionFinished,
     [B_ACTION_NOTHING_FAINTED] = HandleAction_NothingIsFainted,
+    [B_ACTION_THROW_BALL] = HandleAction_ThrowBall,
 };
 
 static void (* const sEndTurnFuncsTable[])(void) =
@@ -775,90 +783,19 @@ static void sub_8036A5C(void)
 
 static void SetPlayerBerryDataInBattleStruct(void)
 {
-    s32 i;
-    struct BattleStruct *battleStruct = gBattleStruct;
-    struct BattleEnigmaBerry *battleBerry = &battleStruct->battleEnigmaBerry;
-
-    if (IsEnigmaBerryValid() == TRUE)
-    {
-        for (i = 0; i < BERRY_NAME_LENGTH; i++)
-            battleBerry->name[i] = gSaveBlock1Ptr->enigmaBerry.berry.name[i];
-        battleBerry->name[i] = EOS;
-
-        for (i = 0; i < BERRY_ITEM_EFFECT_COUNT; i++)
-            battleBerry->itemEffect[i] = gSaveBlock1Ptr->enigmaBerry.itemEffect[i];
-
-        battleBerry->holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
-        battleBerry->holdEffectParam = gSaveBlock1Ptr->enigmaBerry.holdEffectParam;
-    }
-    else
-    {
-        const struct Berry *berryData = GetBerryInfo(ItemIdToBerryType(ITEM_ENIGMA_BERRY));
-
-        for (i = 0; i < BERRY_NAME_LENGTH; i++)
-            battleBerry->name[i] = berryData->name[i];
-        battleBerry->name[i] = EOS;
-
-        for (i = 0; i < BERRY_ITEM_EFFECT_COUNT; i++)
-            battleBerry->itemEffect[i] = 0;
-
-        battleBerry->holdEffect = HOLD_EFFECT_NONE;
-        battleBerry->holdEffectParam = 0;
-    }
+    GetBattleEnigmaBerry(&gBattleStruct->battleEnigmaBerry);
 }
 
 static void SetAllPlayersBerryData(void)
 {
     s32 i, j;
+    struct BattleEnigmaBerry battleBerry;
 
-    if (!(gBattleTypeFlags & BATTLE_TYPE_LINK))
-    {
-        if (IsEnigmaBerryValid() == TRUE)
-        {
-            for (i = 0; i < BERRY_NAME_LENGTH; i++)
-            {
-                gEnigmaBerries[0].name[i] = gSaveBlock1Ptr->enigmaBerry.berry.name[i];
-                gEnigmaBerries[2].name[i] = gSaveBlock1Ptr->enigmaBerry.berry.name[i];
-            }
-            gEnigmaBerries[0].name[i] = EOS;
-            gEnigmaBerries[2].name[i] = EOS;
+    GetBattleEnigmaBerry(&battleBerry);
+    for (i = 0; i < MAX_BATTLERS_COUNT; i++)
+        gEnigmaBerries[i] = battleBerry;
 
-            for (i = 0; i < BERRY_ITEM_EFFECT_COUNT; i++)
-            {
-                gEnigmaBerries[0].itemEffect[i] = gSaveBlock1Ptr->enigmaBerry.itemEffect[i];
-                gEnigmaBerries[2].itemEffect[i] = gSaveBlock1Ptr->enigmaBerry.itemEffect[i];
-            }
-
-            gEnigmaBerries[0].holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
-            gEnigmaBerries[2].holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
-            gEnigmaBerries[0].holdEffectParam = gSaveBlock1Ptr->enigmaBerry.holdEffectParam;
-            gEnigmaBerries[2].holdEffectParam = gSaveBlock1Ptr->enigmaBerry.holdEffectParam;
-        }
-        else
-        {
-            const struct Berry *berryData = GetBerryInfo(ItemIdToBerryType(ITEM_ENIGMA_BERRY));
-
-            for (i = 0; i < BERRY_NAME_LENGTH; i++)
-            {
-                gEnigmaBerries[0].name[i] = berryData->name[i];
-                gEnigmaBerries[2].name[i] = berryData->name[i];
-            }
-            gEnigmaBerries[0].name[i] = EOS;
-            gEnigmaBerries[2].name[i] = EOS;
-
-            for (i = 0; i < BERRY_ITEM_EFFECT_COUNT; i++)
-            {
-                gEnigmaBerries[0].itemEffect[i] = 0;
-                gEnigmaBerries[2].itemEffect[i] = 0;
-            }
-
-            gEnigmaBerries[0].holdEffect = 0;
-            gEnigmaBerries[2].holdEffect = 0;
-            gEnigmaBerries[0].holdEffectParam = 0;
-            gEnigmaBerries[2].holdEffectParam = 0;
-        }
-    }
-    else
+    if (gBattleTypeFlags & BATTLE_TYPE_LINK)
     {
         s32 numPlayers;
         struct BattleEnigmaBerry *src;
@@ -914,6 +851,9 @@ static void SetAllPlayersBerryData(void)
             }
         }
     }
+
+    for (i = 0; i < MAX_BATTLERS_COUNT; i++)
+        gBattleStruct->battlerOriginalEnigmaBerries[i] = gEnigmaBerries[i];
 }
 
 static void sub_8036EB8(u8 arg0, u8 arg1)
@@ -1972,12 +1912,16 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
 
         if (evoCount > 0) // If evoCount is zero, don't do any of this calculation and just return species.
         {
-            u32 validEvoArray[EVOS_PER_MON] = { 0,0,0,0,0 };
+            u32 validEvoArray[EVOS_PER_MON] = {0};
             u32 validCount = 0;
             
             // Second, collect all valid evolution species into an array.
             for (i = 0; i < evoCount; i++)
             {
+                bool32 shouldAdd = FALSE;
+                u32 j;
+                u32 targetSpecies = gEvolutionTable[species][i].targetSpecies;
+
                 if (gEvolutionTable[species][i].method == EVO_LEVEL ||
                     gEvolutionTable[species][i].method == EVO_LEVEL_ATK_LT_DEF ||
                     gEvolutionTable[species][i].method == EVO_LEVEL_ATK_GT_DEF ||
@@ -1988,18 +1932,30 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
                     gEvolutionTable[species][i].method == EVO_LEVEL_SHEDINJA) 
                 {   // If evo level + 5 is less than or equal to the scaled level, add as possible evo
                     if (gEvolutionTable[species][i].param + 5 <= scaledLevel)
-                    {
-                        validEvoArray[validCount] = gEvolutionTable[species][i].targetSpecies;
-                        validCount++;
-                    }
+                        shouldAdd = TRUE;
                 }
                 else
                 {   // If method is not level up, and the normalLevel+7 is less than the scaledLevel, add as possible evo
                     if (normalLevel + 7 < scaledLevel)
+                        shouldAdd = TRUE;
+                }
+
+                if (!shouldAdd)
+                    continue;
+
+                for (j = 0; j < validCount; j++)
+                {
+                    if (validEvoArray[j] == targetSpecies)
                     {
-                        validEvoArray[validCount] = gEvolutionTable[species][i].targetSpecies;
-                        validCount++;
+                        shouldAdd = FALSE;
+                        break;
                     }
+                }
+
+                if (shouldAdd)
+                {
+                    validEvoArray[validCount] = targetSpecies;
+                    validCount++;
                 }
             }
             // Third, return a random valid evolution.
@@ -2045,6 +2001,7 @@ u8 ScaleLevel(u32 pokeBaseLevel, u32 trainerNum, u32 avgLevel, u32 currentMon, u
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_ELITE_FOUR ||
             gTrainers[trainerNum].trainerClass == TRAINER_CLASS_CHAMPION)
         {
+            // For 'important' trainers, no mercy.
             scale = (avgLevel - pokeBaseLevel);
         }
         else
@@ -2144,9 +2101,6 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
 
         for (i = 0; i < monsCount; i++)
         {
-            u8 scaledLevel = 0;
-            u16 evolution = 0;
-
             if (gTrainers[trainerNum].doubleBattle == TRUE)
                 personalityValue = 0x80;
             else if (gTrainers[trainerNum].encounterMusic_gender & 0x80) // is female
@@ -2162,11 +2116,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 case 0:
                 {
                     const struct TrainerMonNoItemDefaultMoves *partyData = gTrainers[trainerNum].party.NoItemDefaultMoves;
+                    u8 scaledLevel = partyData[i].lvl;
+                    u16 evolution = partyData[i].species;
 
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                         nameHash += gSpeciesNames[partyData[i].species][j];
 
-                    evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
                     scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
@@ -2184,11 +2139,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 case F_TRAINER_PARTY_CUSTOM_MOVESET:
                 {
                     const struct TrainerMonNoItemCustomMoves *partyData = gTrainers[trainerNum].party.NoItemCustomMoves;
+                    u8 scaledLevel = partyData[i].lvl;
+                    u16 evolution = partyData[i].species;
 
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                         nameHash += gSpeciesNames[partyData[i].species][j];
 
-                    evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
                     scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
@@ -2211,11 +2167,12 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 case F_TRAINER_PARTY_HELD_ITEM:
                 {
                     const struct TrainerMonItemDefaultMoves *partyData = gTrainers[trainerNum].party.ItemDefaultMoves;
+                    u8 scaledLevel = partyData[i].lvl;
+                    u16 evolution = partyData[i].species;
 
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                         nameHash += gSpeciesNames[partyData[i].species][j];
 
-                    evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
                     scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
@@ -2235,16 +2192,14 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                 {
                     u32 forceShinyTrainerId = 0;
                     const struct TrainerMonItemCustomMoves *partyData = gTrainers[trainerNum].party.ItemCustomMoves;
+                    u8 scaledLevel = partyData[i].lvl;
+                    u16 evolution = partyData[i].species;
 
                     for (j = 0; gSpeciesNames[partyData[i].species][j] != EOS; j++)
                         nameHash += gSpeciesNames[partyData[i].species][j];
 
-                    evolution = partyData[i].species;
                     personalityValue += nameHash << 8;
                     fixedIV = partyData[i].iv * 31 / 255;
-                    scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
-                    if (scaledLevel > partyData[i].lvl)
-                        evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
 
                     switch (trainerNum)
                     {
@@ -2255,9 +2210,76 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                         case TRAINER_KRIS:
                         case TRAINER_SAPPHYR_EMERALD:
                         case TRAINER_SAPPHYR_EMERALD2:
-                        case TRAINER_RUBY_EMERALD:
+                        case TRAINER_RUBY_EMERALD: // For these trainers, their pokemon are already level 100 and have the specified teams we want. Don't scale or evolve them.
                             forceShinyTrainerId = (Random() << 0x10) | Random();
                             personalityValue = ForceShiny(personalityValue, forceShinyTrainerId);
+                            break;
+                        // Don't force evolve these trainer's Pokemon at all.
+                        case TRAINER_ROXANNE_1:
+                        case TRAINER_ROXANNE_2:
+                        case TRAINER_ROXANNE_3:
+                        case TRAINER_ROXANNE_4:
+                        case TRAINER_ROXANNE_5:
+                        case TRAINER_BRAWLY_1:
+                        case TRAINER_BRAWLY_2:
+                        case TRAINER_BRAWLY_3:
+                        case TRAINER_BRAWLY_4:
+                        case TRAINER_BRAWLY_5:
+                        case TRAINER_WATTSON_1:
+                        case TRAINER_WATTSON_2:
+                        case TRAINER_WATTSON_3:
+                        case TRAINER_WATTSON_4:
+                        case TRAINER_WATTSON_5:
+                        case TRAINER_FLANNERY_1:
+                        case TRAINER_FLANNERY_2:
+                        case TRAINER_FLANNERY_3:
+                        case TRAINER_FLANNERY_4:
+                        case TRAINER_FLANNERY_5:
+                        case TRAINER_NORMAN_1:
+                        case TRAINER_NORMAN_2:
+                        case TRAINER_NORMAN_3:
+                        case TRAINER_NORMAN_4:
+                        case TRAINER_NORMAN_5:
+                        case TRAINER_WINONA_1:
+                        case TRAINER_WINONA_2:
+                        case TRAINER_WINONA_3:
+                        case TRAINER_WINONA_4:
+                        case TRAINER_WINONA_5:
+                        case TRAINER_TATE_AND_LIZA_1:
+                        case TRAINER_TATE_AND_LIZA_2:
+                        case TRAINER_TATE_AND_LIZA_3:
+                        case TRAINER_TATE_AND_LIZA_4:
+                        case TRAINER_TATE_AND_LIZA_5:
+                        case TRAINER_JUAN_1:
+                        case TRAINER_JUAN_2:
+                        case TRAINER_JUAN_3:
+                        case TRAINER_JUAN_4:
+                        case TRAINER_JUAN_5:
+                        case TRAINER_WALLY_MAUVILLE:
+                        case TRAINER_WALLY_VR_1:
+                        case TRAINER_WALLY_VR_2:
+                        case TRAINER_WALLY_VR_3:
+                        case TRAINER_WALLY_VR_4:
+                        case TRAINER_WALLY_VR_5:
+                            scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
+                            break;
+                        // E4 + Champion case
+                        case TRAINER_SIDNEY:
+                        case TRAINER_PHOEBE:
+                        case TRAINER_GLACIA:
+                        case TRAINER_DRAKE:
+                        case TRAINER_WALLACE:
+                            // If the player hasn't beaten the game yet, don't force-evolve the E4 + Champion's pokemon.
+                            if (!FlagGet(FLAG_SYS_GAME_CLEAR)) 
+                            {
+                                scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
+                                break;
+                            }
+                            // Else - fall through
+                        default:
+                            scaledLevel = ScaleLevel(partyData[i].lvl, trainerNum, avgLevel, i, monsCount, maxMon);
+                            if (scaledLevel > partyData[i].lvl)
+                                evolution = HasEvolution(partyData[i].species, scaledLevel, partyData[i].lvl);
                             break;
                     }
 
@@ -2266,7 +2288,11 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum, bool8 fir
                     else
                         CreateMon(&party[i], evolution, scaledLevel, fixedIV, TRUE, personalityValue, OT_ID_RANDOM_NO_SHINY, 0);
                     SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
-                    if (gBaseStats[evolution].abilities[1] && (partyData[i].abilityNum == 0 || partyData[i].abilityNum == 1)) // Check valid ranges
+                    if (partyData[i].abilityNum == ABILITY_NUM_HIDDEN && gBaseStats[evolution].abilities[ABILITY_NUM_HIDDEN])
+                    {
+                        SetMonData(&party[i], MON_DATA_ABILITY_NUM, &partyData[i].abilityNum);
+                    }
+                    else if (gBaseStats[evolution].abilities[1] && (partyData[i].abilityNum == 0 || partyData[i].abilityNum == 1)) // Check valid ranges
                     {
                         SetMonData(&party[i], MON_DATA_ABILITY_NUM, &partyData[i].abilityNum);
                     }
@@ -3354,6 +3380,12 @@ static void BattleStartClearSetData(void)
         *(gBattleStruct->AI_monToSwitchIntoId + i) = PARTY_SIZE;
     }
 
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        gBattleStruct->partyRageFistCounters[B_SIDE_PLAYER][i] = 0;
+        gBattleStruct->partyRageFistCounters[B_SIDE_OPPONENT][i] = 0;
+    }
+
     gBattleStruct->givenExpMons = 0;
     gBattleStruct->palaceFlags = 0;
 
@@ -3393,7 +3425,7 @@ void SwitchInClearSetData(void)
     if (gBattleMoves[gCurrentMove].effect == EFFECT_BATON_PASS)
     {
         gBattleMons[gActiveBattler].status2 &= (STATUS2_CONFUSION | STATUS2_FOCUS_ENERGY | STATUS2_SUBSTITUTE | STATUS2_ESCAPE_PREVENTION | STATUS2_CURSED);
-        gStatuses3[gActiveBattler] &= (STATUS3_LEECHSEED_BATTLER | STATUS3_LEECHSEED | STATUS3_ALWAYS_HITS | STATUS3_PERISH_SONG | STATUS3_ROOTED | STATUS3_MUDSPORT | STATUS3_WATERSPORT);
+        gStatuses3[gActiveBattler] &= (STATUS3_LEECHSEED_BATTLER | STATUS3_LEECHSEED | STATUS3_ALWAYS_HITS | STATUS3_PERISH_SONG | STATUS3_ROOTED | STATUS3_MUDSPORT | STATUS3_WATERSPORT | STATUS3_MAGNET_RISE);
 
         for (i = 0; i < gBattlersCount; i++)
         {
@@ -3434,6 +3466,7 @@ void SwitchInClearSetData(void)
         gDisableStructs[gActiveBattler].perishSongTimer = disableStructCopy.perishSongTimer;
         gDisableStructs[gActiveBattler].perishSongTimerStartValue = disableStructCopy.perishSongTimerStartValue;
         gDisableStructs[gActiveBattler].battlerPreventingEscape = disableStructCopy.battlerPreventingEscape;
+        gDisableStructs[gActiveBattler].magnetRiseTimer = disableStructCopy.magnetRiseTimer;
     }
 
     gMoveResultFlags = 0;
@@ -3528,6 +3561,7 @@ void FaintClearSetData(void)
     gProtectStructs[gActiveBattler].flag2Unknown = 0;
     gProtectStructs[gActiveBattler].flinchImmobility = 0;
     gProtectStructs[gActiveBattler].notFirstStrike = 0;
+    gProtectStructs[gActiveBattler].pursuitSwitchDmg = 0;
 
     gDisableStructs[gActiveBattler].isFirstTurn = 2;
 
@@ -3637,7 +3671,8 @@ static void BattleIntroDrawTrainersOrMonsSprites(void)
 
             gBattleMons[gActiveBattler].type1 = gBaseStats[gBattleMons[gActiveBattler].species].type1;
             gBattleMons[gActiveBattler].type2 = gBaseStats[gBattleMons[gActiveBattler].species].type2;
-            gBattleMons[gActiveBattler].ability = GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].abilityNum);
+            ClearBattlerFlashFire(gActiveBattler);
+            SetBattlerAbility(gActiveBattler, GetAbilityBySpecies(gBattleMons[gActiveBattler].species, gBattleMons[gActiveBattler].abilityNum));
             hpOnSwitchout = &gBattleStruct->hpOnSwitchout[GetBattlerSide(gActiveBattler)];
             *hpOnSwitchout = gBattleMons[gActiveBattler].hp;
             for (i = 0; i < NUM_BATTLE_STATS; i++)
@@ -3968,6 +4003,7 @@ static void BattleIntroPlayer2SendsOutMonAnimation(void)
     gBattleStruct->switchInAbilitiesCounter = 0;
     gBattleStruct->switchInItemsCounter = 0;
     gBattleStruct->overworldWeatherDone = FALSE;
+    sSwitchInAbilitiesOrderInitialized = FALSE;
 
     gBattleMainFunc = TryDoEventsBeforeFirstTurn;
 }
@@ -4008,6 +4044,7 @@ static void BattleIntroPlayer1SendsOutMonAnimation(void)
     gBattleStruct->switchInAbilitiesCounter = 0;
     gBattleStruct->switchInItemsCounter = 0;
     gBattleStruct->overworldWeatherDone = FALSE;
+    sSwitchInAbilitiesOrderInitialized = FALSE;
 
     gBattleMainFunc = TryDoEventsBeforeFirstTurn;
 }
@@ -4028,6 +4065,7 @@ static void sub_803B598(void) // unused
         gBattleStruct->switchInAbilitiesCounter = 0;
         gBattleStruct->switchInItemsCounter = 0;
         gBattleStruct->overworldWeatherDone = FALSE;
+        sSwitchInAbilitiesOrderInitialized = FALSE;
 
         gBattleMainFunc = TryDoEventsBeforeFirstTurn;
     }
@@ -4049,7 +4087,7 @@ static void TryDoEventsBeforeFirstTurn(void)
         return;
     }
 
-    if (gBattleStruct->switchInAbilitiesCounter == 0)
+    if (!sSwitchInAbilitiesOrderInitialized)
     {
         for (i = 0; i < gBattlersCount; i++)
             gBattlerByTurnOrder[i] = i;
@@ -4057,10 +4095,11 @@ static void TryDoEventsBeforeFirstTurn(void)
         {
             for (j = i + 1; j < gBattlersCount; j++)
             {
-                if (GetWhoStrikesFirst(gBattlerByTurnOrder[i], gBattlerByTurnOrder[j], TRUE) != 0)
+                if (GetWhoStrikesFirstForSwitchIn(gBattlerByTurnOrder[i], gBattlerByTurnOrder[j]) != 0)
                     SwapTurnOrder(i, j);
             }
         }
+        sSwitchInAbilitiesOrderInitialized = TRUE;
     }
     if (!gBattleStruct->overworldWeatherDone
         && AbilityBattleEffects(0, 0, 0, ABILITYEFFECT_SWITCH_IN_WEATHER, 0) != 0)
@@ -4071,8 +4110,16 @@ static void TryDoEventsBeforeFirstTurn(void)
     // Check all switch in abilities happening from the fastest mon to slowest.
     while (gBattleStruct->switchInAbilitiesCounter < gBattlersCount)
     {
-        if (AbilityBattleEffects(ABILITYEFFECT_ON_SWITCHIN, gBattlerByTurnOrder[gBattleStruct->switchInAbilitiesCounter], 0, 0, 0) != 0)
+        u8 battler = gBattlerByTurnOrder[gBattleStruct->switchInAbilitiesCounter];
+        u8 ability = gBattleMons[battler].ability;
+
+        if (AbilityBattleEffects(ABILITYEFFECT_ON_SWITCHIN, battler, 0, 0, 0) != 0)
+        {
             effect++;
+
+            if (ability == ABILITY_FRISK)
+                return;
+        }
 
         gBattleStruct->switchInAbilitiesCounter++;
 
@@ -4176,6 +4223,8 @@ void BattleTurnPassed(void)
     gBattleStruct->faintedActionsState = 0;
     if (HandleWishPerishSongOnTurnEnd())
         return;
+    gBattleStruct->pickupItemEligible[0] = 0;
+    gBattleStruct->pickupItemEligible[1] = 0;
 
     TurnValuesCleanUp(FALSE);
     gHitMarker &= ~(HITMARKER_NO_ATTACKSTRING);
@@ -4236,10 +4285,7 @@ u8 IsRunningFromBattleImpossible(void)
         return 1;
     }
 
-    if (gBattleMons[gActiveBattler].item == ITEM_ENIGMA_BERRY)
-        holdEffect = gEnigmaBerries[gActiveBattler].holdEffect;
-    else
-        holdEffect = ItemId_GetHoldEffect(gBattleMons[gActiveBattler].item);
+    holdEffect = GetBattlerItemHoldEffect(gActiveBattler, gBattleMons[gActiveBattler].item);
 
     gPotentialItemEffectBattler = gActiveBattler;
 
@@ -4250,35 +4296,37 @@ u8 IsRunningFromBattleImpossible(void)
 
     for (i = 0; i < gBattlersCount; i++)
     {
-        if (side != GetBattlerSide(i)
-         && gBattleMons[i].ability == ABILITY_SHADOW_TAG)
+        // If ghost typed, then it can't be trapped per Gen 6 rules.
+        if (side != GetBattlerSide(i) && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST))
         {
-            gBattleScripting.battler = i;
-            gLastUsedAbility = gBattleMons[i].ability;
-            gBattleCommunication[MULTISTRING_CHOOSER] = 2;
-            return 2;
+            if (gBattleMons[i].ability == ABILITY_SHADOW_TAG
+                && gBattleMons[gActiveBattler].ability != ABILITY_SHADOW_TAG)
+            {
+                gBattleScripting.battler = i;
+                gLastUsedAbility = gBattleMons[i].ability;
+                gBattleCommunication[MULTISTRING_CHOOSER] = 2;
+                return 2;
+            }
+            else if (gBattleMons[i].ability == ABILITY_ARENA_TRAP
+                && !IsBattlerGroundImmune(gActiveBattler))
+            {
+                gBattleScripting.battler = i;
+                gLastUsedAbility = gBattleMons[i].ability;
+                gBattleCommunication[MULTISTRING_CHOOSER] = 2;
+                return 2;
+            }
+            else if (gBattleMons[i].ability == ABILITY_MAGNET_PULL
+                && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL))
+            {
+                gBattleScripting.battler = i;
+                gLastUsedAbility = gBattleMons[i].ability;
+                gBattleCommunication[MULTISTRING_CHOOSER] = 2;
+                return 2;
+            }
         }
-        if (side != GetBattlerSide(i)
-         && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE
-         && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
-         && gBattleMons[i].ability == ABILITY_ARENA_TRAP)
-        {
-            gBattleScripting.battler = i;
-            gLastUsedAbility = gBattleMons[i].ability;
-            gBattleCommunication[MULTISTRING_CHOOSER] = 2;
-            return 2;
-        }
-    }
-    i = AbilityBattleEffects(ABILITYEFFECT_CHECK_FIELD_EXCEPT_BATTLER, gActiveBattler, ABILITY_MAGNET_PULL, 0, 0);
-    if (i != 0 && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL))
-    {
-        gBattleScripting.battler = i - 1;
-        gLastUsedAbility = gBattleMons[i - 1].ability;
-        gBattleCommunication[MULTISTRING_CHOOSER] = 2;
-        return 2;
     }
     if ((gBattleMons[gActiveBattler].status2 & (STATUS2_ESCAPE_PREVENTION | STATUS2_WRAPPED))
-        || (gStatuses3[gActiveBattler] & STATUS3_ROOTED))
+        || IsBattlerTrappedByIngrain(gActiveBattler))
     {
         gBattleCommunication[MULTISTRING_CHOOSER] = 0;
         return 1;
@@ -4448,21 +4496,49 @@ static void HandleTurnActionSelectionState(void)
                     }
                     break;
                 case B_ACTION_SWITCH:
+                {
+                    u8 side = GetBattlerSide(gActiveBattler);
+                    bool32 isTrapped = FALSE;
                     *(gBattleStruct->field_58 + gActiveBattler) = gBattlerPartyIndexes[gActiveBattler];
+
+                    // If ghost typed, then it can't be trapped per Gen 6 rules.
+                    if (!IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST))
+                    {
+                        for (i = 0; i < gBattlersCount; i++)
+                        {
+                            if (side != GetBattlerSide(i))
+                            {
+                                if (gBattleMons[i].ability == ABILITY_SHADOW_TAG
+                                    && gBattleMons[gActiveBattler].ability != ABILITY_SHADOW_TAG)
+                                {
+                                    isTrapped = TRUE;
+                                    break;
+                                }
+                                else if (gBattleMons[i].ability == ABILITY_ARENA_TRAP
+                                    && !IsBattlerGroundImmune(gActiveBattler))
+                                {
+                                    isTrapped = TRUE;
+                                    break;
+                                }
+                                else if (gBattleMons[i].ability == ABILITY_MAGNET_PULL
+                                    && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL))
+                                {
+                                    isTrapped = TRUE;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     if (gBattleMons[gActiveBattler].status2 & (STATUS2_WRAPPED | STATUS2_ESCAPE_PREVENTION)
                         || gBattleTypeFlags & BATTLE_TYPE_ARENA
-                        || gStatuses3[gActiveBattler] & STATUS3_ROOTED)
+                        || IsBattlerTrappedByIngrain(gActiveBattler))
                     {
                         BtlController_EmitChoosePokemon(0, PARTY_ACTION_CANT_SWITCH, PARTY_SIZE, ABILITY_NONE, gBattleStruct->field_60[gActiveBattler]);
                     }
-                    else if ((i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_SHADOW_TAG))
-                             || ((i = ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_ARENA_TRAP))
-                                 && !IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_FLYING)
-                                 && gBattleMons[gActiveBattler].ability != ABILITY_LEVITATE)
-                             || ((i = AbilityBattleEffects(ABILITYEFFECT_CHECK_FIELD_EXCEPT_BATTLER, gActiveBattler, ABILITY_MAGNET_PULL, 0, 0))
-                                 && IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL)))
+                    else if (isTrapped)
                     {
-                        BtlController_EmitChoosePokemon(0, ((i - 1) << 4) | PARTY_ACTION_ABILITY_PREVENTS, PARTY_SIZE, gLastUsedAbility, gBattleStruct->field_60[gActiveBattler]);
+                        BtlController_EmitChoosePokemon(0, (i << 4) | PARTY_ACTION_ABILITY_PREVENTS, PARTY_SIZE, gLastUsedAbility, gBattleStruct->field_60[gActiveBattler]);
                     }
                     else
                     {
@@ -4475,7 +4551,18 @@ static void HandleTurnActionSelectionState(void)
                     }
                     MarkBattlerForControllerExec(gActiveBattler);
                     break;
+                }
                 case B_ACTION_SAFARI_BALL:
+                    if (IsPlayerPartyAndPokemonStorageFull())
+                    {
+                        gSelectionBattleScripts[gActiveBattler] = BattleScript_PrintFullBox;
+                        gBattleCommunication[gActiveBattler] = STATE_SELECTION_SCRIPT;
+                        *(gBattleStruct->selectionScriptFinished + gActiveBattler) = FALSE;
+                        *(gBattleStruct->stateIdAfterSelScript + gActiveBattler) = STATE_BEFORE_ACTION_CHOSEN;
+                        return;
+                    }
+                    break;
+                case B_ACTION_THROW_BALL:
                     if (IsPlayerPartyAndPokemonStorageFull())
                     {
                         gSelectionBattleScripts[gActiveBattler] = BattleScript_PrintFullBox;
@@ -4646,6 +4733,9 @@ static void HandleTurnActionSelectionState(void)
                 case B_ACTION_SAFARI_BALL:
                     gBattleCommunication[gActiveBattler]++;
                     break;
+                case B_ACTION_THROW_BALL:
+                    gBattleCommunication[gActiveBattler]++;
+                    break;
                 case B_ACTION_SAFARI_POKEBLOCK:
                     if ((gBattleBufferB[gActiveBattler][1] | (gBattleBufferB[gActiveBattler][2] << 8)) != 0)
                     {
@@ -4806,115 +4896,81 @@ void SwapTurnOrder(u8 id1, u8 id2)
     SWAP(gBattlerByTurnOrder[id1], gBattlerByTurnOrder[id2], temp);
 }
 
-static u8 GetWhoStrikesFirstInternal(u8 battler1, u8 battler2, bool8 ignoreChosenMoves, bool8 useRandomTieBreak)
+u32 GetBattlerTotalSpeedStat(u8 battler, bool32 includeQuickClaw)
 {
-    u8 strikesFirst = 0;
-    u8 speedMultiplierBattler1 = 0, speedMultiplierBattler2 = 0;
-    u32 speedBattler1 = 0, speedBattler2 = 0;
-    bool32 trickRoomShouldFlip = FALSE;
-    u8 holdEffect = 0;
-    u8 holdEffectParam = 0;
-    u16 moveBattler1 = 0, moveBattler2 = 0;
+    u32 speedMultiplier = 1;
+    u32 holdEffect = 0;
+    u32 holdEffectParam = 0;
+    u32 speed;
 
     if (WEATHER_HAS_EFFECT)
     {
-        if ((gBattleMons[battler1].ability == ABILITY_SWIFT_SWIM && gBattleWeather & WEATHER_RAIN_ANY)
-            || (gBattleMons[battler1].ability == ABILITY_CHLOROPHYLL && gBattleWeather & WEATHER_SUN_ANY))
-            speedMultiplierBattler1 = 2;
-        else
-            speedMultiplierBattler1 = 1;
-
-        if ((gBattleMons[battler2].ability == ABILITY_SWIFT_SWIM && gBattleWeather & WEATHER_RAIN_ANY)
-            || (gBattleMons[battler2].ability == ABILITY_CHLOROPHYLL && gBattleWeather & WEATHER_SUN_ANY))
-            speedMultiplierBattler2 = 2;
-        else
-            speedMultiplierBattler2 = 1;
-    }
-    else
-    {
-        speedMultiplierBattler1 = 1;
-        speedMultiplierBattler2 = 1;
+        if ((gBattleMons[battler].ability == ABILITY_SWIFT_SWIM && gBattleWeather & WEATHER_RAIN_ANY)
+            || (gBattleMons[battler].ability == ABILITY_CHLOROPHYLL && gBattleWeather & WEATHER_SUN_ANY)
+            || (gBattleMons[battler].ability == ABILITY_SLUSH_RUSH && gBattleWeather & WEATHER_HAIL_ANY)
+            || (gBattleMons[battler].ability == ABILITY_SAND_RUSH && gBattleWeather & WEATHER_SANDSTORM_ANY))
+            speedMultiplier *= 2;
     }
 
-    speedBattler1 = (gBattleMons[battler1].speed * speedMultiplierBattler1)
-                * (gStatStageRatios[gBattleMons[battler1].statStages[STAT_SPEED]][0])
-                / (gStatStageRatios[gBattleMons[battler1].statStages[STAT_SPEED]][1]);
+    if (gSideStatuses[GetBattlerSide(battler)] & SIDE_STATUS_TAILWIND)
+        speedMultiplier *= 2;
 
-    if (gBattleMons[battler1].item == ITEM_ENIGMA_BERRY)
-    {
-        holdEffect = gEnigmaBerries[battler1].holdEffect;
-        holdEffectParam = gEnigmaBerries[battler1].holdEffectParam;
-    }
-    else
-    {
-        holdEffect = ItemId_GetHoldEffect(gBattleMons[battler1].item);
-        holdEffectParam = ItemId_GetHoldEffectParam(gBattleMons[battler1].item);
-    }
+    if (IsUnburdenBoostActive(battler))
+        speedMultiplier *= 2;
+
+    speed = (gBattleMons[battler].speed * speedMultiplier)
+          * (gStatStageRatios[gBattleMons[battler].statStages[STAT_SPEED]][0])
+          / (gStatStageRatios[gBattleMons[battler].statStages[STAT_SPEED]][1]);
+
+    holdEffect = GetBattlerItemHoldEffect(battler, gBattleMons[battler].item);
+    holdEffectParam = GetBattlerItemHoldEffectParam(battler, gBattleMons[battler].item);
 
     // badge boost
     if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_x2000000 | BATTLE_TYPE_FRONTIER))
         && FlagGet(FLAG_BADGE03_GET)
-        && GetBattlerSide(battler1) == B_SIDE_PLAYER)
+        && GetBattlerSide(battler) == B_SIDE_PLAYER)
     {
-        speedBattler1 = (speedBattler1 * 110) / 100;
+        speed = (speed * 110) / 100;
     }
 
     if (holdEffect == HOLD_EFFECT_CHOICE_SCARF)
-        speedBattler1 = (speedBattler1 * 150) / 100;
+        speed = (speed * 150) / 100;
 
-    if (gBattleMons[battler1].ability == ABILITY_TITANIC)
-        speedBattler1 = (speedBattler1 * 80) / 100;
+    if (gBattleMons[battler].ability == ABILITY_TITANIC)
+        speed = (speed * 80) / 100;
 
-    if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
-        speedBattler1 /= 2;
-
-    if (gBattleMons[battler1].status1 & STATUS1_PARALYSIS)
-        speedBattler1 /= 4;
-
-    if (holdEffect == HOLD_EFFECT_QUICK_CLAW && gRandomTurnNumber < (0xFFFF * holdEffectParam) / 100)
-        speedBattler1 = UINT_MAX;
-
-    // check second battlerId's speed
-
-    speedBattler2 = (gBattleMons[battler2].speed * speedMultiplierBattler2)
-                * (gStatStageRatios[gBattleMons[battler2].statStages[STAT_SPEED]][0])
-                / (gStatStageRatios[gBattleMons[battler2].statStages[STAT_SPEED]][1]);
-
-    if (gBattleMons[battler2].item == ITEM_ENIGMA_BERRY)
-    {
-        holdEffect = gEnigmaBerries[battler2].holdEffect;
-        holdEffectParam = gEnigmaBerries[battler2].holdEffectParam;
-    }
-    else
-    {
-        holdEffect = ItemId_GetHoldEffect(gBattleMons[battler2].item);
-        holdEffectParam = ItemId_GetHoldEffectParam(gBattleMons[battler2].item);
-    }
-
-    // badge boost
-    if (!(gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_x2000000 | BATTLE_TYPE_FRONTIER))
-        && FlagGet(FLAG_BADGE03_GET)
-        && GetBattlerSide(battler2) == B_SIDE_PLAYER)
-    {
-        speedBattler2 = (speedBattler2 * 110) / 100;
-    }
-
-    if (holdEffect == HOLD_EFFECT_CHOICE_SCARF)
-        speedBattler2 = (speedBattler2 * 150) / 100;
-
-    if (gBattleMons[battler2].ability == ABILITY_TITANIC)
-        speedBattler2 = (speedBattler2 * 80) / 100;
+    if (gBattleMons[battler].ability == ABILITY_QUICK_FEET
+        && (gBattleMons[battler].status1 & STATUS1_ANY))
+        speed = (speed * 150) / 100;
 
     if (holdEffect == HOLD_EFFECT_MACHO_BRACE)
-        speedBattler2 /= 2;
+        speed /= 2;
 
-    if (gBattleMons[battler2].status1 & STATUS1_PARALYSIS)
-        speedBattler2 /= 4;
+    if ((gBattleMons[battler].status1 & STATUS1_PARALYSIS)
+        && gBattleMons[battler].ability != ABILITY_QUICK_FEET)
+        speed /= 4;
 
-    if (holdEffect == HOLD_EFFECT_QUICK_CLAW && gRandomTurnNumber < (0xFFFF * holdEffectParam) / 100)
-        speedBattler2 = UINT_MAX;
+    if (includeQuickClaw
+        && holdEffect == HOLD_EFFECT_QUICK_CLAW
+        && gRandomTurnNumber < (0xFFFF * holdEffectParam) / 100)
+    {
+        speed = UINT_MAX;
+    }
 
-    // Trick Room reverses only speed-based ordering. Quick Claw's guaranteed first-strike override remains unchanged.
+    return speed;
+}
+
+static u8 GetWhoStrikesFirstInternal(u8 battler1, u8 battler2, bool8 ignoreChosenMoves, bool8 useRandomTieBreak, bool8 includeQuickClaw)
+{
+    u8 strikesFirst = 0;
+    u32 speedBattler1 = GetBattlerTotalSpeedStat(battler1, includeQuickClaw);
+    u32 speedBattler2 = GetBattlerTotalSpeedStat(battler2, includeQuickClaw);
+    bool32 trickRoomShouldFlip = FALSE;
+    u16 moveBattler1 = 0, moveBattler2 = 0;
+    s8 priority1 = 0, priority2 = 0;
+
+    // Trick Room reverses only speed-based ordering. When included, Quick Claw's
+    // guaranteed first-strike override remains unchanged.
     if (gWishFutureKnock.trickRoomTimer != 0
         && speedBattler1 != UINT_MAX
         && speedBattler2 != UINT_MAX)
@@ -4948,11 +5004,14 @@ static u8 GetWhoStrikesFirstInternal(u8 battler1, u8 battler2, bool8 ignoreChose
             moveBattler2 = MOVE_NONE;
     }
 
+    priority1 = GetBattlerMovePriority(battler1, moveBattler1);
+    priority2 = GetBattlerMovePriority(battler2, moveBattler2);
+
     // both move priorities are different than 0
-    if (gBattleMoves[moveBattler1].priority != 0 || gBattleMoves[moveBattler2].priority != 0)
+    if (priority1 != 0 || priority2 != 0)
     {
         // both priorities are the same
-        if (gBattleMoves[moveBattler1].priority == gBattleMoves[moveBattler2].priority)
+        if (priority1 == priority2)
         {
             if (speedBattler1 == speedBattler2)
             {
@@ -4967,13 +5026,12 @@ static u8 GetWhoStrikesFirstInternal(u8 battler1, u8 battler2, bool8 ignoreChose
 
             // else battler1 has more speed
         }
-        else if (gBattleMoves[moveBattler1].priority < gBattleMoves[moveBattler2].priority)
+        else if (priority1 < priority2)
             strikesFirst = 1; // battler2's move has greater priority
 
         // else battler1's move has greater priority
     }
-    // both priorities are equal to 0
-    else
+    else // both priorities are equal to 0
     {
         if (speedBattler1 == speedBattler2)
         {
@@ -4992,14 +5050,35 @@ static u8 GetWhoStrikesFirstInternal(u8 battler1, u8 battler2, bool8 ignoreChose
     return strikesFirst;
 }
 
+static void TryRecordSpeedAbilityActivation(u8 battler)
+{
+    if ((gBattleMons[battler].ability == ABILITY_SWIFT_SWIM && (gBattleWeather & WEATHER_RAIN_ANY))
+     || (gBattleMons[battler].ability == ABILITY_CHLOROPHYLL && (gBattleWeather & WEATHER_SUN_ANY))
+     || (gBattleMons[battler].ability == ABILITY_SLUSH_RUSH && (gBattleWeather & WEATHER_HAIL_ANY))
+     || (gBattleMons[battler].ability == ABILITY_SAND_RUSH && (gBattleWeather & WEATHER_SANDSTORM_ANY))
+     || (gBattleMons[battler].ability == ABILITY_QUICK_FEET
+         && (gBattleMons[battler].status1 & STATUS1_ANY))
+     || IsUnburdenBoostActive(battler))
+    {
+        RecordAbilityBattle(battler, gBattleMons[battler].ability);
+    }
+}
+
+static u8 GetWhoStrikesFirstForSwitchIn(u8 battler1, u8 battler2)
+{
+    return GetWhoStrikesFirstInternal(battler1, battler2, TRUE, TRUE, FALSE);
+}
+
 u8 GetWhoStrikesFirst(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
 {
-    return GetWhoStrikesFirstInternal(battler1, battler2, ignoreChosenMoves, TRUE);
+    TryRecordSpeedAbilityActivation(battler1);
+    TryRecordSpeedAbilityActivation(battler2);
+    return GetWhoStrikesFirstInternal(battler1, battler2, ignoreChosenMoves, TRUE, TRUE);
 }
 
 u8 GetWhoStrikesFirstForAI(u8 battler1, u8 battler2, bool8 ignoreChosenMoves)
 {
-    return GetWhoStrikesFirstInternal(battler1, battler2, ignoreChosenMoves, FALSE);
+    return GetWhoStrikesFirstInternal(battler1, battler2, ignoreChosenMoves, FALSE, TRUE);
 }
 
 static void SetActionsAndBattlersTurnOrder(void)
@@ -5063,7 +5142,9 @@ static void SetActionsAndBattlersTurnOrder(void)
         }
         for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
         {
-            if (gChosenActionByBattler[gActiveBattler] == B_ACTION_USE_ITEM || gChosenActionByBattler[gActiveBattler] == B_ACTION_SWITCH)
+            if (gChosenActionByBattler[gActiveBattler] == B_ACTION_USE_ITEM
+             || gChosenActionByBattler[gActiveBattler] == B_ACTION_SWITCH
+             || gChosenActionByBattler[gActiveBattler] == B_ACTION_THROW_BALL)
             {
                 gActionsByTurnOrder[turnOrderId] = gChosenActionByBattler[gActiveBattler];
                 gBattlerByTurnOrder[turnOrderId] = gActiveBattler;
@@ -5072,7 +5153,9 @@ static void SetActionsAndBattlersTurnOrder(void)
         }
         for (gActiveBattler = 0; gActiveBattler < gBattlersCount; gActiveBattler++)
         {
-            if (gChosenActionByBattler[gActiveBattler] != B_ACTION_USE_ITEM && gChosenActionByBattler[gActiveBattler] != B_ACTION_SWITCH)
+            if (gChosenActionByBattler[gActiveBattler] != B_ACTION_USE_ITEM
+             && gChosenActionByBattler[gActiveBattler] != B_ACTION_SWITCH
+             && gChosenActionByBattler[gActiveBattler] != B_ACTION_THROW_BALL)
             {
                 gActionsByTurnOrder[turnOrderId] = gChosenActionByBattler[gActiveBattler];
                 gBattlerByTurnOrder[turnOrderId] = gActiveBattler;
@@ -5089,7 +5172,9 @@ static void SetActionsAndBattlersTurnOrder(void)
                 if (gActionsByTurnOrder[i] != B_ACTION_USE_ITEM
                     && gActionsByTurnOrder[j] != B_ACTION_USE_ITEM
                     && gActionsByTurnOrder[i] != B_ACTION_SWITCH
-                    && gActionsByTurnOrder[j] != B_ACTION_SWITCH)
+                    && gActionsByTurnOrder[j] != B_ACTION_SWITCH
+                    && gActionsByTurnOrder[i] != B_ACTION_THROW_BALL
+                    && gActionsByTurnOrder[j] != B_ACTION_THROW_BALL)
                 {
                     if (GetWhoStrikesFirst(battler1, battler2, FALSE))
                         SwapTurnOrder(i, j);
@@ -5136,6 +5221,10 @@ static void TurnValuesCleanUp(bool8 var0)
 
     gSideTimers[0].followmeTimer = 0;
     gSideTimers[1].followmeTimer = 0;
+    gSideTimers[0].followmeUsesPowder = FALSE;
+    gSideTimers[1].followmeUsesPowder = FALSE;
+    gSideStatuses[0] &= ~(SIDE_STATUS_WIDE_GUARD | SIDE_STATUS_QUICK_GUARD);
+    gSideStatuses[1] &= ~(SIDE_STATUS_WIDE_GUARD | SIDE_STATUS_QUICK_GUARD);
 }
 
 void SpecialStatusesClear(void)

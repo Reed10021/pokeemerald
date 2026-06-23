@@ -158,6 +158,7 @@
 #define STATUS3_UNDERWATER              (1 << 18)
 #define STATUS3_INTIMIDATE_POKES        (1 << 19)
 #define STATUS3_TRACE                   (1 << 20)
+#define STATUS3_MAGNET_RISE             (1 << 21)
 #define STATUS3_SEMI_INVULNERABLE       (STATUS3_UNDERGROUND | STATUS3_ON_AIR | STATUS3_UNDERWATER)
 
 // Not really sure what a "hitmarker" is.
@@ -191,12 +192,16 @@
 // Per-side statuses that affect an entire party
 #define SIDE_STATUS_REFLECT          (1 << 0)
 #define SIDE_STATUS_LIGHTSCREEN      (1 << 1)
-#define SIDE_STATUS_X4               (1 << 2)
+#define SIDE_STATUS_X4               (1 << 2) // Not Used
+#define SIDE_STATUS_WIDE_GUARD       (1 << 3)
 #define SIDE_STATUS_SPIKES           (1 << 4)
 #define SIDE_STATUS_SAFEGUARD        (1 << 5)
 #define SIDE_STATUS_FUTUREATTACK     (1 << 6)
+#define SIDE_STATUS_TAILWIND         (1 << 7)
 #define SIDE_STATUS_MIST             (1 << 8)
 #define SIDE_STATUS_SPIKES_DAMAGED   (1 << 9)
+#define SIDE_STATUS_AURORA_VEIL      (1 << 10)
+#define SIDE_STATUS_QUICK_GUARD      (1 << 11)
 
 // Flags describing move's result
 #define MOVE_RESULT_MISSED             (1 << 0)
@@ -282,7 +287,7 @@
 #define MOVE_EFFECT_THRASH              53
 #define MOVE_EFFECT_KNOCK_OFF           54
 #define MOVE_EFFECT_DEF_SPDEF_DOWN      55
-#define MOVE_EFFECT_NOTHING_38          56
+#define MOVE_EFFECT_SPD_DOWN            56
 #define MOVE_EFFECT_NOTHING_39          57
 #define MOVE_EFFECT_NOTHING_3A          58
 #define MOVE_EFFECT_SP_ATK_TWO_DOWN     59

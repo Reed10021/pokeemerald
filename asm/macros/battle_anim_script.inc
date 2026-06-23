@@ -14,7 +14,7 @@
 	.byte 0x02
 	.4byte \template
 	.if \anim_battler == ANIM_TARGET
-	.byte 0x80 | (\subpriority_offset & 0x7F)
+	.byte ANIMSPRITE_IS_TARGET | (\subpriority_offset & 0x7F)
 	.else
 	.byte (\subpriority_offset & 0x7F)
 	.endif
@@ -153,6 +153,15 @@
 	.byte \param4
 	.endm
 
+	.macro panse se:req, currentPan:req, targetPan:req, incrementPan:req, delay:req
+	.byte 0x1b
+	.2byte \se
+	.byte \currentPan
+	.byte \targetPan
+	.byte \incrementPan
+	.byte \delay
+	.endm
+
 	.macro loopsewithpan se:req, pan:req, wait:req, times:req
 	.byte 0x1c
 	.2byte \se
@@ -224,6 +233,15 @@
 	.byte \param4
 	.endm
 
+	.macro panse_adjustnone se:req, currentPan:req, targetPan:req, incrementPan:req, delay:req
+	.byte 0x26
+	.2byte \se
+	.byte \currentPan
+	.byte \targetPan
+	.byte \incrementPan
+	.byte \delay
+	.endm
+
 	.macro panse_27 se:req, param1:req, param2:req, param3:req, param4:req
 	.byte 0x27
 	.2byte \se
@@ -233,7 +251,21 @@
 	.byte \param4
 	.endm
 
+	.macro panse_adjustall se:req, currentPan:req, targetPan:req, incrementPan:req, delay:req
+	.byte 0x27
+	.2byte \se
+	.byte \currentPan
+	.byte \targetPan
+	.byte \incrementPan
+	.byte \delay
+	.endm
+
 	.macro monbgprio_28 battler:req
+	.byte 0x28
+	.byte \battler
+	.endm
+
+	.macro splitbgprio battler:req
 	.byte 0x28
 	.byte \battler
 	.endm
@@ -242,7 +274,16 @@
 	.byte 0x29
 	.endm
 
+	.macro splitbgprio_all
+	.byte 0x29
+	.endm
+
 	.macro monbgprio_2A battler:req
+	.byte 0x2a
+	.byte \battler
+	.endm
+
+	.macro splitbgprio_foes battler:req
 	.byte 0x2a
 	.byte \battler
 	.endm
@@ -269,6 +310,56 @@
 
 	.macro stopsound
 	.byte 0x2f
+	.endm
+
+	@ same as createvisualtask except takes in battlerargindex, which is the battle anim arg index of the battler to loop through
+	.macro createvisualtaskontargets addr:req, priority:req, battlerargindex:req, argv:vararg
+	.byte 0x30
+	.4byte \addr
+	.byte \priority
+	.byte \battlerargindex
+	.byte (.Lcreatetask_\@_2 - .Lcreatetask_\@_1) / 2	@ num_args
+.Lcreatetask_\@_1:
+	.2byte \argv
+.Lcreatetask_\@_2:
+	.endm
+
+	@ same as createsprite except takes in battlerargindex, which is the battle anim arg index of the battler to loop through
+	.macro createspriteontargets template:req, anim_battler:req, subpriority_offset:req, battlerargindex:req, argv:vararg
+	.byte 0x31
+	.4byte \template
+	.if \anim_battler == ANIM_TARGET
+	.byte ANIMSPRITE_IS_TARGET | (\subpriority_offset & 0x7F)
+	.else
+	.byte (\subpriority_offset & 0x7F)
+	.endif
+	.byte \battlerargindex
+	.byte (.Lsprite_\@_2 - .Lsprite_\@_1) / 2
+.Lsprite_\@_1:
+	.2byte \argv
+.Lsprite_\@_2:
+	.endm
+
+	@ does not overwrite gBattleAnimArgs[battlerargindex], some sprite templates are too dependent on the value (e.g. heal block)
+	.macro createspriteontargets_onpos template:req, anim_battler:req, subpriority_offset:req, battlerargindex:req, argv:vararg
+	.byte 0x32
+	.4byte \template
+	.if \anim_battler == ANIM_TARGET
+	.byte ANIMSPRITE_IS_TARGET | (\subpriority_offset & 0x7F)
+	.else
+	.byte (\subpriority_offset & 0x7F)
+	.endif
+	.byte \battlerargindex
+	.byte (.Lsprite_\@_2 - .Lsprite_\@_1) / 2
+.Lsprite_\@_1:
+	.2byte \argv
+.Lsprite_\@_2:
+	.endm
+
+	.macro jumpifmovetypeequal type:req, jumpInstr:req
+	.byte 0x33
+	.byte \type
+	.4byte \jumpInstr
 	.endm
 	
 @ useful macros
@@ -309,16 +400,67 @@
 	.endif
 	.endm
 
+	.macro create_dragon_rage_fire_plume_sprite anim_battler:req, subpriority_offset:req, relative_to:req, x:req, y:req
+	createsprite gDragonRageFirePlumeSpriteTemplate, \anim_battler, \subpriority_offset, \relative_to, \x, \y
+	.endm
+
+	.macro create_sharp_teeth_sprite anim_battler:req, subpriority_offset:req, x:req, y:req, animation:req, x_velocity:req, y_velocity:req, half_duration:req
+	createsprite gSharpTeethSpriteTemplate, \anim_battler, \subpriority_offset, \x, \y, \animation, 256 * \x_velocity, 256 * \y_velocity, \half_duration
+	.endm
+
 	.macro create_claw_slash_sprite anim_battler:req, subpriority_offset:req, x:req, y:req, animation:req
 	createsprite gClawSlashSpriteTemplate, \anim_battler, \subpriority_offset, \x, \y, \animation
+	.endm
+
+	.macro create_dragon_dance_orb_sprite anim_battler:req, subpriority_offset:req, angle:req
+	createsprite gDragonDanceOrbSpriteTemplate, \anim_battler, \subpriority_offset, 256 * \angle
+	.endm
+
+	.macro create_constrict_binding_sprite anim_battler:req, subpriority_offset:req, initial_x:req, initial_y:req, affine_animation:req, squeezes:req
+	createsprite gConstrictBindingSpriteTemplate, \anim_battler, \subpriority_offset, \initial_x, \initial_y, \affine_animation, \squeezes
 	.endm
 
 	.macro create_basic_hitsplat_sprite anim_battler:req, subpriority_offset:req, x:req, y:req, relative_to:req, animation:req
 	createsprite gBasicHitSplatSpriteTemplate, \anim_battler, \subpriority_offset, \x, \y, \relative_to, \animation
 	.endm
 
+	.macro create_random_pos_hitsplat_sprite anim_battler:req, subpriority_offset:req, relative_to:req, animation
+	.ifnb \animation
+	createsprite gRandomPosHitSplatSpriteTemplate, \anim_battler, \subpriority_offset, \relative_to, \animation
+	.else
+	createsprite gRandomPosHitSplatSpriteTemplate, \anim_battler, \subpriority_offset, \relative_to, -1
+	.endif
+	.endm
+
 	.macro create_cross_impact_sprite anim_battler:req, subpriority_offset:req, x:req, y:req, relative_to:req, duration:req
 	createsprite gCrossImpactSpriteTemplate, \anim_battler, \subpriority_offset, \x, \y, \relative_to, \duration
+	.endm
+
+	.macro create_flashing_hitsplat_sprite anim_battler:req, subpriority_offset:req, x:req, y:req, relative_to:req, animation:req
+	createsprite gFlashingHitSplatSpriteTemplate, \anim_battler, \subpriority_offset, \x, \y, \relative_to, \animation
+	.endm
+
+@ createvisualtask wrappers
+@ The arguments are based on the CMD_ARGS of the task.
+
+	.macro metallic_shine priority=5, permanent:req, color
+	.ifb \color
+	createvisualtask AnimTask_MetallicShine, \priority, \permanent, FALSE, RGB_BLACK
+	.else
+	createvisualtask AnimTask_MetallicShine, \priority, \permanent, TRUE, \color
+	.endif
+	.endm
+
+	.macro set_grayscale_pal priority=5, battler:req
+	createvisualtask AnimTask_SetGreyscaleOrOriginalPal, \priority, \battler, FALSE
+	.endm
+
+	.macro set_greyscale_pal priority=5, battler:req
+	createvisualtask AnimTask_SetGreyscaleOrOriginalPal, \priority, \battler, FALSE
+	.endm
+
+	.macro set_original_pal priority=5, battler:req
+	createvisualtask AnimTask_SetGreyscaleOrOriginalPal, \priority, \battler, TRUE
 	.endm
 
 	.macro attacker_fade_to_invisible priority=2, step_delay:req
@@ -331,4 +473,29 @@
 
 	.macro shrink_target_copy priority=5, unk0:req, unk1:req
 	createvisualtask AnimTask_ShrinkTargetCopy, \priority, \unk0, \unk1
+	.endm
+
+	.macro blend_color_cycle priority=2, selector:req, delay:req, num_blends:req, initial_blend_y:req, target_blend_y:req, color:req
+	createvisualtask AnimTask_BlendColorCycle, \priority, \selector, \delay, \num_blends, \initial_blend_y, \target_blend_y, \color
+	.endm
+
+	.macro blend_color_cycleexclude priority=2, unk0:req, delay:req, num_blends:req, initial_blend_y:req, target_blend_y:req, color:req
+	createvisualtask AnimTask_BlendColorCycleExclude, \priority, \unk0, \delay, \num_blends, \initial_blend_y, \target_blend_y, \color
+	.endm
+
+	.macro blend_color_cyclebytag priority=2, tag:req, delay:req, num_blends:req, initial_blend_y:req, target_blend_y:req, color:req
+	createvisualtask AnimTask_BlendColorCycleByTag, \priority, \tag, \delay, \num_blends, \initial_blend_y, \target_blend_y, \color
+	.endm
+
+	.macro flash_anim_tag_with_color priority=2, tag:req, delay:req, num_blends:req, color1:req, blend_y1:req, color2:req, blend_y2:req
+	createvisualtask AnimTask_FlashAnimTagWithColor, \priority, \tag, \delay, \num_blends, \color1, \blend_y1, \color2, \blend_y2
+	.endm
+
+	.macro invert_screen_color priority=2, scenery:req
+	@ NOTE: These generate 0x000 or 0x101 to match, but the code checks for '& 0x100'.
+	createvisualtask AnimTask_InvertScreenColor_Expansion, \priority, \scenery
+	.endm
+
+	.macro create_surf_wave priority=2, palette:req
+	createvisualtask AnimTask_CreateSurfWave, \priority, \palette
 	.endm

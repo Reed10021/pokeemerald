@@ -32,6 +32,7 @@ BattleFrontier_Lounge1_EventScript_AlreadyMetBreeder:: @ 825E7B6
 @ VAR_0x8005: Sum of the mons IVs
 @ VAR_0x8006: Stat id of highest IV stat
 @ VAR_0x8007: IV of the highest IV stat
+@ VAR_0x8008: Bitfield of hyper trained IV stats
 BattleFrontier_Lounge1_EventScript_ShowMonToBreeder:: @ 825E7BF
 	specialvar VAR_RESULT, ScriptGetPartyMonSpecies
 	compare VAR_RESULT, SPECIES_EGG
@@ -81,6 +82,11 @@ BattleFrontier_Lounge1_EventScript_HighestIVValue:: @ 825E850
 	end
 
 BattleFrontier_Lounge1_EventScript_EndBreederComments:: @ 825E87D
+	compare VAR_0x8008, 0
+	goto_if_eq BattleFrontier_Lounge1_EventScript_ReleaseBreeder
+	msgbox BattleFrontier_Lounge1_Text_HyperTrainedStats, MSGBOX_DEFAULT
+
+BattleFrontier_Lounge1_EventScript_ReleaseBreeder:
 	release
 	end
 
@@ -240,6 +246,11 @@ BattleFrontier_Lounge1_Text_StatFlawless: @ 825EDF6
 	.string "It's flawless! A thing of perfection!\n"
 	.string "…Hm… That's how I call it.$"
 
+BattleFrontier_Lounge1_Text_HyperTrainedStats:
+	.string "I can also tell this one has\n"
+	.string "been hyper trained in:\l"
+	.string "{STR_VAR_1}.$"
+
 BattleFrontier_Lounge1_Text_NoTimeForMyAdvice: @ 825EE37
 	.string "What?\n"
 	.string "You have no time for my advice?\p"
@@ -272,4 +283,3 @@ BattleFrontier_Lounge1_Text_DidntDoAnythingSpecialRaisingIt: @ 825F020
 	.string "He said my POKéMON is outstanding!\n"
 	.string "But I didn't do anything special\l"
 	.string "raising it…$"
-

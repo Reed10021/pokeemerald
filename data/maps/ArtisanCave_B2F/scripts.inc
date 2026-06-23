@@ -71,8 +71,8 @@ ArtisanCave_B2F_Text_SuspiciousDirt:
 
 ArtisanCave_B2F_Text_MewtwoAttacks:
 	.string "It was a trap!\n"
-	.string "MEWTWO came out from the\l"
-	.string "shadows and attacked!$"
+	.string "MEWTWO came out from the shadows\l"
+	.string "and attacked!$"
 
 ArtisanCave_B2F_Text_MewtwoHid::
 	.string "MEWTWO slunk back into\n"

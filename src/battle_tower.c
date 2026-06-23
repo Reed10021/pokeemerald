@@ -9,6 +9,7 @@
 #include "main.h"
 #include "international_string_util.h"
 #include "battle.h"
+#include "pokemon.h"
 #include "frontier_util.h"
 #include "strings.h"
 #include "recorded_battle.h"
@@ -146,7 +147,19 @@ const u16 gBattleFrontierHeldItems[] =
     ITEM_METAL_POWDER,
     ITEM_PETAYA_BERRY,
     ITEM_LUCKY_PUNCH,
-    ITEM_GANLON_BERRY
+    ITEM_GANLON_BERRY,
+    ITEM_WEATHER_ORB,
+    ITEM_PUNCHING_GLOVE,
+    ITEM_FOCUS_SASH,
+    ITEM_CHOICE_SPECS,
+    ITEM_CHOICE_SCARF,
+    ITEM_MUSCLE_BAND,
+    ITEM_WISE_GLASSES,
+    ITEM_EXPERT_BELT,
+    ITEM_FLAME_ORB,
+    ITEM_TOXIC_ORB,
+    ITEM_LIFE_ORB,
+    ITEM_EVIOLITE
 };
 
 #include "data/battle_frontier/battle_frontier_trainer_mons.h"
@@ -1728,13 +1741,14 @@ static void FillTrainerParty(u16 trainerId, u8 firstMonId, u8 monCount)
         chosenMonIndices[i] = monId;
 
         // Place the chosen pokemon into the trainer's party.
-        CreateMonWithEVSpreadNatureOTID(&gEnemyParty[i + firstMonId],
-                                             gFacilityTrainerMons[monId].species,
-                                             level,
-                                             gFacilityTrainerMons[monId].nature,
-                                             fixedIV,
-                                             gFacilityTrainerMons[monId].evSpread,
-                                             otID);
+        CreateMonWithEVSpreadNatureOTIDAbility(&gEnemyParty[i + firstMonId],
+                                               gFacilityTrainerMons[monId].species,
+                                               level,
+                                               gFacilityTrainerMons[monId].nature,
+                                               fixedIV,
+                                               gFacilityTrainerMons[monId].evSpread,
+                                               gFacilityTrainerMons[monId].ability,
+                                               otID);
 
         friendship = MAX_FRIENDSHIP;
         // Give the chosen pokemon its specified moves.
@@ -1858,13 +1872,14 @@ static void FillFactoryFrontierTrainerParty(u16 trainerId, u8 firstMonId)
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
     {
         u16 monId = gUnknown_03006298[i];
-        CreateMonWithEVSpreadNatureOTID(&gEnemyParty[firstMonId + i],
-                                             gFacilityTrainerMons[monId].species,
-                                             level,
-                                             gFacilityTrainerMons[monId].nature,
-                                             fixedIV,
-                                             gFacilityTrainerMons[monId].evSpread,
-                                             otID);
+        CreateMonWithEVSpreadNatureOTIDAbility(&gEnemyParty[firstMonId + i],
+                                               gFacilityTrainerMons[monId].species,
+                                               level,
+                                               gFacilityTrainerMons[monId].nature,
+                                               fixedIV,
+                                               gFacilityTrainerMons[monId].evSpread,
+                                               gFacilityTrainerMons[monId].ability,
+                                               otID);
 
         friendship = 0;
         for (j = 0; j < MAX_MON_MOVES; j++)
@@ -1886,13 +1901,14 @@ static void FillFactoryTentTrainerParty(u16 trainerId, u8 firstMonId)
     for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
     {
         u16 monId = gUnknown_03006298[i];
-        CreateMonWithEVSpreadNatureOTID(&gEnemyParty[firstMonId + i],
-                                             gFacilityTrainerMons[monId].species,
-                                             level,
-                                             gFacilityTrainerMons[monId].nature,
-                                             fixedIV,
-                                             gFacilityTrainerMons[monId].evSpread,
-                                             otID);
+        CreateMonWithEVSpreadNatureOTIDAbility(&gEnemyParty[firstMonId + i],
+                                               gFacilityTrainerMons[monId].species,
+                                               level,
+                                               gFacilityTrainerMons[monId].nature,
+                                               fixedIV,
+                                               gFacilityTrainerMons[monId].evSpread,
+                                               gFacilityTrainerMons[monId].ability,
+                                               otID);
 
         friendship = 0;
         for (j = 0; j < MAX_MON_MOVES; j++)
@@ -2942,6 +2958,7 @@ static void FillPartnerParty(u16 trainerId)
     u32 friendship;
     u16 monId;
     u32 otID;
+    u8 abilityNum;
     u8 trainerName[PLAYER_NAME_LENGTH + 1];
     SetFacilityPtrsGetLevel();
 
@@ -2959,6 +2976,8 @@ static void FillPartnerParty(u16 trainerId)
                       sStevenMons[i].fixedIV,
                       TRUE, j, // BUG: (fixed) personality was stored in the 'j' variable. As a result, Steven's pokemon do not have the intended natures.
                       OT_ID_PRESET, STEVEN_OTID);
+            abilityNum = GetAbilityNumBySpeciesAndPersonality(sStevenMons[i].species, j);
+            SetMonData(&gPlayerParty[MULTI_PARTY_SIZE + i], MON_DATA_ABILITY_NUM, &abilityNum);
             for (j = 0; j < PARTY_SIZE; j++)
                 SetMonData(&gPlayerParty[MULTI_PARTY_SIZE + i], MON_DATA_HP_EV + j, &sStevenMons[i].evs[j]);
             for (j = 0; j < MAX_MON_MOVES; j++)
@@ -2982,13 +3001,14 @@ static void FillPartnerParty(u16 trainerId)
         for (i = 0; i < FRONTIER_MULTI_PARTY_SIZE; i++)
         {
             monId = gSaveBlock2Ptr->frontier.trainerIds[i + 18];
-            CreateMonWithEVSpreadNatureOTID(&gPlayerParty[MULTI_PARTY_SIZE + i],
-                                                 gFacilityTrainerMons[monId].species,
-                                                 level,
-                                                 gFacilityTrainerMons[monId].nature,
-                                                 ivs,
-                                                 gFacilityTrainerMons[monId].evSpread,
-                                                 otID);
+            CreateMonWithEVSpreadNatureOTIDAbility(&gPlayerParty[MULTI_PARTY_SIZE + i],
+                                                   gFacilityTrainerMons[monId].species,
+                                                   level,
+                                                   gFacilityTrainerMons[monId].nature,
+                                                   ivs,
+                                                   gFacilityTrainerMons[monId].evSpread,
+                                                   gFacilityTrainerMons[monId].ability,
+                                                   otID);
             friendship = MAX_FRIENDSHIP;
             for (j = 0; j < MAX_MON_MOVES; j++)
             {
@@ -3086,7 +3106,10 @@ bool32 RubyBattleTowerRecordToEmerald(struct RSBattleTowerRecord *src, struct Em
         for (i = 0; i < EASY_CHAT_BATTLE_WORDS_COUNT; i++)
             dst->speechLost[i] = sRecordTrainerSpeechLost[i];
         for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+        {
             dst->party[i] = src->party[i];
+            dst->party[i].hiddenAbility = FALSE;
+        }
 
         CpuFill32(0, &dst->party[FRONTIER_PARTY_SIZE], sizeof(dst->party[FRONTIER_PARTY_SIZE]));
         CalcEmeraldBattleTowerChecksum(dst);
@@ -3132,7 +3155,10 @@ bool32 EmeraldBattleTowerRecordToRuby(struct EmeraldBattleTowerRecord *src, stru
         for (i = 0; i < EASY_CHAT_BATTLE_WORDS_COUNT; i++)
             dst->greeting[i] = src->greeting[i];
         for (i = 0; i < FRONTIER_PARTY_SIZE; i++)
+        {
             dst->party[i] = src->party[i];
+            dst->party[i].hiddenAbility = FALSE;
+        }
 
         CalcRubyBattleTowerChecksum(dst);
         return TRUE;
@@ -3409,13 +3435,14 @@ static void FillTentTrainerParty_(u16 trainerId, u8 firstMonId, u8 monCount)
         chosenMonIndices[i] = monId;
 
         // Place the chosen pokemon into the trainer's party.
-        CreateMonWithEVSpreadNatureOTID(&gEnemyParty[i + firstMonId],
-                                             gFacilityTrainerMons[monId].species,
-                                             level,
-                                             gFacilityTrainerMons[monId].nature,
-                                             fixedIV,
-                                             gFacilityTrainerMons[monId].evSpread,
-                                             otID);
+        CreateMonWithEVSpreadNatureOTIDAbility(&gEnemyParty[i + firstMonId],
+                                               gFacilityTrainerMons[monId].species,
+                                               level,
+                                               gFacilityTrainerMons[monId].nature,
+                                               fixedIV,
+                                               gFacilityTrainerMons[monId].evSpread,
+                                               gFacilityTrainerMons[monId].ability,
+                                               otID);
 
         friendship = MAX_FRIENDSHIP;
         // Give the chosen pokemon its specified moves.

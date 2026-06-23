@@ -1140,6 +1140,24 @@ void ItemUseOutOfBattle_AbilityCapsule(u8 taskId)
     SetUpItemUseCallback(taskId);
 }
 
+void ItemUseOutOfBattle_AbilityPatch(u8 taskId)
+{
+    gItemUseCB = ItemUseCB_AbilityPatch;
+    SetUpItemUseCallback(taskId);
+}
+
+void ItemUseOutOfBattle_BottleCap(u8 taskId)
+{
+    gItemUseCB = ItemUseCB_BottleCap;
+    SetUpItemUseCallback(taskId);
+}
+
+void ItemUseOutOfBattle_GoldBottleCap(u8 taskId)
+{
+    gItemUseCB = ItemUseCB_GoldBottleCap;
+    SetUpItemUseCallback(taskId);
+}
+
 void ItemUseInBattle_EnigmaBerry(u8 taskId)
 {
     switch (GetItemEffectType(gSpecialVar_ItemId))

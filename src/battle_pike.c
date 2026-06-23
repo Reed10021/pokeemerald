@@ -9,6 +9,7 @@
 #include "task.h"
 #include "battle_tower.h"
 #include "party_menu.h"
+#include "pokemon.h"
 #include "malloc.h"
 #include "palette.h"
 #include "script.h"
@@ -1147,6 +1148,7 @@ bool32 TryGenerateBattlePikeWildMon(bool8 checkKeenEyeIntimidate)
     else
         abilityNum = 0;
     SetMonData(&gEnemyParty[0], MON_DATA_ABILITY_NUM, &abilityNum);
+    TrySetMonHiddenAbility(&gEnemyParty[0]);
     for (i = 0; i < MAX_MON_MOVES; i++)
         SetMonMoveSlot(&gEnemyParty[0], wildMons[headerId][pikeMonId].moves[i], i);
 

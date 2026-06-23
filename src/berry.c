@@ -13,6 +13,7 @@
 #include "text.h"
 #include "constants/berry.h"
 #include "constants/event_object_movement.h"
+#include "constants/hold_effects.h"
 #include "constants/items.h"
 #include "constants/region_map_sections.h"
 #include "constants/weather.h"
@@ -26,6 +27,11 @@ static u8 CalcBerryYieldInternal(u16 max, u16 min, u8 water);
 static u8 CalcBerryYield(struct BerryTree *tree);
 static u8 GetBerryCountByBerryTreeId(u8 id);
 static u16 GetStageDurationByBerryType(u8);
+static void GetBerryCountString(u8 *dst, const u8 *berryName, u32 berryCount);
+
+static const u8 sDefaultEnigmaBerryItemEffect[BERRY_ITEM_EFFECT_COUNT] = {0};
+static const u8 sText_Berry[] = _("BERRY");
+static const u8 sText_Berries[] = _("BERRIES");
 
 //.rodata
 static const u8 sBerryDescriptionPart1_Cheri[] = _("Blooms with delicate pretty flowers.");
@@ -876,19 +882,19 @@ const struct Berry gBerries[] =
     [ITEM_ENIGMA_BERRY - FIRST_BERRY_INDEX] =
     {
         .name = _("ENIGMA"),
-        .firmness = BERRY_FIRMNESS_UNKNOWN,
-        .size = 0,
-        .maxYield = 2,
+        .firmness = BERRY_FIRMNESS_HARD,
+        .size = 155,
+        .maxYield = 5,
         .minYield = 1,
         .description1 = sBerryDescriptionPart1_Enigma,
         .description2 = sBerryDescriptionPart2_Enigma,
         .stageDuration = 10,
         .spicy = 40,
-        .dry = 40,
-        .sweet = 40,
-        .bitter = 40,
-        .sour = 40,
-        .smoothness = 40,
+        .dry = 10,
+        .sweet = 0,
+        .bitter = 0,
+        .sour = 0,
+        .smoothness = 60,
     },
 };
 
@@ -978,6 +984,54 @@ bool32 IsEnigmaBerryValid(void)
     if (GetEnigmaBerryChecksum(&gSaveBlock1Ptr->enigmaBerry) != gSaveBlock1Ptr->enigmaBerry.checksum)
         return FALSE;
     return TRUE;
+}
+
+const u8 *GetEnigmaBerryItemEffect(void)
+{
+    if (IsEnigmaBerryValid())
+        return gSaveBlock1Ptr->enigmaBerry.itemEffect;
+
+    return sDefaultEnigmaBerryItemEffect;
+}
+
+u8 GetEnigmaBerryHoldEffect(void)
+{
+    if (IsEnigmaBerryValid())
+        return gSaveBlock1Ptr->enigmaBerry.holdEffect;
+
+    return HOLD_EFFECT_NONE;
+}
+
+void GetBattleEnigmaBerry(struct BattleEnigmaBerry *battleBerry)
+{
+    s32 i;
+
+    if (IsEnigmaBerryValid())
+    {
+        for (i = 0; i < BERRY_NAME_LENGTH; i++)
+            battleBerry->name[i] = gSaveBlock1Ptr->enigmaBerry.berry.name[i];
+        battleBerry->name[i] = EOS;
+
+        for (i = 0; i < BERRY_ITEM_EFFECT_COUNT; i++)
+            battleBerry->itemEffect[i] = gSaveBlock1Ptr->enigmaBerry.itemEffect[i];
+
+        battleBerry->holdEffect = gSaveBlock1Ptr->enigmaBerry.holdEffect;
+        battleBerry->holdEffectParam = gSaveBlock1Ptr->enigmaBerry.holdEffectParam;
+    }
+    else
+    {
+        const struct Berry *berryData = GetBerryInfo(ItemIdToBerryType(ITEM_ENIGMA_BERRY));
+
+        for (i = 0; i < BERRY_NAME_LENGTH; i++)
+            battleBerry->name[i] = berryData->name[i];
+        battleBerry->name[i] = EOS;
+
+        for (i = 0; i < BERRY_ITEM_EFFECT_COUNT; i++)
+            battleBerry->itemEffect[i] = 0;
+
+        battleBerry->holdEffect = HOLD_EFFECT_SUPER_EFF_HP;
+        battleBerry->holdEffectParam = 33; // Restore 33% HP
+    }
 }
 
 const struct Berry *GetBerryInfo(u8 berry)
@@ -1173,6 +1227,15 @@ void GetBerryNameByBerryType(u8 berry, u8 *string)
 {
     memcpy(string, GetBerryInfo(berry)->name, BERRY_NAME_LENGTH);
     string[BERRY_NAME_LENGTH] = EOS;
+}
+
+static void GetBerryCountString(u8 *dst, const u8 *berryName, u32 berryCount)
+{
+    const u8 *berryString = (berryCount < 2) ? sText_Berry : sText_Berries;
+    u8 *txtPtr = StringCopy(dst, berryName);
+
+    *txtPtr = CHAR_SPACE;
+    StringCopy(txtPtr + 1, berryString);
 }
 
 void GetBerryCountStringByBerryType(u8 berry, u8* dest, u32 berryCount)

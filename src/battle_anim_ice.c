@@ -26,7 +26,6 @@ static void sub_810B6C4(struct Sprite *);
 static void sub_810B848(struct Sprite *);
 static void AnimIcePunchSwirlingParticle(struct Sprite *);
 static void AnimIceBeamParticle(struct Sprite *);
-static void AnimIceEffectParticle(struct Sprite *);
 static void AnimFlickerIceEffectParticle(struct Sprite *);
 static void AnimSwirlingSnowball(struct Sprite *);
 static void AnimSwirlingSnowball_Step1(struct Sprite *);
@@ -223,7 +222,7 @@ static const union AffineAnimCmd sAffineAnim_IceCrystalHit[] =
     AFFINEANIMCMD_END,
 };
 
-static const union AffineAnimCmd *const sAffineAnims_IceCrystalHit[] =
+const union AffineAnimCmd *const gAffineAnims_IceCrystalHit[] =
 {
     sAffineAnim_IceCrystalHit,
 };
@@ -235,7 +234,7 @@ const struct SpriteTemplate gIceCrystalHitLargeSpriteTemplate =
     .oam = &gOamData_AffineNormal_ObjBlend_8x16,
     .anims = sAnims_IceCrystalLarge,
     .images = NULL,
-    .affineAnims = sAffineAnims_IceCrystalHit,
+    .affineAnims = gAffineAnims_IceCrystalHit,
     .callback = AnimIceEffectParticle,
 };
 
@@ -246,7 +245,7 @@ const struct SpriteTemplate gIceCrystalHitSmallSpriteTemplate =
     .oam = &gOamData_AffineNormal_ObjBlend_8x8,
     .anims = sAnims_IceCrystalSmall,
     .images = NULL,
-    .affineAnims = sAffineAnims_IceCrystalHit,
+    .affineAnims = gAffineAnims_IceCrystalHit,
     .callback = AnimIceEffectParticle,
 };
 
@@ -593,6 +592,87 @@ const struct SpriteTemplate gIceShardSpriteTemplate =
     .callback = SpriteCB_MaxFlutterby
 };
 
+// Ice Hammer
+const struct SpriteTemplate gIceHammerPunchStompTemplate =
+{
+    .tileTag = ANIM_TAG_HORSESHOE_SIDE_FIST,
+    .paletteTag = ANIM_TAG_HORSESHOE_SIDE_FIST,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAnims_HandsAndFeet,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimStompFoot
+};
+
+// Frost Breath
+const struct SpriteTemplate gFrostBreathBlueRageTemplate =
+{
+    .tileTag = ANIM_TAG_FIRE_PLUME,
+    .paletteTag = ANIM_TAG_ICE_CHUNK,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAnims_DragonRageFirePlume,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimDragonRageFirePlume
+};
+
+const struct SpriteTemplate gFrostBreathBlueBreathTemplate =
+{
+    .tileTag = ANIM_TAG_SMALL_EMBER,
+    .paletteTag = ANIM_TAG_ICE_CHUNK,
+    .oam = &gOamData_AffineDouble_ObjNormal_32x32,
+    .anims = gAnims_DragonRageFire,
+    .images = NULL,
+    .affineAnims = gAffineAnims_DragonRageFire,
+    .callback = AnimDragonFireToTarget
+};
+
+// Icicle Crash
+static const union AffineAnimCmd sSpriteAffineAnim_IcicleCrash[] =
+{
+    AFFINEANIMCMD_FRAME(0, 0, 128, 1), //180 degree turn
+    AFFINEANIMCMD_END
+};
+static const union AffineAnimCmd* const sSpriteAffineAnimTable_IcicleCrash[] =
+{
+    sSpriteAffineAnim_IcicleCrash,
+};
+const struct SpriteTemplate gIcicleCrashSpearTemplate =
+{
+    .tileTag = ANIM_TAG_ICICLE_SPEAR,
+    .paletteTag = ANIM_TAG_ICICLE_SPEAR,
+    .oam = &gOamData_AffineNormal_ObjNormal_32x32,
+    .anims = gAnims_HandsAndFeet,
+    .images = NULL,
+    .affineAnims = sSpriteAffineAnimTable_IcicleCrash,
+    .callback = AnimFallingRock
+};
+
+// Aurora Veil
+const struct SpriteTemplate gAuroraVeilRingTemplate =
+{
+    .tileTag = ANIM_TAG_GUARD_RING,
+    .paletteTag = ANIM_TAG_GUARD_RING,
+    .oam = &gOamData_AffineDouble_ObjBlend_64x32,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gGuardRingAffineAnimTable,
+    .callback = SpriteCB_SurroundingRing
+};
+
+void SpriteCB_SurroundingRing(struct Sprite *sprite)
+{
+    sprite->pos1.x = GetBattlerSpriteCoord(gBattleAnimAttacker, BATTLER_COORD_X);
+    sprite->pos1.y = GetBattlerSpriteCoord(gBattleAnimAttacker, BATTLER_COORD_Y) + 40;
+
+    sprite->data[0] = 13;
+    sprite->data[2] = sprite->pos1.x;
+    sprite->data[4] = sprite->pos1.y - 72;
+
+    sprite->callback = StartAnimLinearTranslation;
+    StoreSpriteCallbackInData6(sprite, DestroyAnimSprite);
+}
+
 static void AvalancheAnim_Step(struct Sprite* sprite)
 {
     if (gBattleAnimArgs[3] != 0)
@@ -647,8 +727,7 @@ static void SpriteCB_MaxFlutterby(struct Sprite* sprite)
     s16 target_x;
     s16 target_y;
 
-    // if (GetMoveTarget(gAnimMoveIndex) == MOVE_TARGET_BOTH)
-    if (IsDoubleBattle() == TRUE)
+    if (gBattleMoves[gCurrentMove].target == MOVE_TARGET_BOTH)
     {
         SetAverageBattlerPositions(gBattleAnimTarget, TRUE, &target_x, &target_y);
     }
@@ -796,7 +875,7 @@ static void AnimIceBeamParticle(struct Sprite *sprite)
 // arg 0: target x offset
 // arg 1: target y offset
 // arg 2: ??? unknown boolean
-static void AnimIceEffectParticle(struct Sprite *sprite)
+void AnimIceEffectParticle(struct Sprite *sprite)
 {
     if (gBattleAnimArgs[2] == 0)
     {

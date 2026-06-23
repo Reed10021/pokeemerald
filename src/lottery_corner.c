@@ -16,12 +16,13 @@ static const u16 sLotteryPrizes[] =
 {
     ITEM_PP_UP,
     ITEM_EXP_SHARE,
-    ITEM_MAX_REVIVE,
+    ITEM_BOTTLE_CAP,
     ITEM_MASTER_BALL,
 };
 
 static const u16 sLotteryPrizes1Digit[] =
 {
+    ITEM_MAX_REVIVE,
     ITEM_RARE_CANDY,
     ITEM_POMEG_BERRY,
     ITEM_KELPSY_BERRY,
@@ -36,10 +37,11 @@ static const u16 sLotteryPrizes1Digit[] =
     ITEM_APICOT_BERRY,
     ITEM_LANSAT_BERRY,
     ITEM_STARF_BERRY,
+    ITEM_ENIGMA_BERRY,
     ITEM_RARE_CANDY,
 };
 
-#define LOTTERY_ONE_DIGIT_MAX_SIZE 15
+#define LOTTERY_ONE_DIGIT_MAX_SIZE 17
 
 
 static u8 GetMatchingDigits(u16, u16);
@@ -132,9 +134,9 @@ void PickLotteryCornerTicket(void)
             else if (gSpecialVar_0x8004 == 3)
                 gSpecialVar_0x800A = 1; // Count: 1
             else if (gSpecialVar_0x8004 == 4)
-                gSpecialVar_0x800A = 10; // Count: 10
+                gSpecialVar_0x800A = 4; // Count: 4
             else if (gSpecialVar_0x8004 == 5)
-                gSpecialVar_0x800A = 2; // Count: 2
+                gSpecialVar_0x800A = 1; // Count: 1
         }
 
         if (box == TOTAL_BOXES_COUNT)

@@ -17,6 +17,9 @@ u32 UseStrength(u32, u8, u8, u8);
 
 void FldEff_UseFlashTool();
 u32 CanUseFlash();
+void InitAutoFlash();
+void QueueAutoFlash();
+bool32 TryStartQueuedAutoFlash();
 void TryUseFlash();
 
 u32 CanUseRockSmash(s16 x, s16 y);

@@ -372,7 +372,6 @@ static void Task_WaitFadeAccessPC(u8 taskId)
     }
 }
 
-
 static u32 HandleConditionMenuInput(struct Pokenav1Struct *state)
 {
     if (UpdateMenuCursorPos(state))

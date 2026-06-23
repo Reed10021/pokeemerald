@@ -17,12 +17,26 @@ SouthernIsland_Interior_EventScript_TryRemoveLati:: @ 8242A5A
 	return
 
 SouthernIsland_Interior_OnTransition: @ 8242A6E
+	@ Fix older versions that may have incorrect VAR_ROAMER_POKEMON
+	compare VAR_ROAMER_POKEMON, SPECIES_LATIAS
+	call_if_eq SouthernIsland_Interior_EventScript_FixLatias
+	compare VAR_ROAMER_POKEMON, SPECIES_LATIOS
+	call_if_eq SouthernIsland_Interior_EventScript_FixLatios
+
 	compare VAR_ROAMER_POKEMON, 0
 	call_if_eq SouthernIsland_Interior_EventScript_SetUpLatios
 	compare VAR_ROAMER_POKEMON, 0
 	call_if_ne SouthernIsland_Interior_EventScript_SetUpLatias
 	call SouthernIsland_Interior_EventScript_SetUpPlayerGfx
 	end
+
+SouthernIsland_Interior_EventScript_FixLatias::
+	setvar VAR_ROAMER_POKEMON, 0
+	return
+
+SouthernIsland_Interior_EventScript_FixLatios::
+	setvar VAR_ROAMER_POKEMON, 1
+	return
 
 SouthernIsland_Interior_EventScript_SetUpLatios:: @ 8242A8A
 	setvar VAR_OBJ_GFX_ID_1, OBJ_EVENT_GFX_LATIOS

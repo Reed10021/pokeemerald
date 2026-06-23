@@ -108,6 +108,8 @@ static void ClearPokedexFlags(void)
     gUnusedPokedexU8 = 0;
     memset(&gSaveBlock2Ptr->pokedex.owned, 0, sizeof(gSaveBlock2Ptr->pokedex.owned));
     memset(&gSaveBlock2Ptr->pokedex.seen, 0, sizeof(gSaveBlock2Ptr->pokedex.seen));
+    memset(gSaveBlock2Ptr->pokedexOwnedOverflow, 0, sizeof(gSaveBlock2Ptr->pokedexOwnedOverflow));
+    memset(gSaveBlock2Ptr->pokedexSeenOverflow, 0, sizeof(gSaveBlock2Ptr->pokedexSeenOverflow));
 }
 
 void ClearAllContestWinnerPics(void)

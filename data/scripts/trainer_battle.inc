@@ -68,6 +68,22 @@ EventScript_TryDoRematchBattle:: @ 82713D1
 EventScript_NoRematchTrainerBattle:: @ 82713F7
 	gotopostbattlescript
 
+EventScript_TryDoRematchBattleContinueScript::
+	call EventScript_RevealTrainer
+	specialvar VAR_RESULT, IsTrainerReadyForRematch
+	compare VAR_RESULT, FALSE
+	goto_if_eq EventScript_NoRematchTrainerBattle
+	special SetUpTrainerEncounterMusic
+	special SetUpTrainerMovement
+	special ShowTrainerIntroSpeech
+	waitmessage
+	waitbuttonpress
+	special BattleSetup_StartRematchBattle
+	waitstate
+	gotobeatenscript
+	releaseall
+	end
+
 EventScript_TryDoDoubleRematchBattle:: @ 82713F8
 	specialvar VAR_RESULT, IsTrainerReadyForRematch
 	compare VAR_RESULT, FALSE

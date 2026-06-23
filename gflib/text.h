@@ -212,6 +212,7 @@
 #define EXT_CTRL_CODE_COLOR_HIGHLIGHT_SHADOW 0x04
 #define EXT_CTRL_CODE_PALETTE                0x05
 #define EXT_CTRL_CODE_SIZE                   0x06
+#define EXT_CTRL_CODE_FONT                   EXT_CTRL_CODE_SIZE
 #define EXT_CTRL_CODE_RESET_SIZE             0x07
 #define EXT_CTRL_CODE_PAUSE                  0x08
 #define EXT_CTRL_CODE_PAUSE_UNTIL_PRESS      0x09
@@ -270,8 +271,26 @@
 #define TEXT_SPEED_FF 0xFF
 
 #define TEXT_SKIP_DRAW 0xFF
-#define FONT_NORMAL 1
-#define FONT_NARROW 7
+
+enum {
+    FONT_SMALL,
+    FONT_NORMAL,
+    FONT_SHORT,
+    FONT_SHORT_COPY_1,
+    FONT_SHORT_COPY_2,
+    FONT_SHORT_COPY_3,
+    FONT_BRAILLE,
+    FONT_NARROW,
+    FONT_SMALL_NARROW, // Very similar to FONT_SMALL, some glyphs are narrower
+    FONT_BOLD, // JP glyph set only
+    FONT_NARROWER,
+    FONT_SMALL_NARROWER,
+    FONT_SHORT_NARROW,
+    FONT_SHORT_NARROWER,
+};
+
+#define FONT_MALE FONT_NORMAL
+#define FONT_FEMALE FONT_NORMAL
 
 enum
 {
@@ -410,6 +429,10 @@ u16 Font4Func(struct TextPrinter *textPrinter);
 u16 Font5Func(struct TextPrinter *textPrinter);
 u16 Font7Func(struct TextPrinter *textPrinter);
 u16 Font8Func(struct TextPrinter *textPrinter);
+u16 Font10Func(struct TextPrinter *textPrinter);
+u16 Font11Func(struct TextPrinter *textPrinter);
+u16 Font12Func(struct TextPrinter *textPrinter);
+u16 Font13Func(struct TextPrinter *textPrinter);
 
 void TextPrinterInitDownArrowCounters(struct TextPrinter *textPrinter);
 void TextPrinterDrawDownArrow(struct TextPrinter *textPrinter);
@@ -436,6 +459,14 @@ void DecompressGlyphFont7(u16 glyphId, bool32 isJapanese);
 u32 GetGlyphWidthFont7(u16 glyphId, bool32 isJapanese);
 void DecompressGlyphFont8(u16 glyphId, bool32 isJapanese);
 u32 GetGlyphWidthFont8(u16 glyphId, bool32 isJapanese);
+void DecompressGlyphFont10(u16 glyphId, bool32 isJapanese);
+u32 GetGlyphWidthFont10(u16 glyphId, bool32 isJapanese);
+void DecompressGlyphFont11(u16 glyphId, bool32 isJapanese);
+u32 GetGlyphWidthFont11(u16 glyphId, bool32 isJapanese);
+void DecompressGlyphFont12(u16 glyphId, bool32 isJapanese);
+u32 GetGlyphWidthFont12(u16 glyphId, bool32 isJapanese);
+void DecompressGlyphFont13(u16 glyphId, bool32 isJapanese);
+u32 GetGlyphWidthFont13(u16 glyphId, bool32 isJapanese);
 void DecompressGlyphFont2(u16 glyphId, bool32 isJapanese);
 u32 GetGlyphWidthFont2(u16 glyphId, bool32 isJapanese);
 void DecompressGlyphFont1(u16 glyphId, bool32 isJapanese);
@@ -445,5 +476,9 @@ void DecompressGlyphFont9(u16 glyphId);
 // unk_text_util_2.c
 u16 Font6Func(struct TextPrinter *textPrinter);
 u32 GetGlyphWidthFont6(u16 glyphId, bool32 isJapanese);
+
+u32 GetFontIdToFit(const u8* string, u32 widestFontId, u32 letterSpacing, u32 widthPx);
+u8 *PrependFontIdToFit(u8 *start, u8 *end, u32 fontId, u32 width);
+u8 *WrapFontIdToFit(u8 *start, u8 *end, u32 fontId, u32 width);
 
 #endif // GUARD_TEXT_H

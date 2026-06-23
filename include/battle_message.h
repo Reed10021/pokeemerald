@@ -3,7 +3,8 @@
 
 #define TEXT_BUFF_ARRAY_COUNT   max(17, \
                                 max(MOVE_NAME_LENGTH + 2, /* +2 to hold the "!" and EOS. */ \
-                                    POKEMON_NAME_LENGTH + 1))
+                                max(POKEMON_NAME_LENGTH + 1, \
+                                    ABILITY_NAME_LENGTH + 1)))
 
 // for 0xFD
 #define B_TXT_BUFF1 0x0

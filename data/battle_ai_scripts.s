@@ -47,38 +47,150 @@ gBattleAI_ScriptsTable:: @ 82DBEF8
 
 AI_CheckBadMove:
 	if_target_is_ally AI_Ret
+	if_move_is_blocked_by_prankster AI_TARGET, Score_Minus10
+	if_move_is_blocked_by_armor_tail AI_TARGET, Score_Minus10
 	if_move MOVE_FISSURE, AI_CBM_CheckIfNegatesType
 	if_move MOVE_HORN_DRILL, AI_CBM_CheckIfNegatesType
+	if_move_would_be_bounced Score_Minus10
+	@ Check ability before we bounce status moves to CheckSoundproof.
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CheckBadMove_CheckPower
+	get_ability AI_TARGET
+	if_equal ABILITY_OVERCOAT, CheckIfOvercoatCancelsPowder
+	if_equal ABILITY_SAP_SIPPER, CheckIfSapSipperCancelsGrass
+AI_CheckBadMove_CheckPower:
 	get_how_powerful_move_is
-	if_equal 0, AI_CheckBadMove_CheckSoundproof
+	if_equal 0, AI_CheckBadMove_CheckStatusAbsorb
+	goto AI_CBM_CheckIfNegatesType
+
+AI_CheckBadMove_CheckStatusAbsorb:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CheckBadMove_CheckSoundproof
+	@ MOVE_TARGET_SELECTED
+	if_move_target 0x0, AI_CheckBadMove_CheckStatusAbsorb_CheckTargetAbility
+	@ MOVE_TARGET_USER_OR_SELECTED
+	if_move_target 0x2, AI_CheckBadMove_CheckStatusAbsorb_CheckTargetAbility
+	@ MOVE_TARGET_RANDOM
+	if_move_target 0x4, AI_CheckBadMove_CheckStatusAbsorb_CheckTargetAbility
+	@ MOVE_TARGET_BOTH
+	if_move_target 0x8, AI_CheckBadMove_CheckStatusAbsorb_CheckTargetAbility
+	@ MOVE_TARGET_FOES_AND_ALLY
+	if_move_target 0x20, AI_CheckBadMove_CheckStatusAbsorb_CheckTargetAbility
+	goto AI_CheckBadMove_CheckSoundproof
+
+AI_CheckBadMove_CheckStatusAbsorb_CheckTargetAbility:
+	check_ability AI_TARGET, ABILITY_VOLT_ABSORB
+	if_equal 1, CheckIfAbilityCancelsElectric
+	if_equal 2, CheckIfAbilityMayCancelElectric
+	check_ability AI_TARGET, ABILITY_LIGHTNING_ROD
+	if_equal 1, CheckIfAbilityCancelsElectric
+	if_equal 2, CheckIfAbilityMayCancelElectric
+	check_ability AI_TARGET, ABILITY_MOTOR_DRIVE
+	if_equal 1, CheckIfAbilityCancelsElectric
+	if_equal 2, CheckIfAbilityMayCancelElectric
+	check_ability AI_TARGET, ABILITY_WATER_ABSORB
+	if_equal 1, CheckIfAbilityCancelsWater
+	if_equal 2, CheckIfAbilityMayCancelWater
+	check_ability AI_TARGET, ABILITY_DRY_SKIN
+	if_equal 1, CheckIfAbilityCancelsWater
+	if_equal 2, CheckIfAbilityMayCancelWater
+	check_ability AI_TARGET, ABILITY_STORM_DRAIN
+	if_equal 1, CheckIfAbilityCancelsWater
+	if_equal 2, CheckIfAbilityMayCancelWater
+	check_ability AI_TARGET, ABILITY_FLASH_FIRE
+	if_equal 1, CheckIfAbilityCancelsFire
+	if_equal 2, CheckIfAbilityMayCancelFire
+	check_ability AI_TARGET, ABILITY_PYRO_REACTOR
+	if_equal 1, CheckIfAbilityCancelsFire
+	if_equal 2, CheckIfAbilityMayCancelFire
+	goto AI_CheckBadMove_CheckSoundproof
+
+CheckIfAbilityMayCancelElectric:
+	get_curr_move_type
+	if_equal_ TYPE_ELECTRIC, CheckIfAbilityMayCancelElectric_ScoreDown
+	goto AI_CheckBadMove_CheckSoundproof
+
+CheckIfAbilityMayCancelElectric_ScoreDown:
+	score -1
+	goto AI_CheckBadMove_CheckSoundproof
+
+CheckIfAbilityMayCancelWater:
+	get_curr_move_type
+	if_equal_ TYPE_WATER, CheckIfAbilityMayCancelWater_ScoreDown
+	goto AI_CheckBadMove_CheckSoundproof
+
+CheckIfAbilityMayCancelWater_ScoreDown:
+	score -1
+	goto AI_CheckBadMove_CheckSoundproof
+
+CheckIfAbilityMayCancelFire:
+	get_curr_move_type
+	if_equal_ TYPE_FIRE, CheckIfAbilityMayCancelFire_ScoreDown
+	goto AI_CheckBadMove_CheckSoundproof
+
+CheckIfAbilityMayCancelFire_ScoreDown:
+	score -1
+	goto AI_CheckBadMove_CheckSoundproof
+
+CheckIfSapSipperCancelsGrass:
+	@ MOVE_TARGET_SELECTED
+	if_move_target 0x0, CheckIfSapSipperCancelsGrass_CheckType
+	@ MOVE_TARGET_USER_OR_SELECTED
+	if_move_target 0x2, CheckIfSapSipperCancelsGrass_CheckType
+	@ MOVE_TARGET_RANDOM
+	if_move_target 0x4, CheckIfSapSipperCancelsGrass_CheckType
+	@ MOVE_TARGET_BOTH
+	if_move_target 0x8, CheckIfSapSipperCancelsGrass_CheckType
+	@ MOVE_TARGET_FOES_AND_ALLY
+	if_move_target 0x20, CheckIfSapSipperCancelsGrass_CheckType
+	goto AI_CheckBadMove_CheckPower
+
+CheckIfSapSipperCancelsGrass_CheckType:
+	get_curr_move_type
+	if_equal_ TYPE_GRASS, Score_Minus12
+	goto AI_CheckBadMove_CheckPower
 
 AI_CBM_CheckIfNegatesType: @ 82DBF92
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
 	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus5
 	if_type_effectiveness AI_EFFECTIVENESS_x0_25, Score_Minus30
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CheckBadMove_CheckSoundproof_
 	get_ability AI_TARGET
-	if_equal ABILITY_VOLT_ABSORB, CheckIfVoltAbsorbCancelsElectric
-	if_equal ABILITY_LIGHTNING_ROD, CheckIfVoltAbsorbCancelsElectric
-	if_equal ABILITY_WATER_ABSORB, CheckIfWaterAbsorbCancelsWater
-	if_equal ABILITY_FLASH_FIRE, CheckIfFlashFireCancelsFire
+	if_equal ABILITY_VOLT_ABSORB, CheckIfAbilityCancelsElectric
+	if_equal ABILITY_LIGHTNING_ROD, CheckIfAbilityCancelsElectric
+	if_equal ABILITY_MOTOR_DRIVE, CheckIfAbilityCancelsElectric
+	if_equal ABILITY_WATER_ABSORB, CheckIfAbilityCancelsWater
+	if_equal ABILITY_DRY_SKIN, CheckIfAbilityCancelsWater
+	if_equal ABILITY_STORM_DRAIN, CheckIfAbilityCancelsWater
+	if_equal ABILITY_FLASH_FIRE, CheckIfAbilityCancelsFire
+	if_equal ABILITY_PYRO_REACTOR, CheckIfAbilityCancelsFire
 	if_equal ABILITY_WONDER_GUARD, CheckIfWonderGuardCancelsMove
 	if_equal ABILITY_LEVITATE, CheckIfLevitateCancelsGroundMove
 	goto AI_CheckBadMove_CheckSoundproof_
 
-CheckIfVoltAbsorbCancelsElectric: @ 82DBFBD
+CheckIfAbilityCancelsElectric: @ 82DBFBD
 	get_curr_move_type
 	if_equal_ TYPE_ELECTRIC, Score_Minus12
 	goto AI_CheckBadMove_CheckSoundproof_
 
-CheckIfWaterAbsorbCancelsWater: @ 82DBFCA
+CheckIfAbilityCancelsWater: @ 82DBFCA
 	get_curr_move_type
 	if_equal_ TYPE_WATER, Score_Minus12
 	goto AI_CheckBadMove_CheckSoundproof_
 
-CheckIfFlashFireCancelsFire: @ 82DBFD7
+CheckIfAbilityCancelsFire: @ 82DBFD7
 	get_curr_move_type
 	if_equal_ TYPE_FIRE, Score_Minus12
 	goto AI_CheckBadMove_CheckSoundproof_
+
+CheckIfOvercoatCancelsPowder:
+	if_move MOVE_POISON_POWDER, Score_Minus10
+	if_move MOVE_STUN_SPORE, Score_Minus10
+	if_move MOVE_SLEEP_POWDER, Score_Minus10
+	if_move MOVE_SPORE, Score_Minus10
+	if_move MOVE_COTTON_SPORE, Score_Minus10
+	goto AI_CheckBadMove_CheckPower
 
 CheckIfWonderGuardCancelsMove: @ 82DBFE4
 	if_type_effectiveness AI_EFFECTIVENESS_x2, AI_CheckBadMove_CheckSoundproof_
@@ -93,8 +205,10 @@ AI_CheckBadMove_CheckSoundproof_: @ 82DBFF7
 	if_equal 0, AI_CheckBadMove_CheckSoundproof
 
 AI_CheckBadMove_CheckSoundproof: @ 82DBFFE
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CheckBadMove_CheckBulletproof
 	get_ability AI_TARGET
-	if_not_equal ABILITY_SOUNDPROOF, AI_CheckBadMove_CheckEffect
+	if_not_equal ABILITY_SOUNDPROOF, AI_CheckBadMove_CheckBulletproof
 	if_move MOVE_GROWL, Score_Minus10
 	if_move MOVE_ROAR, Score_Minus10
 	if_move MOVE_SING, Score_Minus10
@@ -107,8 +221,17 @@ AI_CheckBadMove_CheckSoundproof: @ 82DBFFE
 	if_move MOVE_HYPER_VOICE, Score_Minus10
 	if_move MOVE_PERISH_SONG, Score_Minus10
 
+AI_CheckBadMove_CheckBulletproof:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CheckBadMove_CheckEffect
+	get_ability AI_TARGET
+	if_not_equal ABILITY_BULLETPROOF, AI_CheckBadMove_CheckEffect
+	get_considered_move
+	if_in_hwords sMovesTable_BulletproofMoves, Score_Minus10
+
 AI_CheckBadMove_CheckEffect: @ 82DC045
 	if_effect EFFECT_SLEEP, AI_CBM_Sleep
+	if_effect EFFECT_YAWN, AI_CBM_Yawn
 	if_effect EFFECT_EXPLOSION, AI_CBM_Explosion
 	if_effect EFFECT_DREAM_EATER, AI_CBM_DreamEater
 	if_effect EFFECT_ATTACK_UP, AI_CBM_AttackUp
@@ -204,6 +327,7 @@ AI_CheckBadMove_CheckEffect: @ 82DC045
 	if_effect EFFECT_TRICK, AI_CBM_TrickAndKnockOff
 	if_effect EFFECT_INGRAIN, AI_CBM_Ingrain
 	if_effect EFFECT_SUPERPOWER, AI_CBM_HighRiskForDamage
+	if_effect EFFECT_HAMMER_ARM, AI_CBM_HighRiskForDamage
 	if_effect EFFECT_RECYCLE, AI_CBM_Recycle
 	if_effect EFFECT_KNOCK_OFF, AI_CBM_TrickAndKnockOff
 	if_effect EFFECT_ENDEAVOR, AI_CBM_HighRiskForDamage
@@ -218,22 +342,80 @@ AI_CheckBadMove_CheckEffect: @ 82DC045
 	if_effect EFFECT_CALM_MIND, AI_CBM_CalmMind
 	if_effect EFFECT_DRAGON_DANCE, AI_CBM_DragonDance
 	if_effect EFFECT_GROWTH, AI_CBM_Growth
+	if_effect EFFECT_ATTACK_SPATK_UP, AI_CBM_Growth
+	if_effect EFFECT_THREE_STAT_UP, AI_CBM_ThreeStatUp
 	if_effect EFFECT_CLOSE_COMBAT, AI_CBM_HighRiskForDamage
 	if_effect EFFECT_TRICK_ROOM, AI_CBM_TrickRoom
+	if_effect EFFECT_TAILWIND, AI_CBM_Tailwind
+	if_effect EFFECT_GRAVITY, AI_CBM_Gravity
+	if_effect EFFECT_MAGNET_RISE, AI_CBM_MagnetRise
 	end
 
 AI_CBM_Sleep: @ 82DC2D4
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_Sleep_CheckStatus
 	get_ability AI_TARGET
 	if_equal ABILITY_INSOMNIA, Score_Minus10
 	if_equal ABILITY_VITAL_SPIRIT, Score_Minus10
+	if_equal ABILITY_LEAF_GUARD, AI_CBM_Sleep_CheckLeafGuard
+
+AI_CBM_Sleep_CheckStatus:
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10
 	end
 
+AI_CBM_Sleep_CheckLeafGuard:
+	get_weather
+	if_equal AI_WEATHER_SUN, Score_Minus10
+	goto AI_CBM_Sleep_CheckStatus
+
+AI_CBM_Yawn:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_Yawn_CheckStatus
+	get_ability AI_TARGET
+	if_equal ABILITY_INSOMNIA, Score_Minus10
+	if_equal ABILITY_VITAL_SPIRIT, Score_Minus10
+	if_equal ABILITY_LEAF_GUARD, AI_CBM_Yawn_CheckLeafGuard
+
+AI_CBM_Yawn_CheckStatus:
+	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
+	if_status3 AI_TARGET, STATUS3_YAWN, Score_Minus10
+	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10
+	end
+
+AI_CBM_Yawn_CheckLeafGuard:
+	get_weather
+	if_equal AI_WEATHER_SUN, Score_Minus10
+	goto AI_CBM_Yawn_CheckStatus
+
 AI_CBM_Explosion: @ 82DC2F7
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus30
-	get_ability AI_TARGET
+	get_ability AI_USER
 	if_equal ABILITY_DAMP, Score_Minus10
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_Explosion_CheckParty
+	check_ability AI_TARGET, ABILITY_DAMP
+	if_equal 1, Score_Minus10
+	if_equal 2, AI_CBM_Explosion_TargetMaybeDamp
+	goto AI_CBM_Explosion_CheckTargetPartner
+
+AI_CBM_Explosion_TargetMaybeDamp:
+	score -1
+
+AI_CBM_Explosion_CheckTargetPartner:
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_CBM_Explosion_CheckUserPartner
+	check_ability AI_TARGET_PARTNER, ABILITY_DAMP
+	if_equal 1, Score_Minus10
+	if_equal 2, AI_CBM_Explosion_TargetPartnerMaybeDamp
+	goto AI_CBM_Explosion_CheckUserPartner
+
+AI_CBM_Explosion_TargetPartnerMaybeDamp:
+	score -1
+
+AI_CBM_Explosion_CheckUserPartner:
+	if_hp_equal AI_USER_PARTNER, 0, AI_CBM_Explosion_CheckParty
+	get_ability AI_USER_PARTNER
+	if_equal ABILITY_DAMP, Score_Minus10
+AI_CBM_Explosion_CheckParty:
 	count_usable_party_mons AI_USER
 	if_not_equal 0, AI_CBM_Explosion_End
 	count_usable_party_mons AI_TARGET
@@ -286,12 +468,20 @@ AI_CBM_EvasionUp: @ 82DC37E
 
 AI_CBM_AttackDown: @ 82DC387
 	if_stat_level_equal AI_TARGET, STAT_ATK, MIN_STAT_STAGE, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_AttackDown_CheckGeneralBlockers
 	get_ability AI_TARGET
 	if_equal ABILITY_HYPER_CUTTER, Score_Minus10
+AI_CBM_AttackDown_CheckGeneralBlockers:
 	goto CheckIfAbilityBlocksStatChange
 
 AI_CBM_DefenseDown: @ 82DC39C
 	if_stat_level_equal AI_TARGET, STAT_DEF, MIN_STAT_STAGE, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_DefenseDown_CheckGeneralBlockers
+	get_ability AI_TARGET
+	if_equal ABILITY_BIG_PECKS, Score_Minus10
+AI_CBM_DefenseDown_CheckGeneralBlockers:
 	goto CheckIfAbilityBlocksStatChange
 
 AI_CBM_SpeedDown: @ 82DC3A9
@@ -309,8 +499,11 @@ AI_CBM_SpDefDown: @ 82DC3CC
 
 AI_CBM_AccDown: @ 82DC3D9
 	if_stat_level_equal AI_TARGET, STAT_ACC, MIN_STAT_STAGE, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_AccDown_CheckGeneralBlockers
 	get_ability AI_TARGET
 	if_equal ABILITY_KEEN_EYE, Score_Minus10
+AI_CBM_AccDown_CheckGeneralBlockers:
 	goto CheckIfAbilityBlocksStatChange
 
 AI_CBM_EvasionDown: @ 82DC3EE
@@ -318,8 +511,15 @@ AI_CBM_EvasionDown: @ 82DC3EE
 
 CheckIfAbilityBlocksStatChange: @ 82DC3F6
 	get_ability AI_TARGET
+	if_equal ABILITY_DEFIANT, Score_Minus10
+	if_equal ABILITY_COMPETITIVE, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_StatChange_End
+	get_ability AI_TARGET
+	if_equal ABILITY_CONTRARY, Score_Minus10
 	if_equal ABILITY_CLEAR_BODY, Score_Minus10
 	if_equal ABILITY_WHITE_SMOKE, Score_Minus10
+AI_CBM_StatChange_End:
 	end
 
 AI_CBM_Haze: @ 82DC405
@@ -345,8 +545,12 @@ AI_CBM_Haze_End: @ 82DC47A
 AI_CBM_Roar: @ 82DC47B
 	count_usable_party_mons AI_TARGET
 	if_equal 0, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_Roar_CheckTitanic
 	get_ability AI_TARGET
 	if_equal ABILITY_SUCTION_CUPS, Score_Minus10
+AI_CBM_Roar_CheckTitanic:
+	get_ability AI_TARGET
 	if_equal ABILITY_TITANIC, Score_Minus10
 	end
 
@@ -358,28 +562,53 @@ AI_CBM_Toxic: @ 82DC48C
 	if_equal TYPE_STEEL, Score_Minus10
 	if_equal TYPE_POISON, Score_Minus10
 	get_ability AI_TARGET
+	if_equal ABILITY_POISON_HEAL, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_Toxic_CheckStatus
+	get_ability AI_TARGET
 	if_equal ABILITY_IMMUNITY, Score_Minus10
+	if_equal ABILITY_LEAF_GUARD, AI_CBM_Toxic_CheckLeafGuard
+
+AI_CBM_Toxic_CheckStatus:
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10
 	end
+
+AI_CBM_Toxic_CheckLeafGuard:
+	get_weather
+	if_equal AI_WEATHER_SUN, Score_Minus10
+	goto AI_CBM_Toxic_CheckStatus
 
 AI_CBM_LightScreen: @ 82DC4C5
 	if_side_affecting AI_USER, SIDE_STATUS_LIGHTSCREEN, Score_Minus8
 	end
 
+AI_CBM_Tailwind:
+	get_trick_room
+	if_equal AI_TRICK_ROOM_ON, Score_Minus10
+	if_side_affecting AI_USER, SIDE_STATUS_TAILWIND, Score_Minus10
+	end
+
 AI_CBM_OneHitKO: @ 82DC4D0
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_OneHitKO_CheckLevel
 	get_ability AI_TARGET
 	if_equal ABILITY_STURDY, Score_Minus10
+AI_CBM_OneHitKO_CheckLevel:
 	if_level_cond 1, Score_Minus10
 	end
 
 AI_CBM_Magnitude: @ 82DC4E5
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_HighRiskForDamage
 	get_ability AI_TARGET
 	if_equal ABILITY_LEVITATE, Score_Minus10
 
 AI_CBM_HighRiskForDamage: @ 82DC4ED
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_HighRiskForDamage_End
 	get_ability AI_TARGET
 	if_not_equal ABILITY_WONDER_GUARD, AI_CBM_HighRiskForDamage_End
 	if_type_effectiveness AI_EFFECTIVENESS_x2, AI_CBM_HighRiskForDamage_End
@@ -398,8 +627,11 @@ AI_CBM_FocusEnergy: @ 82DC512
 
 AI_CBM_Confuse: @ 82DC51D
 	if_status2 AI_TARGET, STATUS2_CONFUSION, Score_Minus5
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_Confuse_CheckSafeguard
 	get_ability AI_TARGET
 	if_equal ABILITY_OWN_TEMPO, Score_Minus10
+AI_CBM_Confuse_CheckSafeguard:
 	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10
 	end
 
@@ -410,10 +642,26 @@ AI_CBM_Reflect: @ 82DC53A
 AI_CBM_Paralyze: @ 82DC545
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	get_ability AI_TARGET
+	if_equal ABILITY_QUICK_FEET, AI_CBM_Paralyze_QuickFeet
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_Paralyze_CheckStatus
+	get_ability AI_TARGET
 	if_equal ABILITY_LIMBER, Score_Minus10
+	if_equal ABILITY_LEAF_GUARD, AI_CBM_Paralyze_CheckLeafGuard
+
+AI_CBM_Paralyze_CheckStatus:
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10
 	end
+
+AI_CBM_Paralyze_QuickFeet:
+	score -5
+	goto AI_CBM_Paralyze_CheckStatus
+
+AI_CBM_Paralyze_CheckLeafGuard:
+	get_weather
+	if_equal AI_WEATHER_SUN, Score_Minus10
+	goto AI_CBM_Paralyze_CheckStatus
 
 AI_CBM_Substitute: @ 82DC568
 	if_status2 AI_USER, STATUS2_SUBSTITUTE, Score_Minus8
@@ -468,8 +716,12 @@ AI_CBM_Sandstorm: @ 82DC5ED
 
 AI_CBM_Attract: @ 82DC5F5
 	if_status2 AI_TARGET, STATUS2_INFATUATION, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_Attract_CheckGender
 	get_ability AI_TARGET
 	if_equal ABILITY_OBLIVIOUS, Score_Minus10
+
+AI_CBM_Attract_CheckGender:
 	get_gender AI_USER
 	if_equal 0, AI_CBM_Attract_CheckIfTargetIsFemale
 	if_equal 254, AI_CBM_Attract_CheckIfTargetIsMale
@@ -532,6 +784,14 @@ AI_CBM_FutureSight: @ 82DC669
 AI_CBM_FakeOut: @ 82DC680
 	is_first_turn_for AI_USER
 	if_equal 0, Score_Minus10
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_FakeOut_CheckTitanic
+	get_ability AI_TARGET
+	if_equal ABILITY_INNER_FOCUS, Score_Minus1
+
+AI_CBM_FakeOut_CheckTitanic:
+	get_ability AI_TARGET
+	if_equal ABILITY_TITANIC, Score_Minus1
 	end
 
 AI_CBM_Stockpile: @ 82DC689
@@ -555,8 +815,13 @@ AI_CBM_Torment: @ 82DC6A9
 	end
 
 AI_CBM_WillOWisp: @ 82DC6B4
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_WillOWisp_CheckStatus
 	get_ability AI_TARGET
 	if_equal ABILITY_WATER_VEIL, Score_Minus10
+	if_equal ABILITY_LEAF_GUARD, AI_CBM_WillOWisp_CheckLeafGuard
+
+AI_CBM_WillOWisp_CheckStatus:
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus10
 	if_type_effectiveness AI_EFFECTIVENESS_x0, Score_Minus10
 	if_type_effectiveness AI_EFFECTIVENESS_x0_5, Score_Minus10
@@ -564,17 +829,36 @@ AI_CBM_WillOWisp: @ 82DC6B4
 	if_side_affecting AI_TARGET, SIDE_STATUS_SAFEGUARD, Score_Minus10
 	end
 
+AI_CBM_WillOWisp_CheckLeafGuard:
+	get_weather
+	if_equal AI_WEATHER_SUN, Score_Minus10
+	goto AI_CBM_WillOWisp_CheckStatus
+
 AI_CBM_HelpingHand: @ 82DC6E3
 	if_not_double_battle Score_Minus10
 	end
 
 AI_CBM_TrickAndKnockOff: @ 82DC6EB
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CBM_TrickAndKnockOff_End
 	get_ability AI_TARGET
 	if_equal ABILITY_STICKY_HOLD, Score_Minus10
+AI_CBM_TrickAndKnockOff_End:
 	end
 
 AI_CBM_Ingrain: @ 82DC6F4
 	if_status3 AI_USER, STATUS3_ROOTED, Score_Minus10
+	end
+
+AI_CBM_Gravity:
+	get_gravity
+	if_equal AI_GRAVITY_ON, Score_Minus10
+	end
+
+AI_CBM_MagnetRise:
+	if_status3 AI_USER, STATUS3_MAGNET_RISE, Score_Minus10
+	if_ability AI_USER, ABILITY_LEVITATE, Score_Minus10
+	if_type AI_USER, TYPE_FLYING, Score_Minus10
 	end
 
 AI_CBM_Recycle: @ 82DC6FF
@@ -627,6 +911,19 @@ AI_CBM_DragonDance: @ 82DC778
 AI_CBM_Growth:
 	if_stat_level_equal AI_USER, STAT_ATK, MAX_STAT_STAGE, Score_Minus8
 	if_stat_level_equal AI_USER, STAT_SPATK, MAX_STAT_STAGE, Score_Minus8
+	end
+
+AI_CBM_ThreeStatUp:
+	if_move MOVE_COIL, AI_CBM_Coil
+	if_stat_level_equal AI_USER, STAT_SPATK, MAX_STAT_STAGE, Score_Minus8
+	if_stat_level_equal AI_USER, STAT_SPDEF, MAX_STAT_STAGE, Score_Minus8
+	if_stat_level_equal AI_USER, STAT_SPEED, MAX_STAT_STAGE, Score_Minus3
+	end
+
+AI_CBM_Coil:
+	if_stat_level_equal AI_USER, STAT_ATK, MAX_STAT_STAGE, Score_Minus8
+	if_stat_level_equal AI_USER, STAT_DEF, MAX_STAT_STAGE, Score_Minus8
+	if_stat_level_equal AI_USER, STAT_ACC, MAX_STAT_STAGE, Score_Minus3
 	end
 
 Score_Minus1:
@@ -716,6 +1013,7 @@ AI_CheckViability:
 	if_effect EFFECT_SUPER_FANG, AI_CV_SuperFang
 	if_effect EFFECT_TRAP, AI_CV_Trap
 	if_effect EFFECT_HIGH_CRITICAL, AI_CV_HighCrit
+	if_effect EFFECT_ALWAYS_CRIT_HIT, AI_CV_HighCrit
 	if_effect EFFECT_CONFUSE, AI_CV_Confuse
 	if_effect EFFECT_ATTACK_UP_2, AI_CV_AttackUp
 	if_effect EFFECT_DEFENSE_UP_2, AI_CV_DefenseUp
@@ -765,13 +1063,15 @@ AI_CheckViability:
 	if_effect EFFECT_MOONLIGHT, AI_CV_HealWeather
 	if_effect EFFECT_RAIN_DANCE, AI_CV_RainDance
 	if_effect EFFECT_SUNNY_DAY, AI_CV_SunnyDay
+	if_effect EFFECT_SANDSTORM, AI_CV_Sandstorm
 	if_effect EFFECT_BELLY_DRUM, AI_CV_BellyDrum
 	if_effect EFFECT_PSYCH_UP, AI_CV_PsychUp
 	if_effect EFFECT_MIRROR_COAT, AI_CV_MirrorCoat
 	if_effect EFFECT_SKULL_BASH, AI_CV_ChargeUpMove
-	if_effect EFFECT_SOLARBEAM, AI_CV_ChargeUpMove
+	if_effect EFFECT_SOLARBEAM, AI_CV_SolarBeam
 	if_effect EFFECT_SEMI_INVULNERABLE, AI_CV_SemiInvulnerable
 	if_effect EFFECT_SOFTBOILED, AI_CV_Heal
+	if_effect EFFECT_LIFE_DEW, AI_CV_Heal
 	if_effect EFFECT_FAKE_OUT, AI_CV_FakeOut
 	if_effect EFFECT_SPIT_UP, AI_CV_SpitUp
 	if_effect EFFECT_SWALLOW, AI_CV_Heal
@@ -784,6 +1084,7 @@ AI_CheckViability:
 	if_effect EFFECT_TRICK, AI_CV_Trick
 	if_effect EFFECT_ROLE_PLAY, AI_CV_ChangeSelfAbility
 	if_effect EFFECT_SUPERPOWER, AI_CV_Superpower
+	if_effect EFFECT_HAMMER_ARM, AI_CV_CloseCombat
 	if_effect EFFECT_MAGIC_COAT, AI_CV_MagicCoat
 	if_effect EFFECT_RECYCLE, AI_CV_Recycle
 	if_effect EFFECT_REVENGE, AI_CV_Revenge
@@ -806,9 +1107,15 @@ AI_CheckViability:
 	if_effect EFFECT_CALM_MIND, AI_CV_SpDefUp
 	if_effect EFFECT_DRAGON_DANCE, AI_CV_DragonDance
 	if_effect EFFECT_GROWTH, AI_CV_Growth
+	if_effect EFFECT_ATTACK_SPATK_UP, AI_CV_Growth
+	if_effect EFFECT_THREE_STAT_UP, AI_CV_ThreeStatUp
 	if_effect EFFECT_POWER_BASED_ON_TARGET_HP, AI_CV_PowerBasedOnTargetHP
 	if_effect EFFECT_CLOSE_COMBAT, AI_CV_CloseCombat
 	if_effect EFFECT_TRICK_ROOM, AI_CV_TrickRoom
+	if_effect EFFECT_TAILWIND, AI_CV_Tailwind
+	if_effect EFFECT_CONDITIONAL_DOUBLE_DAMAGE_HIT, AI_CV_ConditionalDoubleDamage
+	if_effect EFFECT_GRAVITY, AI_CV_Gravity
+	if_effect EFFECT_MAGNET_RISE, AI_CV_MagnetRise
 	end
 
 AI_CV_Sleep: @ 82DCA92
@@ -934,8 +1241,34 @@ AI_CV_MirrorMove_EncouragedMovesToMirror: @ 82DCB6C
     .2byte MOVE_TRICK
     .2byte MOVE_SUPERPOWER
     .2byte MOVE_SKILL_SWAP
-	.2byte MOVE_CLOSE_COMBAT
+    .2byte MOVE_CLOSE_COMBAT
+    .2byte MOVE_METEOR_ASSAULT
     .2byte -1
+
+sMovesTable_BulletproofMoves:
+	.2byte MOVE_ACID_SPRAY
+	.2byte MOVE_AURA_SPHERE
+	.2byte MOVE_BARRAGE
+	.2byte MOVE_BULLET_SEED
+	.2byte MOVE_EGG_BOMB
+	.2byte MOVE_ELECTRO_BALL
+	.2byte MOVE_ENERGY_BALL
+	.2byte MOVE_FOCUS_BLAST
+	.2byte MOVE_GYRO_BALL
+	.2byte MOVE_ICE_BALL
+	.2byte MOVE_MAGNET_BOMB
+	.2byte MOVE_MIST_BALL
+	.2byte MOVE_MUD_BOMB
+	.2byte MOVE_OCTAZOOKA
+	.2byte MOVE_POLLEN_PUFF
+	.2byte MOVE_ROCK_BLAST
+	.2byte MOVE_ROCK_WRECKER
+	.2byte MOVE_SEED_BOMB
+	.2byte MOVE_SHADOW_BALL
+	.2byte MOVE_SLUDGE_BOMB
+	.2byte MOVE_WEATHER_BALL
+	.2byte MOVE_ZAP_CANNON
+	.2byte -1
 
 AI_CV_AttackUp: @ 82DCBBC
 	if_stat_level_less_than AI_USER, STAT_ATK, 9, AI_CV_AttackUp2
@@ -1015,6 +1348,59 @@ AI_CV_SpeedUp2: @ 82DCC6A
 	score +3
 
 AI_CV_SpeedUp_End: @ 82DCC72
+	end
+
+AI_CV_Tailwind:
+	if_random_less_than 64, AI_CV_Tailwind_End
+	if_user_faster AI_CV_Tailwind_ScoreDown1
+	if_hp_less_than AI_USER, 31, AI_CV_Tailwind_ScoreDown1
+	if_hp_more_than AI_USER, 75, AI_CV_Tailwind_ScoreUp1
+	if_random_less_than 192, AI_CV_Tailwind_ScoreUp1
+	goto AI_CV_Tailwind_End
+
+AI_CV_Tailwind_ScoreDown1:
+	score -1
+	goto AI_CV_Tailwind_End
+
+AI_CV_Tailwind_ScoreUp1:
+	score +1
+
+AI_CV_Tailwind_End:
+	end
+
+AI_CV_Gravity:
+	if_type AI_TARGET, TYPE_FLYING, Score_Plus1
+	if_ability AI_TARGET, ABILITY_LEVITATE, Score_Plus1
+	if_status3 AI_TARGET, STATUS3_MAGNET_RISE, Score_Plus1
+	if_hp_more_than AI_USER, 59, AI_CV_Gravity_MaybeScoreUp1
+	end
+
+AI_CV_Gravity_MaybeScoreUp1:
+	if_random_less_than 96, Score_Plus1
+	end
+
+AI_CV_MagnetRise:
+	if_hp_less_than AI_USER, 50, AI_CV_MagnetRise_End
+	if_has_move AI_TARGET, MOVE_EARTHQUAKE, AI_CV_MagnetRise_ScoreUp1
+	if_has_move AI_TARGET, MOVE_EARTH_POWER, AI_CV_MagnetRise_ScoreUp1
+	if_has_move AI_TARGET, MOVE_FISSURE, AI_CV_MagnetRise_ScoreUp1
+	goto AI_CV_MagnetRise_CheckTargetType
+
+AI_CV_MagnetRise_ScoreUp1:
+	score +1
+
+AI_CV_MagnetRise_CheckTargetType:
+	if_type AI_TARGET, TYPE_GROUND, AI_CV_MagnetRise_TargetGround
+
+AI_CV_MagnetRise_End:
+	end
+
+AI_CV_MagnetRise_TargetGround:
+	if_random_less_than 128, AI_CV_MagnetRise_TargetGround_ScoreUp1
+	end
+
+AI_CV_MagnetRise_TargetGround_ScoreUp1:
+	score +1
 	end
 
 AI_CV_SpAtkUp: @ 82DCC73
@@ -1417,6 +1803,7 @@ AI_CV_Conversion_End:
 	end
 
 AI_CV_HealWeather:
+	if_ability AI_USER, ABILITY_MEGA_SOL, AI_CV_Heal
 	get_weather
 	if_equal AI_WEATHER_HAIL, AI_CV_HealWeather_ScoreDown2
 	if_equal AI_WEATHER_RAIN, AI_CV_HealWeather_ScoreDown2
@@ -1537,6 +1924,11 @@ AI_CV_Rest6:
 AI_CV_Rest7:
 	if_random_less_than 10, AI_CV_Rest_End
 	score +3
+	get_ability AI_USER
+	if_not_equal ABILITY_HYDRATION, AI_CV_Rest_End
+	get_weather
+	if_not_equal AI_WEATHER_RAIN, AI_CV_Rest_End
+	score +2
 
 AI_CV_Rest_End:
 	end
@@ -1916,6 +2308,8 @@ AI_CV_Encore_EncouragedMovesToEncore:
     .byte EFFECT_DRAGON_DANCE
     .byte EFFECT_CAMOUFLAGE
     .byte EFFECT_GROWTH
+    .byte EFFECT_ATTACK_SPATK_UP
+    .byte EFFECT_THREE_STAT_UP
     .byte -1
 
 AI_CV_PainSplit:
@@ -2068,6 +2462,8 @@ AI_CV_Curse_End:
 	end
 
 AI_CV_Protect:
+	if_move MOVE_WIDE_GUARD, AI_CV_WideGuard
+	if_move MOVE_QUICK_GUARD, AI_CV_QuickGuard
 	get_protect_count AI_USER
 	if_more_than 1, AI_CV_Protect_ScoreDown2
 	if_status AI_USER, STATUS1_TOXIC_POISON, AI_CV_Protect3
@@ -2077,6 +2473,7 @@ AI_CV_Protect:
 	if_status3 AI_USER, STATUS3_LEECHSEED, AI_CV_Protect3
 	if_status3 AI_USER, STATUS3_YAWN, AI_CV_Protect3
 	if_has_move_with_effect AI_TARGET, EFFECT_RESTORE_HP, AI_CV_Protect3
+	if_has_move_with_effect AI_TARGET, EFFECT_LIFE_DEW, AI_CV_Protect3
 	if_has_move_with_effect AI_TARGET, EFFECT_DEFENSE_CURL, AI_CV_Protect3
 	if_status AI_TARGET, STATUS1_TOXIC_POISON, AI_CV_Protect_ScoreUp2
 	if_status2 AI_TARGET, STATUS2_CURSED, AI_CV_Protect_ScoreUp2
@@ -2115,6 +2512,36 @@ AI_CV_Protect_ScoreDown2:
 AI_CV_Protect_End:
 	end
 
+AI_CV_WideGuard:
+	if_has_move_with_target AI_TARGET, 0x8, AI_CV_WideGuard_SeenSpreadMove @ MOVE_TARGET_BOTH
+	if_has_move_with_target AI_TARGET, 0x20, AI_CV_WideGuard_SeenSpreadMove @ MOVE_TARGET_FOES_AND_ALLY
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_CV_WideGuard_NoSeenSpreadMove
+	if_has_move_with_target AI_TARGET_PARTNER, 0x8, AI_CV_WideGuard_SeenSpreadMove @ MOVE_TARGET_BOTH
+	if_has_move_with_target AI_TARGET_PARTNER, 0x20, AI_CV_WideGuard_SeenSpreadMove @ MOVE_TARGET_FOES_AND_ALLY
+
+AI_CV_WideGuard_NoSeenSpreadMove:
+	score -3
+	goto AI_CV_Protect_End
+
+AI_CV_WideGuard_SeenSpreadMove:
+	if_random_less_than 128, AI_CV_Protect_End
+	score +2
+	goto AI_CV_Protect_End
+
+AI_CV_QuickGuard:
+	if_has_move_blocked_by_quick_guard AI_TARGET, AI_CV_QuickGuard_SeenPriorityMove
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_CV_QuickGuard_NoSeenPriorityMove
+	if_has_move_blocked_by_quick_guard AI_TARGET_PARTNER, AI_CV_QuickGuard_SeenPriorityMove
+
+AI_CV_QuickGuard_NoSeenPriorityMove:
+	score -3
+	goto AI_CV_Protect_End
+
+AI_CV_QuickGuard_SeenPriorityMove:
+	if_random_less_than 128, AI_CV_Protect_End
+	score +2
+	goto AI_CV_Protect_End
+
 @ BUG: (fixed) Foresight is only encouraged if the user is Ghost type or
 @      has high evasion, but should check target instead
 AI_CV_Foresight:
@@ -2123,11 +2550,6 @@ AI_CV_Foresight:
 	get_target_type2
 	if_equal TYPE_GHOST, AI_CV_Foresight2
 	if_stat_level_more_than AI_TARGET, STAT_EVASION, 8, AI_CV_Foresight3
-@	get_user_type1
-@	if_equal TYPE_GHOST, AI_CV_Foresight2
-@	get_user_type2
-@	if_equal TYPE_GHOST, AI_CV_Foresight2
-@	if_stat_level_more_than AI_USER, STAT_EVASION, 8, AI_CV_Foresight3
 	score -2
 	goto AI_CV_Foresight_End
 
@@ -2223,6 +2645,8 @@ AI_CV_RainDance:
 	if_user_faster AI_CV_RainDance2
 	get_ability AI_USER
 	if_equal ABILITY_SWIFT_SWIM, AI_CV_RainDance3
+	if_equal ABILITY_DRY_SKIN, AI_CV_RainDance3
+	if_equal ABILITY_HYDRATION, AI_CV_RainDance3
 
 AI_CV_RainDance2:
 	if_hp_less_than AI_USER, 40, AI_CV_RainDance_ScoreDown1
@@ -2232,6 +2656,8 @@ AI_CV_RainDance2:
 	if_equal AI_WEATHER_SANDSTORM, AI_CV_RainDance3
 	get_ability AI_USER
 	if_equal ABILITY_RAIN_DISH, AI_CV_RainDance3
+	if_equal ABILITY_DRY_SKIN, AI_CV_RainDance3
+	if_equal ABILITY_HYDRATION, AI_CV_RainDance3
 	goto AI_CV_RainDance_End
 
 AI_CV_RainDance3:
@@ -2246,6 +2672,10 @@ AI_CV_RainDance_End:
 
 AI_CV_SunnyDay:
 	if_hp_less_than AI_USER, 40, AI_CV_SunnyDay_ScoreDown1
+	get_ability AI_USER
+	if_equal ABILITY_DRY_SKIN, AI_CV_SunnyDay_ScoreDown2
+	if_equal ABILITY_SOLAR_POWER, AI_CV_SunnyDay2
+	if_equal ABILITY_LEAF_GUARD, AI_CV_SunnyDay2
 	get_weather
 	if_equal AI_WEATHER_HAIL, AI_CV_SunnyDay2
 	if_equal AI_WEATHER_RAIN, AI_CV_SunnyDay2
@@ -2255,6 +2685,9 @@ AI_CV_SunnyDay:
 AI_CV_SunnyDay2:
 	score +1
 	goto AI_CV_SunnyDay_End
+
+AI_CV_SunnyDay_ScoreDown2:
+	score -1
 
 AI_CV_SunnyDay_ScoreDown1:
 	score -1
@@ -2388,6 +2821,16 @@ AI_CV_MirrorCoat_SpecialTypeList:
     .byte TYPE_DARK
     .byte -1
 
+AI_CV_SolarBeam:
+	if_type_effectiveness AI_EFFECTIVENESS_x0_25, AI_CV_ChargeUpMove_ScoreDown2
+	if_ability AI_USER, ABILITY_MEGA_SOL, AI_CV_SolarBeam_End
+	get_weather
+	if_equal AI_WEATHER_SUN, AI_CV_SolarBeam_End
+	goto AI_CV_ChargeUpMove
+
+AI_CV_SolarBeam_End:
+	end
+
 AI_CV_ChargeUpMove:
 	if_type_effectiveness AI_EFFECTIVENESS_x0_25, AI_CV_ChargeUpMove_ScoreDown2
 	if_type_effectiveness AI_EFFECTIVENESS_x0_5, AI_CV_ChargeUpMove_ScoreDown2
@@ -2424,6 +2867,11 @@ AI_CV_SemiInvulnerable_CheckSandstormTypes:
 	if_in_bytes AI_CV_SandstormResistantTypes, AI_CV_SemiInvulnerable_TryEncourage
 	get_user_type2
 	if_in_bytes AI_CV_SandstormResistantTypes, AI_CV_SemiInvulnerable_TryEncourage
+	get_ability AI_USER
+	if_equal ABILITY_SAND_VEIL, AI_CV_SemiInvulnerable_TryEncourage
+	if_equal ABILITY_SAND_STREAM, AI_CV_SemiInvulnerable_TryEncourage
+	if_equal ABILITY_SAND_RUSH, AI_CV_SemiInvulnerable_TryEncourage
+	if_equal ABILITY_SAND_FORCE, AI_CV_SemiInvulnerable_TryEncourage
 	goto AI_CV_SemiInvulnerable5
 
 AI_CV_SemiInvulnerable_CheckIceType:
@@ -2431,6 +2879,11 @@ AI_CV_SemiInvulnerable_CheckIceType:
 	if_equal TYPE_ICE, AI_CV_SemiInvulnerable_TryEncourage
 	get_user_type2
 	if_equal TYPE_ICE, AI_CV_SemiInvulnerable_TryEncourage
+	get_ability AI_USER
+	if_equal ABILITY_SNOW_WARNING, AI_CV_SemiInvulnerable_TryEncourage
+	if_equal ABILITY_SLUSH_RUSH, AI_CV_SemiInvulnerable_TryEncourage
+	if_equal ABILITY_SNOW_CLOAK, AI_CV_SemiInvulnerable_TryEncourage
+	if_equal ABILITY_ARTIC_FORCE, AI_CV_SemiInvulnerable_TryEncourage
 
 AI_CV_SemiInvulnerable5:
 	if_target_faster AI_CV_SemiInvulnerable_End
@@ -2453,7 +2906,16 @@ AI_CV_SandstormResistantTypes:
     .byte -1
 
 AI_CV_FakeOut:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_CV_FakeOut_CheckTitanic
+	get_ability AI_TARGET
+	if_equal ABILITY_INNER_FOCUS, AI_CV_FakeOut_End
+
+AI_CV_FakeOut_CheckTitanic:
+	get_ability AI_TARGET
+	if_equal ABILITY_TITANIC, AI_CV_FakeOut_End
 	score +2
+AI_CV_FakeOut_End:
 	end
 
 AI_CV_SpitUp:
@@ -2465,13 +2927,45 @@ AI_CV_SpitUp:
 AI_CV_SpitUp_End:
 	end
 
+AI_CV_Sandstorm:
+	if_hp_less_than AI_USER, 40, AI_CV_Sandstorm_ScoreDown1
+	get_ability AI_USER
+	if_equal ABILITY_SAND_VEIL, AI_CV_SandstormScorePlus2
+	if_equal ABILITY_SAND_RUSH, AI_CV_SandstormScorePlus2
+	if_equal ABILITY_SAND_FORCE, AI_CV_SandstormScorePlus2
+	get_weather
+	if_equal AI_WEATHER_SUN, AI_CV_Sandstorm2
+	if_equal AI_WEATHER_RAIN, AI_CV_Sandstorm2
+	if_equal AI_WEATHER_HAIL, AI_CV_Sandstorm2
+	goto AI_CV_Sandstorm_End
+
+AI_CV_SandstormScorePlus2:
+	score +1
+
+AI_CV_Sandstorm2:
+	score +1
+	goto AI_CV_Sandstorm_End
+
+AI_CV_Sandstorm_ScoreDown1:
+	score -1
+
+AI_CV_Sandstorm_End:
+	end
+
 AI_CV_Hail:
 	if_hp_less_than AI_USER, 40, AI_CV_Hail_ScoreDown1
+	get_ability AI_USER
+	if_equal ABILITY_SLUSH_RUSH, AI_CV_HailScorePlus2
+	if_equal ABILITY_SNOW_CLOAK, AI_CV_HailScorePlus2
+	if_equal ABILITY_ARTIC_FORCE, AI_CV_HailScorePlus2
 	get_weather
 	if_equal AI_WEATHER_SUN, AI_CV_Hail2
 	if_equal AI_WEATHER_RAIN, AI_CV_Hail2
 	if_equal AI_WEATHER_SANDSTORM, AI_CV_Hail2
 	goto AI_CV_Hail_End
+
+AI_CV_HailScorePlus2:
+	score +1
 
 AI_CV_Hail2:
 	score +1
@@ -2488,6 +2982,13 @@ AI_CV_Facade:
 	if_not_status AI_USER, STATUS1_POISON | STATUS1_BURN | STATUS1_PARALYSIS | STATUS1_TOXIC_POISON, AI_CV_Facade_End
 	score +1
 AI_CV_Facade_End:
+	end
+
+AI_CV_ConditionalDoubleDamage:
+	@if_move MOVE_HEX
+	if_not_status AI_TARGET, STATUS1_ANY, AI_CV_ConditionalDoubleDamage_End
+	score +1
+AI_CV_ConditionalDoubleDamage_End:
 	end
 
 AI_CV_FocusPunch:
@@ -2591,6 +3092,7 @@ AI_CV_ChangeSelfAbility_AbilitiesToEncourage:
     .byte ABILITY_SAND_VEIL
     .byte ABILITY_STATIC
     .byte ABILITY_WATER_ABSORB
+    .byte ABILITY_STORM_DRAIN
     .byte ABILITY_VOLT_ABSORB
     .byte ABILITY_FLASH_FIRE
     .byte ABILITY_WONDER_GUARD
@@ -2600,6 +3102,18 @@ AI_CV_ChangeSelfAbility_AbilitiesToEncourage:
     .byte ABILITY_SWIFT_SWIM
     .byte ABILITY_HUGE_POWER
     .byte ABILITY_RAIN_DISH
+    .byte ABILITY_DRY_SKIN
+    .byte ABILITY_MOTOR_DRIVE
+    .byte ABILITY_SAND_RUSH
+    .byte ABILITY_SAND_FORCE
+    .byte ABILITY_ANALYTIC
+    .byte ABILITY_ADAPTABILITY
+    .byte ABILITY_HYDRATION
+    .byte ABILITY_QUICK_FEET
+    .byte ABILITY_LEAF_GUARD
+    .byte ABILITY_MAGIC_BOUNCE
+    .byte ABILITY_MOLD_BREAKER
+    .byte ABILITY_ARTIC_FORCE
     .byte ABILITY_CUTE_CHARM
     .byte ABILITY_SHED_SKIN
     .byte ABILITY_MARVEL_SCALE
@@ -2607,6 +3121,12 @@ AI_CV_ChangeSelfAbility_AbilitiesToEncourage:
     .byte ABILITY_CHLOROPHYLL
     .byte ABILITY_SHIELD_DUST
     .byte ABILITY_TECHNICIAN
+    .byte ABILITY_SLUSH_RUSH
+    .byte ABILITY_SNOW_CLOAK
+    .byte ABILITY_PYRO_REACTOR
+    .byte ABILITY_SHARPNESS
+    .byte ABILITY_SAP_SIPPER
+    .byte ABILITY_GOOEY
     .byte -1
 
 AI_CV_Superpower:
@@ -2778,6 +3298,7 @@ AI_CV_Snatch:
 AI_CV_Snatch2:
 	if_hp_more_than AI_TARGET, 25, AI_CV_Snatch5
 	if_has_move_with_effect AI_TARGET, EFFECT_RESTORE_HP, AI_CV_Snatch3
+	if_has_move_with_effect AI_TARGET, EFFECT_LIFE_DEW, AI_CV_Snatch3
 	if_has_move_with_effect AI_TARGET, EFFECT_DEFENSE_CURL, AI_CV_Snatch3
 	goto AI_CV_Snatch4
 
@@ -2864,27 +3385,72 @@ AI_CV_DragonDance2:
 AI_CV_DragonDance_End:
 	end
 
-AI_CV_Growth::
-	if_stat_level_less_than AI_USER, STAT_ATK, 9, AI_CV_Growth2
-	if_stat_level_less_than AI_USER, STAT_SPATK, 9, AI_CV_Growth2
-	if_random_less_than 100, AI_CV_Growth3
-	score -1
-	goto AI_CV_Growth3
+AI_CV_ThreeStatUp:
+	if_move MOVE_COIL, AI_CV_Coil
+	goto AI_CV_DragonDance
 
-AI_CV_Growth2::
-	if_hp_not_equal AI_USER, 100, AI_CV_Growth3
-	if_random_less_than 128, AI_CV_Growth3
+AI_CV_Growth::
+	if_stat_level_more_than AI_USER, STAT_ATK, 8, AI_CV_GrowthMaybeScoreDown1
+	if_stat_level_more_than AI_USER, STAT_SPATK, 8, AI_CV_GrowthMaybeScoreDown1
+	goto AI_CV_GrowthCheckFullHp
+
+AI_CV_GrowthMaybeScoreDown1::
+	if_random_less_than 156, AI_CV_GrowthScoreDown1
+	goto AI_CV_GrowthCheckFullHp
+
+AI_CV_GrowthScoreDown1::
+	score -1
+
+AI_CV_GrowthCheckFullHp::
+	if_hp_not_equal AI_USER, 100, AI_CV_GrowthCheckHpRange
+	if_stat_level_more_than AI_USER, STAT_ATK, 8, AI_CV_GrowthCheckHpRange
+	if_stat_level_more_than AI_USER, STAT_SPATK, 8, AI_CV_GrowthCheckHpRange
+	if_random_less_than 128, AI_CV_GrowthCheckHpRange
 	score +2
 
-AI_CV_Growth3::
-	if_hp_more_than AI_USER, 70, AI_CV_Growth_End
+AI_CV_GrowthCheckHpRange::
 	if_hp_less_than AI_USER, 40, AI_CV_Growth_ScoreDown2
-	if_random_less_than 40, AI_CV_Growth_End
+	if_hp_more_than AI_USER, 70, AI_CV_Growth_End
+	if_random_less_than 186, AI_CV_Growth_ScoreDown2
+	goto AI_CV_Growth_End
 
 AI_CV_Growth_ScoreDown2::
 	score -2
 
 AI_CV_Growth_End::
+	end
+
+AI_CV_Coil:
+	if_stat_level_more_than AI_USER, STAT_ATK, 8, AI_CV_CoilMaybeScoreDown1
+	if_stat_level_more_than AI_USER, STAT_DEF, 8, AI_CV_CoilMaybeScoreDown1
+	if_stat_level_more_than AI_USER, STAT_ACC, 8, AI_CV_CoilMaybeScoreDown1
+	goto AI_CV_CoilCheckFullHp
+
+AI_CV_CoilMaybeScoreDown1:
+	if_random_less_than 156, AI_CV_CoilScoreDown1
+	goto AI_CV_CoilCheckFullHp
+
+AI_CV_CoilScoreDown1:
+	score -1
+
+AI_CV_CoilCheckFullHp:
+	if_hp_not_equal AI_USER, 100, AI_CV_CoilCheckHpRange
+	if_stat_level_more_than AI_USER, STAT_ATK, 8, AI_CV_CoilCheckHpRange
+	if_stat_level_more_than AI_USER, STAT_DEF, 8, AI_CV_CoilCheckHpRange
+	if_stat_level_more_than AI_USER, STAT_ACC, 8, AI_CV_CoilCheckHpRange
+	if_random_less_than 128, AI_CV_CoilCheckHpRange
+	score +2
+
+AI_CV_CoilCheckHpRange:
+	if_hp_less_than AI_USER, 40, AI_CV_Coil_ScoreDown2
+	if_hp_more_than AI_USER, 70, AI_CV_Coil_End
+	if_random_less_than 186, AI_CV_Coil_ScoreDown2
+	goto AI_CV_Coil_End
+
+AI_CV_Coil_ScoreDown2:
+	score -2
+
+AI_CV_Coil_End:
 	end
 
 AI_CV_PowerBasedOnTargetHP::
@@ -3015,7 +3581,8 @@ AI_SetupFirstTurn_SetupEffectsToEncourage:
     .byte EFFECT_CALM_MIND
     .byte EFFECT_CAMOUFLAGE
     .byte EFFECT_GROWTH
-    .byte EFFECT_TRICK_ROOM
+    .byte EFFECT_ATTACK_SPATK_UP
+    .byte EFFECT_THREE_STAT_UP
     .byte -1
 
 AI_PreferStrongestMove:
@@ -3073,6 +3640,8 @@ AI_PreferBatonPass_GoForBatonPass:
 	if_move MOVE_SWORDS_DANCE, AI_PreferBatonPass2
 	if_move MOVE_DRAGON_DANCE, AI_PreferBatonPass2
 	if_move MOVE_CALM_MIND, AI_PreferBatonPass2
+	if_move MOVE_QUIVER_DANCE, AI_PreferBatonPass2
+	if_move MOVE_COIL, AI_PreferBatonPass2
 	if_effect EFFECT_PROTECT, AI_PreferBatonPass_End
 	if_move MOVE_BATON_PASS, AI_PreferBatonPass_EncourageIfHighStats
 	if_random_less_than 20, AI_Risky_End
@@ -3112,12 +3681,18 @@ AI_PreferBatonPassEnd:
 AI_DoubleBattle:
 	if_target_is_ally AI_TryOnAlly
 	if_effect EFFECT_TRICK_ROOM, AI_DoubleBattleTrickRoom
+	if_effect EFFECT_GRAVITY, AI_DoubleBattleGravity
 	if_move MOVE_SKILL_SWAP, AI_DoubleBattleSkillSwap
 	get_curr_move_type
 	if_move MOVE_EARTHQUAKE, AI_DoubleBattleAllHittingGroundMove
 	if_move MOVE_MAGNITUDE, AI_DoubleBattleAllHittingGroundMove
+	if_move MOVE_SURF, AI_DoubleBattleSurfMove
+	if_move MOVE_RAZOR_LEAF, AI_DoubleBattleGrassSpreadMove
+	if_move MOVE_COTTON_SPORE, AI_DoubleBattleGrassSpreadMove
+	if_equal TYPE_WATER, AI_DoubleBattleWaterMove
 	if_equal TYPE_ELECTRIC, AI_DoubleBattleElectricMove
 	if_equal TYPE_FIRE, AI_DoubleBattleFireMove
+AI_DoubleBattleAfterTypeChecks:
 	get_ability AI_USER
 	if_not_equal ABILITY_GUTS, AI_DoubleBattleCheckUserStatus
 	if_has_move AI_USER_PARTNER, MOVE_HELPING_HAND, AI_DoubleBattlePartnerHasHelpingHand
@@ -3179,12 +3754,125 @@ AI_DoubleBattleTrickRoom_BothAfterTie:
 	if_random_less_than 192, Score_Plus5
 	end
 
+AI_DoubleBattleGravity:
+	get_gravity
+	if_equal AI_GRAVITY_ON, AI_DoubleBattleGravity_End
+	if_type AI_USER, TYPE_FLYING, AI_DoubleBattleGravity_ScoreDown5_CheckUserPartner
+	if_ability AI_USER, ABILITY_LEVITATE, AI_DoubleBattleGravity_ScoreDown5_CheckUserPartner
+	if_status3 AI_USER, STATUS3_MAGNET_RISE, AI_DoubleBattleGravity_ScoreDown5_CheckUserPartner
+	goto AI_DoubleBattleGravity_CheckUserPartner
+
+AI_DoubleBattleGravity_ScoreDown5_CheckUserPartner:
+	score -5
+
+AI_DoubleBattleGravity_CheckUserPartner:
+	if_hp_equal AI_USER_PARTNER, 0, AI_DoubleBattleGravity_CheckTarget
+	if_type AI_USER_PARTNER, TYPE_FLYING, AI_DoubleBattleGravity_ScoreDown5_CheckTarget
+	if_ability AI_USER_PARTNER, ABILITY_LEVITATE, AI_DoubleBattleGravity_ScoreDown5_CheckTarget
+	if_status3 AI_USER_PARTNER, STATUS3_MAGNET_RISE, AI_DoubleBattleGravity_ScoreDown5_CheckTarget
+	goto AI_DoubleBattleGravity_CheckTarget
+
+AI_DoubleBattleGravity_ScoreDown5_CheckTarget:
+	score -5
+
+AI_DoubleBattleGravity_CheckTarget:
+	if_type AI_TARGET, TYPE_FLYING, AI_DoubleBattleGravity_TargetMaybeScoreUp3
+	if_ability AI_TARGET, ABILITY_LEVITATE, AI_DoubleBattleGravity_TargetMaybeScoreUp3
+	if_status3 AI_TARGET, STATUS3_MAGNET_RISE, AI_DoubleBattleGravity_TargetMaybeScoreUp3
+	goto AI_DoubleBattleGravity_CheckTargetPartner
+
+AI_DoubleBattleGravity_TargetMaybeScoreUp3:
+	if_random_less_than 192, AI_DoubleBattleGravity_TargetScoreUp3
+	goto AI_DoubleBattleGravity_CheckTargetPartner
+
+AI_DoubleBattleGravity_TargetScoreUp3:
+	score +3
+
+AI_DoubleBattleGravity_CheckTargetPartner:
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_DoubleBattleGravity_End
+	if_type AI_TARGET_PARTNER, TYPE_FLYING, AI_DoubleBattleGravity_TargetPartnerMaybeScoreUp3
+	if_ability AI_TARGET_PARTNER, ABILITY_LEVITATE, AI_DoubleBattleGravity_TargetPartnerMaybeScoreUp3
+	if_status3 AI_TARGET_PARTNER, STATUS3_MAGNET_RISE, AI_DoubleBattleGravity_TargetPartnerMaybeScoreUp3
+
+AI_DoubleBattleGravity_End:
+	end
+
+AI_DoubleBattleGravity_TargetPartnerMaybeScoreUp3:
+	if_random_less_than 192, AI_DoubleBattleGravity_TargetPartnerScoreUp3
+	end
+
+AI_DoubleBattleGravity_TargetPartnerScoreUp3:
+	score +3
+	end
+
 AI_DoubleBattleAllHittingGroundMove:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DoubleBattleAllHittingGroundMove_CheckPartnerTypes
 	if_ability AI_USER_PARTNER, ABILITY_LEVITATE, Score_Plus2
+	if_ability AI_USER_PARTNER, ABILITY_TELEPATHY, Score_Plus2
+
+AI_DoubleBattleAllHittingGroundMove_CheckPartnerTypes:
 	if_type AI_USER_PARTNER, TYPE_FLYING, Score_Plus2
 	if_type AI_USER_PARTNER, TYPE_FIRE, Score_Minus10
 	if_type AI_USER_PARTNER, TYPE_ELECTRIC, Score_Minus10
 	if_type AI_USER_PARTNER, TYPE_POISON, Score_Minus10
+	if_type AI_USER_PARTNER, TYPE_ROCK, Score_Minus10
+	goto Score_Minus3
+
+AI_DoubleBattleSurfMove:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DoubleBattleSurfMove_CheckPartnerTypes
+	if_ability AI_USER_PARTNER, ABILITY_WATER_ABSORB, AI_DoubleBattleSurfMove_UserPartnerSafe
+	if_ability AI_USER_PARTNER, ABILITY_DRY_SKIN, AI_DoubleBattleSurfMove_UserPartnerSafe
+	if_ability AI_USER_PARTNER, ABILITY_STORM_DRAIN, AI_DoubleBattleSurfMove_UserPartnerSafe
+	if_ability AI_USER_PARTNER, ABILITY_TELEPATHY, AI_DoubleBattleSurfMove_UserPartnerSafe
+	goto AI_DoubleBattleSurfMove_CheckTargetPartner
+
+AI_DoubleBattleSurfMove_UserPartnerSafe:
+	score +2
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_DoubleBattleAfterTypeChecks
+	check_ability AI_TARGET_PARTNER, ABILITY_WATER_ABSORB
+	if_equal 1, AI_DoubleBattleSurfMove_TargetPartnerWaterBenefitSafe
+	if_equal 2, AI_DoubleBattleSurfMove_TargetPartnerMaybeWaterBenefitSafe
+	check_ability AI_TARGET_PARTNER, ABILITY_DRY_SKIN
+	if_equal 1, AI_DoubleBattleSurfMove_TargetPartnerWaterBenefitSafe
+	if_equal 2, AI_DoubleBattleSurfMove_TargetPartnerMaybeWaterBenefitSafe
+	check_ability AI_TARGET_PARTNER, ABILITY_STORM_DRAIN
+	if_equal 1, AI_DoubleBattleSurfMove_TargetPartnerWaterBenefitSafe
+	if_equal 2, AI_DoubleBattleSurfMove_TargetPartnerMaybeWaterBenefitSafe
+	goto AI_DoubleBattleAfterTypeChecks
+
+AI_DoubleBattleSurfMove_TargetPartnerWaterBenefitSafe:
+	score -2
+	goto AI_DoubleBattleAfterTypeChecks
+
+AI_DoubleBattleSurfMove_TargetPartnerMaybeWaterBenefitSafe:
+	score -1
+	goto AI_DoubleBattleAfterTypeChecks
+
+AI_DoubleBattleSurfMove_CheckTargetPartner:
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_DoubleBattleSurfMove_CheckPartnerTypes
+	check_ability AI_TARGET_PARTNER, ABILITY_WATER_ABSORB
+	if_equal 1, AI_DoubleBattleSurfMove_TargetPartnerWaterBenefit
+	if_equal 2, AI_DoubleBattleSurfMove_TargetPartnerMaybeWaterBenefit
+	check_ability AI_TARGET_PARTNER, ABILITY_DRY_SKIN
+	if_equal 1, AI_DoubleBattleSurfMove_TargetPartnerWaterBenefit
+	if_equal 2, AI_DoubleBattleSurfMove_TargetPartnerMaybeWaterBenefit
+	check_ability AI_TARGET_PARTNER, ABILITY_STORM_DRAIN
+	if_equal 1, AI_DoubleBattleSurfMove_TargetPartnerWaterBenefit
+	if_equal 2, AI_DoubleBattleSurfMove_TargetPartnerMaybeWaterBenefit
+	goto AI_DoubleBattleSurfMove_CheckPartnerTypes
+
+AI_DoubleBattleSurfMove_TargetPartnerWaterBenefit:
+	score -2
+	goto AI_DoubleBattleSurfMove_CheckPartnerTypes
+
+AI_DoubleBattleSurfMove_TargetPartnerMaybeWaterBenefit:
+	score -1
+
+AI_DoubleBattleSurfMove_CheckPartnerTypes:
+	if_type AI_USER_PARTNER, TYPE_FIRE, Score_Minus10
+	if_type AI_USER_PARTNER, TYPE_GROUND, Score_Minus10
 	if_type AI_USER_PARTNER, TYPE_ROCK, Score_Minus10
 	goto Score_Minus3
 
@@ -3196,46 +3884,263 @@ AI_DoubleBattleSkillSwap:
 	if_equal ABILITY_PURE_POWER, Score_Plus2
 	end
 
-AI_DoubleBattleElectricMove:
-	if_no_ability AI_TARGET_PARTNER, ABILITY_LIGHTNING_ROD, AI_DoubleBattleElectricMoveEnd
+AI_DoubleBattleWaterMove:
+	if_move MOVE_WITHDRAW, AI_DoubleBattleWaterMoveEnd
+	if_move MOVE_RAIN_DANCE, AI_DoubleBattleWaterMoveEnd
+	if_move MOVE_WATER_SPORT, AI_DoubleBattleWaterMoveEnd
+	if_move MOVE_LIFE_DEW, AI_DoubleBattleWaterMoveEnd
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_DoubleBattleWaterMoveEnd
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DoubleBattleWaterMoveEnd
+	if_move MOVE_BUBBLE, AI_DoubleBattleWaterMove_CheckTargetPartnerWaterAbilities
+	if_move MOVE_WATER_SPOUT, AI_DoubleBattleWaterMove_CheckTargetPartnerWaterAbilities
+	if_move MOVE_MUDDY_WATER, AI_DoubleBattleWaterMove_CheckTargetPartnerWaterAbilities
+	check_ability AI_TARGET_PARTNER, ABILITY_STORM_DRAIN
+	if_equal 0, AI_DoubleBattleWaterMoveEnd
+	if_equal 2, AI_DoubleBattleWaterMoveMaybeRedirected
+	score -12
+	goto AI_DoubleBattleWaterMoveEnd
+
+AI_DoubleBattleWaterMove_CheckTargetPartnerWaterAbilities:
+	check_ability AI_TARGET_PARTNER, ABILITY_WATER_ABSORB
+	if_equal 1, AI_DoubleBattleWaterMoveTargetPartnerWaterBenefit
+	if_equal 2, AI_DoubleBattleWaterMoveMaybeRedirected
+	check_ability AI_TARGET_PARTNER, ABILITY_DRY_SKIN
+	if_equal 1, AI_DoubleBattleWaterMoveTargetPartnerWaterBenefit
+	if_equal 2, AI_DoubleBattleWaterMoveMaybeRedirected
+	check_ability AI_TARGET_PARTNER, ABILITY_STORM_DRAIN
+	if_equal 1, AI_DoubleBattleWaterMoveTargetPartnerWaterBenefit
+	if_equal 2, AI_DoubleBattleWaterMoveMaybeRedirected
+	goto AI_DoubleBattleWaterMoveEnd
+
+AI_DoubleBattleWaterMoveTargetPartnerWaterBenefit:
 	score -2
-	if_no_type AI_TARGET_PARTNER, TYPE_GROUND, AI_DoubleBattleElectricMoveEnd
-	score -8
+	goto AI_DoubleBattleWaterMoveEnd
+
+AI_DoubleBattleWaterMoveMaybeRedirected:
+	score -1
+
+AI_DoubleBattleWaterMoveEnd:
+	goto AI_DoubleBattleAfterTypeChecks
+
+AI_DoubleBattleGrassSpreadMove:
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_DoubleBattleGrassSpreadMoveEnd
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DoubleBattleGrassSpreadMoveEnd
+	check_ability AI_TARGET_PARTNER, ABILITY_SAP_SIPPER
+	if_equal 1, AI_DoubleBattleGrassSpreadMove_TargetPartnerGrassBenefit
+	if_equal 2, AI_DoubleBattleGrassSpreadMove_TargetPartnerMaybeGrassBenefit
+	goto AI_DoubleBattleGrassSpreadMoveEnd
+
+AI_DoubleBattleGrassSpreadMove_TargetPartnerGrassBenefit:
+	score -2
+	goto AI_DoubleBattleGrassSpreadMoveEnd
+
+AI_DoubleBattleGrassSpreadMove_TargetPartnerMaybeGrassBenefit:
+	score -1
+
+AI_DoubleBattleGrassSpreadMoveEnd:
+	goto AI_DoubleBattleAfterTypeChecks
+
+AI_DoubleBattleElectricMove:
+	if_move MOVE_CHARGE, AI_DoubleBattleElectricMoveEnd
+	if_move MOVE_MAGNET_RISE, AI_DoubleBattleElectricMoveEnd
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DoubleBattleElectricMoveEnd
+	if_move MOVE_DISCHARGE, AI_DoubleBattleElectricMove_CheckUserPartnerElectricAbilities
+	goto AI_DoubleBattleElectricMove_CheckTargetPartner
+
+AI_DoubleBattleElectricMove_CheckUserPartnerElectricAbilities:
+	if_ability AI_USER_PARTNER, ABILITY_VOLT_ABSORB, AI_DoubleBattleElectricMove_UserPartnerElectricBenefit
+	if_ability AI_USER_PARTNER, ABILITY_LIGHTNING_ROD, AI_DoubleBattleElectricMove_UserPartnerElectricBenefit
+	if_ability AI_USER_PARTNER, ABILITY_MOTOR_DRIVE, AI_DoubleBattleElectricMove_UserPartnerElectricBenefit
+	if_ability AI_USER_PARTNER, ABILITY_TELEPATHY, AI_DoubleBattleElectricMove_UserPartnerElectricBenefit
+	goto AI_DoubleBattleElectricMove_CheckTargetPartner
+
+AI_DoubleBattleElectricMove_UserPartnerElectricBenefit:
+	score +2
+	goto AI_DoubleBattleElectricMove_CheckTargetPartner
+
+AI_DoubleBattleElectricMove_CheckTargetPartner:
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_DoubleBattleElectricMoveEnd
+	if_move MOVE_DISCHARGE, AI_DoubleBattleElectricMove_CheckTargetPartnerElectricAbilities
+	if_move MOVE_ELECTROWEB, AI_DoubleBattleElectricMove_CheckTargetPartnerElectricAbilities
+	check_ability AI_TARGET_PARTNER, ABILITY_LIGHTNING_ROD
+	if_equal 0, AI_DoubleBattleElectricMoveEnd
+	if_equal 2, AI_DoubleBattleElectricMoveMaybeRedirected
+	score -12
+	goto AI_DoubleBattleElectricMoveEnd
+
+AI_DoubleBattleElectricMove_CheckTargetPartnerElectricAbilities:
+	check_ability AI_TARGET_PARTNER, ABILITY_VOLT_ABSORB
+	if_equal 1, AI_DoubleBattleElectricMoveTargetPartnerElectricBenefit
+	if_equal 2, AI_DoubleBattleElectricMoveMaybeRedirected
+	check_ability AI_TARGET_PARTNER, ABILITY_MOTOR_DRIVE
+	if_equal 1, AI_DoubleBattleElectricMoveTargetPartnerElectricBenefit
+	if_equal 2, AI_DoubleBattleElectricMoveMaybeRedirected
+	check_ability AI_TARGET_PARTNER, ABILITY_LIGHTNING_ROD
+	if_equal 1, AI_DoubleBattleElectricMoveTargetPartnerElectricBenefit
+	if_equal 2, AI_DoubleBattleElectricMoveMaybeRedirected
+	goto AI_DoubleBattleElectricMoveEnd
+
+AI_DoubleBattleElectricMoveTargetPartnerElectricBenefit:
+	score -2
+	goto AI_DoubleBattleElectricMoveEnd
+
+AI_DoubleBattleElectricMoveMaybeRedirected:
+	score -1
 
 AI_DoubleBattleElectricMoveEnd:
 	end
 
 AI_DoubleBattleFireMove:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DoubleBattleFireMove_CheckUserFlashFire
+	if_move MOVE_LAVA_PLUME, AI_DoubleBattleFireMove_CheckUserPartnerFireAbilities
+	if_move MOVE_HEAT_WAVE, AI_DoubleBattleFireMove_CheckTargetPartner
+	if_move MOVE_ERUPTION, AI_DoubleBattleFireMove_CheckTargetPartner
+	goto AI_DoubleBattleFireMove_CheckUserFlashFire
+
+AI_DoubleBattleFireMove_CheckUserPartnerFireAbilities:
+	if_ability AI_USER_PARTNER, ABILITY_FLASH_FIRE, AI_DoubleBattleFireMove_UserPartnerFlashFire
+	if_ability AI_USER_PARTNER, ABILITY_PYRO_REACTOR, AI_DoubleBattleFireMove_UserPartnerFireBenefit
+	if_ability AI_USER_PARTNER, ABILITY_TELEPATHY, AI_DoubleBattleFireMove_UserPartnerFireBenefit
+	goto AI_DoubleBattleFireMove_CheckTargetPartner
+
+AI_DoubleBattleFireMove_UserPartnerFlashFire:
+	if_flash_fired AI_USER_PARTNER, AI_DoubleBattleFireMove_CheckTargetPartner
+
+AI_DoubleBattleFireMove_UserPartnerFireBenefit:
+	score +2
+	goto AI_DoubleBattleFireMove_CheckTargetPartner
+
+AI_DoubleBattleFireMove_CheckTargetPartner:
+	if_hp_equal AI_TARGET_PARTNER, 0, AI_DoubleBattleFireMove_CheckUserFlashFire
+	check_ability AI_TARGET_PARTNER, ABILITY_FLASH_FIRE
+	if_equal 1, AI_DoubleBattleFireMove_TargetPartnerAbsorbs
+	if_equal 2, AI_DoubleBattleFireMove_TargetPartnerMaybeAbsorbs
+	check_ability AI_TARGET_PARTNER, ABILITY_PYRO_REACTOR
+	if_equal 1, AI_DoubleBattleFireMove_TargetPartnerAbsorbs
+	if_equal 2, AI_DoubleBattleFireMove_TargetPartnerMaybeAbsorbs
+
+AI_DoubleBattleFireMove_CheckUserFlashFire:
+	get_how_powerful_move_is
+	if_equal 0, AI_DoubleBattleFireMove_End
 	if_flash_fired AI_USER, AI_DoubleBattleFireMove2
+AI_DoubleBattleFireMove_End:
 	end
+
+AI_DoubleBattleFireMove_TargetPartnerAbsorbs:
+	score -2
+	goto AI_DoubleBattleFireMove_CheckUserFlashFire
+
+AI_DoubleBattleFireMove_TargetPartnerMaybeAbsorbs:
+	score -1
+	goto AI_DoubleBattleFireMove_CheckUserFlashFire
 
 AI_DoubleBattleFireMove2:
 	goto Score_Plus1
 
 AI_TryOnAlly:
+	if_move MOVE_POLLEN_PUFF, AI_TryPollenPuffOnAlly
 	get_how_powerful_move_is
 	if_equal 0, AI_TryStatusMoveOnAlly
 	get_curr_move_type
+	if_equal TYPE_WATER, AI_TryWaterMoveOnAlly
+	if_equal TYPE_ELECTRIC, AI_TryElectricMoveOnAlly
 	if_equal TYPE_FIRE, AI_TryFireMoveOnAlly
+	if_equal TYPE_GRASS, AI_TryGrassMoveOnAlly
 
 AI_DiscourageOnAlly:
 	goto Score_Minus30
 
+AI_TryPollenPuffOnAlly:
+	if_hp_equal AI_TARGET, 100, Score_Minus30_
+	if_hp_less_than AI_TARGET, 50, Score_Plus3
+	if_hp_less_than AI_TARGET, 65, Score_Plus1
+	goto Score_Minus1
+
+AI_TryElectricMoveOnAlly:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DiscourageOnAlly
+	if_ability AI_USER_PARTNER, ABILITY_VOLT_ABSORB, AI_TryElectricMoveOnAlly_HpBenefit
+	if_ability AI_USER_PARTNER, ABILITY_LIGHTNING_ROD, AI_TryElectricMoveOnAlly_SpAtkBenefit
+	if_ability AI_USER_PARTNER, ABILITY_MOTOR_DRIVE, AI_TryElectricMoveOnAlly_SpeedBenefit
+	goto AI_DiscourageOnAlly
+
+AI_TryElectricMoveOnAlly_HpBenefit:
+	if_hp_equal AI_USER_PARTNER, 100, AI_DiscourageOnAlly
+	goto Score_Plus3
+
+AI_TryElectricMoveOnAlly_SpAtkBenefit:
+	if_stat_level_equal AI_USER_PARTNER, STAT_SPATK, MAX_STAT_STAGE, AI_DiscourageOnAlly
+	goto Score_Plus3
+
+AI_TryElectricMoveOnAlly_SpeedBenefit:
+	if_stat_level_equal AI_USER_PARTNER, STAT_SPEED, MAX_STAT_STAGE, AI_DiscourageOnAlly
+	goto Score_Plus3
+
+AI_TryWaterMoveOnAlly:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DiscourageOnAlly
+	if_ability AI_USER_PARTNER, ABILITY_WATER_ABSORB, AI_TryWaterMoveOnAlly_HpBenefit
+	if_ability AI_USER_PARTNER, ABILITY_DRY_SKIN, AI_TryWaterMoveOnAlly_HpBenefit
+	if_ability AI_USER_PARTNER, ABILITY_STORM_DRAIN, AI_TryWaterMoveOnAlly_SpAtkBenefit
+	goto AI_DiscourageOnAlly
+
+AI_TryWaterMoveOnAlly_HpBenefit:
+	if_hp_equal AI_USER_PARTNER, 100, AI_DiscourageOnAlly
+	goto Score_Plus3
+
+AI_TryWaterMoveOnAlly_SpAtkBenefit:
+	if_stat_level_equal AI_USER_PARTNER, STAT_SPATK, MAX_STAT_STAGE, AI_DiscourageOnAlly
+	goto Score_Plus3
+
 AI_TryFireMoveOnAlly:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DiscourageOnAlly
 	if_ability AI_USER_PARTNER, ABILITY_FLASH_FIRE, AI_TryFireMoveOnAlly_FlashFire
+	if_ability AI_USER_PARTNER, ABILITY_PYRO_REACTOR, AI_TryFireMoveOnAlly_PyroReactor
 	goto AI_DiscourageOnAlly
 
 AI_TryFireMoveOnAlly_FlashFire:
 	if_flash_fired AI_USER_PARTNER, AI_DiscourageOnAlly
 	goto Score_Plus3
 
+AI_TryFireMoveOnAlly_PyroReactor:
+	if_stat_level_equal AI_USER_PARTNER, STAT_SPEED, MAX_STAT_STAGE, AI_DiscourageOnAlly
+	goto Score_Plus3
+
+AI_TryGrassMoveOnAlly:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_DiscourageOnAlly
+	if_ability AI_USER_PARTNER, ABILITY_SAP_SIPPER, AI_TryGrassMoveOnAlly_SapSipper
+	goto AI_DiscourageOnAlly
+
+AI_TryGrassMoveOnAlly_SapSipper:
+	if_stat_level_equal AI_USER_PARTNER, STAT_ATK, MAX_STAT_STAGE, AI_DiscourageOnAlly
+	goto Score_Plus3
+
 AI_TryStatusMoveOnAlly:
 	if_move MOVE_SKILL_SWAP, AI_TrySkillSwapOnAlly
-	if_move MOVE_WILL_O_WISP, AI_TryStatusOnAlly
+	if_move MOVE_WILL_O_WISP, AI_TryWillOWispOnAlly
 	if_move MOVE_TOXIC, AI_TryStatusOnAlly
 	if_move MOVE_HELPING_HAND, AI_TryHelpingHandOnAlly
 	if_move MOVE_SWAGGER, AI_TrySwaggerOnAlly
+	@ Check status moves absorbed by ally abilities.
+	get_curr_move_type
+	if_equal TYPE_WATER, AI_TryWaterMoveOnAlly
+	if_equal TYPE_ELECTRIC, AI_TryElectricMoveOnAlly
+	if_equal TYPE_GRASS, AI_TryGrassMoveOnAlly
 	goto Score_Minus30_
+
+AI_TryWillOWispOnAlly:
+	get_ability AI_USER
+	if_equal ABILITY_MOLD_BREAKER, AI_TryStatusOnAlly
+	get_ability AI_TARGET
+	if_equal ABILITY_FLASH_FIRE, AI_TryFireMoveOnAlly_FlashFire
+	if_equal ABILITY_PYRO_REACTOR, AI_TryFireMoveOnAlly_PyroReactor
+	goto AI_TryStatusOnAlly
 
 AI_TrySkillSwapOnAlly:
 	get_ability AI_TARGET
@@ -3268,10 +4173,21 @@ AI_TrySkillSwapOnAllyPlus3:
 
 AI_TryStatusOnAlly:
 	get_ability AI_TARGET
-	if_not_equal ABILITY_GUTS, Score_Minus30_
+	if_equal ABILITY_GUTS, AI_TryStatusOnAlly_Guts
+	if_equal ABILITY_QUICK_FEET, AI_TryStatusOnAlly_QuickFeet
+	goto Score_Minus30_
+
+AI_TryStatusOnAlly_Guts:
 	if_status AI_TARGET, STATUS1_ANY, Score_Minus30_
 	if_hp_less_than AI_USER, 91, Score_Minus30_
 	goto Score_Plus5
+
+AI_TryStatusOnAlly_QuickFeet:
+	if_status AI_TARGET, STATUS1_ANY, Score_Minus30_
+	if_hp_less_than AI_TARGET, 60, Score_Minus30_
+	if_hp_less_than AI_USER, 91, Score_Minus30_
+	score +2
+	end
 
 AI_TryHelpingHandOnAlly:
 	if_random_less_than 64, Score_Minus1
@@ -3353,17 +4269,18 @@ AI_HPAware_End:
 	end
 
 AI_HPAware_DiscouragedEffectsWhenHighHP: @ 82DE21F
-    .byte EFFECT_EXPLOSION
-    .byte EFFECT_RESTORE_HP
-    .byte EFFECT_REST
-    .byte EFFECT_DESTINY_BOND
+	.byte EFFECT_EXPLOSION
+	.byte EFFECT_RESTORE_HP
+	.byte EFFECT_REST
+	.byte EFFECT_DESTINY_BOND
     .byte EFFECT_FLAIL
     .byte EFFECT_ENDURE
-    .byte EFFECT_MORNING_SUN
-    .byte EFFECT_SYNTHESIS
-    .byte EFFECT_MOONLIGHT
-    .byte EFFECT_SOFTBOILED
-    .byte EFFECT_MEMENTO
+	.byte EFFECT_MORNING_SUN
+	.byte EFFECT_SYNTHESIS
+	.byte EFFECT_MOONLIGHT
+	.byte EFFECT_SOFTBOILED
+	.byte EFFECT_LIFE_DEW
+	.byte EFFECT_MEMENTO
     .byte EFFECT_GRUDGE
     .byte EFFECT_OVERHEAT
     .byte -1
@@ -3412,6 +4329,8 @@ AI_HPAware_DiscouragedEffectsWhenMediumHP: @ 82DE22D
     .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
     .byte EFFECT_GROWTH
+    .byte EFFECT_ATTACK_SPATK_UP
+    .byte EFFECT_THREE_STAT_UP
     .byte -1
 
 AI_HPAware_DiscouragedEffectsWhenLowHP: @ 82DE258
@@ -3463,6 +4382,8 @@ AI_HPAware_DiscouragedEffectsWhenLowHP: @ 82DE258
     .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
     .byte EFFECT_GROWTH
+    .byte EFFECT_ATTACK_SPATK_UP
+    .byte EFFECT_THREE_STAT_UP
     .byte -1
 
 AI_HPAware_DiscouragedEffectsWhenTargetHighHP: @ 82DE288
@@ -3473,13 +4394,13 @@ AI_HPAware_EncouragedEffectsWhenTargetHighHP:
     .byte -1
 
 AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
-@    .byte EFFECT_ATTACK_UP
-@    .byte EFFECT_DEFENSE_UP
-@    .byte EFFECT_SPEED_UP
-@    .byte EFFECT_SPECIAL_ATTACK_UP
-@    .byte EFFECT_SPECIAL_DEFENSE_UP
-@    .byte EFFECT_ACCURACY_UP
-@    .byte EFFECT_EVASION_UP
+    .byte EFFECT_ATTACK_UP
+    .byte EFFECT_DEFENSE_UP
+    .byte EFFECT_SPEED_UP
+    .byte EFFECT_SPECIAL_ATTACK_UP
+    .byte EFFECT_SPECIAL_DEFENSE_UP
+    .byte EFFECT_ACCURACY_UP
+    .byte EFFECT_EVASION_UP
     .byte EFFECT_ATTACK_DOWN
     .byte EFFECT_DEFENSE_DOWN
     .byte EFFECT_SPEED_DOWN
@@ -3489,13 +4410,13 @@ AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
     .byte EFFECT_EVASION_DOWN
     .byte EFFECT_MIST
     .byte EFFECT_FOCUS_ENERGY
-@    .byte EFFECT_ATTACK_UP_2
-@    .byte EFFECT_DEFENSE_UP_2
+    .byte EFFECT_ATTACK_UP_2
+    .byte EFFECT_DEFENSE_UP_2
     .byte EFFECT_SPEED_UP_2
-@    .byte EFFECT_SPECIAL_ATTACK_UP_2
-@    .byte EFFECT_SPECIAL_DEFENSE_UP_2
+    .byte EFFECT_SPECIAL_ATTACK_UP_2
+    .byte EFFECT_SPECIAL_DEFENSE_UP_2
     .byte EFFECT_ACCURACY_UP_2
-@    .byte EFFECT_EVASION_UP_2
+    .byte EFFECT_EVASION_UP_2
     .byte EFFECT_ATTACK_DOWN_2
     .byte EFFECT_DEFENSE_DOWN_2
     .byte EFFECT_SPEED_DOWN_2
@@ -3513,6 +4434,7 @@ AI_HPAware_DiscouragedEffectsWhenTargetMediumHP: @ 82DE289
 @    .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
     .byte EFFECT_GROWTH
+    .byte EFFECT_ATTACK_SPATK_UP
 	.byte EFFECT_POWER_BASED_ON_TARGET_HP
     .byte -1
 
@@ -3577,7 +4499,9 @@ AI_HPAware_DiscouragedEffectsWhenTargetLowHP: @ 82DE2B1
     .byte EFFECT_CALM_MIND
     .byte EFFECT_DRAGON_DANCE
     .byte EFFECT_GROWTH
-	.byte EFFECT_POWER_BASED_ON_TARGET_HP
+    .byte EFFECT_ATTACK_SPATK_UP
+    .byte EFFECT_THREE_STAT_UP
+    .byte EFFECT_POWER_BASED_ON_TARGET_HP
     .byte -1
 
 AI_Unknown:

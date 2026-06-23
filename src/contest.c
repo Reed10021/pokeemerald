@@ -1521,6 +1521,8 @@ static void Task_ShowMoveSelectScreen(u8 taskId)
     {
         u16 move = gContestMons[gContestPlayerMonIndex].moves[i];
         u8 *moveNameBuffer = moveName;
+        u8 windowId = i + MOVE_WINDOWS_START;
+        u32 width = GetWindowAttribute(windowId, WINDOW_WIDTH) * 8;
 
         if (eContestantStatus[gContestPlayerMonIndex].prevMove != MOVE_NONE
             && IsContestantAllowedToCombo(gContestPlayerMonIndex)
@@ -1539,8 +1541,13 @@ static void Task_ShowMoveSelectScreen(u8 taskId)
         }
         moveNameBuffer = StringCopy(moveNameBuffer, gMoveNames[move]);
 
-        FillWindowPixelBuffer(i + MOVE_WINDOWS_START, PIXEL_FILL(0));
-        Contest_PrintTextToBg0WindowAt(i + MOVE_WINDOWS_START, moveName, 5, 1, 7);
+        if (width > 11)
+            width -= 11;
+        else
+            width = 0;
+
+        FillWindowPixelBuffer(windowId, PIXEL_FILL(0));
+        Contest_PrintTextToBg0WindowAt(windowId, moveName, 5, 1, GetFontIdToFit(moveName, FONT_NARROW, 0, width));
     }
 
     DrawMoveSelectArrow(eContest.playerMoveChoice);
@@ -5333,6 +5340,7 @@ static void SetMoveSpecificAnimData(u8 contestant)
     case MOVE_RAZOR_WIND:
     case MOVE_SKULL_BASH:
     case MOVE_SKY_ATTACK:
+    case MOVE_SOLAR_BLADE:
         if (eContest.moveAnimTurnCount == 0)
         {
             eContest.moveAnimTurnCount = 2;
@@ -6092,5 +6100,4 @@ void StripPlayerAndMonNamesForLinkContest(struct ContestPokemon *mon, s32 langua
         name[PLAYER_NAME_LENGTH] = EOS;
     }
 }
-
 

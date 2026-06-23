@@ -234,3 +234,15 @@ IslandCave_Braille_Regigigias:
 	.braille "REGISTEEL\n"
 	.braille "AND REGICE\n"
 	.braille "THEN DIVE$"
+
+Underwater_RuinedChamber_Braille_WeAwaitOurCreator:
+	.byte 4
+	.byte 6
+	.byte 26
+	.byte 13
+	.byte 7
+	.byte 9
+	.braille "WE AWAIT OUR\n"
+	.braille "CREATOR. BRING\n"
+	.braille "REGIGIGAS THEN\n"
+	.braille "GO UP HERE.$"

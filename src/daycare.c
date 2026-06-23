@@ -22,6 +22,7 @@
 #include "tv.h"
 #include "constants/items.h"
 #include "constants/moves.h"
+#include "constants/abilities.h"
 #include "constants/region_map_sections.h"
 #include "constants/maps.h"
 #include "constants/species.h"
@@ -29,6 +30,7 @@
 // this file's functions
 static void ClearDaycareMonMail(struct DayCareMail *mail);
 static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *daycare);
+static void InheritHiddenAbility(struct Pokemon *egg, struct DayCare *daycare, const u8 *parentSlots);
 static u8 GetDaycareCompatibilityScore(struct DayCare *daycare);
 static void DaycarePrintMonInfo(u8 windowId, s32 daycareSlotId, u8 y);
 static u32 RollEggChains(struct DayCare* daycare, u8 mode);
@@ -956,6 +958,7 @@ static void _GiveEggFromDaycare(struct DayCare *daycare)
     species = DetermineEggSpeciesAndParentSlots(daycare, parentSlots);
     AlterEggSpeciesWithIncenseItem(&species, daycare);
     SetInitialEggData(&egg, species, daycare);
+    InheritHiddenAbility(&egg, daycare, parentSlots);
     InheritIVs(&egg, daycare);
     BuildEggMoveset(&egg, &daycare->mons[parentSlots[1]].mon, &daycare->mons[parentSlots[0]].mon);
 
@@ -977,9 +980,11 @@ void CreateEgg(struct Pokemon *mon, u16 species, bool8 setHotSpringsLocation)
     u8 language;
     u8 metLocation;
     u8 isEgg = TRUE;
+    u8 hasHiddenAbility = FALSE;
 
     SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
     CreateMon(mon, species, EGG_HATCH_LEVEL, 32, FALSE, 0, OT_ID_PLAYER_ID, 0);
+    SetMonData(mon, MON_DATA_HAS_HIDDEN_ABILITY, &hasHiddenAbility);
     metLevel = 0;
     ball = ITEM_POKE_BALL;
     language = LANGUAGE_JAPANESE;
@@ -1002,9 +1007,11 @@ static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *
     u8 metLevel;
     u8 language;
     u8 isEgg = TRUE;
+    u8 hasHiddenAbility = FALSE;
 
     SetMonData(mon, MON_DATA_IS_EGG, &isEgg);
     CreateMon(mon, species, EGG_HATCH_LEVEL, 32, TRUE, personality, OT_ID_PLAYER_ID, 0);
+    SetMonData(mon, MON_DATA_HAS_HIDDEN_ABILITY, &hasHiddenAbility);
     metLevel = 0;
     ball = ITEM_POKE_BALL;
     language = LANGUAGE_JAPANESE;
@@ -1013,6 +1020,34 @@ static void SetInitialEggData(struct Pokemon *mon, u16 species, struct DayCare *
     SetMonData(mon, MON_DATA_FRIENDSHIP, &gBaseStats[species].eggCycles);
     SetMonData(mon, MON_DATA_MET_LEVEL, &metLevel);
     SetMonData(mon, MON_DATA_LANGUAGE, &language);
+}
+
+static void InheritHiddenAbility(struct Pokemon *egg, struct DayCare *daycare, const u8 *parentSlots)
+{
+    u8 parentSlot = parentSlots[0];
+    u16 eggSpecies = GetMonData(egg, MON_DATA_SPECIES, NULL);
+    u16 parentSpecies = GetBoxMonData(&daycare->mons[parentSlot].mon, MON_DATA_SPECIES, NULL);
+    u8 hasHiddenAbility = TRUE;
+
+    if (gBaseStats[eggSpecies].abilities[ABILITY_NUM_HIDDEN] == ABILITY_NONE)
+        return;
+
+    if (parentSpecies == SPECIES_DITTO)
+    {
+        parentSlot = parentSlots[1];
+    }
+    else if (GetBoxMonData(&daycare->mons[parentSlots[1]].mon, MON_DATA_SPECIES, NULL) == SPECIES_DITTO)
+    {
+        parentSlot = parentSlots[0];
+    }
+    else if (GetBoxMonGender(&daycare->mons[parentSlot].mon) != MON_FEMALE)
+    {
+        return;
+    }
+
+    if (GetBoxMonData(&daycare->mons[parentSlot].mon, MON_DATA_ABILITY_NUM, NULL) == ABILITY_NUM_HIDDEN
+        && Random() % 100 < 60)
+        SetMonData(egg, MON_DATA_HAS_HIDDEN_ABILITY, &hasHiddenAbility);
 }
 
 void GiveEggFromDaycare(void)

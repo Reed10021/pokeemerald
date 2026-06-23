@@ -9,8 +9,6 @@
 #include "constants/rgb.h"
 #include "constants/songs.h"
 
-static void AnimFallingRock(struct Sprite *);
-static void AnimFallingRock_Step(struct Sprite *);
 static void AnimRockFragment(struct Sprite *);
 static void AnimFlyingSandCrescent(struct Sprite *);
 static void AnimRaiseSprite(struct Sprite *);
@@ -45,7 +43,7 @@ static const union AnimCmd sAnim_FlyingRock_2[] =
     ANIMCMD_END,
 };
 
-static const union AnimCmd *const sAnims_FlyingRock[] =
+const union AnimCmd *const gAnims_FlyingRock[] =
 {
     sAnim_FlyingRock_0,
     sAnim_FlyingRock_1,
@@ -57,7 +55,7 @@ const struct SpriteTemplate gFallingRockSpriteTemplate =
     .tileTag = ANIM_TAG_ROCKS,
     .paletteTag = ANIM_TAG_ROCKS,
     .oam = &gOamData_AffineOff_ObjNormal_32x32,
-    .anims = sAnims_FlyingRock,
+    .anims = gAnims_FlyingRock,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = AnimFallingRock,
@@ -68,7 +66,7 @@ const struct SpriteTemplate gRockFragmentSpriteTemplate =
     .tileTag = ANIM_TAG_ROCKS,
     .paletteTag = ANIM_TAG_ROCKS,
     .oam = &gOamData_AffineOff_ObjNormal_32x32,
-    .anims = sAnims_FlyingRock,
+    .anims = gAnims_FlyingRock,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
     .callback = AnimRockFragment,
@@ -298,6 +296,28 @@ const struct SpriteTemplate gWeatherBallRockDownSpriteTemplate =
     .callback = AnimWeatherBallDown,
 };
 
+const struct SpriteTemplate gStoneEdgeSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_STONE_EDGE,
+    .paletteTag = ANIM_TAG_STONE_EDGE,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAnims_BasicFire,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimParticleInVortex,
+};
+
+const struct SpriteTemplate gReallyBigRockBlastRockSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_REALLY_BIG_ROCK,
+    .paletteTag = ANIM_TAG_REALLY_BIG_ROCK,
+    .oam = &gOamData_AffineDouble_ObjNormal_64x64,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimRockBlastRock,
+};
+
 static const union AffineAnimCmd sSpriteAffineAnim_CrushGripHandEnemyAttack[] =
 {
     AFFINEANIMCMD_FRAME(0, 0, 96, 1), //180 degree turn
@@ -324,7 +344,7 @@ const struct SpriteTemplate gCrushGripHandTemplate =
     .callback = AnimRockBlastRock
 };
 
-static void AnimFallingRock(struct Sprite *sprite)
+void AnimFallingRock(struct Sprite *sprite)
 {
     if (gBattleAnimArgs[3] != 0)
         SetAverageBattlerPositions(gBattleAnimTarget, 0, &sprite->pos1.x, &sprite->pos1.y);
@@ -347,7 +367,7 @@ static void AnimFallingRock(struct Sprite *sprite)
     sprite->callback(sprite);
 }
 
-static void AnimFallingRock_Step(struct Sprite *sprite)
+void AnimFallingRock_Step(struct Sprite *sprite)
 {
     sprite->pos1.x += sprite->data[5];
 
@@ -390,12 +410,20 @@ static void AnimRockFragment(struct Sprite *sprite)
 }
 
 // Swirls particle in vortex. Used for moves like Fire Spin or Sand Tomb
+// args[0] - initial x offset
+// args[1] - initial y offset
+// args[2] - y increment
+// args[3] - duration
+// args[4] - increments some sin parameter
+// args[5] - fixed sin parameter
+// args[6] - attacker or target
 static void AnimParticleInVortex(struct Sprite *sprite)
 {
-    if (gBattleAnimArgs[6] == ANIM_ATTACKER)
-        InitSpritePosToAnimAttacker(sprite, 0);
+    s16 animBattler = gBattleAnimArgs[6];
+    if (IsDoubleBattle() && gBattleMoves[gCurrentMove].target == MOVE_TARGET_BOTH)
+        InitSpritePosToAnimTargetsCentre(sprite, FALSE);
     else
-        InitSpritePosToAnimTarget(sprite, FALSE);
+        InitSpritePosToAnimBattler(animBattler, sprite, FALSE);
 
     sprite->data[0] = gBattleAnimArgs[3];
     sprite->data[1] = gBattleAnimArgs[2];

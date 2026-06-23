@@ -985,6 +985,28 @@ const struct SpriteTemplate gHiddenPowerOrbScatterSpriteTemplate =
     .callback = AnimOrbitScatter,
 };
 
+const struct SpriteTemplate gPowerGemOrbSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_POWER_GEM,
+    .paletteTag = ANIM_TAG_POWER_GEM,
+    .oam = &gOamData_AffineNormal_ObjNormal_16x16,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gHiddenPowerOrbAffineAnimTable,
+    .callback = AnimOrbitFast,
+};
+
+const struct SpriteTemplate gPowerGemOrbScatterSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_POWER_GEM,
+    .paletteTag = ANIM_TAG_POWER_GEM,
+    .oam = &gOamData_AffineDouble_ObjNormal_16x16,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gHiddenPowerOrbAffineAnimTable,
+    .callback = AnimOrbitScatter,
+};
+
 const union AffineAnimCmd gSpitUpOrbAffineAnimCmds[] =
 {
     AFFINEANIMCMD_FRAME(0x80, 0x80, 0, 0),
@@ -1270,6 +1292,60 @@ const struct SpriteTemplate gCrushGripExplosionTemplate =
     .anims = gExplosionAnimTable,
     .images = NULL,
     .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimSpriteOnMonPos
+};
+
+// Tectonic Rage
+const struct SpriteTemplate gTectonicRageBlastBurnSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_FIRE_PLUME,
+    .paletteTag = ANIM_TAG_FIRE_PLUME,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAnims_FirePlume,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimBlastBurnTargetPlume
+};
+const struct SpriteTemplate gTectonicRageExplosionSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_EXPLOSION_2,
+    .paletteTag = ANIM_TAG_EXPLOSION_2,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gExplosionAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimSpriteOnMonPos
+};
+
+// Pulverizing Pancake
+const struct SpriteTemplate gPulverizingPancakeRedDetectSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_SPARKLE_4,
+    .paletteTag = ANIM_TAG_VERTICAL_HEX,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gAnims_SpinningSparkle,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimSpinningSparkle
+};
+const struct SpriteTemplate gPulverizingPancakeExplosionSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_EXPLOSION,
+    .paletteTag = ANIM_TAG_ELECTRIC_ORBS,
+    .oam = &gOamData_AffineOff_ObjNormal_32x32,
+    .anims = gExplosionAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimSpriteOnMonPos
+};
+const struct SpriteTemplate gPulverizingPancakeYellowRingSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_THIN_RING,
+    .paletteTag = ANIM_TAG_ELECTRIC_ORBS,
+    .oam = &gOamData_AffineDouble_ObjNormal_64x64,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gThinRingExpandingAffineAnimTable,
     .callback = AnimSpriteOnMonPos
 };
 

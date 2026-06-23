@@ -35,6 +35,9 @@ u8 CanUseDigOrEscapeRopeOnCurMap(void);
 u8 CheckIfItemIsTMHMOrEvolutionStone(u16 itemId);
 void ItemUseOutOfBattle_Mints(u8 taskId);
 void ItemUseOutOfBattle_AbilityCapsule(u8 taskId);
+void ItemUseOutOfBattle_AbilityPatch(u8 taskId);
+void ItemUseOutOfBattle_BottleCap(u8 taskId);
+void ItemUseOutOfBattle_GoldBottleCap(u8 taskId);
 void ItemUseOutOfBattle_PokeBall(u8);
 
 void ItemUseOutOfBattle_CutTool(u8);

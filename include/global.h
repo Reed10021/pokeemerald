@@ -71,7 +71,11 @@
 #define Q_4_12_ROUND ((1) << (12 - 1))
 #define UQ_4_12_ROUND ((1) << (12 - 1))
 
-#define POKEMON_SLOTS_NUMBER 412
+// The original save layout stores 52 bytes of dex flags in the base arrays.
+// Four more bytes are repurposed from unused save space so the dex can grow
+// without changing SaveBlock1/SaveBlock2 sizes.
+#define DEX_FLAGS_BASE_BYTES 52
+#define DEX_FLAGS_EXT_BYTES  4
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) >= (b) ? (a) : (b))
@@ -80,7 +84,7 @@
 #define abs(x) (((x) < 0) ? -(x) : (x))
 #endif
 
-#define SAFE_DIV(a, b) ((b) ? (a) / (b) : 0)
+#define SAFE_DIV(a, b) (((b) != 0) ? (a) / (b) : 0)
 
 // Extracts the upper 16 bits of a 32-bit number
 #define HIHALF(n) (((n) & 0xFFFF0000) >> 16)
@@ -124,7 +128,9 @@
 #define DIV_ROUND_UP(val, roundBy)(((val) / (roundBy)) + (((val) % (roundBy)) ? 1 : 0))
 #define ROUND_BITS_TO_BYTES(numBits)(((numBits) / 8) + (((numBits) % 8) ? 1 : 0))
 
-#define DEX_FLAGS_NO (ROUND_BITS_TO_BYTES(POKEMON_SLOTS_NUMBER))
+#define DEX_FLAGS_NO DEX_FLAGS_BASE_BYTES
+#define DEX_FLAGS_COUNT (DEX_FLAGS_NO + DEX_FLAGS_EXT_BYTES)
+#define NATIONAL_DEX_SAVE_CAPACITY (DEX_FLAGS_COUNT * 8)
 #define NUM_FLAG_BYTES (ROUND_BITS_TO_BYTES(FLAGS_COUNT))
 
 struct Coords8
@@ -266,7 +272,7 @@ struct BattleTowerPokemon
     u32 speedIV:5;
     u32 spAttackIV:5;
     u32 spDefenseIV:5;
-    u32 gap:1;
+    u32 hiddenAbility:1;
     u32 abilityNum:1;
     u32 personality;
     u8 nickname[POKEMON_NAME_LENGTH + 1];
@@ -477,8 +483,10 @@ struct SaveBlock2
              u16 optionsBattleStyle:1; // OPTIONS_BATTLE_STYLE_[SHIFT/SET]
              u16 optionsBattleSceneOff:1; // whether battle animations are disabled
              u16 regionMapZoom:1; // whether the map is zoomed in
+             //u16 padding1:4;
     /*0x18*/ struct Pokedex pokedex;
-    /*0x90*/ u8 filler_90[0x8];
+    /*0x90*/ u8 pokedexOwnedOverflow[DEX_FLAGS_EXT_BYTES];
+    /*0x94*/ u8 pokedexSeenOverflow[DEX_FLAGS_EXT_BYTES];
     /*0x98*/ struct Time localTimeOffset;
     /*0xA0*/ struct Time lastBerryTreeUpdate;
     /*0xA8*/ u32 gcnLinkFlags; // Read by Pokemon Colosseum/XD
@@ -519,7 +527,7 @@ struct SecretBase
     /*0x1AA9*/ u8 language;
     /*0x1AAA*/ u16 numSecretBasesReceived;
     /*0x1AAC*/ u8 numTimesEntered;
-    /*0x1AAD*/ u8 sbr_field_11;
+    /*0x1AAD*/ u8 hiddenAbilityFlags; // Bits 0-5 are party slots with Hidden Abilities.
     /*0x1AAE*/ u8 decorations[DECOR_MAX_SECRET_BASE];
     /*0x1ABE*/ u8 decorationPositions[DECOR_MAX_SECRET_BASE];
     /*0x1AD0*/ struct SecretBaseParty party;
@@ -570,7 +578,8 @@ struct Roamer
     /*0x11*/ u8 smart;
     /*0x12*/ u8 tough;
     /*0x13*/ bool8 active;
-    /*0x14*/ u8 filler[0x8];
+    /*0x14*/ bool8 hiddenAbility;
+    /*0x15*/ u8 filler[0x7];
 };
 
 struct RamScriptData
@@ -985,10 +994,11 @@ struct SaveBlock1
     /*0x31F8*/ struct EnigmaBerry enigmaBerry;
     /*0x322C*/ struct MEventBuffers unk_322C;
     /*0x3598*/ struct ItemSlot bagPocket_Medicine[BAG_MEDICINE_COUNT];
-    /*0x3610*/ u8 field_3598[0x108];
-    // field_3598 is unused, therefore we can take space from it in order to create a new pocket at this location
+    // field_3598 is unused, therefore we can take space from it in order to create new structures at this location
     // while maintaining save compatibility.
-//  /*0x3598*/ u8 field_3598[0x180];
+    /*0x3610*/ u8 pokedexSeen1Overflow[DEX_FLAGS_EXT_BYTES];
+    /*0x3614*/ u8 pokedexSeen2Overflow[DEX_FLAGS_EXT_BYTES];
+    /*0x3618*/ u8 field_3598[0x100];
     /*0x3718*/ u32 trainerHillTimes[4];
     /*0x3728*/ struct RamScript ramScript;
     /*0x3B14*/ struct RecordMixingGift recordMixingGift;
@@ -1000,9 +1010,6 @@ struct SaveBlock1
     /*0x3D64*/ struct SaveTrainerHill trainerHill;
     /*0x3D70*/ struct WaldaPhrase waldaPhrase;
     // sizeof: 0x3D88
-    ///*0x3D88*/ u16 registeredItemL;
-    ///*0x3D8A*/ u16 registeredItemR;
-    // sizeof: 0x3D8C
 };
 
 extern struct SaveBlock1* gSaveBlock1Ptr;

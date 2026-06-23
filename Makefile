@@ -31,8 +31,8 @@ else
 EXE :=
 endif
 
-# VERSION: 1.5.3
-TITLE       := POKE EMRR153
+# VERSION: 1.6.0
+TITLE       := POKE EMRR160
 GAME_CODE   := BPEE
 MAKER_CODE  := 01
 REVISION    := 0
@@ -52,6 +52,7 @@ SONG_SUBDIR = sound/songs
 MID_SUBDIR = sound/songs/midi
 SAMPLE_SUBDIR = sound/direct_sound_samples
 CRY_SUBDIR = sound/direct_sound_samples/cries
+CRY_UNCOMPRESSED_SUBDIR = sound/direct_sound_samples/cries_uncompressed
 
 C_BUILDDIR = $(OBJ_DIR)/$(C_SUBDIR)
 GFLIB_BUILDDIR = $(OBJ_DIR)/$(GFLIB_SUBDIR)
@@ -61,6 +62,7 @@ SONG_BUILDDIR = $(OBJ_DIR)/$(SONG_SUBDIR)
 MID_BUILDDIR = $(OBJ_DIR)/$(MID_SUBDIR)
 
 ASFLAGS := -mcpu=arm7tdmi --defsym MODERN=$(MODERN)
+THREADS := $(shell nproc)
 
 ifeq ($(MODERN),0)
 CC1             := tools/agbcc/bin/agbcc$(EXE)
@@ -100,7 +102,7 @@ TOOLDIRS := $(filter-out tools/agbcc tools/binutils,$(wildcard tools/*))
 TOOLBASE = $(TOOLDIRS:tools/%=%)
 TOOLS = $(foreach tool,$(TOOLBASE),tools/$(tool)/$(tool)$(EXE))
 
-MAKEFLAGS += --no-print-directory
+MAKEFLAGS += --print-directory
 
 # Clear the default suffixes
 .SUFFIXES:
@@ -178,6 +180,7 @@ clean-tools:
 mostlyclean: tidy
 	rm -f $(SAMPLE_SUBDIR)/*.bin
 	rm -f $(CRY_SUBDIR)/*.bin
+	rm -f $(CRY_UNCOMPRESSED_SUBDIR)/*.bin
 	rm -f $(MID_SUBDIR)/*.s
 	find . \( -iname '*.1bpp' -o -iname '*.4bpp' -o -iname '*.8bpp' -o -iname '*.gbapal' -o -iname '*.lz' -o -iname '*.latfont' -o -iname '*.hwjpnfont' -o -iname '*.fwjpnfont' \) -exec rm {} +
 	rm -f $(DATA_ASM_SUBDIR)/layouts/layouts.inc $(DATA_ASM_SUBDIR)/layouts/layouts_table.inc
@@ -217,6 +220,7 @@ include songs.mk
 %.lz: % ; $(GFX) $< $@
 %.rl: % ; $(GFX) $< $@
 $(CRY_SUBDIR)/%.bin: $(CRY_SUBDIR)/%.aif ; $(AIF) $< $@ --compress
+$(CRY_UNCOMPRESSED_SUBDIR)/%.bin: $(CRY_UNCOMPRESSED_SUBDIR)/%.aif ; $(AIF) $< $@
 sound/%.bin: sound/%.aif ; $(AIF) $< $@
 
 
@@ -326,7 +330,7 @@ $(ROM): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 	$(FIX) $@ -p --silent
 
-modern: ; @$(MAKE) MODERN=1
+modern: ; @$(MAKE) MODERN=1 -j$(THREADS)
 
 berry_fix/berry_fix.gba: berry_fix
 

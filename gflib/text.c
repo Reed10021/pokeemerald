@@ -62,7 +62,11 @@ const struct GlyphWidthFunc gGlyphWidthFuncs[] =
     { 0x5, GetGlyphWidthFont2 },
     { 0x6, GetGlyphWidthFont6 },
     { 0x7, GetGlyphWidthFont7 },
-    { 0x8, GetGlyphWidthFont8 }
+    { 0x8, GetGlyphWidthFont8 },
+    { 0xA, GetGlyphWidthFont10 },
+    { 0xB, GetGlyphWidthFont11 },
+    { 0xC, GetGlyphWidthFont12 },
+    { 0xD, GetGlyphWidthFont13 }
 };
 
 const struct KeypadIcon gKeypadIcons[] =
@@ -95,7 +99,11 @@ const struct FontInfo gFontInfos[] =
     { Font6Func, 0x8, 0x10, 0x0, 0x8, 0x0, 0x2, 0x1, 0x3 },
     { Font7Func, 0x5, 0x10, 0x0, 0x0, 0x0, 0x2, 0x1, 0x3 },
     { Font8Func, 0x5,  0x8, 0x0, 0x0, 0x0, 0x2, 0x1, 0x3 },
-    { NULL,      0x8,  0x8, 0x0, 0x0, 0x0, 0x1, 0x2, 0xF }
+    { NULL,      0x8,  0x8, 0x0, 0x0, 0x0, 0x1, 0x2, 0xF },
+    { Font10Func, 0x5, 0x10, 0x0, 0x0, 0x0, 0x2, 0x1, 0x3 },
+    { Font11Func, 0x5,  0x8, 0x0, 0x0, 0x0, 0x2, 0x1, 0x3 },
+    { Font12Func, 0x5,  0xE, 0x0, 0x0, 0x0, 0x2, 0x1, 0x3 },
+    { Font13Func, 0x5,  0xE, 0x0, 0x0, 0x0, 0x2, 0x1, 0x3 }
 };
 
 const u8 gMenuCursorDimensions[][2] =
@@ -109,7 +117,11 @@ const u8 gMenuCursorDimensions[][2] =
     { 0x8, 0x10 },
     { 0x8,  0xF },
     { 0x8,  0x8 },
-    { 0x0,  0x0 }
+    { 0x0,  0x0 },
+    { 0x8,  0xF },
+    { 0x8,  0x8 },
+    { 0x8,  0xE },
+    { 0x8,  0xE }
 };
 
 const u16 gFont9JapaneseGlyphs[] = INCBIN_U16("graphics/fonts/font9.hwjpnfont");
@@ -128,6 +140,14 @@ extern const u16 gFont0JapaneseGlyphs[];
 extern const u16 gFont1JapaneseGlyphs[];
 extern const u16 gFont2JapaneseGlyphs[];
 extern const u8 gFont2JapaneseGlyphWidths[];
+extern const u16 gFontNarrowerLatinGlyphs[];
+extern const u8 gFontNarrowerLatinGlyphWidths[];
+extern const u16 gFontSmallNarrowerLatinGlyphs[];
+extern const u8 gFontSmallNarrowerLatinGlyphWidths[];
+extern const u16 gFontShortNarrowLatinGlyphs[];
+extern const u8 gFontShortNarrowLatinGlyphWidths[];
+extern const u16 gFontShortNarrowerLatinGlyphs[];
+extern const u8 gFontShortNarrowerLatinGlyphWidths[];
 
 void SetFontsPointer(const struct FontInfo *fonts)
 {
@@ -684,6 +704,54 @@ u16 Font8Func(struct TextPrinter *textPrinter)
     return RenderText(textPrinter);
 }
 
+u16 Font10Func(struct TextPrinter *textPrinter)
+{
+    struct TextPrinterSubStruct *subStruct = (struct TextPrinterSubStruct *)(&textPrinter->subStructFields);
+
+    if (!subStruct->hasGlyphIdBeenSet)
+    {
+        subStruct->glyphId = 10;
+        subStruct->hasGlyphIdBeenSet = TRUE;
+    }
+    return RenderText(textPrinter);
+}
+
+u16 Font11Func(struct TextPrinter *textPrinter)
+{
+    struct TextPrinterSubStruct *subStruct = (struct TextPrinterSubStruct *)(&textPrinter->subStructFields);
+
+    if (!subStruct->hasGlyphIdBeenSet)
+    {
+        subStruct->glyphId = 11;
+        subStruct->hasGlyphIdBeenSet = TRUE;
+    }
+    return RenderText(textPrinter);
+}
+
+u16 Font12Func(struct TextPrinter *textPrinter)
+{
+    struct TextPrinterSubStruct *subStruct = (struct TextPrinterSubStruct *)(&textPrinter->subStructFields);
+
+    if (!subStruct->hasGlyphIdBeenSet)
+    {
+        subStruct->glyphId = 12;
+        subStruct->hasGlyphIdBeenSet = TRUE;
+    }
+    return RenderText(textPrinter);
+}
+
+u16 Font13Func(struct TextPrinter *textPrinter)
+{
+    struct TextPrinterSubStruct *subStruct = (struct TextPrinterSubStruct *)(&textPrinter->subStructFields);
+
+    if (!subStruct->hasGlyphIdBeenSet)
+    {
+        subStruct->glyphId = 13;
+        subStruct->hasGlyphIdBeenSet = TRUE;
+    }
+    return RenderText(textPrinter);
+}
+
 void TextPrinterInitDownArrowCounters(struct TextPrinter *textPrinter)
 {
     struct TextPrinterSubStruct *subStruct = (struct TextPrinterSubStruct *)(&textPrinter->subStructFields);
@@ -1078,6 +1146,18 @@ u16 RenderText(struct TextPrinter *textPrinter)
             case 8:
                 DecompressGlyphFont8(currChar, textPrinter->japanese);
                 break;
+            case 10:
+                DecompressGlyphFont10(currChar, textPrinter->japanese);
+                break;
+            case 11:
+                DecompressGlyphFont11(currChar, textPrinter->japanese);
+                break;
+            case 12:
+                DecompressGlyphFont12(currChar, textPrinter->japanese);
+                break;
+            case 13:
+                DecompressGlyphFont13(currChar, textPrinter->japanese);
+                break;
             case 6:
                 break;
             }
@@ -1259,7 +1339,7 @@ u32 (*GetFontWidthFunc(u8 glyphId))(u16, bool32)
 {
     u32 i;
 
-    for (i = 0; i < 9; ++i)
+    for (i = 0; i < ARRAY_COUNT(gGlyphWidthFuncs); ++i)
     {
         if (glyphId == gGlyphWidthFuncs[i].fontId)
             return gGlyphWidthFuncs[i].func;
@@ -1752,6 +1832,179 @@ u32 GetGlyphWidthFont8(u16 glyphId, bool32 isJapanese)
         return gFont8LatinGlyphWidths[glyphId];
 }
 
+void DecompressGlyphFont10(u16 glyphId, bool32 isJapanese)
+{
+    const u16 *glyphs;
+
+    if (isJapanese == TRUE)
+    {
+        int eff;
+        glyphs = gFont1JapaneseGlyphs + (0x100 * (glyphId >> 0x4)) + (0x8 * (glyphId & (eff = 0xF)));
+        DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+        DecompressGlyphTile(glyphs + 0x80, gUnknown_03002F90.unk40);
+        gUnknown_03002F90.width = 8;
+        gUnknown_03002F90.height = 15;
+    }
+    else
+    {
+        glyphs = gFontNarrowerLatinGlyphs + (0x20 * glyphId);
+        gUnknown_03002F90.width = gFontNarrowerLatinGlyphWidths[glyphId];
+
+        if (gUnknown_03002F90.width <= 8)
+        {
+            DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+            DecompressGlyphTile(glyphs + 0x10, gUnknown_03002F90.unk40);
+        }
+        else
+        {
+            DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+            DecompressGlyphTile(glyphs + 0x8, gUnknown_03002F90.unk20);
+            DecompressGlyphTile(glyphs + 0x10, gUnknown_03002F90.unk40);
+            DecompressGlyphTile(glyphs + 0x18, gUnknown_03002F90.unk60);
+        }
+
+        gUnknown_03002F90.height = 15;
+    }
+}
+
+u32 GetGlyphWidthFont10(u16 glyphId, bool32 isJapanese)
+{
+    if (isJapanese == TRUE)
+        return 8;
+    else
+        return gFontNarrowerLatinGlyphWidths[glyphId];
+}
+
+void DecompressGlyphFont11(u16 glyphId, bool32 isJapanese)
+{
+    const u16 *glyphs;
+
+    if (isJapanese == TRUE)
+    {
+        glyphs = gFont0JapaneseGlyphs + (0x100 * (glyphId >> 0x4)) + (0x8 * (glyphId & 0xF));
+        DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+        DecompressGlyphTile(glyphs + 0x80, gUnknown_03002F90.unk40);
+        gUnknown_03002F90.width = 8;
+        gUnknown_03002F90.height = 15;
+    }
+    else
+    {
+        glyphs = gFontSmallNarrowerLatinGlyphs + (0x20 * glyphId);
+        gUnknown_03002F90.width = gFontSmallNarrowerLatinGlyphWidths[glyphId];
+
+        if (gUnknown_03002F90.width <= 8)
+        {
+            DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+            DecompressGlyphTile(glyphs + 0x10, gUnknown_03002F90.unk40);
+        }
+        else
+        {
+            DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+            DecompressGlyphTile(glyphs + 0x8, gUnknown_03002F90.unk20);
+            DecompressGlyphTile(glyphs + 0x10, gUnknown_03002F90.unk40);
+            DecompressGlyphTile(glyphs + 0x18, gUnknown_03002F90.unk60);
+        }
+
+        gUnknown_03002F90.height = 15;
+    }
+}
+
+u32 GetGlyphWidthFont11(u16 glyphId, bool32 isJapanese)
+{
+    if (isJapanese == TRUE)
+        return 8;
+    else
+        return gFontSmallNarrowerLatinGlyphWidths[glyphId];
+}
+
+void DecompressGlyphFont12(u16 glyphId, bool32 isJapanese)
+{
+    const u16 *glyphs;
+
+    if (isJapanese == TRUE)
+    {
+        glyphs = gFont2JapaneseGlyphs + (0x100 * (glyphId >> 0x3)) + (0x10 * (glyphId & 0x7));
+        DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+        DecompressGlyphTile(glyphs + 0x8, gUnknown_03002F90.unk20);
+        DecompressGlyphTile(glyphs + 0x80, gUnknown_03002F90.unk40);
+        DecompressGlyphTile(glyphs + 0x88, gUnknown_03002F90.unk60);
+        gUnknown_03002F90.width = gFont2JapaneseGlyphWidths[glyphId];
+        gUnknown_03002F90.height = 14;
+    }
+    else
+    {
+        glyphs = gFontShortNarrowLatinGlyphs + (0x20 * glyphId);
+        gUnknown_03002F90.width = gFontShortNarrowLatinGlyphWidths[glyphId];
+
+        if (gUnknown_03002F90.width <= 8)
+        {
+            DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+            DecompressGlyphTile(glyphs + 0x10, gUnknown_03002F90.unk40);
+        }
+        else
+        {
+            DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+            DecompressGlyphTile(glyphs + 0x8, gUnknown_03002F90.unk20);
+            DecompressGlyphTile(glyphs + 0x10, gUnknown_03002F90.unk40);
+            DecompressGlyphTile(glyphs + 0x18, gUnknown_03002F90.unk60);
+        }
+
+        gUnknown_03002F90.height = 14;
+    }
+}
+
+u32 GetGlyphWidthFont12(u16 glyphId, bool32 isJapanese)
+{
+    if (isJapanese == TRUE)
+        return gFont2JapaneseGlyphWidths[glyphId];
+    else
+        return gFontShortNarrowLatinGlyphWidths[glyphId];
+}
+
+void DecompressGlyphFont13(u16 glyphId, bool32 isJapanese)
+{
+    const u16 *glyphs;
+
+    if (isJapanese == TRUE)
+    {
+        glyphs = gFont2JapaneseGlyphs + (0x100 * (glyphId >> 0x3)) + (0x10 * (glyphId & 0x7));
+        DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+        DecompressGlyphTile(glyphs + 0x8, gUnknown_03002F90.unk20);
+        DecompressGlyphTile(glyphs + 0x80, gUnknown_03002F90.unk40);
+        DecompressGlyphTile(glyphs + 0x88, gUnknown_03002F90.unk60);
+        gUnknown_03002F90.width = gFont2JapaneseGlyphWidths[glyphId];
+        gUnknown_03002F90.height = 14;
+    }
+    else
+    {
+        glyphs = gFontShortNarrowerLatinGlyphs + (0x20 * glyphId);
+        gUnknown_03002F90.width = gFontShortNarrowerLatinGlyphWidths[glyphId];
+
+        if (gUnknown_03002F90.width <= 8)
+        {
+            DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+            DecompressGlyphTile(glyphs + 0x10, gUnknown_03002F90.unk40);
+        }
+        else
+        {
+            DecompressGlyphTile(glyphs, gUnknown_03002F90.unk0);
+            DecompressGlyphTile(glyphs + 0x8, gUnknown_03002F90.unk20);
+            DecompressGlyphTile(glyphs + 0x10, gUnknown_03002F90.unk40);
+            DecompressGlyphTile(glyphs + 0x18, gUnknown_03002F90.unk60);
+        }
+
+        gUnknown_03002F90.height = 14;
+    }
+}
+
+u32 GetGlyphWidthFont13(u16 glyphId, bool32 isJapanese)
+{
+    if (isJapanese == TRUE)
+        return gFont2JapaneseGlyphWidths[glyphId];
+    else
+        return gFontShortNarrowerLatinGlyphWidths[glyphId];
+}
+
 void DecompressGlyphFont2(u16 glyphId, bool32 isJapanese)
 {
     const u16* glyphs;
@@ -1848,4 +2101,72 @@ void DecompressGlyphFont9(u16 glyphId)
     DecompressGlyphTile(glyphs + 0x80, gUnknown_03002F90.unk40);
     gUnknown_03002F90.width = 8;
     gUnknown_03002F90.height = 12;
+}
+
+static const s8 sNarrowerFontIds[] =
+{
+    [FONT_SMALL] = FONT_SMALL_NARROW,
+    [FONT_NORMAL] = FONT_NARROW,
+    [FONT_SHORT] = FONT_SHORT_NARROW,
+    [FONT_SHORT_COPY_1] = FONT_SHORT_NARROW,
+    [FONT_SHORT_COPY_2] = FONT_SHORT_NARROW,
+    [FONT_SHORT_COPY_3] = FONT_SHORT_NARROW,
+    [FONT_BRAILLE] = -1,
+    [FONT_NARROW] = FONT_NARROWER,
+    [FONT_SMALL_NARROW] = FONT_SMALL_NARROWER,
+    [FONT_BOLD] = -1,
+    [FONT_NARROWER] = -1,
+    [FONT_SMALL_NARROWER] = -1,
+    [FONT_SHORT_NARROW] = FONT_SHORT_NARROWER,
+    [FONT_SHORT_NARROWER] = -1,
+};
+
+// If the narrowest font ID doesn't fit the text, we still return that
+// ID because clipping is better than crashing.
+u32 GetFontIdToFit(const u8* string, u32 fontId, u32 letterSpacing, u32 widthPx)
+{
+    for (;;)
+    {
+        s32 narrowerFontId = sNarrowerFontIds[fontId];
+        if (narrowerFontId == -1)
+            return fontId;
+        if (GetStringWidth(fontId, string, letterSpacing) <= widthPx)
+            return fontId;
+        fontId = narrowerFontId;
+    }
+}
+
+u8 *PrependFontIdToFit(u8 *start, u8 *end, u32 fontId, u32 width)
+{
+    u32 fitFontId = GetFontIdToFit(start, fontId, 0, width);
+
+    if (fitFontId == fontId)
+        return end;
+
+    memmove(&start[3], &start[0], end - start);
+    start[0] = EXT_CTRL_CODE_BEGIN;
+    start[1] = EXT_CTRL_CODE_FONT;
+    start[2] = fitFontId;
+    end[3] = EOS;
+    return end + 3;
+}
+
+u8 *WrapFontIdToFit(u8 *start, u8 *end, u32 fontId, u32 width)
+{
+    u32 fitFontId = GetFontIdToFit(start, fontId, 0, width);
+
+    if (fitFontId != fontId)
+    {
+        memmove(&start[3], &start[0], end - start);
+        start[0] = EXT_CTRL_CODE_BEGIN;
+        start[1] = EXT_CTRL_CODE_FONT;
+        start[2] = fitFontId;
+        end[3] = EXT_CTRL_CODE_BEGIN;
+        end[4] = EXT_CTRL_CODE_FONT;
+        end[5] = fontId;
+        end[6] = EOS;
+        return end + 6;
+    }
+
+    return end;
 }

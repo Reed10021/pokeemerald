@@ -4107,17 +4107,19 @@ static void LoadCursorMonGfx(u16 species, u32 pid)
 
 static void PrintCursorMonInfo(void)
 {
+    u32 itemNameWidth = GetWindowAttribute(0, WINDOW_WIDTH) * 8 - 6;
+
     FillWindowPixelBuffer(0, PIXEL_FILL(1));
     if (sPSSData->boxOption != BOX_OPTION_MOVE_ITEMS)
     {
         AddTextPrinterParameterized(0, 1, sPSSData->cursorMonNickText, 6, 0, TEXT_SPEED_FF, NULL);
         AddTextPrinterParameterized(0, 2, sPSSData->cursorMonSpeciesName, 6, 15, TEXT_SPEED_FF, NULL);
         AddTextPrinterParameterized(0, 2, sPSSData->cursorMonGenderLvlText, 10, 29, TEXT_SPEED_FF, NULL);
-        AddTextPrinterParameterized(0, 0, sPSSData->cursorMonItemName, 6, 43, TEXT_SPEED_FF, NULL);
+        AddTextPrinterParameterized(0, GetFontIdToFit(sPSSData->cursorMonItemName, FONT_SMALL, 0, itemNameWidth), sPSSData->cursorMonItemName, 6, 43, TEXT_SPEED_FF, NULL);
     }
     else
     {
-        AddTextPrinterParameterized(0, 0, sPSSData->cursorMonItemName, 6, 0, TEXT_SPEED_FF, NULL);
+        AddTextPrinterParameterized(0, GetFontIdToFit(sPSSData->cursorMonItemName, FONT_SMALL, 0, itemNameWidth), sPSSData->cursorMonItemName, 6, 0, TEXT_SPEED_FF, NULL);
         AddTextPrinterParameterized(0, 1, sPSSData->cursorMonNickText, 6, 13, TEXT_SPEED_FF, NULL);
         AddTextPrinterParameterized(0, 2, sPSSData->cursorMonSpeciesName, 6, 28, TEXT_SPEED_FF, NULL);
         AddTextPrinterParameterized(0, 2, sPSSData->cursorMonGenderLvlText, 10, 42, TEXT_SPEED_FF, NULL);

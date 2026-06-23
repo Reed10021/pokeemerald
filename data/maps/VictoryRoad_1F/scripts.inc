@@ -86,7 +86,7 @@ VictoryRoad_1F_EventScript_EntranceWally:: @ 8235E2C
 
 @ This Wally appears and remains at the exit after the Hall of Fame is entered 
 VictoryRoad_1F_EventScript_ExitWally:: @ 8235E35
-	trainerbattle_single TRAINER_WALLY_VR_2, VictoryRoad_1F_Text_WallyIntro, VictoryRoad_1F_Text_WallyDefeat
+	trainerbattle_single TRAINER_WALLY_VR_2, VictoryRoad_1F_Text_WallyIntro, VictoryRoad_1F_Text_WallyDefeat, VictoryRoad_1F_EventScript_WallyRollGift
 	specialvar VAR_RESULT, ShouldTryRematchBattle
 	compare VAR_RESULT, TRUE
 	goto_if_eq VictoryRoad_1F_EventScript_RematchWally
@@ -94,8 +94,33 @@ VictoryRoad_1F_EventScript_ExitWally:: @ 8235E35
 	end
 
 VictoryRoad_1F_EventScript_RematchWally:: @ 8235E5C
-	trainerbattle_rematch TRAINER_WALLY_VR_2, VictoryRoad_1F_Text_WallyIntro, VictoryRoad_1F_Text_WallyDefeat
+	trainerbattle_rematch TRAINER_WALLY_VR_2, VictoryRoad_1F_Text_WallyRebattleIntro, VictoryRoad_1F_Text_WallyDefeat, VictoryRoad_1F_EventScript_WallyRollGift
 	msgbox VictoryRoad_1F_Text_WallyPostBattle, MSGBOX_AUTOCLOSE
+	end
+
+@ Wally Rematches have a 10% chance to reward the player with an ability patch, 5% chance to reward a gold bottle cap
+VictoryRoad_1F_EventScript_WallyRollGift::
+	msgbox VictoryRoad_1F_Text_WallyPostBattle, MSGBOX_DEFAULT
+	random 100
+	compare VAR_RESULT, 10
+	goto_if_lt VictoryRoad_1F_EventScript_WallyGiveAbilityPatch
+	compare VAR_RESULT, 15
+	goto_if_lt VictoryRoad_1F_EventScript_WallyGiveGoldBottleCap
+	goto VictoryRoad_1F_EventScript_EndWallyRollGift
+VictoryRoad_1F_EventScript_WallyGiveAbilityPatch:
+	msgbox VictoryRoad_1F_Text_WallyGift, MSGBOX_DEFAULT
+	giveitem ITEM_ABILITY_PATCH
+	compare VAR_RESULT, FALSE
+	goto_if_eq Common_EventScript_ShowBagIsFull
+	goto VictoryRoad_1F_EventScript_EndWallyRollGift
+VictoryRoad_1F_EventScript_WallyGiveGoldBottleCap:
+	msgbox VictoryRoad_1F_Text_WallyGift, MSGBOX_DEFAULT
+	giveitem ITEM_GOLD_BOTTLE_CAP
+	compare VAR_RESULT, FALSE
+	goto_if_eq Common_EventScript_ShowBagIsFull
+VictoryRoad_1F_EventScript_EndWallyRollGift::
+	closemessage
+	release
 	end
 
 VictoryRoad_1F_EventScript_Edgar:: @ 8235E73
@@ -150,9 +175,22 @@ VictoryRoad_1F_Text_WallyIntro: @ 8236073
 	.string "time! I wanted to show you, {PLAYER}!\p"
 	.string "Okay… Here I come!$"
 
+VictoryRoad_1F_Text_WallyRebattleIntro:
+	.string "WALLY: {PLAYER}!\p"
+	.string "How are you doing? I've been training\n"
+	.string "nonstop, so I was taking a short rest.\p"
+	.string "Since I managed to run into you,\n"
+	.string "{PLAYER}, it seems like this will be a\l"
+	.string "perfect chance to see how much I've\l"
+	.string "improved!$"
+
 VictoryRoad_1F_Text_WallyDefeat: @ 82360DA
 	.string "Wow!\n"
 	.string "{PLAYER}, you are strong, after all!$"
+
+VictoryRoad_1F_Text_WallyGift:
+	.string "Haha… Here, {PLAYER}.\n"
+	.string "Take this with my thanks.$"
 
 VictoryRoad_1F_Text_WallyPostBattle: @ 82360FE
 	.string "WALLY: I couldn't beat you this time,\n"

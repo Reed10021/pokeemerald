@@ -7,7 +7,9 @@
 #include "trainer_hill.h"
 #include "party_menu.h"
 #include "event_data.h"
+#include "battle_interface.h"
 #include "constants/abilities.h"
+#include "constants/items.h"
 #include "random.h"
 #include "battle_scripts.h"
 
@@ -15,7 +17,7 @@ void FreeBattleResources(void);
 
 void AllocateBattleResources(void)
 {
-    gBattleResources = gBattleResources; // something dumb needed to match
+    //gBattleResources = gBattleResources; // something dumb needed to match
 
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
         InitTrainerHillBattleStruct();
@@ -30,6 +32,18 @@ void AllocateBattleResources(void)
     gBattleStruct = AllocZeroed(sizeof(*gBattleStruct));
     if (gBattleStruct == NULL)
         goto fail;
+    gBattleStruct->moveInfoSpriteId = MAX_SPRITES;
+    gBattleStruct->lastUsedBallSpriteIds[0] = MAX_SPRITES;
+    gBattleStruct->lastUsedBallSpriteIds[1] = MAX_SPRITES;
+    gBattleStruct->lastUsedBallItem = ITEM_NONE;
+    gCanShowLastUsedBallMenu = !(gBattleTypeFlags & (BATTLE_TYPE_TRAINER
+                                                     | BATTLE_TYPE_LINK
+                                                     | BATTLE_TYPE_SAFARI
+                                                     | BATTLE_TYPE_WALLY_TUTORIAL
+                                                     | BATTLE_TYPE_EREADER_TRAINER
+                                                     | BATTLE_TYPE_x2000000
+                                                     | BATTLE_TYPE_FRONTIER))
+                              && !IsPlayerPartyAndPokemonStorageFull();
 
     gBattleResources = AllocZeroed(sizeof(*gBattleResources));
     if (gBattleResources == NULL)
@@ -99,7 +113,9 @@ void FreeBattleResources(void)
     if (gBattleTypeFlags & BATTLE_TYPE_TRAINER_HILL)
         FreeTrainerHillBattleStruct();
 
+    DestroyBattleMenuExtraSprites();
     FREE_AND_SET_NULL(gBattleStruct);
+    gCanShowLastUsedBallMenu = FALSE;
 
     if (gBattleResources != NULL)
     {

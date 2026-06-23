@@ -30,6 +30,10 @@
 #include "constants/songs.h"
 #include "constants/species.h"
 
+#if NATIONAL_DEX_COUNT > NATIONAL_DEX_SAVE_CAPACITY
+#error "National Dex exceeds save-backed Pokedex flag capacity"
+#endif
+
 enum
 {
     PAGE_MAIN,
@@ -300,6 +304,8 @@ static void EraseSelectorArrow(u32);
 static void PrintSelectorArrow(u32);
 static void PrintSearchParameterTitle(u32, const u8*);
 static void ClearSearchParameterBoxText(void);
+static void ClearPokedexFlagBanks(void);
+static u8 *GetPokedexFlagByte(u8, u8 *, u8 *);
 
 // const rom data
 #include "data/pokemon/pokedex_orders.h"
@@ -1500,8 +1506,6 @@ static const struct WindowTemplate sSearchMenu_WindowTemplate[] =
 
 void ResetPokedex(void)
 {
-    u16 i;
-
     sLastSelectedPokemon = 0;
     sPokeBallRotation = POKEBALL_ROTATION_TOP;
     gUnusedPokedexU8 = 0;
@@ -1513,13 +1517,19 @@ void ResetPokedex(void)
     gSaveBlock2Ptr->pokedex.spindaPersonality = 0;
     gSaveBlock2Ptr->pokedex.unknown3 = 0;
     DisableNationalPokedex();
-    for (i = 0; i < DEX_FLAGS_NO; i++)
-    {
-        gSaveBlock2Ptr->pokedex.owned[i] = 0;
-        gSaveBlock2Ptr->pokedex.seen[i] = 0;
-        gSaveBlock1Ptr->seen1[i] = 0;
-        gSaveBlock1Ptr->seen2[i] = 0;
-    }
+    ClearPokedexFlagBanks();
+}
+
+static void ClearPokedexFlagBanks(void)
+{
+    memset(gSaveBlock2Ptr->pokedex.owned, 0, sizeof(gSaveBlock2Ptr->pokedex.owned));
+    memset(gSaveBlock2Ptr->pokedex.seen, 0, sizeof(gSaveBlock2Ptr->pokedex.seen));
+    memset(gSaveBlock2Ptr->pokedexOwnedOverflow, 0, sizeof(gSaveBlock2Ptr->pokedexOwnedOverflow));
+    memset(gSaveBlock2Ptr->pokedexSeenOverflow, 0, sizeof(gSaveBlock2Ptr->pokedexSeenOverflow));
+    memset(gSaveBlock1Ptr->seen1, 0, sizeof(gSaveBlock1Ptr->seen1));
+    memset(gSaveBlock1Ptr->seen2, 0, sizeof(gSaveBlock1Ptr->seen2));
+    memset(gSaveBlock1Ptr->pokedexSeen1Overflow, 0, sizeof(gSaveBlock1Ptr->pokedexSeen1Overflow));
+    memset(gSaveBlock1Ptr->pokedexSeen2Overflow, 0, sizeof(gSaveBlock1Ptr->pokedexSeen2Overflow));
 }
 
 void ResetPokedexScrollPositions(void)
@@ -3038,7 +3048,7 @@ static void SpriteCB_PokedexListMonSprite(struct Sprite *sprite)
         u32 var;
 
         sprite->pos2.y = gSineTable[(u8)sprite->data[5]] * 76 / 256;
-        var = 0x10000 / gSineTable[sprite->data[5] + 64];
+        var = SAFE_DIV(0x10000, gSineTable[sprite->data[5] + 64]);
         if (var > 0xFFFF)
             var = 0xFFFF;
         SetOamMatrix(sprite->data[1] + 1, 0x100, 0, 0, var);
@@ -4168,8 +4178,8 @@ static void PrintMonHeight(u16 height, u8 left, u8 top)
 static void PrintMonWeight(u16 weight, u8 left, u8 top)
 {
     u8 buffer[16];
-    u8 i;
-    bool8 output;
+    u32 i;
+    bool32 output;
     u32 lbs = (weight * 100000) / 4536;
 
     if (lbs % 10u >= 5)
@@ -4253,63 +4263,84 @@ s8 GetSetPokedexFlag(u16 nationalDexNo, u8 caseID)
     u8 index;
     u8 bit;
     u8 mask;
+    u8 *owned;
+    u8 *seen;
+    u8 *seen1;
+    u8 *seen2;
     s8 retVal;
+
+    if (nationalDexNo == 0)
+        return 0;
 
     nationalDexNo--;
     index = nationalDexNo / 8;
+    if (index >= DEX_FLAGS_COUNT)
+        return 0;
     bit = nationalDexNo % 8;
     mask = 1 << bit;
+    owned = GetPokedexFlagByte(index, gSaveBlock2Ptr->pokedex.owned, gSaveBlock2Ptr->pokedexOwnedOverflow);
+    seen = GetPokedexFlagByte(index, gSaveBlock2Ptr->pokedex.seen, gSaveBlock2Ptr->pokedexSeenOverflow);
+    seen1 = GetPokedexFlagByte(index, gSaveBlock1Ptr->seen1, gSaveBlock1Ptr->pokedexSeen1Overflow);
+    seen2 = GetPokedexFlagByte(index, gSaveBlock1Ptr->seen2, gSaveBlock1Ptr->pokedexSeen2Overflow);
     retVal = 0;
     switch (caseID)
     {
     case FLAG_GET_SEEN:
-        if (gSaveBlock2Ptr->pokedex.seen[index] & mask)
+        if (*seen & mask)
         {
-            if ((gSaveBlock2Ptr->pokedex.seen[index] & mask) == (gSaveBlock1Ptr->seen1[index] & mask)
-             && (gSaveBlock2Ptr->pokedex.seen[index] & mask) == (gSaveBlock1Ptr->seen2[index] & mask))
+            if ((*seen & mask) == (*seen1 & mask)
+             && (*seen & mask) == (*seen2 & mask))
                 retVal = 1;
             else
             {
-                gSaveBlock2Ptr->pokedex.seen[index] &= ~mask;
-                gSaveBlock1Ptr->seen1[index] &= ~mask;
-                gSaveBlock1Ptr->seen2[index] &= ~mask;
+                *seen &= ~mask;
+                *seen1 &= ~mask;
+                *seen2 &= ~mask;
                 retVal = 0;
             }
         }
         break;
     case FLAG_GET_CAUGHT:
-        if (gSaveBlock2Ptr->pokedex.owned[index] & mask)
+        if (*owned & mask)
         {
-            if ((gSaveBlock2Ptr->pokedex.owned[index] & mask) == (gSaveBlock2Ptr->pokedex.seen[index] & mask)
-             && (gSaveBlock2Ptr->pokedex.owned[index] & mask) == (gSaveBlock1Ptr->seen1[index] & mask)
-             && (gSaveBlock2Ptr->pokedex.owned[index] & mask) == (gSaveBlock1Ptr->seen2[index] & mask))
+            if ((*owned & mask) == (*seen & mask)
+             && (*owned & mask) == (*seen1 & mask)
+             && (*owned & mask) == (*seen2 & mask))
                 retVal = 1;
             else
             {
-                gSaveBlock2Ptr->pokedex.owned[index] &= ~mask;
-                gSaveBlock2Ptr->pokedex.seen[index] &= ~mask;
-                gSaveBlock1Ptr->seen1[index] &= ~mask;
-                gSaveBlock1Ptr->seen2[index] &= ~mask;
+                *owned &= ~mask;
+                *seen &= ~mask;
+                *seen1 &= ~mask;
+                *seen2 &= ~mask;
                 retVal = 0;
             }
         }
         break;
     case FLAG_SET_SEEN:
-        gSaveBlock2Ptr->pokedex.seen[index] |= mask;
-        gSaveBlock1Ptr->seen1[index] |= mask;
-        gSaveBlock1Ptr->seen2[index] |= mask;
+        *seen |= mask;
+        *seen1 |= mask;
+        *seen2 |= mask;
         break;
     case FLAG_SET_CAUGHT:
-        gSaveBlock2Ptr->pokedex.owned[index] |= mask;
+        *owned |= mask;
         break;
     }
     return retVal;
 }
 
+static u8 *GetPokedexFlagByte(u8 index, u8 *baseFlags, u8 *overflowFlags)
+{
+    if (index < DEX_FLAGS_NO)
+        return &baseFlags[index];
+    else
+        return &overflowFlags[index - DEX_FLAGS_NO];
+}
+
 u16 GetNationalPokedexCount(u8 caseID)
 {
-    u16 count = 0;
-    u16 i;
+    u32 count = 0;
+    u32 i;
 
     for (i = 0; i < NATIONAL_DEX_COUNT; i++)
     {
@@ -4330,8 +4361,8 @@ u16 GetNationalPokedexCount(u8 caseID)
 
 u16 GetHoennPokedexCount(u8 caseID)
 {
-    u16 count = 0;
-    u16 i;
+    u32 count = 0;
+    u32 i;
 
     for (i = 0; i < HOENN_DEX_COUNT; i++)
     {
@@ -4352,8 +4383,8 @@ u16 GetHoennPokedexCount(u8 caseID)
 
 u16 GetKantoPokedexCount(u8 caseID)
 {
-    u16 count = 0;
-    u16 i;
+    u32 count = 0;
+    u32 i;
 
     for (i = 0; i < KANTO_DEX_COUNT; i++)
     {
@@ -4374,7 +4405,7 @@ u16 GetKantoPokedexCount(u8 caseID)
 
 bool16 HasAllHoennMons(void)
 {
-    u16 i;
+    u32 i;
 
     // -2 excludes Jirachi and Deoxys
     for (i = 0; i < HOENN_DEX_COUNT - 2; i++)
@@ -4387,7 +4418,7 @@ bool16 HasAllHoennMons(void)
 
 bool8 HasAllKantoMons(void)
 {
-    u16 i;
+    u32 i;
 
     // -1 excludes Mew
     for (i = 0; i < KANTO_DEX_COUNT - 1; i++)
@@ -4400,26 +4431,39 @@ bool8 HasAllKantoMons(void)
 
 bool16 HasAllMons(void)
 {
-    u16 i;
+    u32 i;
+    u32 nationalDexNum;
 
-    // -1 excludes Mew
-    for (i = 0; i < KANTO_DEX_COUNT - 1; i++)
+    // excludes Mew
+    for (i = 0; i < KANTO_DEX_COUNT; i++)
     {
+        nationalDexNum = i + 1;
+        if (nationalDexNum == NATIONAL_DEX_MEW)
+            continue;
+
         if (!GetSetPokedexFlag(i + 1, FLAG_GET_CAUGHT))
             return FALSE;
     }
 
-    // -3 excludes Lugia, Ho-Oh, and Celebi
-    for (i = KANTO_DEX_COUNT; i < JOHTO_DEX_COUNT - 3; i++)
+    // excludes Lugia, Ho-Oh, and Celebi
+    for (i = KANTO_DEX_COUNT; i < JOHTO_DEX_COUNT; i++)
     {
+        nationalDexNum = i + 1;
+        if (nationalDexNum == NATIONAL_DEX_LUGIA || nationalDexNum == NATIONAL_DEX_HO_OH || nationalDexNum == NATIONAL_DEX_CELEBI)
+            continue;
+
         if (!GetSetPokedexFlag(i + 1, FLAG_GET_CAUGHT))
             return FALSE;
     }
 
-    // -2 excludes Jirachi and Deoxys
-    for (i = JOHTO_DEX_COUNT; i < NATIONAL_DEX_COUNT - 2; i++)
+    // excludes Jirachi and Deoxys
+    for (i = JOHTO_DEX_COUNT; i < NATIONAL_DEX_COUNT; i++)
     {
-        if (!GetSetPokedexFlag(i + 1, FLAG_GET_CAUGHT))
+        nationalDexNum = i + 1;
+        if (nationalDexNum == NATIONAL_DEX_JIRACHI || nationalDexNum == NATIONAL_DEX_DEOXYS)
+            continue;
+
+        if (!GetSetPokedexFlag(nationalDexNum, FLAG_GET_CAUGHT))
             return FALSE;
     }
     return TRUE;

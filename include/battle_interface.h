@@ -60,6 +60,7 @@ enum
     HEALTHBOX_SAFARI_BALLS_TEXT
 };
 
+u8 GetBattlerCoordsIndex(u8 battler);
 u8 CreateBattlerHealthboxSprites(u8 battler);
 u8 CreateSafariPlayerHealthboxSprites(void);
 void SetBattleBarStruct(u8 battler, u8 healthboxSpriteId, s32 maxVal, s32 currVal, s32 receivedValue);
@@ -77,5 +78,14 @@ void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elem
 s32 MoveBattleBar(u8 battler, u8 healthboxSpriteId, u8 whichBar, u8 arg3);
 u8 GetScaledHPFraction(s16 hp, s16 maxhp, u8 scale);
 u8 GetHPBarLevel(s16 hp, s16 maxhp);
+bool32 CanThrowLastUsedBall(void);
+void TryAddLastUsedBallItemSprites(void);
+void TryHideLastUsedBall(void);
+void TryRestoreLastUsedBall(void);
+void TryToAddMoveInfoWindow(void);
+void TryToHideMoveInfoWindow(void);
+void DestroyBattleMenuExtraSprites(void);
+void SwapBallToDisplay(bool32 sameBall);
+void ArrowsChangeColorLastBallCycle(bool32 showArrows);
 
 #endif // GUARD_BATTLE_INTERFACE_H

@@ -195,6 +195,29 @@ const struct SpriteTemplate gTailGlowOrbSpriteTemplate =
     .callback = AnimTailGlowOrb,
 };
 
+// U-Turn
+const struct SpriteTemplate gUTurnBallSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_SMALL_BUBBLES,
+    .paletteTag = ANIM_TAG_RAZOR_LEAF,
+    .oam = &gOamData_AffineOff_ObjNormal_16x16,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gAffineAnims_ShadowBall,
+    .callback = AnimShadowBall,
+};
+
+const struct SpriteTemplate gUTurnBallBackSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_SMALL_BUBBLES,
+    .paletteTag = ANIM_TAG_RAZOR_LEAF,
+    .oam = &gOamData_AffineOff_ObjNormal_16x16,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gAffineAnims_ShadowBall,
+    .callback = AnimAbsorptionOrb,
+};
+
 static void AnimMegahornHorn(struct Sprite *sprite)
 {
     if (IsContest())
@@ -326,6 +349,15 @@ static void AnimSpiderWeb(struct Sprite *sprite)
     SetGpuReg(REG_OFFSET_BLDCNT, BLDCNT_TGT2_ALL | BLDCNT_EFFECT_BLEND);
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(16, 0));
 
+    if (gBattleAnimArgs[2])
+        SetAverageBattlerPositions(gBattleAnimTarget, FALSE, &sprite->pos1.x, &sprite->pos1.y);
+
+    if (!IsOnPlayerSide(gBattleAnimAttacker))
+        sprite->pos1.x -= gBattleAnimArgs[0];
+    else
+        sprite->pos1.x += gBattleAnimArgs[0];
+
+    sprite->pos1.y += gBattleAnimArgs[1];
     sprite->data[0] = 16;
     sprite->callback = AnimSpiderWeb_Step;
 }

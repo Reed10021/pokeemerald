@@ -109,11 +109,10 @@ const u32 *const gItemIconTable[][2] =
     [ITEM_THUNDER_STONE] = {gItemIcon_ThunderStone, gItemIconPalette_ThunderStone},
     [ITEM_WATER_STONE] = {gItemIcon_WaterStone, gItemIconPalette_WaterStone},
     [ITEM_LEAF_STONE] = {gItemIcon_LeafStone, gItemIconPalette_LeafStone},
-    // ????????
-    [ITEM_063] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_064] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_065] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_066] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
+    [ITEM_ICE_STONE] = {gItemIcon_IceStone, gItemIconPalette_IceStone},
+    [ITEM_SHINY_STONE] = {gItemIcon_ShinyStone, gItemIconPalette_ShinyStone},
+    [ITEM_DAWN_STONE] = {gItemIcon_DawnStone, gItemIconPalette_DawnStone},
+    [ITEM_DUSK_STONE] = {gItemIcon_DuskStone, gItemIconPalette_DuskStone},
     // Valuables
     [ITEM_TINY_MUSHROOM] = {gItemIcon_TinyMushroom, gItemIconPalette_Mushroom},
     [ITEM_BIG_MUSHROOM] = {gItemIcon_BigMushroom, gItemIconPalette_Mushroom},
@@ -250,12 +249,12 @@ const u32 *const gItemIconTable[][2] =
     [ITEM_CHOICE_SCARF] = {gItemIcon_ChoiceScarf, gItemIconPalette_ChoiceScarf},
     [ITEM_MUSCLE_BAND] = {gItemIcon_MuscleBand, gItemIconPalette_MuscleBand},
     [ITEM_WISE_GLASSES] = {gItemIcon_WiseGlasses, gItemIconPalette_WiseGlasses},
+    [ITEM_EXPERT_BELT] = {gItemIcon_ExpertBelt, gItemIconPalette_ExpertBelt},
+    [ITEM_FLAME_ORB] = {gItemIcon_FlameOrb, gItemIconPalette_FlameOrb},
+    [ITEM_TOXIC_ORB] = {gItemIcon_ToxicOrb, gItemIconPalette_ToxicOrb},
+    [ITEM_LIFE_ORB] = {gItemIcon_LifeOrb, gItemIconPalette_LifeOrb},
+    [ITEM_EVIOLITE] = {gItemIcon_Eviolite, gItemIconPalette_Eviolite},
     // ????????
-    [ITEM_0E9] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_0EA] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_0EB] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_0EC] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
-    [ITEM_0ED] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_0EE] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_0EF] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
     [ITEM_0F0] = {gItemIcon_QuestionMark, gItemIconPalette_QuestionMark},
@@ -424,6 +423,9 @@ const u32 *const gItemIconTable[][2] =
     [ITEM_SERIOUS_MINT] = {gItemIcon_Mint, gItemIconPalette_YellowMint},
     [ITEM_TIMID_MINT] = {gItemIcon_Mint, gItemIconPalette_GreenMint},
     [ITEM_ABILITY_CAPSULE] = {gItemIcon_AbilityCapsule, gItemIconPalette_AbilityCapsule},
+    [ITEM_ABILITY_PATCH] = {gItemIcon_AbilityPatch, gItemIconPalette_AbilityPatch},
+    [ITEM_BOTTLE_CAP] = {gItemIcon_BottleCap, gItemIconPalette_BottleCap},
+    [ITEM_GOLD_BOTTLE_CAP] = {gItemIcon_BottleCap, gItemIconPalette_GoldBottleCap},
     // Return to field arrow
     [ITEM_FIELD_ARROW] = {gItemIcon_ReturnToFieldArrow, gItemIconPalette_ReturnToFieldArrow},
 };

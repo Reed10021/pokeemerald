@@ -583,6 +583,32 @@
       "trainer_sight_or_berry_tree_id": "0",
       "script": "Route123_EventScript_ItemRevivalHerb",
       "flag": "FLAG_ITEM_ROUTE_123_REVIVAL_HERB"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
+      "x": 119,
+      "y": 9,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_range_x": 1,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "Route123_EventScript_ItemDuskStone",
+      "flag": "FLAG_ITEM_ROUTE_123_DUSK_STONE"
+    },
+    {
+      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
+      "x": 120,
+      "y": 9,
+      "elevation": 3,
+      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
+      "movement_range_x": 1,
+      "movement_range_y": 1,
+      "trainer_type": "TRAINER_TYPE_NONE",
+      "trainer_sight_or_berry_tree_id": "0",
+      "script": "Route123_EventScript_ItemShinyStone",
+      "flag": "FLAG_ITEM_ROUTE_123_SHINY_STONE"
     }
   ],
   "warp_events": [
@@ -594,6 +620,7 @@
       "dest_warp_id": 0
     }
   ],
+  "coord_events": [],
   "bg_events": [
     {
       "type": "sign",
@@ -627,7 +654,7 @@
     },
     {
       "type": "hidden_item",
-      "x": 75,
+      "x": 79,
       "y": 1,
       "elevation": 3,
       "item": "ITEM_SUPER_REPEL",
@@ -679,6 +706,22 @@
       "elevation": 3,
       "item": "ITEM_RARE_CANDY",
       "flag": "FLAG_HIDDEN_ITEM_ROUTE_123_RARE_CANDY"
+    },
+    {
+      "type": "hidden_item",
+      "x": 24,
+      "y": 18,
+      "elevation": 3,
+      "item": "ITEM_EXPERT_BELT",
+      "flag": "FLAG_HIDDEN_ITEM_ROUTE_123_EXPERT_BELT"
+    },
+    {
+      "type": "hidden_item",
+      "x": 75,
+      "y": 1,
+      "elevation": 3,
+      "item": "ITEM_EVIOLITE",
+      "flag": "FLAG_HIDDEN_ITEM_ROUTE_123_EVIOLITE"
     }
   ]
 }

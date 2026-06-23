@@ -1,7 +1,7 @@
 #ifndef GUARD_CONTEST_EFFECT_H
 #define GUARD_CONTEST_EFFECT_H
 
-#define MAX_COMBO_MOVES 5
+#define MAX_COMBO_MOVES 15
 
 struct ContestMove
 {

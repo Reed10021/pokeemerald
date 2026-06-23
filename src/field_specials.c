@@ -1993,17 +1993,67 @@ static void Task_MoveElevatorWindowLights(u8 taskId)
     data[1]++;
 }
 
+static const u8 sText_IVRaterListSeparator[] = _(", ");
+static const u8 *const sIVRaterStatNames[NUM_STATS] =
+{
+    [STAT_HP] = gText_HP4,
+    [STAT_ATK] = gText_Attack3,
+    [STAT_DEF] = gText_Defense3,
+    [STAT_SPEED] = gText_Speed2,
+    [STAT_SPATK] = gText_SpAtk4,
+    [STAT_SPDEF] = gText_SpDef4,
+};
+
+static void BufferIVRaterHyperTrainingStats(u16 flags)
+{
+    u8 statId;
+    u8 lineLength = 0;
+    bool8 first = TRUE;
+    u8 *txtPtr = gStringVar1;
+
+    for (statId = 0; statId < NUM_STATS; statId++)
+    {
+        if (flags & (1 << statId))
+        {
+            const u8 *statName = sIVRaterStatNames[statId];
+            u8 statNameLength = StringLength(statName);
+            u8 separatorLength = StringLength(sText_IVRaterListSeparator);
+
+            if (!first)
+            {
+                if (lineLength + separatorLength + statNameLength > 26)
+                {
+                    *txtPtr++ = CHAR_PROMPT_SCROLL;
+                    lineLength = 0;
+                }
+                else
+                {
+                    txtPtr = StringCopy(txtPtr, sText_IVRaterListSeparator);
+                    lineLength += separatorLength;
+                }
+            }
+
+            txtPtr = StringCopy(txtPtr, statName);
+            lineLength += statNameLength;
+            first = FALSE;
+        }
+    }
+
+    *txtPtr = EOS;
+}
+
 void BufferVarsForIVRater(void)
 {
     u8 i;
     u32 ivStorage[NUM_STATS];
+    struct Pokemon *mon = &gPlayerParty[gSpecialVar_0x8004];
 
-    ivStorage[STAT_HP] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_HP_IV);
-    ivStorage[STAT_ATK] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_ATK_IV);
-    ivStorage[STAT_DEF] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_DEF_IV);
-    ivStorage[STAT_SPEED] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPEED_IV);
-    ivStorage[STAT_SPATK] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPATK_IV);
-    ivStorage[STAT_SPDEF] = GetMonData(&gPlayerParty[gSpecialVar_0x8004], MON_DATA_SPDEF_IV);
+    ivStorage[STAT_HP] = GetMonData(mon, MON_DATA_HP_IV);
+    ivStorage[STAT_ATK] = GetMonData(mon, MON_DATA_ATK_IV);
+    ivStorage[STAT_DEF] = GetMonData(mon, MON_DATA_DEF_IV);
+    ivStorage[STAT_SPEED] = GetMonData(mon, MON_DATA_SPEED_IV);
+    ivStorage[STAT_SPATK] = GetMonData(mon, MON_DATA_SPATK_IV);
+    ivStorage[STAT_SPDEF] = GetMonData(mon, MON_DATA_SPDEF_IV);
 
     gSpecialVar_0x8005 = 0;
 
@@ -2032,6 +2082,9 @@ void BufferVarsForIVRater(void)
             }
         }
     }
+
+    gSpecialVar_0x8008 = GetMonHyperTrainingFlags(mon);
+    BufferIVRaterHyperTrainingStats(gSpecialVar_0x8008);
 }
 
 bool8 UsedPokemonCenterWarp(void)
@@ -2369,7 +2422,7 @@ void ShowScrollableMultichoice(void)
             break;
         case SCROLL_MULTI_BF_EXCHANGE_CORNER_VITAMIN_VENDOR:
             task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
-            task->tNumItems = 29;
+            task->tNumItems = 33;
             task->tLeft = 14;
             task->tTop = 1;
             task->tWidth = 15;
@@ -2379,7 +2432,7 @@ void ShowScrollableMultichoice(void)
             break;
         case SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR:
             task->tMaxItemsOnScreen = MAX_SCROLL_MULTI_ON_SCREEN;
-            task->tNumItems = 18;
+            task->tNumItems = 22;
             task->tLeft = 14;
             task->tTop = 1;
             task->tWidth = 15;
@@ -2505,44 +2558,52 @@ static const u8 *const sScrollableMultichoiceOptions[][MAX_SCROLL_MULTI_LENGTH] 
     },
     [SCROLL_MULTI_BF_EXCHANGE_CORNER_VITAMIN_VENDOR] =
     {
-        gText_RareCandy2BP,
         gText_Protein1BP,
         gText_Calcium1BP,
         gText_Iron1BP,
         gText_Zinc1BP,
         gText_Carbos1BP,
         gText_HpUp1BP,
-        gText_AdamantMint10BP,
-        gText_BoldMint10BP,
-        gText_BraveMint10BP,
-        gText_CalmMint10BP,
-        gText_CarefulMint10BP,
-        gText_GentleMint10BP,
-        gText_HastyMint10BP,
-        gText_ImpishMint10BP,
-        gText_JollyMint10BP,
-        gText_LaxMint10BP,
-        gText_LonelyMint10BP,
-        gText_MildMint10BP,
-        gText_ModestMint10BP,
-        gText_NaiveMint10BP,
-        gText_NaughtyMint10BP,
-        gText_QuietMint10BP,
-        gText_RashMint10BP,
-        gText_RelaxedMint10BP,
-        gText_SassyMint10BP,
-        gText_SeriousMint10BP,
-        gText_TimidMint10BP,
+        gText_RareCandy2BP,
+        gText_AdamantMint6BP,
+        gText_BoldMint6BP,
+        gText_BraveMint6BP,
+        gText_CalmMint6BP,
+        gText_CarefulMint6BP,
+        gText_GentleMint6BP,
+        gText_HastyMint6BP,
+        gText_ImpishMint6BP,
+        gText_JollyMint6BP,
+        gText_LaxMint6BP,
+        gText_LonelyMint6BP,
+        gText_MildMint6BP,
+        gText_ModestMint6BP,
+        gText_NaiveMint6BP,
+        gText_NaughtyMint6BP,
+        gText_QuietMint6BP,
+        gText_RashMint6BP,
+        gText_RelaxedMint6BP,
+        gText_SassyMint6BP,
+        gText_SeriousMint6BP,
+        gText_TimidMint6BP,
+        gText_AbilityCapsule12BP,
+        gText_BottleCap16BP,
+        gText_AbilityPatch24BP,
+        gText_GoldBottleCap64BP,
         gText_Exit
     },
     [SCROLL_MULTI_BF_EXCHANGE_CORNER_HOLD_ITEM_VENDOR] =
     {
         gText_FocusSash2BP,
-        gText_AbilityCapsule12BP,
+        gText_Eviolite8BP,
+        gText_FlameOrb16BP,
+        gText_ToxicOrb16BP,
+        gText_LifeOrb24BP,
         gText_WeatherOrb48BP,
         gText_PunchingGlove48BP,
         gText_MuscleBand48BP,
         gText_WiseGlasses48BP,
+        gText_ExpertBelt48BP,
         gText_Leftovers48BP,
         gText_WhiteHerb48BP,
         gText_QuickClaw48BP,
@@ -4517,12 +4578,12 @@ void GetOutbreakMon(void)
 void CelebiRandomEgg(void)
 {
     // Give a random egg between all poke species.
+    // Random bound is from 1 to (NUM_SPECIES - 1)
     // If the species chosen is greater than or equal to SPECIES_OLD_UNOWN_B
     // and less than or equal to SPECIES_OLD_UNOWN_Z, then re-roll species so we don't use those.
     do {
-        gSpecialVar_0x8004 = Random() % NUM_SPECIES;
-    } while ((gSpecialVar_0x8004 >= SPECIES_OLD_UNOWN_B && gSpecialVar_0x8004 <= SPECIES_OLD_UNOWN_Z) &&
-             (gSpecialVar_0x8004 >= SPECIES_EGG && gSpecialVar_0x8004 <= SPECIES_UNOWN_QMARK));
+        gSpecialVar_0x8004 = (Random() % (NUM_SPECIES - 1)) + 1;
+    } while (gSpecialVar_0x8004 >= SPECIES_OLD_UNOWN_B && gSpecialVar_0x8004 <= SPECIES_OLD_UNOWN_Z);
 }
 
 void MarkMonAsSeen(void)
@@ -4583,3 +4644,23 @@ void ResetEvs(void)
     }
 }
 
+void GetPartyRegigigas(void)
+{
+    u32 i;
+    bool32 hasRegigigas = FALSE;
+    bool32 species = 0;
+
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES);
+        if (species == SPECIES_NONE)
+            break;
+
+        if (species == SPECIES_REGIGIGAS)
+        {
+            hasRegigigas = TRUE;
+            break;
+        }
+    }
+    gSpecialVar_Result = hasRegigigas;
+}

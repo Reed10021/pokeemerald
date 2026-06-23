@@ -27,18 +27,19 @@
 #include "string_util.h"
 #include "strings.h"
 #include "task.h"
+#include "text.h"
 #include "window.h"
 #include "menu_specialized.h"
 
 // structures
-struct Struct203BCC4
+struct ItemStorageMenu
 {
-    struct ListMenuItem unk0[51];
-    u8 unk198[51][0x18];
-    u8 windowIds[6];
-    u8 unk666;
+    struct ListMenuItem listItems[PC_ITEMS_COUNT + 1];
+    u8 itemNames[PC_ITEMS_COUNT + 1][ITEM_NAME_LENGTH + 10];
+    u8 windowIds[6]; // ITEMPC_WIN_COUNT
+    u8 toSwapPos;
     u8 spriteId;
-    u8 spriteIds[7];
+    u8 spriteIds[7]; // SWAP_LINE_LENGTH
 };
 
 // static functions
@@ -125,7 +126,7 @@ static void fish4_goto_x5_or_x6(u8 windowId, s32 id, u8 yOffset);
 static EWRAM_DATA const u8 *gPcItemMenuOptionOrder = NULL;
 static EWRAM_DATA u8 gPcItemMenuOptionsNum = 0;
 EWRAM_DATA struct PlayerPCItemPageStruct playerPCItemPageInfo = {0, 0, 0, 0, {0, 0, 0}, 0};
-static EWRAM_DATA struct Struct203BCC4 *gUnknown_0203BCC4 = NULL;
+static EWRAM_DATA struct ItemStorageMenu *sItemStorageMenu = NULL;
 
 // .rodata
 static const u8 *const gPCText_OptionDescList[] =
@@ -236,7 +237,8 @@ static const struct ListMenuTemplate gUnknown_085DFF44 =
     .lettersSpacing = FALSE,
     .itemVerticalPadding = 0,
     .scrollMultiple = FALSE,
-    .fontId = 7
+    .fontId = 7,
+    .textNarrowWidth = 74
 };
 
 static const struct WindowTemplate gUnknown_085DFF5C[5] =
@@ -577,7 +579,7 @@ static void ItemStorage_WithdrawToss_Helper(u8 taskId, bool8 toss)
     playerPCItemPageInfo.scrollIndicatorId = 0xFF;
     ItemStorage_SetItemAndMailCount(taskId);
     sub_816BC14();
-    if (gUnknown_0203BCC4 == NULL)
+    if (sItemStorageMenu == NULL)
     {
         PlayerPC_ItemStorage(taskId);
         return;
@@ -585,7 +587,7 @@ static void ItemStorage_WithdrawToss_Helper(u8 taskId, bool8 toss)
 
     FreeAndReserveObjectSpritePalettes();
     LoadListMenuArrowsGfx();
-    sub_8122344(gUnknown_0203BCC4->spriteIds, 7);
+    sub_8122344(sItemStorageMenu->spriteIds, 7);
     ClearDialogWindowAndFrame(0,0);
     gTasks[taskId].func = ItemStorage_ProcessWithdrawTossInput;
 }
@@ -928,31 +930,31 @@ static void Mailbox_Cancel(u8 taskId)
 
 static void sub_816BC14(void)
 {
-    gUnknown_0203BCC4 = AllocZeroed(sizeof(struct Struct203BCC4));
-    if (gUnknown_0203BCC4 == NULL)
+    sItemStorageMenu = AllocZeroed(sizeof(struct ItemStorageMenu));
+    if (sItemStorageMenu == NULL)
         return;
 
-    memset(gUnknown_0203BCC4->windowIds, 0xFF, 0x6);
-    gUnknown_0203BCC4->unk666 = 0xFF;
-    gUnknown_0203BCC4->spriteId = 0xFF;
+    memset(sItemStorageMenu->windowIds, 0xFF, 0x6);
+    sItemStorageMenu->toSwapPos = 0xFF;
+    sItemStorageMenu->spriteId = 0xFF;
 }
 
 static void sub_816BC58(void)
 {
     u32 i;
 
-    if (gUnknown_0203BCC4 == NULL)
+    if (sItemStorageMenu == NULL)
         return;
 
     for(i = 0; i < 6; i++)
         sub_816BCC4(i);
-    Free(gUnknown_0203BCC4);
-    gUnknown_0203BCC4 = NULL;
+    Free(sItemStorageMenu);
+    sItemStorageMenu = NULL;
 }
 
 static u8 sub_816BC7C(u8 a)
 {
-    u8 *windowIdLoc = &(gUnknown_0203BCC4->windowIds[a]);
+    u8 *windowIdLoc = &(sItemStorageMenu->windowIds[a]);
     if (*windowIdLoc == 0xFF)
     {
         *windowIdLoc = AddWindow(&gUnknown_085DFF5C[a]);
@@ -964,7 +966,7 @@ static u8 sub_816BC7C(u8 a)
 
 static void sub_816BCC4(u8 a)
 {
-    u8 *windowIdLoc = &(gUnknown_0203BCC4->windowIds[a]);
+    u8 *windowIdLoc = &(sItemStorageMenu->windowIds[a]);
     if (*windowIdLoc != 0xFF)
     {
         ClearStdWindowAndFrameToTransparent(*windowIdLoc, FALSE);
@@ -981,17 +983,17 @@ void ItemStorage_RefreshListMenu(void)
 
     for(i = 0; i < playerPCItemPageInfo.count - 1; i++)
     {
-        CopyItemName_PlayerPC(&(gUnknown_0203BCC4->unk198[i][0]), gSaveBlock1Ptr->pcItems[i].itemId);
-        gUnknown_0203BCC4->unk0[i].name = &(gUnknown_0203BCC4->unk198[i][0]);
-        gUnknown_0203BCC4->unk0[i].id = i;
+        CopyItemName_PlayerPC(&(sItemStorageMenu->itemNames[i][0]), gSaveBlock1Ptr->pcItems[i].itemId);
+        sItemStorageMenu->listItems[i].name = &(sItemStorageMenu->itemNames[i][0]);
+        sItemStorageMenu->listItems[i].id = i;
     }
-    StringCopy(&(gUnknown_0203BCC4->unk198[i][0]) ,gText_Cancel2);
-    gUnknown_0203BCC4->unk0[i].name = &(gUnknown_0203BCC4->unk198[i][0]);
-    gUnknown_0203BCC4->unk0[i].id = -2;
+    StringCopy(&(sItemStorageMenu->itemNames[i][0]) ,gText_Cancel2);
+    sItemStorageMenu->listItems[i].name = &(sItemStorageMenu->itemNames[i][0]);
+    sItemStorageMenu->listItems[i].id = -2;
     gMultiuseListMenuTemplate = gUnknown_085DFF44;
     gMultiuseListMenuTemplate.windowId = sub_816BC7C(0);
     gMultiuseListMenuTemplate.totalItems = playerPCItemPageInfo.count;
-    gMultiuseListMenuTemplate.items = gUnknown_0203BCC4->unk0;
+    gMultiuseListMenuTemplate.items = sItemStorageMenu->listItems;
     gMultiuseListMenuTemplate.maxShowed = playerPCItemPageInfo.pageItems;
 }
 
@@ -1000,11 +1002,37 @@ void CopyItemName_PlayerPC(u8 *string, u16 itemId)
     CopyItemName(itemId, string);
 }
 
+static u32 GetItemStorageMessageWidth(void)
+{
+    u32 width = GetWindowAttribute(sItemStorageMenu->windowIds[1], WINDOW_WIDTH) * 8;
+
+    if (width > 6)
+        width -= 6;
+    else
+        width = 0;
+
+    return width;
+}
+
+static void CopyItemNameToStorageMessageBuffer(u16 itemId)
+{
+    u8 *end = CopyItemName(itemId, gStringVar1);
+
+    WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, GetItemStorageMessageWidth());
+}
+
+static void CopyItemNameToStorageMessageBufferHandlePlural(u16 itemId, u32 quantity)
+{
+    u8 *end = CopyItemNameHandlePlural(itemId, gStringVar1, quantity);
+
+    WrapFontIdToFit(gStringVar1, end, FONT_NORMAL, GetItemStorageMessageWidth());
+}
+
 static void ItemStorage_MoveCursor(s32 id, bool8 b, struct ListMenu *thisMenu)
 {
     if (b != TRUE)
         PlaySE(SE_SELECT);
-    if (gUnknown_0203BCC4->unk666 == 0xFF)
+    if (sItemStorageMenu->toSwapPos == 0xFF)
     {
         sub_816C0C8();
         if (id != -2)
@@ -1019,9 +1047,9 @@ static void fish4_goto_x5_or_x6(u8 windowId, s32 id, u8 yOffset)
 {
     if (id != -2)
     {
-        if (gUnknown_0203BCC4->unk666 != 0xFF)
+        if (sItemStorageMenu->toSwapPos != 0xFF)
         {
-            if (gUnknown_0203BCC4->unk666 == (u8)id)
+            if (sItemStorageMenu->toSwapPos == (u8)id)
                 sub_816BFE0(yOffset, 0, 0xFF);
             else
                 sub_816BFE0(yOffset, 0xFF, 0xFF);
@@ -1035,7 +1063,7 @@ static void fish4_goto_x5_or_x6(u8 windowId, s32 id, u8 yOffset)
 static void sub_816BEF0(s32 id)
 {
     const u8* description;
-    u8 windowId = gUnknown_0203BCC4->windowIds[1];
+    u8 windowId = sItemStorageMenu->windowIds[1];
 
     if (id != -2)
         description = (u8 *)ItemId_GetDescription(gSaveBlock1Ptr->pcItems[id].itemId);
@@ -1067,7 +1095,7 @@ static void sub_816BFB8(u8 a, u8 b, u8 speed)
 
 static void sub_816BFE0(u8 y, u8 b, u8 speed)
 {
-    u8 windowId = gUnknown_0203BCC4->windowIds[0];
+    u8 windowId = sItemStorageMenu->windowIds[0];
     if (b == 0xFF)
         FillWindowPixelRect(windowId, PIXEL_FILL(1), 0, y, GetMenuCursorDimensionByFont(1, 0), GetMenuCursorDimensionByFont(1, 1));
     else
@@ -1077,7 +1105,7 @@ static void sub_816BFE0(u8 y, u8 b, u8 speed)
 static void sub_816C060(u16 itemId)
 {
     u8 spriteId;
-    u8* spriteIdLoc = &(gUnknown_0203BCC4->spriteId);
+    u8* spriteIdLoc = &(sItemStorageMenu->spriteId);
 
     if (*spriteIdLoc == 0xFF)
     {
@@ -1096,7 +1124,7 @@ static void sub_816C060(u16 itemId)
 
 static void sub_816C0C8(void)
 {
-    u8* spriteIdLoc = &(gUnknown_0203BCC4->spriteId);
+    u8* spriteIdLoc = &(sItemStorageMenu->spriteId);
     if (*spriteIdLoc != 0xFF)
     {
         FreeSpriteTilesByTag(0x13F6);
@@ -1133,8 +1161,8 @@ static void ItemStorage_ProcessWithdrawTossInput(u8 taskId)
     if (!toss)
         text = gText_WithdrawItem;
     x = GetStringCenterAlignXOffset(1, text, 104);
-    AddTextPrinterParameterized(gUnknown_0203BCC4->windowIds[3], 1, text, x, 1, 0, NULL);
-    CopyWindowToVram(gUnknown_0203BCC4->windowIds[2], 2);
+    AddTextPrinterParameterized(sItemStorageMenu->windowIds[3], 1, text, x, 1, 0, NULL);
+    CopyWindowToVram(sItemStorageMenu->windowIds[2], 2);
     sub_816C110();
     sub_816C140();
     ItemStorage_RefreshListMenu();
@@ -1186,7 +1214,7 @@ static const u8* ItemStorage_GetItemPcResponse(u16 itemId)
 
 static void ItemStorage_PrintItemPcResponse(const u8 *string)
 {
-    u8 windowId = gUnknown_0203BCC4->windowIds[1];
+    u8 windowId = sItemStorageMenu->windowIds[1];
     FillWindowPixelBuffer(windowId, PIXEL_FILL(1));
     StringExpandPlaceholders(gStringVar4, string);
     AddTextPrinterParameterized(windowId, 1, gStringVar4, 0, 1, 0, NULL);
@@ -1251,7 +1279,7 @@ static void ItemStorage_GoBackToPlayerPCMenu(u8 taskId)
     sub_816C0C8();
     ItemStorage_RemoveScrollIndicator();
     DestroyListMenuTask(data[5], NULL, NULL);
-    sub_81223B0(gUnknown_0203BCC4->spriteIds, 7);
+    sub_81223B0(sItemStorageMenu->spriteIds, 7);
     sub_816BC58();
     gTasks[taskId].func = ItemStorage_GoBackToPlayerPCMenu_InitStorage;
 }
@@ -1262,10 +1290,10 @@ static void ItemStorage_ItemSwapChoosePrompt(u8 taskId)
 
     data = gTasks[taskId].data;
     ListMenuSetUnkIndicatorsStructField(data[5], 16, 1);
-    gUnknown_0203BCC4->unk666 = (playerPCItemPageInfo.itemsAbove + playerPCItemPageInfo.cursorPos);
+    sItemStorageMenu->toSwapPos = (playerPCItemPageInfo.itemsAbove + playerPCItemPageInfo.cursorPos);
     sub_816BFB8(data[5], 0, 0);
-    sub_816C690(gUnknown_0203BCC4->unk666);
-    CopyItemName(gSaveBlock1Ptr->pcItems[gUnknown_0203BCC4->unk666].itemId, gStringVar1);
+    sub_816C690(sItemStorageMenu->toSwapPos);
+    CopyItemNameToStorageMessageBuffer(gSaveBlock1Ptr->pcItems[sItemStorageMenu->toSwapPos].itemId);
     ItemStorage_PrintItemPcResponse(ItemStorage_GetItemPcResponse(ITEMPC_SWITCH_WHICH_ITEM));
     gTasks[taskId].func = sub_816C4FC;
 }
@@ -1284,7 +1312,7 @@ static void sub_816C4FC(u8 taskId)
     }
     id = ListMenu_ProcessInput(data[5]);
     ListMenuGetScrollAndRow(data[5], &(playerPCItemPageInfo.itemsAbove), &(playerPCItemPageInfo.cursorPos));
-    sub_81223FC(gUnknown_0203BCC4->spriteIds, 7, 0);
+    sub_81223FC(sItemStorageMenu->spriteIds, 7, 0);
     sub_816C690(playerPCItemPageInfo.cursorPos);
     switch(id)
     {
@@ -1318,7 +1346,7 @@ static void ItemStorage_DoItemSwap(u8 taskId, bool8 a)
     DestroyListMenuTask(data[5], &(playerPCItemPageInfo.itemsAbove), &(playerPCItemPageInfo.cursorPos));
     if (!a)
     {
-        c = gUnknown_0203BCC4->unk666;
+        c = sItemStorageMenu->toSwapPos;
         if (c != b)
         {
             if (c != b - 1)
@@ -1330,11 +1358,11 @@ static void ItemStorage_DoItemSwap(u8 taskId, bool8 a)
         else
             goto LABEL_SKIP_CURSOR_DECREMENT;
     }
-    if (gUnknown_0203BCC4->unk666 < b)
+    if (sItemStorageMenu->toSwapPos < b)
         playerPCItemPageInfo.cursorPos--;
     LABEL_SKIP_CURSOR_DECREMENT:
-    sub_81223FC(gUnknown_0203BCC4->spriteIds, 7, 1);
-    gUnknown_0203BCC4->unk666 = 0xFF;
+    sub_81223FC(sItemStorageMenu->spriteIds, 7, 1);
+    sItemStorageMenu->toSwapPos = 0xFF;
     data[5] = ListMenuInit(&gMultiuseListMenuTemplate, playerPCItemPageInfo.itemsAbove, playerPCItemPageInfo.cursorPos);
     ScheduleBgCopyTilemapToVram(0);
     gTasks[taskId].func = ItemStorage_ProcessInput;
@@ -1342,7 +1370,7 @@ static void ItemStorage_DoItemSwap(u8 taskId, bool8 a)
 
 static void sub_816C690(u8 a)
 {
-    sub_8122448(gUnknown_0203BCC4->spriteIds, 7, 128, ((a+1) * 16));
+    sub_8122448(sItemStorageMenu->spriteIds, 7, 128, ((a+1) * 16));
 }
 
 static void sub_816C6BC(u8 windowId, u16 value, u32 mode, u8 x, u8 y, u8 n)
@@ -1368,7 +1396,7 @@ static void ItemStorage_DoItemAction(u8 taskId)
             ItemStorage_DoItemWithdraw(taskId);
             return;
         }
-        CopyItemName(gSaveBlock1Ptr->pcItems[b].itemId, gStringVar1);
+        CopyItemNameToStorageMessageBufferHandlePlural(gSaveBlock1Ptr->pcItems[b].itemId, 2);
         ItemStorage_PrintItemPcResponse(ItemStorage_GetItemPcResponse(ITEMPC_HOW_MANY_TO_WITHDRAW));
     }
     else
@@ -1378,7 +1406,7 @@ static void ItemStorage_DoItemAction(u8 taskId)
             ItemStorage_DoItemToss(taskId);
             return;
         }
-        CopyItemName(gSaveBlock1Ptr->pcItems[b].itemId, gStringVar1);
+        CopyItemNameToStorageMessageBufferHandlePlural(gSaveBlock1Ptr->pcItems[b].itemId, 2);
         ItemStorage_PrintItemPcResponse(ItemStorage_GetItemPcResponse(ITEMPC_HOW_MANY_TO_TOSS));
     }
     sub_816C6BC(sub_816BC7C(4), data[2], STR_CONV_MODE_LEADING_ZEROS, 8, 1, 3);
@@ -1424,7 +1452,7 @@ static void ItemStorage_DoItemWithdraw(u8 taskId)
     b = (playerPCItemPageInfo.cursorPos + playerPCItemPageInfo.itemsAbove);
     if (AddBagItem(gSaveBlock1Ptr->pcItems[b].itemId, data[2]) == TRUE)
     {
-        CopyItemName(gSaveBlock1Ptr->pcItems[b].itemId, gStringVar1);
+        CopyItemNameToStorageMessageBufferHandlePlural(gSaveBlock1Ptr->pcItems[b].itemId, data[2]);
         ConvertIntToDecimalStringN(gStringVar2, data[2], STR_CONV_MODE_LEFT_ALIGN, 3);
         ItemStorage_PrintItemPcResponse(ItemStorage_GetItemPcResponse(ITEMPC_WITHDREW_THING));
         gTasks[taskId].func = ItemStorage_HandleRemoveItem;
@@ -1446,7 +1474,7 @@ static void ItemStorage_DoItemToss(u8 taskId)
     b = (playerPCItemPageInfo.cursorPos + playerPCItemPageInfo.itemsAbove);
     if (ItemId_GetImportance(gSaveBlock1Ptr->pcItems[b].itemId) == 0)
     {
-        CopyItemName(gSaveBlock1Ptr->pcItems[b].itemId, gStringVar1);
+        CopyItemNameToStorageMessageBufferHandlePlural(gSaveBlock1Ptr->pcItems[b].itemId, data[2]);
         ConvertIntToDecimalStringN(gStringVar2, data[2], STR_CONV_MODE_LEFT_ALIGN, 3);
         ItemStorage_PrintItemPcResponse(ItemStorage_GetItemPcResponse(ITEMPC_OKAY_TO_THROW_AWAY));
         CreateYesNoMenuWithCallbacks(taskId, &gUnknown_085DFF84, 1, 0, 1, 0x214, 0xE, &ResumeFromWithdrawYesNoFuncList);

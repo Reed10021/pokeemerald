@@ -5,6 +5,7 @@ void ClearRoamerData(void);
 void ClearRoamerLocationData(void);
 void InitRoamer(void);
 bool16 CheckShinyRoamer(void);
+u16 GetRoamingSpecies(void);
 u16 GetSpeciesFromRoamer(void);
 void UpdateLocationHistoryForRoamer(void);
 bool8 IsRoamerActive(void);

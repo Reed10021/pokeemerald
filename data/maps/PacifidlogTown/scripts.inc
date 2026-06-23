@@ -21,10 +21,30 @@ PacifidlogTown_EventScript_Girl:: @ 81EBACC
 
 PacifidlogTown_EventScript_Fisherman:: @ 81EBAD5
 	msgbox PacifidlogTown_Text_SkyPillarTooScary, MSGBOX_NPC
+	release
 	end
 
 PacifidlogTown_EventScript_TownSign:: @ 81EBADE
 	msgbox PacifidlogTown_Text_TownSign, MSGBOX_SIGN
+	end
+
+PacifidlogTown_EventScript_Fisherman_CheckSuperRod::
+	lock
+	faceplayer
+	goto_if_set FLAG_RECEIVED_SUPER_ROD, PacifidlogTown_EventScript_Fisherman
+	msgbox MossdeepCity_House3_Text_YouWantSuperRod, MSGBOX_YESNO
+	compare VAR_RESULT, NO
+	goto_if_eq PacifidlogTown_EventScript_Fisherman_DeclineSuperRod
+	msgbox MossdeepCity_House3_Text_SuperRodIsSuper, MSGBOX_DEFAULT
+	giveitem ITEM_SUPER_ROD
+	setflag FLAG_RECEIVED_SUPER_ROD
+	msgbox MossdeepCity_House3_Text_TryDroppingRodInWater, MSGBOX_DEFAULT
+	release
+	end
+
+PacifidlogTown_EventScript_Fisherman_DeclineSuperRod::
+	msgbox MossdeepCity_House3_Text_DontYouLikeToFish, MSGBOX_DEFAULT
+	release
 	end
 
 PacifidlogTown_Text_FastRunningCurrent: @ 81EBAE7

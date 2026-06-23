@@ -75,7 +75,8 @@ NavelRock_Bottom_EventScript_Lugia:: @ 82692A2
 	setflag FLAG_CAUGHT_LUGIA
 	compare VAR_SPECIESCHAINED, SPECIES_LUGIA
 	call_if_eq ChainNumberNoLock
-	release
+	closemessage
+	goto Common_EventScript_RemoveStaticPokemon
 	end
 
 NavelRock_Bottom_EventScript_DefeatedLugia:: @ 8269336

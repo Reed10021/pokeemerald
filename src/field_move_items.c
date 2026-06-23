@@ -55,6 +55,8 @@ static bool32 IsPlayerFacingWaterfall(void);
 static void Task_UseDiveTool(u8);
 static bool32 SetMonResultVariables(u32 partyIndex, u32 species);
 
+static u32 sQueuedAutoFlashFieldMoveStatus;
+
 static bool32 CheckPartyMoves(u16 moveId)
 {
     struct Pokemon* curMon;
@@ -306,7 +308,6 @@ void RemoveRelevantSurfFieldEffect()
 
 u32 CanUseStrength()
 {
-
     if (CheckObjectGraphicsInFrontOfPlayer(OBJ_EVENT_GFX_PUSHABLE_BOULDER))
     {
         bool32 bagHasItem = CheckBagHasItem(ITEM_HM_POWER_GLOVE, 1);
@@ -438,6 +439,36 @@ u32 CanUseFlash()
     }
 
     return FIELD_MOVE_FAIL;
+}
+
+void InitAutoFlash()
+{
+    sQueuedAutoFlashFieldMoveStatus = FIELD_MOVE_FAIL;
+}
+
+void QueueAutoFlash()
+{
+    sQueuedAutoFlashFieldMoveStatus = CanUseFlash();
+}
+
+bool32 TryStartQueuedAutoFlash()
+{
+    u32 fieldMoveStatus = sQueuedAutoFlashFieldMoveStatus;
+
+    sQueuedAutoFlashFieldMoveStatus = FIELD_MOVE_FAIL;
+
+    if (fieldMoveStatus == FIELD_MOVE_POKEMON)
+    {
+        FieldCallback_UseFlashMove();
+        return TRUE;
+    }
+    else if (fieldMoveStatus == FIELD_MOVE_TOOL)
+    {
+        FieldCallback_UseFlashTool();
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 static void UseFlash(u32 fieldMoveStatus)

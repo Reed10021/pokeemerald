@@ -26,6 +26,7 @@
 #include "metatile_behavior.h"
 #include "overworld.h"
 #include "palette.h"
+#include "pokemon.h"
 #include "script.h"
 #include "secret_base.h"
 #include "sound.h"
@@ -756,6 +757,7 @@ void SetPlayerSecretBaseParty(void)
 
     partyId = 0;
     party = &gSaveBlock1Ptr->secretBases[0].party;
+    gSaveBlock1Ptr->secretBases[0].hiddenAbilityFlags = 0;
     if (gSaveBlock1Ptr->secretBases[0].secretBaseId)
     {
         for (i = 0; i < PARTY_SIZE; i++)
@@ -780,6 +782,8 @@ void SetPlayerSecretBaseParty(void)
                 party->levels[partyId] = GetMonData(&gPlayerParty[i], MON_DATA_LEVEL);
                 party->personality[partyId] = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
                 party->EVs[partyId] = GetAverageEVs(&gPlayerParty[i]);
+                if (GetMonData(&gPlayerParty[i], MON_DATA_ABILITY_NUM) == ABILITY_NUM_HIDDEN)
+                    gSaveBlock1Ptr->secretBases[0].hiddenAbilityFlags |= 1 << partyId;
                 partyId++;
             }
         }

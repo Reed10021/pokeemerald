@@ -18,7 +18,6 @@
 *.fwjpnfont
 sound/**/*.bin
 sound/songs/midi/*.s
-!sound/songs/midi/se_low_health.s
 tools/agbcc
 *.map
 *.ld

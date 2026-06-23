@@ -1,7 +1,6 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_gfx_sfx_util.h"
-#include "berry.h"
 #include "data.h"
 #include "daycare.h"
 #include "decompress.h"
@@ -68,6 +67,7 @@ u8 ScriptGiveMon(u16 species, u8 level, u16 item, u32 unused1, u32 unused2, u8 u
     struct Pokemon mon;
 
     CreateMon(&mon, species, level, 32, 0, 0, OT_ID_PLAYER_ID, 0);
+    TrySetMonHiddenAbility(&mon);
     heldItem[0] = item;
     heldItem[1] = item >> 8;
     SetMonData(&mon, MON_DATA_HELD_ITEM, heldItem);
@@ -93,6 +93,7 @@ u8 ScriptGiveEgg(u16 species, bool16 hotspingsFlag)
     CreateEgg(&mon, species, (bool8)hotspingsFlag);
     isEgg = TRUE;
     SetMonData(&mon, MON_DATA_IS_EGG, &isEgg);
+    TrySetMonHiddenAbility(&mon);
 
     return GiveMonToPlayer(&mon);
 }
@@ -113,34 +114,13 @@ void HasEnoughMonsForDoubleBattle(void)
     }
 }
 
-static bool8 CheckPartyMonHasHeldItem(u16 item)
-{
-    int i;
-
-    for(i = 0; i < PARTY_SIZE; i++)
-    {
-        u16 species = GetMonData(&gPlayerParty[i], MON_DATA_SPECIES2);
-        if (species != SPECIES_NONE && species != SPECIES_EGG && GetMonData(&gPlayerParty[i], MON_DATA_HELD_ITEM) == item)
-            return TRUE;
-    }
-    return FALSE;
-}
-
-bool8 DoesPartyHaveEnigmaBerry(void)
-{
-    bool8 hasItem = CheckPartyMonHasHeldItem(ITEM_ENIGMA_BERRY);
-    if (hasItem == TRUE)
-        GetBerryNameByBerryType(ItemIdToBerryType(ITEM_ENIGMA_BERRY), gStringVar1);
-
-    return hasItem;
-}
-
 void CreateScriptedWildMon(u16 species, u8 level, u16 item)
 {
     u8 heldItem[2];
 
     ZeroEnemyPartyMons();
     CreateMon(&gEnemyParty[0], species, level, 32, 0, 0, OT_ID_PLAYER_ID, 0);
+    TrySetMonHiddenAbility(&gEnemyParty[0]);
     if (item)
     {
         heldItem[0] = item;

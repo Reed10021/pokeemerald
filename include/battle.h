@@ -34,6 +34,7 @@
 
 #define B_ACTION_CANCEL_PARTNER         12 // when choosing an action
 #define B_ACTION_NOTHING_FAINTED        13 // when choosing an action
+#define B_ACTION_THROW_BALL             14 // R to throw the selected shortcut ball
 #define B_ACTION_NONE                   0xFF
 
 #define MAX_TRAINER_ITEMS 4
@@ -79,7 +80,7 @@ struct DisableStruct
     u8 disableTimer:4;
     u8 disableTimerStartValue:4;
     u8 encoredMovePos;
-    u8 filler_D; // Unused field.
+    u8 magnetRiseTimer;
     u8 encoreTimer:4;
     u8 encoreTimerStartValue:4;
     u8 perishSongTimer:4;
@@ -94,7 +95,8 @@ struct DisableStruct
     u8 battlerPreventingEscape;
     u8 battlerWithSureHit;
     u8 isFirstTurn;
-    u8 filler_17; // Unused field.
+    u8 cudChewTimer;
+    u16 cudChewItem;
     u8 truantCounter:1;
     u8 truantSwitchInHack:1;
     u8 filler_18_2:2; // Unused field.
@@ -124,6 +126,7 @@ struct ProtectStruct
     u32 flinchImmobility:1;
     u32 notFirstStrike:1;
     u32 palaceUnableToUseMove:1;
+    u32 pursuitSwitchDmg:1;
     s32 physicalDmg;
     s32 specialDmg;
     u8 physicalBattlerId;
@@ -133,13 +136,17 @@ struct ProtectStruct
 struct SpecialStatus
 {
     u32 statLowered:1;
-    u32 lightningRodRedirected:1;
+    u32 abilityRedirected:1;
     u32 restoredBattlerSprite: 1;
     u32 intimidatedMon:1;
     u32 traced:1;
     u32 ppNotAffectedByPressure:1;
     u32 flag40:1;
     u32 focusBanded:1;
+    u32 unnerveActivated:1;
+    u32 moldBreakerActivated:1;
+    u32 downloadActivated:1;
+    u32 friskedTargets:4;
     s32 dmg;
     s32 physicalDmg;
     s32 specialDmg;
@@ -153,12 +160,17 @@ struct SideTimer
     u8 reflectBattlerId;
     u8 lightscreenTimer;
     u8 lightscreenBattlerId;
+    u8 auroraVeilTimer;
+    u8 auroraVeilBattlerId;
     u8 mistTimer;
     u8 mistBattlerId;
     u8 safeguardTimer;
     u8 safeguardBattlerId;
+    u8 tailwindTimer;
+    u8 tailwindBattlerId;
     u8 followmeTimer;
     u8 followmeTarget;
+    bool8 followmeUsesPowder;
     u8 spikesAmount;
 };
 
@@ -172,6 +184,7 @@ struct WishFutureKnock
     u8 wishMonId[MAX_BATTLERS_COUNT];
     u8 weatherDuration;
     u8 trickRoomTimer;
+    u8 gravityTimer;
     u8 knockedOffMons[2]; // Each battler is represented by a bit. The array entry is dependent on the battler's side.
 };
 
@@ -386,10 +399,10 @@ struct BattleStruct
     u8 stateIdAfterSelScript[MAX_BATTLERS_COUNT];
     u8 unused_3[3];
     u8 field_8B; // related to player's pokemon switching
-    u8 unused_4[2];
+    u8 hitEscapeRestoreSentInPokes[2];
     u8 stringMoveType;
     u8 expGetterBattlerId;
-    u8 unused_5;
+    u8 hitEscapeRestoreSentInMask;
     u8 field_91; // related to gAbsentBattlerFlags, possibly absent flags turn ago?
     u8 palaceFlags; // First 4 bits are "is < 50% HP and not asleep" for each battler, last 4 bits are selected moves to pass to AI
     u8 field_93; // related to choosing pokemon?
@@ -406,6 +419,17 @@ struct BattleStruct
     bool8 anyMonHasTransformed;
     void (*savedCallback)(void);
     u16 usedHeldItems[MAX_BATTLERS_COUNT];
+    struct BattleEnigmaBerry battlerOriginalEnigmaBerries[MAX_BATTLERS_COUNT];
+    u16 partyUsedHeldItems[2][PARTY_SIZE];
+    struct BattleEnigmaBerry partyEnigmaBerries[2][PARTY_SIZE];
+    struct BattleEnigmaBerry partyUsedEnigmaBerries[2][PARTY_SIZE];
+    u16 partyUsedHeldItemOrder[2][PARTY_SIZE];
+    u8 partyUsedHeldItemTurn[2][PARTY_SIZE];
+    u8 pickupItemEligible[2];
+    u8 partyRageFistCounters[2][PARTY_SIZE];
+    u16 usedHeldItemOrder;
+    u16 cudChewItem;
+    bool8 cudChewing;
     u8 chosenItem[MAX_BATTLERS_COUNT]; // why is this an u8?
     u8 AI_itemType[2];
     u8 AI_itemFlags[2];
@@ -438,6 +462,18 @@ struct BattleStruct
     u8 arenaLostPlayerMons; // Bits for party member, lost as in referee's decision, not by fainting.
     u8 arenaLostOpponentMons;
     u8 alreadyStatusedMoveAttempt; // As bits for battlers; For example when using Thunder Wave on an already paralyzed pokemon.
+    bool8 moveBouncePending;
+    bool8 moveBounceResuming;
+    u8 moveBounceResumeAttacker;
+    u8 moveBounceResumeTarget;
+    bool8 moldBreakerForcingSwitch;
+    u8 moldBreakerForceSwitchBattler;
+    u8 unburdenBattlers;
+    u8 moveInfoSpriteId;
+    u8 lastUsedBallSpriteIds[2];
+    u16 lastUsedBallItem;
+    bool8 lastUsedBallBtnAck;
+    bool8 lastUsedBallSwapped;
 };
 
 #define GET_MOVE_TYPE(move, typeArg)                        \
@@ -448,20 +484,11 @@ struct BattleStruct
         typeArg = gBattleMoves[move].type;                  \
 }
 
-#define IS_PHYSICAL_MOVE(move)(move == MOVE_CRABHAMMER || move == MOVE_SACRED_FIRE || move == MOVE_BLAZE_KICK || move == MOVE_FLARE_BLITZ || move == MOVE_OUTRAGE || move == MOVE_DRAGON_CLAW \
-                            || move == MOVE_WATERFALL || move == MOVE_BITE ||move == MOVE_CRUNCH || move == MOVE_NEEDLE_ARM || move == MOVE_BULLET_SEED || move == MOVE_KNOCK_OFF || move == MOVE_AVALANCHE \
-                            || move == MOVE_ICE_SHARD || move == MOVE_SEED_BOMB || move == MOVE_PSYCHO_CUT || move == MOVE_ZEN_HEADBUTT || move == MOVE_FLAME_WHEEL)
-#define IS_SPECIAL_MOVE(move)(move == MOVE_AEROBLAST || move == MOVE_SIGNAL_BEAM || move == MOVE_AIR_SLASH || move == MOVE_WEATHER_BALL || move == MOVE_TRI_ATTACK || move == MOVE_SHADOW_BALL \
-                            || move == MOVE_AURA_SPHERE || move == MOVE_BUG_BUZZ  || move == MOVE_FLASH_CANNON)
+// For the ability Iron Fist and the held item Punching Glove
+#define IS_PUNCHING_MOVE(move) (gBattleMoves[move].punchingMove)
 
-#define IS_TYPE_PHYSICAL(move, moveType)((moveType < TYPE_MYSTERY || IS_PHYSICAL_MOVE(move)) && !IS_SPECIAL_MOVE(move))
-#define IS_TYPE_SPECIAL(move, moveType)((moveType > TYPE_MYSTERY || IS_SPECIAL_MOVE(move)) && !IS_PHYSICAL_MOVE(move))
-
-#define IS_PUNCHING_MOVE(move)(move == MOVE_COMET_PUNCH || move == MOVE_DIZZY_PUNCH || move == MOVE_DYNAMIC_PUNCH || move == MOVE_FIRE_PUNCH || move == MOVE_FOCUS_PUNCH \
-                            || move == MOVE_ICE_PUNCH || move == MOVE_MACH_PUNCH || move == MOVE_MEGA_PUNCH || move == MOVE_SHADOW_PUNCH || move == MOVE_SKY_UPPERCUT \
-                            || move == MOVE_THUNDER_PUNCH || move == MOVE_METEOR_MASH || move == MOVE_NEEDLE_ARM || move == MOVE_BULLET_PUNCH || move == MOVE_DRAIN_PUNCH \
-                            || move == MOVE_ARM_THRUST || move == MOVE_ROCK_SMASH || move == MOVE_STRENGTH || move == MOVE_FAINT_ATTACK || move == MOVE_CLOSE_COMBAT \
-                            || move == MOVE_FORCE_PALM)
+// For the ability Sharpness
+#define IS_SHARPNESS_MOVE(move) (gBattleMoves[move].sharpnessMove)
 
 #define TARGET_TURN_DAMAGED ((gSpecialStatuses[gBattlerTarget].physicalDmg != 0 || gSpecialStatuses[gBattlerTarget].specialDmg != 0))
 
@@ -481,6 +508,8 @@ struct BattleStruct
 
 #define SET_STATCHANGER(statId, stage, goesDown)(gBattleScripting.statChanger = (statId) + (stage << 4) + (goesDown << 7))
 
+// NOTE: The members of this struct have hard-coded offsets
+//       in include/constants/battle_script_commands.h
 struct BattleScripting
 {
     s32 painSplitHp;
@@ -503,15 +532,16 @@ struct BattleScripting
     u8 battleStyle;
     u8 drawlvlupboxState;
     u8 learnMoveState;
-    u8 field_20;
+    u8 pursuitDoublesAttacker;
     u8 reshowMainState;
     u8 reshowHelperState;
-    u8 field_23;
+    u8 levelUpHP;
     u8 windowsType; // 0 - normal, 1 - battle arena
     u8 multiplayerId;
     u8 specialTrainerBattleType;
     bool8 monCaught;
     bool8 expOnCatch;
+    u8 savedBattler;
 };
 
 // rom_80A5C6C
@@ -652,6 +682,9 @@ extern s32 gBattleMoveDamage;
 extern s32 gHpDealt;
 extern s32 gTakenDmg[MAX_BATTLERS_COUNT];
 extern u16 gLastUsedItem;
+extern u16 gLastThrownBall;
+extern u16 gBallToDisplay;
+extern bool8 gCanShowLastUsedBallMenu;
 extern u8 gLastUsedAbility;
 extern u8 gBattlerAttacker;
 extern u8 gBattlerTarget;
@@ -706,6 +739,7 @@ extern u8 gMoveSelectionCursor[MAX_BATTLERS_COUNT];
 extern u8 gBattlerStatusSummaryTaskId[MAX_BATTLERS_COUNT];
 extern u8 gBattlerInMenuId;
 extern bool8 gDoingBattleAnim;
+extern bool8 gLastUsedBallMenuPresent;
 extern u32 gTransformedPersonalities[MAX_BATTLERS_COUNT];
 extern u8 gPlayerDpadHoldFrames;
 extern struct BattleSpriteData *gBattleSpritesDataPtr;
@@ -725,6 +759,18 @@ extern u8 gHealthboxSpriteIds[MAX_BATTLERS_COUNT];
 extern u8 gMultiUsePlayerCursor;
 extern u8 gNumberOfMovesToChoose;
 extern u8 gUnknown_03005D7C[MAX_BATTLERS_COUNT];
+
+static inline bool32 IsBattlerAlive(u8 battler)
+{
+    if (battler >= gBattlersCount)
+        return FALSE;
+    else if (gBattleMons[battler].hp == 0)
+        return FALSE;
+    else if (gAbsentBattlerFlags & (1u << battler))
+        return FALSE;
+    else
+        return TRUE;
+}
 
 static inline bool32 IsBattlerAtMaxHp(u32 battler)
 {

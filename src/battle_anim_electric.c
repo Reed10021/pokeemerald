@@ -1,5 +1,6 @@
 #include "global.h"
 #include "battle_anim.h"
+#include "random.h"
 #include "constants/rgb.h"
 #include "trig.h"
 #include "constants/songs.h"
@@ -11,7 +12,6 @@ static void sub_810A214(struct Sprite *);
 static void sub_810A258(struct Sprite *);
 static void sub_810A274(struct Sprite *);
 static void AnimSparkElectricity(struct Sprite *);
-static void AnimZapCannonSpark(struct Sprite *);
 static void AnimZapCannonSpark_Step(struct Sprite *);
 static void AnimThunderboltOrb(struct Sprite *);
 static void AnimThunderboltOrb_Step(struct Sprite *);
@@ -25,7 +25,6 @@ static void AnimThunderWave_Step(struct Sprite *);
 static void AnimTask_ElectricChargingParticles_Step(u8 taskId);
 static void AnimElectricChargingParticles(struct Sprite *);
 static void AnimElectricChargingParticles_Step(struct Sprite *);
-static void AnimGrowingChargeOrb(struct Sprite *);
 static void AnimElectricPuff(struct Sprite *);
 static void AnimVoltTackleOrbSlide(struct Sprite *);
 static void AnimVoltTackleOrbSlide_Step(struct Sprite *);
@@ -36,6 +35,8 @@ static bool8 sub_810B430(struct Task *task, u8 taskId);
 static void AnimShockWaveProgressingBolt(struct Sprite *);
 static bool8 sub_810B614(struct Task *task, u8 taskId);
 static void sub_810B684(struct Sprite *sprite);
+static void AnimIon(struct Sprite*);
+static void AnimIon_Step(struct Sprite*);
 
 static const union AnimCmd sAnim_Lightning[] =
 {
@@ -144,7 +145,7 @@ static const union AffineAnimCmd sAffineAnim_FlashingSpark[] =
     AFFINEANIMCMD_JUMP(0),
 };
 
-static const union AffineAnimCmd *const sAffineAnims_FlashingSpark[] =
+const union AffineAnimCmd *const gAffineAnims_FlashingSpark[] =
 {
     sAffineAnim_FlashingSpark,
 };
@@ -156,7 +157,7 @@ const struct SpriteTemplate gZapCannonSparkSpriteTemplate =
     .oam = &gOamData_AffineNormal_ObjNormal_16x16,
     .anims = gDummySpriteAnimTable,
     .images = NULL,
-    .affineAnims = sAffineAnims_FlashingSpark,
+    .affineAnims = gAffineAnims_FlashingSpark,
     .callback = AnimZapCannonSpark,
 };
 
@@ -204,7 +205,7 @@ const struct SpriteTemplate gSparkElectricityFlashingSpriteTemplate =
     .oam = &gOamData_AffineNormal_ObjNormal_16x16,
     .anims = gDummySpriteAnimTable,
     .images = NULL,
-    .affineAnims = sAffineAnims_FlashingSpark,
+    .affineAnims = gAffineAnims_FlashingSpark,
     .callback = AnimSparkElectricityFlashing,
 };
 
@@ -326,11 +327,42 @@ static const union AffineAnimCmd sAffineAnim_GrowingElectricOrb_2[] =
     AFFINEANIMCMD_END,
 };
 
-static const union AffineAnimCmd *const sAffineAnims_GrowingElectricOrb[] =
+static const union AffineAnimCmd sAffineAnim_GrowingElectricOrb_3[] =
+{
+    AFFINEANIMCMD_FRAME(0x10, 0x10, 0, 0),
+    AFFINEANIMCMD_FRAME(0x4, 0x4, 0, 60),
+    AFFINEANIMCMD_FRAME(0x100, 0x100, 0, 0),
+    AFFINEANIMCMD_LOOP(0),
+    AFFINEANIMCMD_FRAME(0xFFFC, 0xFFFC, 0, 5),
+    AFFINEANIMCMD_FRAME(0x4, 0x4, 0, 5),
+    AFFINEANIMCMD_LOOP(10),
+    AFFINEANIMCMD_FRAME(-4, -4, 0, 60),
+    AFFINEANIMCMD_END,
+};
+
+static const union AffineAnimCmd sAffineAnim_GrowingElectricOrb_4[] =
+{
+    AFFINEANIMCMD_FRAME(5, 5, 0, 0),
+    AFFINEANIMCMD_FRAME(0x2, 0x2, 0, 20),
+    AFFINEANIMCMD_FRAME(0x3, 0x3, 0, 15),
+    AFFINEANIMCMD_FRAME(0x1, 0x1, 0, 25),
+    AFFINEANIMCMD_FRAME(0xFFFC, 0xFFFC, 0, 5),
+    AFFINEANIMCMD_FRAME(0x3, 0x3, 0, 5),
+    AFFINEANIMCMD_FRAME(0xFFFB, 0xFFFB, 0, 5),
+    AFFINEANIMCMD_FRAME(0x4, 0x4, 0, 5),
+    AFFINEANIMCMD_END
+};
+
+const union AffineAnimCmd *const gAffineAnims_GrowingElectricOrb[] =
 {
     sAffineAnim_GrowingElectricOrb_0,
     sAffineAnim_GrowingElectricOrb_1,
     sAffineAnim_GrowingElectricOrb_2,
+};
+
+const union AffineAnimCmd* const gAffineAnims_GrowingElectricOrb2[] =
+{
+    sAffineAnim_GrowingElectricOrb_4,
 };
 
 const struct SpriteTemplate gGrowingChargeOrbSpriteTemplate =
@@ -340,7 +372,19 @@ const struct SpriteTemplate gGrowingChargeOrbSpriteTemplate =
     .oam = &gOamData_AffineNormal_ObjBlend_64x64,
     .anims = gDummySpriteAnimTable,
     .images = NULL,
-    .affineAnims = sAffineAnims_GrowingElectricOrb,
+    .affineAnims = gAffineAnims_GrowingElectricOrb,
+    .callback = AnimGrowingChargeOrb,
+};
+
+// For Electro Ball - smaller orb.
+const struct SpriteTemplate gGrowingChargeOrb2SpriteTemplate =
+{
+    .tileTag = ANIM_TAG_CIRCLE_OF_LIGHT,
+    .paletteTag = ANIM_TAG_CIRCLE_OF_LIGHT,
+    .oam = &gOamData_AffineNormal_ObjBlend_64x64,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gAffineAnims_GrowingElectricOrb2,
     .callback = AnimGrowingChargeOrb,
 };
 
@@ -376,7 +420,7 @@ const struct SpriteTemplate gVoltTackleOrbSlideSpriteTemplate =
     .oam = &gOamData_AffineNormal_ObjBlend_64x64,
     .anims = gDummySpriteAnimTable,
     .images = NULL,
-    .affineAnims = sAffineAnims_GrowingElectricOrb,
+    .affineAnims = gAffineAnims_GrowingElectricOrb,
     .callback = AnimVoltTackleOrbSlide,
 };
 
@@ -441,7 +485,7 @@ const struct SpriteTemplate gGrowingShockWaveOrbSpriteTemplate =
     .oam = &gOamData_AffineNormal_ObjBlend_64x64,
     .anims = gDummySpriteAnimTable,
     .images = NULL,
-    .affineAnims = sAffineAnims_GrowingElectricOrb,
+    .affineAnims = gAffineAnims_GrowingElectricOrb,
     .callback = AnimGrowingShockWaveOrb,
 };
 
@@ -463,8 +507,59 @@ const struct SpriteTemplate gFlashCannonGrayChargeTemplate =
     .oam = &gOamData_AffineNormal_ObjBlend_64x64,
     .anims = gDummySpriteAnimTable,
     .images = NULL,
-    .affineAnims = sAffineAnims_GrowingElectricOrb,
+    .affineAnims = gAffineAnims_GrowingElectricOrb,
     .callback = AnimGrowingChargeOrb
+};
+
+static const union AnimCmd sAnim_Ion[] =
+{
+    ANIMCMD_FRAME(0, 2),
+    ANIMCMD_FRAME(8, 2),
+    ANIMCMD_FRAME(16, 2),
+    ANIMCMD_FRAME(24, 6),
+    ANIMCMD_FRAME(32, 2),
+    ANIMCMD_FRAME(40, 2),
+    ANIMCMD_FRAME(48, 2),
+    ANIMCMD_END,
+};
+
+static const union AnimCmd* const sAnims_Ion[] =
+{
+    sAnim_Ion,
+};
+
+const struct SpriteTemplate gIonSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_IONS,
+    .paletteTag = ANIM_TAG_IONS,
+    .oam = &gOamData_AffineOff_ObjNormal_16x32,
+    .anims = sAnims_Ion,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = AnimIon,
+};
+
+const struct SpriteTemplate gVoltSwitchSpriteTemplate =
+{
+    .tileTag = ANIM_TAG_SHADOW_BALL,
+    .paletteTag = ANIM_TAG_IONS,
+    .oam = &gOamData_AffineNormal_ObjNormal_32x32,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gAffineAnims_ShadowBall,
+    .callback = AnimTask_VoltSwitch,
+};
+
+// Electro Ball
+const struct SpriteTemplate gElectroBallCannonBallTemplate =
+{
+    .tileTag = ANIM_TAG_FLASH_CANNON_BALL,
+    .paletteTag = ANIM_TAG_CIRCLE_OF_LIGHT,
+    .oam = &gOamData_AffineNormal_ObjNormal_32x32,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gAffineAnims_ShadowBall,
+    .callback = AnimShadowBall
 };
 
 static void AnimLightning(struct Sprite *sprite)
@@ -580,7 +675,7 @@ static void AnimSparkElectricity(struct Sprite *sprite)
     sprite->callback = DestroyAnimSpriteAfterTimer;
 }
 
-static void AnimZapCannonSpark(struct Sprite *sprite)
+void AnimZapCannonSpark(struct Sprite *sprite)
 {
     InitSpritePosToAnimAttacker(sprite, 1);
     sprite->data[0] = gBattleAnimArgs[3];
@@ -677,7 +772,8 @@ static void AnimSparkElectricityFlashing_Step(struct Sprite *sprite)
 // Electricity arcs around the target. Used for Paralysis and various electric move hits
 static void AnimElectricity(struct Sprite *sprite)
 {
-    InitSpritePosToAnimTarget(sprite, FALSE);
+    if (!InitSpritePosToAnimBattler(gBattleAnimArgs[4], sprite, FALSE))
+        return;
     sprite->oam.tileNum += gBattleAnimArgs[3] * 4;
 
     if (gBattleAnimArgs[3] == 1)
@@ -899,7 +995,7 @@ static void AnimElectricChargingParticles(struct Sprite *sprite)
     sprite->callback = AnimElectricChargingParticles_Step;
 }
 
-static void AnimGrowingChargeOrb(struct Sprite *sprite)
+void AnimGrowingChargeOrb(struct Sprite *sprite)
 {
     if (gBattleAnimArgs[0] == ANIM_ATTACKER)
     {
@@ -1338,3 +1434,94 @@ static void sub_810B684(struct Sprite *sprite)
         DestroySprite(sprite);
     }
 }
+
+// Copy of Rain Dance's function but displays the ion sprite instead
+// arg 0: initial step
+// arg 1: amount (?)
+// arg 2: duration
+void AnimTask_CreateIons(u8 taskId)
+{
+    u8 x, y;
+
+    if (gTasks[taskId].data[0] == 0)
+    {
+        gTasks[taskId].data[1] = gBattleAnimArgs[0];
+        gTasks[taskId].data[2] = gBattleAnimArgs[1];
+        gTasks[taskId].data[3] = gBattleAnimArgs[2];
+    }
+    gTasks[taskId].data[0]++;
+    if (gTasks[taskId].data[0] % gTasks[taskId].data[2] == 1)
+    {
+        x = Random2() % DISPLAY_WIDTH;
+        y = Random2() % (DISPLAY_HEIGHT / 2);
+        CreateSprite(&gIonSpriteTemplate, x, y, 4);
+    }
+    if (gTasks[taskId].data[0] == gTasks[taskId].data[3])
+        DestroyAnimVisualTask(taskId);
+}
+
+static void AnimIon(struct Sprite* sprite)
+{
+    sprite->callback = AnimIon_Step;
+}
+
+static void AnimIon_Step(struct Sprite* sprite)
+{
+    if (++sprite->data[0] <= 13)
+    {
+        sprite->pos2.x++;
+        sprite->pos2.y += 4;
+    }
+    if (sprite->animEnded)
+        DestroySprite(sprite);
+}
+
+//Volt Switch//
+
+//Launches the projectiles for Volt Switch
+//arg 0: initial x pixel offset
+//arg 1: initial y pixel offset
+//arg 2: target x pixel offset
+//arg 3: target y pixel offset
+//arg 4: duration
+//arg 5: wave amplitude
+static void VoltSwitch_Step(struct Sprite* sprite)
+{
+    sprite->invisible = FALSE;
+
+    if (TranslateAnimHorizontalArc(sprite))
+    {
+        //Merge coords into one
+        sprite->pos1.x += sprite->pos2.x;
+        sprite->pos1.y += sprite->pos2.y;
+        sprite->pos2.x = 0;
+        sprite->pos2.y = 0;
+
+        //Come straight back to the attacker
+        sprite->data[0] = 0x14; //Duration
+        sprite->data[2] = GetBattlerSpriteCoord(gBattleAnimAttacker, BATTLER_COORD_X_2);
+        sprite->data[4] = GetBattlerSpriteCoord(gBattleAnimAttacker, BATTLER_COORD_Y_PIC_OFFSET);
+
+        sprite->callback = StartAnimLinearTranslation;
+        StoreSpriteCallbackInData6(sprite, DestroyAnimSprite);
+    }
+}
+
+void AnimTask_VoltSwitch(struct Sprite* sprite)
+{
+    InitSpritePosToAnimAttacker(sprite, FALSE);
+
+    if (!IsOnPlayerSide(gBattleAnimAttacker))
+        gBattleAnimArgs[2] = -gBattleAnimArgs[2];
+    else
+        sprite->pos1.y += 10; //Move slightly down
+
+    sprite->data[0] = gBattleAnimArgs[4];
+    sprite->data[2] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X_2) + gBattleAnimArgs[2]; //Target X
+    sprite->data[4] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y_PIC_OFFSET) + gBattleAnimArgs[3]; //Target Y
+    sprite->data[5] = gBattleAnimArgs[5];
+    InitAnimArcTranslation(sprite);
+
+    sprite->callback = VoltSwitch_Step;
+}
+

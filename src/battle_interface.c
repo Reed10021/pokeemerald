@@ -21,7 +21,10 @@
 #include "international_string_util.h"
 #include "safari_zone.h"
 #include "battle_anim.h"
+#include "item.h"
+#include "item_icon.h"
 #include "constants/battle_anim.h"
+#include "constants/items.h"
 #include "constants/rgb.h"
 #include "data.h"
 #include "pokemon_summary_screen.h"
@@ -197,6 +200,106 @@ static u8 GetScaledExpFraction(s32 currValue, s32 receivedValue, s32 maxValue, u
 static void MoveBattleBarGraphically(u8 battlerId, u8 whichBar);
 static u8 CalcBarFilledPixels(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *currValue, u8 *arg4, u8 scale);
 static void sub_8074F88(struct TestingBar *barInfo, s32 *arg1, u16 *arg2);
+
+static void SpriteCB_LastUsedBallWindow(struct Sprite* sprite);
+static void SpriteCB_LastUsedBallIcon(struct Sprite* sprite);
+static void SpriteCB_LastUsedBallBounce(struct Sprite* sprite);
+static void SpriteCB_MoveInfoWindow(struct Sprite* sprite);
+static void Task_BounceLastUsedBall(u8 taskId);
+static void DestroyLastUsedBallTasks(void);
+static void TryHideOrRestoreLastUsedBall(bool32 hide);
+static bool32 IsLastUsedBallIconSpriteValid(void);
+static bool32 IsLastUsedBallWindowSpriteValid(void);
+static bool32 IsMoveInfoWindowSpriteValid(void);
+static void FreeLastUsedBallIconResources(void);
+static void FreeLastUsedBallWindowResources(void);
+static void FreeMoveInfoWindowResources(void);
+static void SanitizeLastUsedBallSpriteIds(void);
+static void SanitizeMoveInfoSpriteId(void);
+static void ResolveLastUsedBallToDisplay(void);
+
+enum
+{
+    TAG_LAST_USED_BALL_WINDOW_PAL = 0xD720, // Only used for the SpritePalette, the rest below is for the SpriteSheets.
+    TAG_LAST_USED_BALL_WINDOW,
+    TAG_LAST_USED_BALL_ICON,
+    TAG_MOVE_INFO_WINDOW,
+};
+
+static const u16 sLastUsedBallWindowPalette[] = INCBIN_U16("graphics/battle_interface/ability_pop_up.gbapal");
+static const u8 ALIGNED(4) sLastUsedBallWindowGfx[] = INCBIN_U8("graphics/battle_interface/last_used_ball_r_cycle.4bpp");
+static const u8 sMoveInfoWindowGfx[] = INCBIN_U8("graphics/battle_interface/move_info_window_r.4bpp");
+
+static const struct SpritePalette sSpritePalette_LastUsedBallWindow =
+{
+    sLastUsedBallWindowPalette, TAG_LAST_USED_BALL_WINDOW_PAL
+};
+
+static const struct SpriteSheet sSpriteSheet_LastUsedBallWindow =
+{
+    sLastUsedBallWindowGfx, sizeof(sLastUsedBallWindowGfx), TAG_LAST_USED_BALL_WINDOW
+};
+
+static const struct SpriteSheet sSpriteSheet_MoveInfoWindow =
+{
+    sMoveInfoWindowGfx, sizeof(sMoveInfoWindowGfx), TAG_MOVE_INFO_WINDOW
+};
+
+static const struct OamData sOamData_LastUsedBallWindow =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = 0,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x64),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x64),
+    .tileNum = 0,
+    .priority = 1,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_LastUsedBallWindow =
+{
+    .tileTag = TAG_LAST_USED_BALL_WINDOW,
+    .paletteTag = TAG_LAST_USED_BALL_WINDOW_PAL,
+    .oam = &sOamData_LastUsedBallWindow,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_LastUsedBallWindow,
+};
+
+static const struct OamData sOamData_MoveInfoWindow =
+{
+    .y = 0,
+    .affineMode = ST_OAM_AFFINE_OFF,
+    .objMode = ST_OAM_OBJ_NORMAL,
+    .mosaic = 0,
+    .bpp = ST_OAM_4BPP,
+    .shape = SPRITE_SHAPE(32x32),
+    .x = 0,
+    .matrixNum = 0,
+    .size = SPRITE_SIZE(32x32),
+    .tileNum = 0,
+    .priority = 1,
+    .paletteNum = 0,
+    .affineParam = 0,
+};
+
+static const struct SpriteTemplate sSpriteTemplate_MoveInfoWindow =
+{
+    .tileTag = TAG_MOVE_INFO_WINDOW,
+    .paletteTag = TAG_LAST_USED_BALL_WINDOW_PAL,
+    .oam = &sOamData_MoveInfoWindow,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = gDummySpriteAffineAnimTable,
+    .callback = SpriteCB_MoveInfoWindow,
+};
 
 // const rom data
 static const struct OamData sUnknown_0832C138 =
@@ -763,7 +866,7 @@ static s32 DummiedOutFunction(s16 unused1, s16 unused2, s32 unused3)
 }
 void sub_8072308(s16 number, u16 *dest, bool8 unk)
 {
-    s8 i, j;
+    s32 i, j;
     u8 buff[4];
 
     for (i = 0; i < 4; i++)
@@ -2231,8 +2334,7 @@ s32 MoveBattleBar(u8 battlerId, u8 healthboxSpriteId, u8 whichBar, u8 unused)
                     gBattleSpritesDataPtr->battleBars[battlerId].oldValue,
                     gBattleSpritesDataPtr->battleBars[battlerId].receivedValue,
                     &gBattleSpritesDataPtr->battleBars[battlerId].currValue,
-					B_HEALTHBAR_PIXELS / 8, max(gBattleSpritesDataPtr->battleBars[battlerId].maxValue / 32, 1));
-                    //B_HEALTHBAR_PIXELS / 8, 1);
+                    B_HEALTHBAR_PIXELS / 8, max(gBattleSpritesDataPtr->battleBars[battlerId].maxValue / (B_HEALTHBAR_PIXELS / 2), 1));
     }
     else // exp bar
     {
@@ -2265,22 +2367,53 @@ static void MoveBattleBarGraphically(u8 battlerId, u8 whichBar)
     u8 filledPixelsCount, level;
     u8 barElementId;
     u8 i;
+    s32 currValue, maxValue;
 
     switch (whichBar)
     {
     case HEALTH_BAR:
-        filledPixelsCount = CalcBarFilledPixels(gBattleSpritesDataPtr->battleBars[battlerId].maxValue,
-                            gBattleSpritesDataPtr->battleBars[battlerId].oldValue,
-                            gBattleSpritesDataPtr->battleBars[battlerId].receivedValue,
-                            &gBattleSpritesDataPtr->battleBars[battlerId].currValue,
-                            array, B_HEALTHBAR_PIXELS / 8);
-
-        if (filledPixelsCount > (B_HEALTHBAR_PIXELS * 50 / 100)) // more than 50 % hp
-            barElementId = HEALTHBOX_GFX_HP_BAR_GREEN;
-        else if (filledPixelsCount > (B_HEALTHBAR_PIXELS * 20 / 100)) // more than 20% hp
-            barElementId = HEALTHBOX_GFX_HP_BAR_YELLOW;
+        if (FALSE) // B_HPBAR_COLOR_THRESHOLD < GEN_5
+        {
+            // Old
+            maxValue = B_HEALTHBAR_PIXELS;
+            currValue = CalcBarFilledPixels(gBattleSpritesDataPtr->battleBars[battlerId].maxValue,
+                gBattleSpritesDataPtr->battleBars[battlerId].oldValue,
+                gBattleSpritesDataPtr->battleBars[battlerId].receivedValue,
+                &gBattleSpritesDataPtr->battleBars[battlerId].currValue,
+                array, B_HEALTHBAR_PIXELS / 8);
+        }
         else
-            barElementId = HEALTHBOX_GFX_HP_BAR_RED; // 20 % or less
+        {
+            CalcBarFilledPixels(gBattleSpritesDataPtr->battleBars[battlerId].maxValue,
+                gBattleSpritesDataPtr->battleBars[battlerId].oldValue,
+                gBattleSpritesDataPtr->battleBars[battlerId].receivedValue,
+                &gBattleSpritesDataPtr->battleBars[battlerId].currValue,
+                array, B_HEALTHBAR_PIXELS / 8);
+
+            maxValue = gBattleSpritesDataPtr->battleBars[battlerId].maxValue;
+            currValue = gBattleSpritesDataPtr->battleBars[battlerId].currValue;
+
+            if (maxValue < B_HEALTHBAR_PIXELS)
+                currValue = Q_24_8_TO_INT(currValue);
+        }
+
+        switch (GetHPBarLevel(currValue, maxValue))
+        {
+            case HP_BAR_FULL:
+            case HP_BAR_GREEN: // more than 50 % hp
+                barElementId = HEALTHBOX_GFX_HP_BAR_GREEN;
+                break;
+            case HP_BAR_YELLOW: // more than 20% hp
+                barElementId = HEALTHBOX_GFX_HP_BAR_YELLOW;
+                break;
+            default:
+            case HP_BAR_RED: // 20 % or less
+                if (maxValue > 1) // handling for wonder guard
+                    barElementId = HEALTHBOX_GFX_HP_BAR_RED;
+                else
+                    barElementId = HEALTHBOX_GFX_HP_BAR_GREEN;
+                break;
+        }
 
         for (i = 0; i < 6; i++)
         {
@@ -2331,11 +2464,7 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
             *currValue = oldValue;
     }
 
-    newValue = oldValue - receivedValue;
-    if (newValue < 0)
-        newValue = 0;
-    else if (newValue > maxValue)
-        newValue = maxValue;
+    newValue = SubtractClamped(0, maxValue, oldValue, receivedValue);
 
     if (maxValue < scale)
     {
@@ -2400,23 +2529,18 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
 static u8 CalcBarFilledPixels(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *currValue, u8 *arg4, u8 scale)
 {
     u8 pixels, filledPixels, totalPixels;
-    u8 i;
+    u32 i;
 
-    s32 newValue = oldValue - receivedValue;
-    if (newValue < 0)
-        newValue = 0;
-    else if (newValue > maxValue)
-        newValue = maxValue;
-
+    s32 newValue = SubtractClamped(0, maxValue, oldValue, receivedValue); // HP_EMPTY = 0
     totalPixels = scale * 8;
 
     for (i = 0; i < scale; i++)
         arg4[i] = 0;
 
     if (maxValue < totalPixels)
-        pixels = (*currValue * totalPixels / maxValue) >> 8;
+        pixels = SAFE_DIV(*currValue * totalPixels, maxValue) >> 8;
     else
-        pixels = *currValue * totalPixels / maxValue;
+        pixels = SAFE_DIV(*currValue * totalPixels, maxValue);
 
     filledPixels = pixels;
 
@@ -2487,12 +2611,7 @@ static u8 GetScaledExpFraction(s32 oldValue, s32 receivedValue, s32 maxValue, u8
     s8 oldToMax, newToMax;
 
     scale *= 8;
-    newVal = oldValue - receivedValue;
-
-    if (newVal < 0)
-        newVal = 0;
-    else if (newVal > maxValue)
-        newVal = maxValue;
+    newVal = SubtractClamped(0, maxValue, oldValue, receivedValue);
 
     oldToMax = oldValue * scale / maxValue;
     newToMax = newVal * scale / maxValue;
@@ -2513,26 +2632,20 @@ u8 GetScaledHPFraction(s16 hp, s16 maxhp, u8 scale)
 
 u8 GetHPBarLevel(s16 hp, s16 maxhp)
 {
-    u8 result;
+    s32 currValue = hp;
+    s32 maxValue = maxhp;
 
     if (hp == maxhp)
-    {
-        result = HP_BAR_FULL;
-    }
-    else
-    {
-        u8 fraction = GetScaledHPFraction(hp, maxhp, B_HEALTHBAR_PIXELS);
-        if (fraction > (B_HEALTHBAR_PIXELS * 50 / 100)) // more than 50 % hp
-            result = HP_BAR_GREEN;
-        else if (fraction > (B_HEALTHBAR_PIXELS * 20 / 100)) // more than 20% hp
-            result = HP_BAR_YELLOW;
-        else if (fraction > 0)
-            result = HP_BAR_RED;
-        else
-            result = HP_BAR_EMPTY;
-    }
+        return HP_BAR_FULL;
 
-    return result;
+    if (currValue > (maxValue * 50 / 100)) // more than 50% hp
+        return HP_BAR_GREEN;
+    else if (currValue > (maxValue * 20 / 100)) // more than 20% hp
+        return HP_BAR_YELLOW;
+    else if (currValue > 0)
+        return HP_BAR_RED; // 20% or less
+
+    return HP_BAR_EMPTY;
 }
 
 static u8* AddTextPrinterAndCreateWindowOnHealthbox(const u8 *str, u32 x, u32 y, u32 bgColor, u32 *windowId)
@@ -2589,3 +2702,645 @@ static void SafariTextIntoHealthboxObject(void *dest, u8 *windowTileData, u32 wi
     CpuCopy32(windowTileData, dest, windowWidth * TILE_SIZE_4BPP);
     CpuCopy32(windowTileData + 256, dest + 256, windowWidth * TILE_SIZE_4BPP);
 }
+
+#define LAST_USED_BALL_X_F    14
+#define LAST_USED_BALL_X_0    -14
+#define LAST_USED_BALL_Y      (IsDoubleBattle() ? 78 : 68)
+#define LAST_USED_BALL_Y_BNC  (IsDoubleBattle() ? 76 : 66)
+#define LAST_BALL_WINDOW_X_F  LAST_USED_BALL_X_F
+#define LAST_BALL_WINDOW_X_0  LAST_USED_BALL_X_0
+#define MOVE_INFO_WINDOW_X_F  14
+#define MOVE_INFO_WINDOW_X_0  -16 // Move info button box is wider than the last used ball one, so -16 is needed to slide it fully off screen.
+#define LAST_USED_WIN_Y       (LAST_USED_BALL_Y - 8)
+#define MOVE_INFO_WIN_Y       (IsDoubleBattle() ? 78 : 92)
+
+#define sHide     data[0]
+#define sTimer    data[1]
+#define sMoving   data[2]
+#define sBounce   data[3] // 0 = Bounce down; 1 = Bounce up
+
+#define sState    data[0]
+#define sSameBall data[1]
+
+static void CreateLastUsedBallIconSprite(void)
+{
+    u8 spriteId;
+
+    spriteId = AddItemIconSprite(TAG_LAST_USED_BALL_ICON, TAG_LAST_USED_BALL_ICON, gBallToDisplay);
+    if (spriteId == MAX_SPRITES)
+        return;
+
+    gBattleStruct->lastUsedBallSpriteIds[0] = spriteId;
+    gBattleStruct->lastUsedBallItem = gBallToDisplay;
+    gSprites[spriteId].pos1.x = LAST_USED_BALL_X_0;
+    gSprites[spriteId].pos1.y = LAST_USED_BALL_Y;
+    gSprites[spriteId].sHide = FALSE;
+    gSprites[spriteId].sTimer = 0;
+    gSprites[spriteId].sMoving = FALSE;
+    gSprites[spriteId].sBounce = FALSE;
+    gSprites[spriteId].callback = SpriteCB_LastUsedBallIcon;
+}
+
+static void CreateLastUsedBallWindowSprite(void)
+{
+    u8 spriteId;
+    bool32 loadedPalette = FALSE;
+    bool32 loadedTiles = FALSE;
+
+    if (IndexOfSpritePaletteTag(TAG_LAST_USED_BALL_WINDOW_PAL) == 0xFF)
+    {
+        LoadSpritePalette(&sSpritePalette_LastUsedBallWindow);
+        loadedPalette = TRUE;
+    }
+    if (GetSpriteTileStartByTag(TAG_LAST_USED_BALL_WINDOW) == 0xFFFF)
+    {
+        LoadSpriteSheet(&sSpriteSheet_LastUsedBallWindow);
+        loadedTiles = TRUE;
+    }
+
+    spriteId = CreateSprite(&sSpriteTemplate_LastUsedBallWindow, LAST_BALL_WINDOW_X_0, LAST_USED_WIN_Y, 5);
+    if (spriteId == MAX_SPRITES)
+    {
+        if (loadedTiles)
+            FreeSpriteTilesByTag(TAG_LAST_USED_BALL_WINDOW);
+        if (loadedPalette && GetSpriteTileStartByTag(TAG_MOVE_INFO_WINDOW) == 0xFFFF)
+            FreeSpritePaletteByTag(TAG_LAST_USED_BALL_WINDOW_PAL);
+        return;
+    }
+
+    gBattleStruct->lastUsedBallSpriteIds[1] = spriteId;
+    gSprites[spriteId].sHide = FALSE;
+}
+
+static void CreateMoveInfoWindowSprite(void)
+{
+    u8 spriteId;
+    bool32 loadedPalette = FALSE;
+    bool32 loadedTiles = FALSE;
+
+    if (IndexOfSpritePaletteTag(TAG_LAST_USED_BALL_WINDOW_PAL) == 0xFF)
+    {
+        LoadSpritePalette(&sSpritePalette_LastUsedBallWindow);
+        loadedPalette = TRUE;
+    }
+    if (GetSpriteTileStartByTag(TAG_MOVE_INFO_WINDOW) == 0xFFFF)
+    {
+        LoadSpriteSheet(&sSpriteSheet_MoveInfoWindow);
+        loadedTiles = TRUE;
+    }
+
+    spriteId = CreateSprite(&sSpriteTemplate_MoveInfoWindow, MOVE_INFO_WINDOW_X_0, MOVE_INFO_WIN_Y, 6); // +32
+    if (spriteId == MAX_SPRITES)
+    {
+        if (loadedTiles)
+            FreeSpriteTilesByTag(TAG_MOVE_INFO_WINDOW);
+        if (loadedPalette && GetSpriteTileStartByTag(TAG_LAST_USED_BALL_WINDOW) == 0xFFFF)
+            FreeSpritePaletteByTag(TAG_LAST_USED_BALL_WINDOW_PAL);
+        return;
+    }
+
+    gBattleStruct->moveInfoSpriteId = spriteId;
+    gSprites[spriteId].sHide = FALSE;
+}
+
+static void DestroyLastUsedBallTasks(void)
+{
+    u32 taskId;
+
+    for (taskId = 0; taskId < NUM_TASKS; taskId++)
+    {
+        if (gTasks[taskId].isActive && gTasks[taskId].func == Task_BounceLastUsedBall)
+            DestroyTask(taskId);
+    }
+}
+
+static void FreeLastUsedBallIconResources(void)
+{
+    if (GetSpriteTileStartByTag(TAG_LAST_USED_BALL_ICON) != 0xFFFF)
+        FreeSpriteTilesByTag(TAG_LAST_USED_BALL_ICON);
+    if (IndexOfSpritePaletteTag(TAG_LAST_USED_BALL_ICON) != 0xFF)
+        FreeSpritePaletteByTag(TAG_LAST_USED_BALL_ICON);
+    gBattleStruct->lastUsedBallSpriteIds[0] = MAX_SPRITES;
+    gBattleStruct->lastUsedBallItem = ITEM_NONE;
+}
+
+static void FreeLastUsedBallWindowResources(void)
+{
+    if (GetSpriteTileStartByTag(TAG_LAST_USED_BALL_WINDOW) != 0xFFFF)
+        FreeSpriteTilesByTag(TAG_LAST_USED_BALL_WINDOW);
+    if (IndexOfSpritePaletteTag(TAG_LAST_USED_BALL_WINDOW_PAL) != 0xFF
+        && GetSpriteTileStartByTag(TAG_MOVE_INFO_WINDOW) == 0xFFFF)
+    {
+        FreeSpritePaletteByTag(TAG_LAST_USED_BALL_WINDOW_PAL);
+    }
+    gBattleStruct->lastUsedBallSpriteIds[1] = MAX_SPRITES;
+}
+
+static void FreeMoveInfoWindowResources(void)
+{
+    if (GetSpriteTileStartByTag(TAG_MOVE_INFO_WINDOW) != 0xFFFF)
+        FreeSpriteTilesByTag(TAG_MOVE_INFO_WINDOW);
+    if (IndexOfSpritePaletteTag(TAG_LAST_USED_BALL_WINDOW_PAL) != 0xFF
+        && GetSpriteTileStartByTag(TAG_LAST_USED_BALL_WINDOW) == 0xFFFF)
+    {
+        FreeSpritePaletteByTag(TAG_LAST_USED_BALL_WINDOW_PAL);
+    }
+    gBattleStruct->moveInfoSpriteId = MAX_SPRITES;
+}
+
+static void DestroyLastUsedBallIconSprite(void)
+{
+    u8 spriteId = gBattleStruct->lastUsedBallSpriteIds[0];
+
+    if (IsLastUsedBallIconSpriteValid())
+        DestroySprite(&gSprites[spriteId]);
+
+    FreeLastUsedBallIconResources();
+}
+
+static void DestroyLastUsedBallWindowSprite(void)
+{
+    u8 spriteId = gBattleStruct->lastUsedBallSpriteIds[1];
+
+    if (IsLastUsedBallWindowSpriteValid())
+        DestroySprite(&gSprites[spriteId]);
+
+    FreeLastUsedBallWindowResources();
+}
+
+static void DestroyMoveInfoWindowSprite(void)
+{
+    u8 spriteId = gBattleStruct->moveInfoSpriteId;
+
+    if (IsMoveInfoWindowSpriteValid())
+        DestroySprite(&gSprites[spriteId]);
+
+    FreeMoveInfoWindowResources();
+}
+
+static bool32 IsLastUsedBallIconSpriteValid(void)
+{
+    u8 spriteId = gBattleStruct->lastUsedBallSpriteIds[0];
+
+    if (spriteId == MAX_SPRITES || !gSprites[spriteId].inUse)
+        return FALSE;
+
+    return gSprites[spriteId].callback == SpriteCB_LastUsedBallIcon
+        || gSprites[spriteId].callback == SpriteCB_LastUsedBallBounce;
+}
+
+static bool32 IsLastUsedBallWindowSpriteValid(void)
+{
+    u8 spriteId = gBattleStruct->lastUsedBallSpriteIds[1];
+
+    if (spriteId == MAX_SPRITES || !gSprites[spriteId].inUse)
+        return FALSE;
+
+    return gSprites[spriteId].callback == SpriteCB_LastUsedBallWindow;
+}
+
+static bool32 IsMoveInfoWindowSpriteValid(void)
+{
+    u8 spriteId = gBattleStruct->moveInfoSpriteId;
+
+    if (spriteId == MAX_SPRITES || !gSprites[spriteId].inUse)
+        return FALSE;
+
+    return gSprites[spriteId].callback == SpriteCB_MoveInfoWindow;
+}
+
+static void SanitizeLastUsedBallSpriteIds(void)
+{
+    bool32 iconValid = IsLastUsedBallIconSpriteValid();
+    bool32 windowValid = IsLastUsedBallWindowSpriteValid();
+
+    if (!iconValid && windowValid)
+        DestroyLastUsedBallWindowSprite();
+    else if (iconValid && !windowValid)
+        DestroyLastUsedBallIconSprite();
+
+    if (!iconValid)
+        FreeLastUsedBallIconResources();
+    if (!windowValid)
+        FreeLastUsedBallWindowResources();
+
+    if (!iconValid || !windowValid)
+    {
+        DestroyLastUsedBallTasks();
+        gLastUsedBallMenuPresent = FALSE;
+        gBattleStruct->lastUsedBallBtnAck = FALSE;
+        gBattleStruct->lastUsedBallSwapped = FALSE;
+    }
+}
+
+static void SanitizeMoveInfoSpriteId(void)
+{
+    if (!IsMoveInfoWindowSpriteValid())
+        FreeMoveInfoWindowResources();
+}
+
+static void SpriteCB_LastUsedBallWindow(struct Sprite *sprite)
+{
+    if (sprite->sHide)
+    {
+        if (sprite->pos1.x != LAST_BALL_WINDOW_X_0)
+            sprite->pos1.x--;
+
+        if (sprite->pos1.x == LAST_BALL_WINDOW_X_0)
+            return;
+    }
+    else if (sprite->pos1.x != LAST_BALL_WINDOW_X_F)
+    {
+        sprite->pos1.x++;
+    }
+}
+
+static void SpriteCB_MoveInfoWindow(struct Sprite *sprite)
+{
+    if (sprite->sHide)
+    {
+        if (sprite->pos1.x != MOVE_INFO_WINDOW_X_0)
+            sprite->pos1.x--;
+
+        if (sprite->pos1.x == MOVE_INFO_WINDOW_X_0)
+            return;
+    }
+    else if (sprite->pos1.x != MOVE_INFO_WINDOW_X_F)
+    {
+        sprite->pos1.x++;
+    }
+}
+
+static void SpriteCB_LastUsedBallIcon(struct Sprite *sprite)
+{
+    if (sprite->sHide)
+    {
+        if (sprite->pos1.y < LAST_USED_BALL_Y) // Used to recover from an incomplete bounce before hiding the window
+            sprite->pos1.y++;
+
+        if (sprite->pos1.x != LAST_USED_BALL_X_0)
+            sprite->pos1.x--;
+
+        if (sprite->pos1.x == LAST_USED_BALL_X_0)
+            return;
+    }
+    else if (sprite->pos1.x != LAST_USED_BALL_X_F)
+    {
+        sprite->pos1.x++;
+    }
+}
+
+static void SpriteCB_LastUsedBallBounce(struct Sprite *sprite)
+{
+    if ((sprite->sTimer++ % 4) != 0) // Change the image every 4 frame
+        return;
+
+    if (sprite->sBounce)
+    {
+        if (sprite->pos1.y > LAST_USED_BALL_Y_BNC)
+            sprite->pos1.y--;
+        else
+            sprite->sMoving = FALSE;
+    }
+    else
+    {
+        if (sprite->pos1.y < LAST_USED_BALL_Y)
+            sprite->pos1.y++;
+        else
+            sprite->sMoving = FALSE;
+    }
+}
+
+static void Task_BounceLastUsedBall(u8 taskId)
+{
+    struct Task *task = &gTasks[taskId];
+    struct Sprite *sprite;
+
+    if (!gLastUsedBallMenuPresent)
+    {
+        if (gBattleStruct->lastUsedBallSpriteIds[0] != MAX_SPRITES)
+            gSprites[gBattleStruct->lastUsedBallSpriteIds[0]].callback = SpriteCB_LastUsedBallIcon;
+        DestroyTask(taskId);
+        return;
+    }
+
+    if (gBattleStruct->lastUsedBallSpriteIds[0] == MAX_SPRITES)
+    {
+        DestroyTask(taskId);
+        return;
+    }
+
+    sprite = &gSprites[gBattleStruct->lastUsedBallSpriteIds[0]];
+    switch (task->sState)
+    {
+    case 0:
+        sprite->sBounce = TRUE;
+        sprite->sMoving = TRUE;
+        sprite->sTimer = 0;
+        sprite->callback = SpriteCB_LastUsedBallBounce;
+        task->sState = task->sSameBall ? 3 : 1;
+        break;
+    case 1:
+        if (sprite->sMoving)
+            break;
+
+        DestroyLastUsedBallIconSprite();
+        task->sState++;
+        // fall through
+    case 2:
+        if (gBattleStruct->lastUsedBallSpriteIds[0] == MAX_SPRITES)
+        {
+            CreateLastUsedBallIconSprite();
+            if (gBattleStruct->lastUsedBallSpriteIds[0] == MAX_SPRITES)
+            {
+                DestroyLastUsedBallWindowSprite();
+                gLastUsedBallMenuPresent = FALSE;
+                gBattleStruct->lastUsedBallBtnAck = FALSE;
+                gBattleStruct->lastUsedBallSwapped = FALSE;
+                DestroyTask(taskId);
+                break;
+            }
+
+            sprite = &gSprites[gBattleStruct->lastUsedBallSpriteIds[0]];
+            sprite->pos1.x = LAST_USED_BALL_X_F;
+            sprite->pos1.y = LAST_USED_BALL_Y_BNC;
+            task->sState++;
+        }
+        // fall through
+    case 3:
+        if (sprite->sMoving)
+            break;
+
+        sprite->sBounce = FALSE;
+        sprite->sMoving = TRUE;
+        sprite->sTimer = 0;
+        sprite->callback = SpriteCB_LastUsedBallBounce;
+        task->sState++;
+        break;
+    case 4:
+        if (!sprite->sMoving)
+        {
+            sprite->callback = SpriteCB_LastUsedBallIcon;
+            if (gBattleStruct->lastUsedBallItem != gBallToDisplay)
+            {
+                task->sSameBall = FALSE;
+                task->sState = 0;
+            }
+            else
+            {
+                DestroyTask(taskId);
+            }
+        }
+        break;
+    }
+}
+
+void ArrowsChangeColorLastBallCycle(bool32 showArrows)
+{
+    u16 paletteNum;
+    struct PlttData *defaultPlttArrow;
+    struct PlttData *defaultPlttOutline;
+    struct PlttData *pltArrowFaded;
+    struct PlttData *pltOutlineFaded;
+    struct PlttData *pltArrowUnfaded;
+    struct PlttData *pltOutlineUnfaded;
+
+    if (!IsLastUsedBallWindowSpriteValid())
+        return;
+
+    paletteNum = 16 + gSprites[gBattleStruct->lastUsedBallSpriteIds[1]].oam.paletteNum;
+    paletteNum *= 16;
+    pltArrowFaded = (struct PlttData *)&gPlttBufferFaded[paletteNum + 9];
+    pltOutlineFaded = (struct PlttData *)&gPlttBufferFaded[paletteNum + 8];
+    pltArrowUnfaded = (struct PlttData *)&gPlttBufferUnfaded[paletteNum + 9];
+    pltOutlineUnfaded = (struct PlttData *)&gPlttBufferUnfaded[paletteNum + 8];
+    if (!showArrows)
+    {
+        defaultPlttArrow = (struct PlttData *)&gPlttBufferUnfaded[paletteNum + 13];
+        pltArrowUnfaded->r = defaultPlttArrow->r;
+        pltArrowUnfaded->g = defaultPlttArrow->g;
+        pltArrowUnfaded->b = defaultPlttArrow->b;
+        pltOutlineUnfaded->r = defaultPlttArrow->r;
+        pltOutlineUnfaded->g = defaultPlttArrow->g;
+        pltOutlineUnfaded->b = defaultPlttArrow->b;
+
+        defaultPlttArrow = (struct PlttData *)&gPlttBufferFaded[paletteNum + 13];
+        pltArrowFaded->r = defaultPlttArrow->r;
+        pltArrowFaded->g = defaultPlttArrow->g;
+        pltArrowFaded->b = defaultPlttArrow->b;
+        pltOutlineFaded->r = defaultPlttArrow->r;
+        pltOutlineFaded->g = defaultPlttArrow->g;
+        pltOutlineFaded->b = defaultPlttArrow->b;
+    }
+    else
+    {
+        defaultPlttArrow = (struct PlttData *)&gPlttBufferUnfaded[paletteNum + 11];
+        defaultPlttOutline = (struct PlttData *)&gPlttBufferUnfaded[paletteNum + 10];
+        pltArrowUnfaded->r = defaultPlttArrow->r;
+        pltArrowUnfaded->g = defaultPlttArrow->g;
+        pltArrowUnfaded->b = defaultPlttArrow->b;
+        pltOutlineUnfaded->r = defaultPlttOutline->r;
+        pltOutlineUnfaded->g = defaultPlttOutline->g;
+        pltOutlineUnfaded->b = defaultPlttOutline->b;
+
+        defaultPlttArrow = (struct PlttData *)&gPlttBufferFaded[paletteNum + 11];
+        defaultPlttOutline = (struct PlttData *)&gPlttBufferFaded[paletteNum + 10];
+        pltArrowFaded->r = defaultPlttArrow->r;
+        pltArrowFaded->g = defaultPlttArrow->g;
+        pltArrowFaded->b = defaultPlttArrow->b;
+        pltOutlineFaded->r = defaultPlttOutline->r;
+        pltOutlineFaded->g = defaultPlttOutline->g;
+        pltOutlineFaded->b = defaultPlttOutline->b;
+    }
+
+    CpuCopy16(gPlttBufferFaded + paletteNum, (void *)(OBJ_PLTT + paletteNum * 2), PLTT_SIZE_4BPP);
+}
+
+static void ResolveLastUsedBallToDisplay(void)
+{
+    u16 firstBall;
+
+    if ((gBallToDisplay == ITEM_NONE || gBallToDisplay > LAST_BALL || !CheckBagHasItem(gBallToDisplay, 1))
+        && gLastThrownBall != ITEM_NONE
+        && CheckBagHasItem(gLastThrownBall, 1))
+    {
+        gBallToDisplay = gLastThrownBall;
+    }
+    else if (gBallToDisplay == ITEM_NONE || gBallToDisplay > LAST_BALL || !CheckBagHasItem(gBallToDisplay, 1))
+    {
+        // we're out of the last used ball, so just set it to the first ball in the bag
+        // we have to compact the bag first because it is typically only compacted when you open it
+        CompactItemsInBagPocket(&gBagPockets[BALLS_POCKET]);
+        firstBall = BagGetItemIdByPocketPosition(POCKET_POKE_BALLS, 0);
+        gBallToDisplay = firstBall;
+    }
+}
+
+bool32 CanThrowLastUsedBall(void)
+{
+    if (!gCanShowLastUsedBallMenu)
+        return FALSE;
+    if (gBallToDisplay == ITEM_NONE || gBallToDisplay > LAST_BALL)
+        return FALSE;
+    if (!CheckBagHasItem(gBallToDisplay, 1))
+        return FALSE;
+
+    return TRUE;
+}
+
+static void TryHideOrRestoreLastUsedBall(bool32 hide)
+{
+    SanitizeLastUsedBallSpriteIds();
+
+    if (gBattleStruct->lastUsedBallSpriteIds[0] != MAX_SPRITES)
+        gSprites[gBattleStruct->lastUsedBallSpriteIds[0]].sHide = hide;
+    if (gBattleStruct->lastUsedBallSpriteIds[1] != MAX_SPRITES)
+        gSprites[gBattleStruct->lastUsedBallSpriteIds[1]].sHide = hide;
+
+    gLastUsedBallMenuPresent = !hide;
+    ArrowsChangeColorLastBallCycle(FALSE);
+}
+
+void TryToAddMoveInfoWindow(void)
+{
+    SanitizeMoveInfoSpriteId();
+
+    if (gBattleStruct->moveInfoSpriteId != MAX_SPRITES)
+    {
+        gSprites[gBattleStruct->moveInfoSpriteId].data[0] = FALSE;
+    }
+    else
+    {
+        CreateMoveInfoWindowSprite();
+    }
+}
+
+void TryToHideMoveInfoWindow(void)
+{
+    SanitizeMoveInfoSpriteId();
+
+    if (gBattleStruct->moveInfoSpriteId != MAX_SPRITES)
+        gSprites[gBattleStruct->moveInfoSpriteId].data[0] = TRUE;
+}
+
+void DestroyBattleMenuExtraSprites(void)
+{
+    if (gBattleStruct == NULL)
+        return;
+
+    DestroyLastUsedBallTasks();
+    DestroyMoveInfoWindowSprite();
+    DestroyLastUsedBallWindowSprite();
+    DestroyLastUsedBallIconSprite();
+    gLastUsedBallMenuPresent = FALSE;
+    gBattleStruct->lastUsedBallBtnAck = FALSE;
+    gBattleStruct->lastUsedBallSwapped = FALSE;
+}
+
+void TryHideLastUsedBall(void)
+{
+    TryHideOrRestoreLastUsedBall(TRUE);
+    gBattleStruct->lastUsedBallBtnAck = FALSE;
+    gBattleStruct->lastUsedBallSwapped = FALSE;
+}
+
+void TryRestoreLastUsedBall(void)
+{
+    if (!gCanShowLastUsedBallMenu)
+    {
+        TryHideLastUsedBall();
+        return;
+    }
+
+    ResolveLastUsedBallToDisplay();
+    if (!CanThrowLastUsedBall())
+    {
+        TryHideLastUsedBall();
+        return;
+    }
+
+    SanitizeLastUsedBallSpriteIds();
+    if (gBattleStruct->lastUsedBallSpriteIds[0] != MAX_SPRITES
+        && gBattleStruct->lastUsedBallSpriteIds[1] != MAX_SPRITES
+        && gBattleStruct->lastUsedBallItem == gBallToDisplay)
+    {
+        TryHideOrRestoreLastUsedBall(FALSE);
+    }
+    else
+    {
+        TryAddLastUsedBallItemSprites();
+    }
+}
+
+void TryAddLastUsedBallItemSprites(void)
+{
+    if (!gCanShowLastUsedBallMenu)
+    {
+        TryHideLastUsedBall();
+        return;
+    }
+
+    ResolveLastUsedBallToDisplay();
+
+    if (!CanThrowLastUsedBall())
+    {
+        TryHideLastUsedBall();
+        return;
+    }
+
+    SanitizeLastUsedBallSpriteIds();
+    if (gBattleStruct->lastUsedBallSpriteIds[0] != MAX_SPRITES
+        || gBattleStruct->lastUsedBallSpriteIds[1] != MAX_SPRITES)
+    {
+        DestroyLastUsedBallWindowSprite();
+        DestroyLastUsedBallIconSprite();
+    }
+
+    CreateLastUsedBallIconSprite();
+    CreateLastUsedBallWindowSprite();
+    if (gBattleStruct->lastUsedBallSpriteIds[0] == MAX_SPRITES
+        || gBattleStruct->lastUsedBallSpriteIds[1] == MAX_SPRITES)
+    {
+        DestroyLastUsedBallWindowSprite();
+        DestroyLastUsedBallIconSprite();
+        gLastUsedBallMenuPresent = FALSE;
+        gBattleStruct->lastUsedBallBtnAck = FALSE;
+        gBattleStruct->lastUsedBallSwapped = FALSE;
+        return;
+    }
+
+    gBattleStruct->lastUsedBallBtnAck = FALSE;
+    gBattleStruct->lastUsedBallSwapped = FALSE;
+    gLastUsedBallMenuPresent = TRUE;
+    ArrowsChangeColorLastBallCycle(FALSE);
+}
+
+void SwapBallToDisplay(bool32 sameBall)
+{
+    u32 taskId = FindTaskIdByFunc(Task_BounceLastUsedBall);
+
+    if (taskId != 0xFF)
+        return;
+
+    taskId = CreateTaskIfSpace(Task_BounceLastUsedBall, 10);
+    if (taskId != NUM_TASKS)
+    {
+        gTasks[taskId].sSameBall = sameBall;
+    }
+}
+
+#undef LAST_USED_BALL_X_F
+#undef LAST_USED_BALL_X_0
+#undef LAST_USED_BALL_Y
+#undef LAST_USED_BALL_Y_BNC
+#undef LAST_BALL_WINDOW_X_F
+#undef LAST_BALL_WINDOW_X_0
+#undef MOVE_INFO_WINDOW_X_F
+#undef MOVE_INFO_WINDOW_X_0
+#undef LAST_USED_WIN_Y
+#undef sHide
+#undef sTimer
+#undef sMoving
+#undef sBounce
+#undef sState
+#undef sSameBall

@@ -4,6 +4,9 @@
 void ClearEnigmaBerries(void);
 void SetEnigmaBerry(u8 *src);
 bool32 IsEnigmaBerryValid(void);
+const u8 *GetEnigmaBerryItemEffect(void);
+u8 GetEnigmaBerryHoldEffect(void);
+void GetBattleEnigmaBerry(struct BattleEnigmaBerry *battleBerry);
 const struct Berry *GetBerryInfo(u8 berry);
 struct BerryTree *GetBerryTreeInfo(u8 id);
 bool32 ObjectEventInteractionWaterBerryTree(void);

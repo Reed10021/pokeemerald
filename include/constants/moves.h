@@ -360,20 +360,20 @@
 
 // Gen 4 moves
 #define MOVE_ROOST        355 // Unused / Placeholder
-#define MOVE_GRAVITY      356 // Unused / Placeholder
+#define MOVE_GRAVITY      356
 #define MOVE_MIRACLE_EYE  357 // Unused / Placeholder
 #define MOVE_WAKE_UP_SLAP 358 // Unused / Placeholder
-#define MOVE_HAMMER_ARM   359 // Unused / Placeholder
+#define MOVE_HAMMER_ARM   359
 #define MOVE_GYRO_BALL    360 // Unused / Placeholder
 #define MOVE_HEALING_WISH 361 // Unused / Placeholder
 #define MOVE_BRINE        362 // Unused / Placeholder
 #define MOVE_NATURAL_GIFT 363 // Unused / Placeholder
 #define MOVE_FEINT        364 // Unused / Placeholder
 #define MOVE_PLUCK        365 // Unused / Placeholder
-#define MOVE_TAILWIND     366 // Unused / Placeholder
+#define MOVE_TAILWIND     366
 #define MOVE_ACUPRESSURE  367 // Unused / Placeholder
 #define MOVE_METAL_BURST  368 // Unused / Placeholder
-#define MOVE_U_TURN       369 // Unused / Placeholder
+#define MOVE_U_TURN       369
 #define MOVE_CLOSE_COMBAT 370 
 #define MOVE_PAYBACK      371 // Unused / Placeholder
 #define MOVE_ASSURANCE    372 // Unused / Placeholder
@@ -397,72 +397,72 @@
 #define MOVE_TOXIC_SPIKES 390 // Unused / Placeholder
 #define MOVE_HEART_SWAP   391 // Unused / Placeholder
 #define MOVE_AQUA_RING    392 // Unused / Placeholder
-#define MOVE_MAGNET_RISE  393 // Unused / Placeholder
+#define MOVE_MAGNET_RISE  393
 #define MOVE_FLARE_BLITZ  394
 #define MOVE_FORCE_PALM   395
 #define MOVE_AURA_SPHERE  396
 #define MOVE_ROCK_POLISH  397
 #define MOVE_POISON_JAB   398
 #define MOVE_DARK_PULSE   399
-#define MOVE_NIGHT_SLASH  400 // Unused / Placeholder
-#define MOVE_AQUA_TAIL    401 // Unused / Placeholder
+#define MOVE_NIGHT_SLASH  400
+#define MOVE_AQUA_TAIL    401
 #define MOVE_SEED_BOMB    402
 #define MOVE_AIR_SLASH    403
 #define MOVE_X_SCISSOR    404
 #define MOVE_BUG_BUZZ     405
 #define MOVE_DRAGON_PULSE 406
-#define MOVE_DRAGON_RUSH  407 // Unused / Placeholder
-#define MOVE_POWER_GEM    408 // Unused / Placeholder
+#define MOVE_DRAGON_RUSH  407
+#define MOVE_POWER_GEM    408
 #define MOVE_DRAIN_PUNCH  409
-#define MOVE_VACUUM_WAVE  410 // Unused / Placeholder
-#define MOVE_FOCUS_BLAST  411 // Unused / Placeholder
-#define MOVE_ENERGY_BALL  412 // Unused / Placeholder
+#define MOVE_VACUUM_WAVE  410
+#define MOVE_FOCUS_BLAST  411
+#define MOVE_ENERGY_BALL  412
 #define MOVE_BRAVE_BIRD   413
-#define MOVE_EARTH_POWER  414 // Unused / Placeholder
+#define MOVE_EARTH_POWER  414
 #define MOVE_SWITCHEROO   415 // Unused / Placeholder
-#define MOVE_GIGA_IMPACT  416 // Unused / Placeholder
+#define MOVE_GIGA_IMPACT  416 // Unused / Placeholder -- Use Hyper Beam instead
 #define MOVE_NASTY_PLOT   417
 #define MOVE_BULLET_PUNCH 418
 #define MOVE_AVALANCHE    419
 #define MOVE_ICE_SHARD    420
 #define MOVE_SHADOW_CLAW  421
-#define MOVE_THUNDER_FANG 422 // Unused / Placeholder
-#define MOVE_ICE_FANG     423 // Unused / Placeholder
-#define MOVE_FIRE_FANG    424 // Unused / Placeholder
+#define MOVE_THUNDER_FANG 422
+#define MOVE_ICE_FANG     423
+#define MOVE_FIRE_FANG    424
 #define MOVE_SHADOW_SNEAK 425 // Unused / Placeholder
 #define MOVE_MUD_BOMB     426 // Unused / Placeholder
 #define MOVE_PSYCHO_CUT   427
 #define MOVE_ZEN_HEADBUTT 428
-#define MOVE_MIRROR_SHOT  429 // Unused / Placeholder
+#define MOVE_MIRROR_SHOT  429
 #define MOVE_FLASH_CANNON 430
 #define MOVE_ROCK_CLIMB   431 // Unused / Placeholder
 #define MOVE_DEFOG        432 // Unused / Placeholder
 #define MOVE_TRICK_ROOM   433
 #define MOVE_DRACO_METEOR 434 // Unused / Placeholder
-#define MOVE_DISCHARGE    435 // Unused / Placeholder
-#define MOVE_LAVA_PLUME   436 // Unused / Placeholder
-#define MOVE_LEAF_STORM   437 // Unused / Placeholder
-#define MOVE_POWER_WHIP   438 // Unused / Placeholder
-#define MOVE_ROCK_WRECKER 439 // Unused / Placeholder
-#define MOVE_CROSS_POISON 440 // Unused / Placeholder
-#define MOVE_GUNK_SHOT    441 // Unused / Placeholder
-#define MOVE_IRON_HEAD    442 // Unused / Placeholder
-#define MOVE_MAGNET_BOMB  443 // Unused / Placeholder
-#define MOVE_STONE_EDGE   444 // Unused / Placeholder
+#define MOVE_DISCHARGE    435
+#define MOVE_LAVA_PLUME   436
+#define MOVE_LEAF_STORM   437
+#define MOVE_POWER_WHIP   438
+#define MOVE_ROCK_WRECKER 439
+#define MOVE_CROSS_POISON 440
+#define MOVE_GUNK_SHOT    441
+#define MOVE_IRON_HEAD    442
+#define MOVE_MAGNET_BOMB  443
+#define MOVE_STONE_EDGE   444
 #define MOVE_CAPTIVATE    445 // Unused / Placeholder
 #define MOVE_STEALTH_ROCK 446 // Unused / Placeholder
-#define MOVE_GRASS_KNOT   447 // Unused / Placeholder
+#define MOVE_GRASS_KNOT   447
 #define MOVE_CHATTER      448 // Unused / Placeholder
 #define MOVE_JUDGMENT     449 // Unused / Placeholder
 #define MOVE_BUG_BITE     450 // Unused / Placeholder
-#define MOVE_CHARGE_BEAM  451 // Unused / Placeholder
+#define MOVE_CHARGE_BEAM  451
 #define MOVE_WOOD_HAMMER  452 // Unused / Placeholder
 #define MOVE_AQUA_JET     453 // Unused / Placeholder
 #define MOVE_ATTACK_ORDER 454 // Unused / Placeholder
 #define MOVE_DEFEND_ORDER 455 // Unused / Placeholder
 #define MOVE_HEAL_ORDER   456 // Unused / Placeholder
 #define MOVE_HEAD_SMASH   457 // Unused / Placeholder
-#define MOVE_DOUBLE_HIT   458 // Unused / Placeholder
+#define MOVE_DOUBLE_HIT   458
 #define MOVE_ROAR_OF_TIME 459 // Unused / Placeholder
 #define MOVE_SPACIAL_REND 460 // Unused / Placeholder
 #define MOVE_LUNAR_DANCE  461 // Unused / Placeholder
@@ -470,9 +470,74 @@
 #define MOVE_MAGMA_STORM  463 // Unused / Placeholder
 #define MOVE_DARK_VOID    464 // Unused / Placeholder
 #define MOVE_SEED_FLARE   465 // Unused / Placeholder
-#define MOVE_OMINOUS_WIND 466 // Unused / Placeholder
+#define MOVE_OMINOUS_WIND 466
 #define MOVE_SHADOW_FORCE 467 // Unused / Placeholder
 
-#define MOVES_COUNT 468
+// Gen 5 Moves
+#define MOVE_HONE_CLAWS   468 // Unused / Placeholder
+#define MOVE_WIDE_GUARD   469
+#define MOVE_PSYSHOCK     470 // Unused / Placeholder
+#define MOVE_VENOSHOCK    471 // Unused / Placeholder
+#define MOVE_AUTOTOMIZE   472 // Unused / Placeholder
+#define MOVE_RAGE_POWDER  473
+#define MOVE_SMACK_DOWN   474 // Unused / Placeholder
+#define MOVE_HEX          475
+#define MOVE_SLUDGE_WAVE  476
+#define MOVE_QUIVER_DANCE 477
+#define MOVE_HEAVY_SLAM   478
+#define MOVE_ELECTRO_BALL 479
+#define MOVE_FLAME_CHARGE 480
+#define MOVE_COIL         481
+#define MOVE_ACID_SPRAY   482 // Unused / Placeholder
+#define MOVE_QUICK_GUARD  483
+#define MOVE_SCALD        484
+#define MOVE_ACROBATICS   485
+#define MOVE_VOLT_SWITCH  486
+#define MOVE_FROST_BREATH 487
+#define MOVE_WORK_UP      488
+#define MOVE_ELECTROWEB   489
+#define MOVE_WILD_CHARGE  490
+#define MOVE_DUAL_CHOP    491
+#define MOVE_SACRED_SWORD 492
+#define MOVE_PSYSTRIKE    493
+// Hurricane is accurate in Rain and in Hail/Snow (a la Nor'easter).
+#define MOVE_HURRICANE    494
+#define MOVE_FIERY_DANCE  495
+#define MOVE_ICICLE_CRASH 496
+
+// Gen 6 Moves
+#define MOVE_FREEZE_DRY        497
+#define MOVE_ORIGIN_PULSE      498 // Unused / Placeholder
+#define MOVE_PRECIPICE_BLADES  499 // Unused / Placeholder
+#define MOVE_DRAGON_ASCENT     500 // Unused / Placeholder
+
+// Gen 7 Moves
+#define MOVE_HIGH_HORSEPOWER   501
+#define MOVE_SOLAR_BLADE       502
+#define MOVE_POLLEN_PUFF       503
+#define MOVE_LUNGE             504
+#define MOVE_AURORA_VEIL       505
+#define MOVE_PSYCHIC_FANGS     506
+#define MOVE_LIQUIDATION       507
+#define MOVE_DOUBLE_IRON_BASH  508
+
+// Gen 8 Moves
+#define MOVE_BREAKING_SWIPE    509
+#define MOVE_LIFE_DEW          510
+#define MOVE_METEOR_ASSAULT    511
+#define MOVE_SKITTER_SMACK     512
+#define MOVE_THUNDER_CAGE      513
+#define MOVE_DRAGON_ENERGY     514
+#define MOVE_PSYSHIELD_BASH    515
+#define MOVE_STONE_AXE         516
+#define MOVE_HEADLONG_RUSH     517
+#define MOVE_BARB_BARRAGE      518
+
+// Gen 9 Moves
+#define MOVE_HYPER_DRILL       519
+#define MOVE_TWIN_BEAM         520
+#define MOVE_RAGE_FIST         521
+
+#define MOVES_COUNT 522
 
 #endif  // GUARD_CONSTANTS_MOVES_H

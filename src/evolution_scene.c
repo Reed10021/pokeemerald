@@ -559,7 +559,8 @@ static void CreateShedinja(u16 preEvoSpecies, struct Pokemon* mon)
         SetMonData(&gPlayerParty[gPlayerPartyCount], MON_DATA_NICKNAME, (gSpeciesNames[gEvolutionTable[preEvoSpecies][1].targetSpecies]));
         SetMonData(&gPlayerParty[gPlayerPartyCount], MON_DATA_HELD_ITEM, (&data));
         SetMonData(&gPlayerParty[gPlayerPartyCount], MON_DATA_MARKINGS, (&data));
-        SetMonData(&gPlayerParty[gPlayerPartyCount], MON_DATA_ENCRYPT_SEPARATOR, (&data));
+        SetMonData(&gPlayerParty[gPlayerPartyCount], MON_DATA_HYPER_TRAINING_FLAGS, (&data));
+        SetMonData(&gPlayerParty[gPlayerPartyCount], MON_DATA_HAS_HIDDEN_ABILITY, (&data));
 
         for (i = MON_DATA_COOL_RIBBON; i < MON_DATA_COOL_RIBBON + 5; i++)
             SetMonData(&gPlayerParty[gPlayerPartyCount], i, (&data));

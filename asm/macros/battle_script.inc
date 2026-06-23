@@ -1249,6 +1249,15 @@
 	.macro scaledamagebytargethp
 	.byte 0xf9
 	.endm
+
+	.macro settailwind
+	.byte 0xfa
+	.endm
+
+	.macro callnative func:req
+	.byte 0xfb
+	.4byte \func
+	.endm
 	
 @ various command changed to more readable macros
 	.macro cancelmultiturnmoves battler:req
@@ -1360,6 +1369,24 @@
 	.endm
 	
 @ helpful macros
+	.macro setallytonexttarget jumpInstr:req
+	jumpifbyte CMP_GREATER_THAN, gBattlerTarget, 0x1, 1f
+	addbyte gBattlerTarget, 0x2
+	goto \jumpInstr
+	1:
+	subbyte gBattlerTarget, 0x2
+	goto \jumpInstr
+	.endm
+
+	.macro setallytonextattacker jumpInstr:req
+	jumpifbyte CMP_GREATER_THAN, gBattlerAttacker, 0x1, 1f
+	addbyte gBattlerAttacker, 0x2
+	goto \jumpInstr
+	1:
+	subbyte gBattlerAttacker, 0x2
+	goto \jumpInstr
+	.endm
+
 	.macro setstatchanger stat:req, stages:req, down:req
 	setbyte sSTATCHANGER \stat | \stages << 4 | \down << 7
 	.endm
@@ -1434,4 +1461,85 @@
 	
 	.macro jumpifnotbattletype flags:req, jumpptr:req
 	jumpifword CMP_NO_COMMON_BITS, gBattleTypeFlags, \flags, \jumpptr
+	.endm
+
+@ Native calls
+	.macro jumpiffullhp battler:req, jumpInstr:req
+	callnative BS_JumpIfFullHp
+	.byte \battler
+	.4byte \jumpInstr
+	.endm
+
+	.macro jumpifabsent battler:req, jumpInstr:req
+	callnative BS_JumpIfAbsent
+	.byte \battler
+	.4byte \jumpInstr
+	.endm
+
+	.macro jumpifabilitynotignored battler:req, ability:req, jumpInstr:req
+	callnative BS_JumpIfAbilityNotIgnored
+	.byte \battler
+	.byte \ability
+	.4byte \jumpInstr
+	.endm
+
+	.macro jumpifcannotlifedew battler:req, jumpInstr:req
+	callnative BS_JumpIfCannotLifeDew
+	.byte \battler
+	.4byte \jumpInstr
+	.endm
+
+	.macro jumpiftargetally jumpInstr:req
+	callnative BS_JumpIfTargetAlly
+	.4byte \jumpInstr
+	.endm
+
+	.macro tryhealquarterhealth battler:req, failInstr:req
+	callnative BS_TryHealQuarterHealth
+	.byte \battler
+	.4byte \failInstr
+	.endm
+
+	.macro trysetgravity failInstr:req
+	callnative BS_TrySetGravity
+	.4byte \failInstr
+	.endm
+
+	.macro trysetmagnetrise failInstr:req
+	callnative BS_TrySetMagnetRise
+	.4byte \failInstr
+	.endm
+
+	.macro heavyslamdamagecalc accuracyInstr:req, alwaysHitInstr:req
+	callnative BS_HeavySlamDamageCalc
+	.4byte \accuracyInstr
+	.4byte \alwaysHitInstr
+	.endm
+
+	.macro electroballdamagecalc
+	callnative BS_ElectroBallDamageCalc
+	.endm
+
+	.macro trypreparehitescape failInstr:req
+	callnative BS_TryPrepareHitEscape
+	.4byte \failInstr
+	.endm
+
+	.macro setstatchangesource battler:req
+	callnative BS_SetStatChangeSource
+	.byte \battler
+	.endm
+
+	.macro trystatdropability battler:req
+	callnative BS_TryStatDropAbility
+	.byte \battler
+	.endm
+
+	.macro trymoxie
+	callnative BS_TryMoxie
+	.endm
+
+	.macro trydownload battler:req
+	callnative BS_TryGainedDownload
+	.byte \battler
 	.endm

@@ -1,7 +1,9 @@
 #include "global.h"
 #include "battle.h"
 #include "battle_anim.h"
+#include "berry.h"
 #include "battle_controllers.h"
+#include "battle_util.h"
 #include "pokemon.h"
 #include "random.h"
 #include "util.h"
@@ -57,7 +59,7 @@ static bool8 ShouldSwitchIfWonderGuard(void)
         if (move == MOVE_NONE)
             continue;
 
-        moveFlags = AI_TypeCalc(move, gBattleMons[opposingBattler].type1, gBattleMons[opposingBattler].type2, gBattleMons[opposingBattler].ability);
+        moveFlags = AI_TypeCalcByBattler(move, opposingBattler);
         if (moveFlags & MOVE_RESULT_SUPER_EFFECTIVE)
             return FALSE;
     }
@@ -101,7 +103,7 @@ static bool8 ShouldSwitchIfWonderGuard(void)
             if (move == MOVE_NONE)
                 continue;
 
-            moveFlags = AI_TypeCalc(move, gBattleMons[opposingBattler].type1, gBattleMons[opposingBattler].type2, gBattleMons[opposingBattler].ability);
+            moveFlags = AI_TypeCalcByBattler(move, opposingBattler);
             if (moveFlags & MOVE_RESULT_SUPER_EFFECTIVE && Random() % 3 < 2)
             {
                 // We found a mon.
@@ -120,6 +122,8 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
     u8 battlerIn1, battlerIn2;
     u8 absorbingTypeAbility;
     u8 absorbingTypeAbility2 = ABILITIES_COUNT;
+    u8 absorbingTypeAbility3 = ABILITIES_COUNT;
+    u16 lastLandedMove = gLastLandedMoves[gActiveBattler];
     s32 firstId;
     s32 lastId; // + 1
     struct Pokemon *party;
@@ -127,11 +131,12 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
 
     if (HasSuperEffectiveMoveAgainstOpponents(TRUE) && Random() % 3 != 0)
         return FALSE;
-    if (gLastLandedMoves[gActiveBattler] == 0)
+    if (lastLandedMove == 0)
         return FALSE;
-    if (gLastLandedMoves[gActiveBattler] == 0xFFFF)
+    if (lastLandedMove == 0xFFFF)
         return FALSE;
-    if (gBattleMoves[gLastLandedMoves[gActiveBattler]].power == 0)
+    if (gBattleMoves[lastLandedMove].power == 0
+        && gBattleMoves[lastLandedMove].type != TYPE_GRASS)
         return FALSE;
 
     if (gBattleTypeFlags & BATTLE_TYPE_DOUBLE)
@@ -148,19 +153,32 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
         battlerIn2 = gActiveBattler;
     }
 
-    if (gBattleMoves[gLastLandedMoves[gActiveBattler]].type == TYPE_FIRE)
+    if (gBattleMoves[lastLandedMove].type == TYPE_FIRE)
+    {
         absorbingTypeAbility = ABILITY_FLASH_FIRE;
-    else if (gBattleMoves[gLastLandedMoves[gActiveBattler]].type == TYPE_WATER)
+        absorbingTypeAbility2 = ABILITY_PYRO_REACTOR;
+    }
+    else if (gBattleMoves[lastLandedMove].type == TYPE_WATER)
+    {
         absorbingTypeAbility = ABILITY_WATER_ABSORB;
-    else if (gBattleMoves[gLastLandedMoves[gActiveBattler]].type == TYPE_ELECTRIC)
+        absorbingTypeAbility2 = ABILITY_DRY_SKIN;
+        absorbingTypeAbility3 = ABILITY_STORM_DRAIN;
+    }
+    else if (gBattleMoves[lastLandedMove].type == TYPE_ELECTRIC)
     {
         absorbingTypeAbility = ABILITY_VOLT_ABSORB;
         absorbingTypeAbility2 = ABILITY_LIGHTNING_ROD;
+        absorbingTypeAbility3 = ABILITY_MOTOR_DRIVE;
+    }
+    else if (gBattleMoves[lastLandedMove].type == TYPE_GRASS)
+    {
+        absorbingTypeAbility = ABILITY_SAP_SIPPER;
     }
     else
         return FALSE;
 
-    if (gBattleMons[gActiveBattler].ability == absorbingTypeAbility || gBattleMons[gActiveBattler].ability == absorbingTypeAbility2)
+    if (gBattleMons[gActiveBattler].ability == absorbingTypeAbility || gBattleMons[gActiveBattler].ability == absorbingTypeAbility2 || 
+        gBattleMons[gActiveBattler].ability == absorbingTypeAbility3)
         return FALSE;
 
     if (gBattleTypeFlags & (BATTLE_TYPE_TWO_OPPONENTS | BATTLE_TYPE_x800000))
@@ -201,12 +219,9 @@ static bool8 FindMonThatAbsorbsOpponentsMove(void)
             continue;
 
         species = GetMonData(&party[i], MON_DATA_SPECIES);
-        if (GetMonData(&party[i], MON_DATA_ABILITY_NUM) != 0)
-            monAbility = gBaseStats[species].abilities[1];
-        else
-            monAbility = gBaseStats[species].abilities[0];
+        monAbility = GetMonAbility(&party[i]);
 
-        if ((absorbingTypeAbility == monAbility || absorbingTypeAbility2 == monAbility) && Random() & 1)
+        if ((absorbingTypeAbility == monAbility || absorbingTypeAbility2 == monAbility || absorbingTypeAbility3 == monAbility) && Random() & 1)
         {
             // we found a mon.
             *(gBattleStruct->AI_monToSwitchIntoId + gActiveBattler) = i;
@@ -274,7 +289,7 @@ static bool8 HasSuperEffectiveMoveAgainstOpponents(bool8 noRng)
             if (move == MOVE_NONE)
                 continue;
 
-            moveFlags = AI_TypeCalc(move, gBattleMons[opposingBattler].type1, gBattleMons[opposingBattler].type2, gBattleMons[opposingBattler].ability);
+            moveFlags = AI_TypeCalcByBattler(move, opposingBattler);
             if (moveFlags & MOVE_RESULT_SUPER_EFFECTIVE)
             {
                 if (noRng)
@@ -297,7 +312,7 @@ static bool8 HasSuperEffectiveMoveAgainstOpponents(bool8 noRng)
             if (move == MOVE_NONE)
                 continue;
 
-            moveFlags = AI_TypeCalc(move, gBattleMons[opposingBattler].type1, gBattleMons[opposingBattler].type2, gBattleMons[opposingBattler].ability);
+            moveFlags = AI_TypeCalcByBattler(move, opposingBattler);
             if (moveFlags & MOVE_RESULT_SUPER_EFFECTIVE)
             {
                 if (noRng)
@@ -396,10 +411,7 @@ static bool8 FindMonWithFlagsAndSuperEffective(u8 flags, u8 moduloPercent)
             continue;
 
         species = GetMonData(&party[i], MON_DATA_SPECIES);
-        if (GetMonData(&party[i], MON_DATA_ABILITY_NUM) != 0)
-            monAbility = gBaseStats[species].abilities[1];
-        else
-            monAbility = gBaseStats[species].abilities[0];
+        monAbility = GetMonAbility(&party[i]);
 
         moveFlags = AI_TypeCalc(gLastLandedMoves[gActiveBattler], gBaseStats[species].type1, gBaseStats[species].type2, monAbility);
         if (moveFlags & flags)
@@ -438,19 +450,35 @@ static bool8 ShouldSwitch(void)
 
     if (gBattleMons[*(activeBattlerPtr = &gActiveBattler)].status2 & (STATUS2_WRAPPED | STATUS2_ESCAPE_PREVENTION))
         return FALSE;
-    if (gStatuses3[gActiveBattler] & STATUS3_ROOTED)
+    if (IsBattlerTrappedByIngrain(gActiveBattler))
         return FALSE;
-    if (ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_SHADOW_TAG))
-        return FALSE;
-    if (ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_ARENA_TRAP)) // Misses the flying type and Levitate check.
-        return FALSE;
-    if (ABILITY_ON_FIELD2(ABILITY_MAGNET_PULL))
+
+    // If ghost typed, then it can't be trapped per Gen 6 rules.
+    if (!IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_GHOST))
     {
-        if (gBattleMons[gActiveBattler].type1 == TYPE_STEEL)
-            return FALSE;
-        if (gBattleMons[gActiveBattler].type2 == TYPE_STEEL)
-            return FALSE;
+        if (ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_SHADOW_TAG))
+        {
+            if (gBattleMons[gActiveBattler].ability != ABILITY_SHADOW_TAG)
+            {
+                return FALSE;
+            }
+        }
+
+        if (ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_ARENA_TRAP)) // (fixed): Misses the flying type and Levitate check.
+        {
+            if (!IsBattlerGroundImmune(gActiveBattler))
+            {
+                return FALSE;
+            }
+        }
+
+        if (ABILITY_ON_OPPOSING_FIELD(gActiveBattler, ABILITY_MAGNET_PULL))
+        {
+            if (IS_BATTLER_OF_TYPE(gActiveBattler, TYPE_STEEL))
+                return FALSE;
+        }
     }
+
     if (gBattleTypeFlags & BATTLE_TYPE_ARENA)
         return FALSE;
 
@@ -655,8 +683,8 @@ u8 GetMostSuitableMonToSwitchInto(void)
         else
             battlerIn2 = GetBattlerAtPosition(GetBattlerPosition(gActiveBattler) ^ BIT_FLANK);
 
-        // UB: It considers the opponent only player's side even though it can battle alongside player.
-        opposingBattler = Random() & BIT_FLANK;
+        // UB (fixed): It considers the opponent only player's side even though it can battle alongside player.
+        opposingBattler = BATTLE_OPPOSITE(battlerIn1);
         if (gAbsentBattlerFlags & gBitTable[opposingBattler])
             opposingBattler ^= BIT_FLANK;
     }
@@ -688,7 +716,7 @@ u8 GetMostSuitableMonToSwitchInto(void)
 
     while (invalidMons != 0x3F) // All mons are invalid.
     {
-        bestDmg = TYPE_MUL_NORMAL;
+        bestDmg = 255; // Fixed from TYPE_MUL_NO_EFFECT
         bestMonId = 6;
         // Find the mon whose type is the most suitable offensively.
         for (i = firstId; i < lastId; i++)
@@ -846,7 +874,7 @@ static bool8 ShouldUseItem(void)
             continue;
 
         if (item == ITEM_ENIGMA_BERRY)
-            itemEffects = gSaveBlock1Ptr->enigmaBerry.itemEffect;
+            itemEffects = GetEnigmaBerryItemEffect();
         else
             itemEffects = gItemEffectTable[item - ITEM_POTION];
 

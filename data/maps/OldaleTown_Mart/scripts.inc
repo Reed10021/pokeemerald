@@ -37,6 +37,8 @@ OldaleTown_Mart_Pokemart_Expanded: @ 81FC27C
 	.2byte ITEM_AWAKENING
 	.2byte ITEM_POKE_DOLL
 	.2byte ITEM_ABILITY_CAPSULE
+	.2byte ITEM_ABILITY_PATCH
+	.2byte ITEM_BOTTLE_CAP
 	.2byte ITEM_SERIOUS_MINT
 	.2byte ITEM_NONE
 	release

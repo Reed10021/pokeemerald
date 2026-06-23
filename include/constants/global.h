@@ -79,12 +79,12 @@
 #define UNION_ROOM_PARTY_SIZE       2
 
 // string lengths
-#define ITEM_NAME_LENGTH 14
+#define ITEM_NAME_LENGTH 16
 #define POKEMON_NAME_LENGTH 10
 #define PLAYER_NAME_LENGTH 7
 #define MAIL_WORDS_COUNT 9
 #define EASY_CHAT_BATTLE_WORDS_COUNT 6
-#define MOVE_NAME_LENGTH 14
+#define MOVE_NAME_LENGTH 17
 
 #define MALE 0
 #define FEMALE 1

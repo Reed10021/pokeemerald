@@ -100,12 +100,12 @@ static const u8 sMaxPotionDesc[] = _(
 static const u8 sHyperPotionDesc[] = _(
     "Restores the HP of\n"
     "a POKéMON by\n"
-    "200 points.");
+    "120 points.");
 
 static const u8 sSuperPotionDesc[] = _(
     "Restores the HP of\n"
     "a POKéMON by\n"
-    "50 points.");
+    "60 points.");
 
 static const u8 sFullHealDesc[] = _(
     "Heals all the\n"
@@ -395,6 +395,26 @@ static const u8 sWaterStoneDesc[] = _(
     "evolve.");
 
 static const u8 sLeafStoneDesc[] = _(
+    "Makes certain\n"
+    "species of POKéMON\n"
+    "evolve.");
+
+static const u8 sIceStoneDesc[] = _(
+    "Makes certain\n"
+    "species of POKéMON\n"
+    "evolve.");
+
+static const u8 sShinyStoneDesc[] = _(
+    "Makes certain\n"
+    "species of POKéMON\n"
+    "evolve.");
+
+static const u8 sDawnStoneDesc[] = _(
+    "Makes certain\n"
+    "species of POKéMON\n"
+    "evolve.");
+
+static const u8 sDuskStoneDesc[] = _(
     "Makes certain\n"
     "species of POKéMON\n"
     "evolve.");
@@ -718,9 +738,9 @@ static const u8 sStarfBerryDesc[] = _(
     "stat in a pinch.");
 
 static const u8 sEnigmaBerryDesc[] = _(
-    "{POKEBLOCK} ingredient.\n"
-    "Plant in loamy soil\n"
-    "to grow a mystery.");
+    "A hold item that\n"
+    "heals from super\n"
+    "effective moves.");
 
 // Hold items
 static const u8 sBrightPowderDesc[] = _(
@@ -992,6 +1012,31 @@ static const u8 sWiseGlassesDesc[] = _(
     "that ups the power\n"
     "of special moves.");
 
+static const u8 sExpertBeltDesc[] = _(
+    "A belt that boosts\n"
+    "the power of super\n"
+    "effective moves.");
+
+static const u8 sFlameOrbDesc[] = _(
+    "A bizarre orb that\n"
+    "burns the holder in\n"
+    "battle.");
+
+static const u8 sToxicOrbDesc[] = _(
+    "A bizarre orb that\n"
+    "badly poisons the\n"
+    "holder in battle.");
+
+static const u8 sLifeOrbDesc[] = _(
+    "Boosts move power\n"
+    "but holder loses HP\n"
+    "with each attack.");
+
+static const u8 sEvioliteDesc[] = _(
+    "A stone that boosts\n"
+    "the defenses of an\n"
+    "unevolved holder.");
+
 static const u8 sAxeDesc[] = _(
     "A tool that can\n"
     "be used to cut\n"
@@ -1000,7 +1045,7 @@ static const u8 sAxeDesc[] = _(
 static const u8 sTaxiFluteDesc[] = _(
     "A flute that can\n"
     "be used to call a\n"
-    "Fly Taxi to you.");
+    "Flying Taxi to you.");
 
 static const u8 sSurfboardDesc[] = _(
     "An item that can\n"
@@ -1756,3 +1801,17 @@ static const u8 sAbilityCapsuleDesc[] = _(
     "of a POKéMON\n"
     "if possible.");
 
+static const u8 sAbilityPatchDesc[] = _(
+    "Switches a POKéMON\n"
+    "to or from its\n"
+    "Hidden Ability.");
+
+static const u8 sBottleCapDesc[] = _(
+    "Used to Hyper Train\n"
+    "one stat of a\n"
+    "Lv. 50+ POKéMON.");
+
+static const u8 sGoldBottleCapDesc[] = _(
+    "Used to Hyper Train\n"
+    "all the stats of a\n"
+    "Lv. 50+ POKéMON.");
