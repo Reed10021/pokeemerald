@@ -50,7 +50,7 @@
 #define FLAG_GOT_BOTH_BIKES      0x26 // Was unused Flag
 #define FLAG_GOT_JOHTO_STARTER   0x27 // Was unused Flag
 #define FLAG_MEWTWO_BATTLE       0x28 // Was unused Flag
-#define FLAG_UNUSED_0x029        0x29 // Unused Flag
+#define FLAG_SURF_PICHU_EGG      0x29 // Was unused Flag
 #define FLAG_UNUSED_0x02A        0x2A // Unused Flag
 #define FLAG_UNUSED_0x02B        0x2B // Unused Flag
 #define FLAG_UNUSED_0x02C        0x2C // Unused Flag

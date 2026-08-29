@@ -1543,3 +1543,7 @@
 	callnative BS_TryGainedDownload
 	.byte \battler
 	.endm
+
+	.macro applyroosttypechange
+	callnative BS_ApplyRoostTypeChange
+	.endm

@@ -74,18 +74,18 @@ voicegroup017:: @ 8678F80
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86792D4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86792E0
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_flute, 255, 127, 231, 127  @ 86792EC
-	voice_programmable_wave 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 0  @ 86792F8
+	voice_programmable_wave 60, 0, ProgrammableWaveData_1, 0, 7, 15, 0  @ 86792F8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8679304
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8679310
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867931C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8679328
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8679334
 	voice_square_2_alt 60, 0, 2, 1, 1, 7, 2  @ 8679340
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 2  @ 867934C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 2  @ 867934C
 	voice_square_1_alt 60, 0, 0, 2, 1, 1, 7, 2  @ 8679358
 	voice_square_2_alt 60, 0, 3, 1, 1, 7, 2  @ 8679364
 	voice_square_1_alt 60, 0, 0, 3, 1, 1, 7, 2  @ 8679370
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 3  @ 867937C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 3  @ 867937C
 	voice_square_1_alt 60, 0, 0, 2, 0, 0, 7, 2  @ 8679388
 	voice_square_1_alt 60, 0, 0, 3, 0, 0, 7, 2  @ 8679394
 	voice_square_2_alt 60, 0, 1, 1, 2, 6, 2  @ 86793A0

@@ -1461,7 +1461,7 @@ const struct CompressedSpriteSheet gBattleAnimPicTable[] =
     {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_ALPHA_STONE}, // Unused
     {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_BERRY_NORMAL},  // Unused
     {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_BERRY_EATEN},  // Unused
-    {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_DRAGON_ASCENT},   // Unused
+    {gBattleAnimSpriteGfx_PurpleDrake, 0x800, ANIM_TAG_DRAGON_ASCENT},
     {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_PINK_DIAMOND},  // Unused
     {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_STEAM_ERUPTION}, // Unused
     {gBattleAnimSpriteGfx_PinkOrb, 0x0020, ANIM_TAG_CONFIDE}, // Unused
@@ -1825,7 +1825,7 @@ const struct CompressedSpritePalette gBattleAnimPaletteTable[] =
     {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_ALPHA_STONE}, // Unused
     {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_BERRY_NORMAL},  // Unused
     {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_BERRY_EATEN},  // Unused
-    {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_DRAGON_ASCENT},   // Unused
+    {gBattleAnimSpritePal_GreenDrake, ANIM_TAG_DRAGON_ASCENT},
     {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_PINK_DIAMOND},  // Unused
     {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_STEAM_ERUPTION}, // Unused
     {gBattleAnimSpritePal_PinkOrb, ANIM_TAG_CONFIDE}, // Unused

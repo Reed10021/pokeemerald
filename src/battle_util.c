@@ -71,6 +71,7 @@ static bool32 TryHarvestRestoreItem(u32 battlerId);
 static bool32 TryPickupRestoreItem(u32 battlerId);
 static bool32 TryActivateCudChew(u32 battlerId);
 static bool32 IsAfterCudChewEndTurnCheck(void);
+static void GetRoostedTypes(u8 type1, u8 type2, u8 *roostedType1, u8 *roostedType2);
 static u16 GetBattlerDownloadDefenseStat(u8 battlerId, u8 statId);
 static u8 GetDownloadBoostStat(u8 battlerId);
 static bool32 ShouldBerserkActivate(u8 battlerId, u16 move);
@@ -1151,6 +1152,88 @@ bool32 IsBattlerGroundedByBattler(u8 battlerId, u8 battlerAtk)
         && !IS_BATTLER_OF_TYPE(battlerId, TYPE_FLYING);
 }
 
+static void GetRoostedTypes(u8 type1, u8 type2, u8 *roostedType1, u8 *roostedType2)
+{
+    if (type1 == TYPE_FLYING && (type2 == TYPE_FLYING || type2 == TYPE_NONE))
+    {
+        *roostedType1 = TYPE_NORMAL;
+        *roostedType2 = TYPE_NORMAL;
+    }
+    else if (type1 == TYPE_FLYING)
+    {
+        *roostedType1 = type2;
+        *roostedType2 = type2;
+    }
+    else if (type2 == TYPE_FLYING)
+    {
+        *roostedType1 = type1;
+        *roostedType2 = type1;
+    }
+    else
+    {
+        *roostedType1 = type1;
+        *roostedType2 = type2;
+    }
+}
+
+void ClearRoostTypeChange(u8 battlerId)
+{
+    gBattleStruct->roostedBattlers &= ~gBitTable[battlerId];
+}
+
+void GetBattlerUnderlyingTypes(u8 battlerId, u8 *type1, u8 *type2)
+{
+    if (gBattleStruct->roostedBattlers & gBitTable[battlerId])
+    {
+        *type1 = gBattleStruct->roostTypes[battlerId][0];
+        *type2 = gBattleStruct->roostTypes[battlerId][1];
+    }
+    else
+    {
+        *type1 = gBattleMons[battlerId].type1;
+        *type2 = gBattleMons[battlerId].type2;
+    }
+}
+
+void SetBattlerTypes(u8 battlerId, u8 type1, u8 type2)
+{
+    if (gBattleStruct->roostedBattlers & gBitTable[battlerId])
+    {
+        gBattleStruct->roostTypes[battlerId][0] = type1;
+        gBattleStruct->roostTypes[battlerId][1] = type2;
+        GetRoostedTypes(type1, type2, &gBattleMons[battlerId].type1, &gBattleMons[battlerId].type2);
+    }
+    else
+    {
+        gBattleMons[battlerId].type1 = type1;
+        gBattleMons[battlerId].type2 = type2;
+    }
+}
+
+void ApplyRoostTypeChange(u8 battlerId)
+{
+    if (!(gBattleStruct->roostedBattlers & gBitTable[battlerId]))
+    {
+        gBattleStruct->roostTypes[battlerId][0] = gBattleMons[battlerId].type1;
+        gBattleStruct->roostTypes[battlerId][1] = gBattleMons[battlerId].type2;
+        gBattleStruct->roostedBattlers |= gBitTable[battlerId];
+    }
+
+    SetBattlerTypes(battlerId,
+                    gBattleStruct->roostTypes[battlerId][0],
+                    gBattleStruct->roostTypes[battlerId][1]);
+}
+
+void RestoreBattlerTypesAfterRoost(u8 battlerId)
+{
+    if (!(gBattleStruct->roostedBattlers & gBitTable[battlerId]))
+        return;
+
+    gBattleMons[battlerId].type1 = gBattleStruct->roostTypes[battlerId][0];
+    gBattleMons[battlerId].type2 = gBattleStruct->roostTypes[battlerId][1];
+    ClearRoostTypeChange(battlerId);
+}
+
 bool32 IsBattlerGroundImmune(u8 battlerId)
 {
     return !IsBattlerGrounded(battlerId);
@@ -1407,8 +1490,15 @@ u8 GetBattlerMoveSplit(u8 battlerId, u16 move, u8 moveType)
         else
             return 1;
     }
-    if (gBattleMoves[move].category == DAMAGE_CATEGORY_TYPE && IsMoveAffectedByNormalize(battlerId, move))
-        return GetMoveSplit(move, gBattleMoves[move].type);
+    else if(gBattleMoves[move].category == DAMAGE_CATEGORY_TYPE)
+    {
+        bool32 isNormalize = IsMoveAffectedByNormalize(battlerId, move);
+        bool32 isDragonize = gBattleMons[battlerId].ability == ABILITY_DRAGONIZE && IsMoveChangedByDragonize(move, moveType);
+        if (isNormalize || isDragonize)
+        {
+            return GetMoveSplit(move, gBattleMoves[move].type);
+        }
+    }
 
     return GetMoveSplit(move, moveType);
 }
@@ -3181,6 +3271,7 @@ enum
     ENDTURN_MAGNET_RISE,
     ENDTURN_TAUNT,
     ENDTURN_YAWN,
+    ENDTURN_ROOST,
     ENDTURN_ITEMS2,
     ENDTURN_BATTLER_COUNT
 };
@@ -3558,6 +3649,10 @@ u8 DoBattlerEndTurnEffects(void)
                         effect++;
                     }
                 }
+                gBattleStruct->turnEffectsTracker++;
+                break;
+            case ENDTURN_ROOST:
+                RestoreBattlerTypesAfterRoost(gActiveBattler);
                 gBattleStruct->turnEffectsTracker++;
                 break;
             case ENDTURN_BATTLER_COUNT:  // done
@@ -4338,8 +4433,7 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
         else
             move = gCurrentMove;
 
-        moveType = GetBattlerMoveType(gBattlerAttacker < gBattlersCount ? gBattlerAttacker : battler, move, gBattleStruct->dynamicMoveType);
-
+        // moveType cannot be defined here because it causes an infinite loop with Weather Ball.
         switch (caseID)
         {
         case ABILITYEFFECT_ON_SWITCHIN: // 0
@@ -4688,6 +4782,8 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
                 if (DoesBattlerIgnoreAbility(gBattlerAttacker, battler, gLastUsedAbility))
                     break;
 
+                moveType = GetBattlerMoveType(gBattlerAttacker < gBattlersCount ? gBattlerAttacker : battler, move, gBattleStruct->dynamicMoveType);
+
                 switch (gLastUsedAbility)
                 {
                 case ABILITY_VOLT_ABSORB:
@@ -4988,6 +5084,8 @@ u8 AbilityBattleEffects(u8 caseID, u8 battler, u8 ability, u8 special, u16 moveA
             }
             break;
         case ABILITYEFFECT_ON_DAMAGE: // Contact abilities and Color Change
+            moveType = GetBattlerMoveType(gBattlerAttacker < gBattlersCount ? gBattlerAttacker : battler, move, gBattleStruct->dynamicMoveType);
+
             switch (gLastUsedAbility)
             {
             // Sheer Force blocks Color Change explicitly.

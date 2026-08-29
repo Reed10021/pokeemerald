@@ -4810,16 +4810,16 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
 
     [MOVE_ROOST] =
     {
-        // Unused / Placeholder
-        .effect = EFFECT_HIT,
+        .effect = EFFECT_RESTORE_HP,
         .power = 0,
-        .type = TYPE_NORMAL,
+        .type = TYPE_FLYING,
+        .category = DAMAGE_CATEGORY_STATUS,
         .accuracy = 0,
-        .pp = 0,
+        .pp = 10,
         .secondaryEffectChance = 0,
-        .target = MOVE_TARGET_SELECTED,
+        .target = MOVE_TARGET_USER,
         .priority = 0,
-        .flags = 0,
+        .flags = FLAG_SNATCH_AFFECTED,
     },
 
     [MOVE_GRAVITY] =
@@ -6177,7 +6177,7 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
         .flags = FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED | FLAG_KINGSROCK_AFFECTED,
     },
 
-    [MOVE_ORIGIN_PULSE ... MOVE_DRAGON_ASCENT] =
+    [MOVE_ORIGIN_PULSE ... MOVE_PRECIPICE_BLADES] =
     {
         // Unused / Placeholder
         .effect = EFFECT_HIT,
@@ -6189,6 +6189,20 @@ const struct BattleMove gBattleMoves[MOVES_COUNT] =
         .target = MOVE_TARGET_SELECTED,
         .priority = 0,
         .flags = 0,
+    },
+
+    [MOVE_DRAGON_ASCENT] =
+    {
+        .effect = EFFECT_CLOSE_COMBAT,
+        .power = 120,
+        .type = TYPE_FLYING,
+        .category = DAMAGE_CATEGORY_PHYSICAL,
+        .accuracy = 100,
+        .pp = 5,
+        .secondaryEffectChance = 0,
+        .target = MOVE_TARGET_SELECTED,
+        .priority = 0,
+        .flags = FLAG_MAKES_CONTACT | FLAG_PROTECT_AFFECTED | FLAG_MIRROR_MOVE_AFFECTED | FLAG_KINGSROCK_AFFECTED,
     },
 
     [MOVE_HIGH_HORSEPOWER] =

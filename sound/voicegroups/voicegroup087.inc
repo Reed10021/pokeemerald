@@ -29,7 +29,7 @@ voicegroup087:: @ 868F87C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F9B4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F9C0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F9CC
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4910, 0, 7, 15, 0  @ 868F9D8
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_15, 0, 7, 15, 0  @ 868F9D8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F9E4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F9F0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F9FC
@@ -83,7 +83,7 @@ voicegroup087:: @ 868F87C
 	voice_square_1_alt 60, 0, 0, 0, 0, 1, 4, 1  @ 868FC3C
 	voice_square_2_alt 60, 0, 0, 0, 1, 4, 1  @ 868FC48
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868FC54
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4920, 0, 7, 15, 0  @ 868FC60
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_16, 0, 7, 15, 0  @ 868FC60
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868FC6C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868FC78
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868FC84

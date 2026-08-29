@@ -4,10 +4,10 @@ voicegroup045:: @ 8680AB0
 	voice_square_1_alt 60, 0, 0, 1, 0, 2, 0, 1  @ 8680ABC
 	voice_square_1_alt 60, 0, 0, 3, 1, 2, 6, 0  @ 8680AC8
 	voice_square_2_alt 60, 0, 3, 1, 2, 6, 0  @ 8680AD4
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 1  @ 8680AE0
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_1, 0, 7, 15, 1  @ 8680AE0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8680AEC
 	voice_square_2_alt 60, 0, 1, 0, 2, 0, 1  @ 8680AF8
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4860, 1, 7, 15, 1  @ 8680B04
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_4, 1, 7, 15, 1  @ 8680B04
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8680B10
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8680B1C
 	voice_keysplit voicegroup005, KeySplitTable1  @ 8680B28

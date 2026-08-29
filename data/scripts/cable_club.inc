@@ -6,6 +6,9 @@ CableClub_EventScript_HideOrShowMysteryGiftMan:: @ 8276AD5
 	specialvar VAR_RESULT, ShouldDistributeEonTicket
 	compare VAR_RESULT, TRUE
 	goto_if_eq CableClub_EventScript_ShowMysteryGiftMan
+	goto_if_unset FLAG_BADGE02_GET, CableClub_EventScript_CheckWonderCard
+	goto_if_unset FLAG_SURF_PICHU_EGG, CableClub_EventScript_ShowMysteryGiftMan
+CableClub_EventScript_CheckWonderCard::
 	specialvar VAR_RESULT, ValidateReceivedWonderCard
 	compare VAR_RESULT, FALSE
 	goto_if_eq CableClub_EventScript_HideMysteryGiftMan
@@ -24,11 +27,80 @@ CableClub_EventScript_MysteryGiftMan:: @ 8276B03
 	specialvar VAR_RESULT, ShouldDistributeEonTicket
 	compare VAR_RESULT, TRUE
 	goto_if_eq CableClub_EventScript_DistributeEonTicket
+	specialvar VAR_RESULT, ValidateReceivedWonderCard
+	compare VAR_RESULT, TRUE
+	goto_if_eq CableClub_EventScript_AlreadyGotEonTicket
+	goto_if_set FLAG_BADGE02_GET, CableClub_EventScript_TryDistributeSurfPichuEgg
 	goto CableClub_EventScript_AlreadyGotEonTicket
 	end
 
 CableClub_EventScript_AlreadyGotEonTicket:: @ 8276B19
 	gotoram
+
+CableClub_EventScript_TryDistributeSurfPichuEgg::
+	goto_if_set FLAG_SURF_PICHU_EGG, CableClub_EventScript_MysteryGiftThankYou2
+	goto CableClub_EventScript_DistributeSurfPichuEgg
+	end
+
+CableClub_EventScript_DistributeSurfPichuEgg::
+	specialvar VAR_EVENT_PICHU_SLOT, CalculatePlayerPartyCount
+	compare VAR_EVENT_PICHU_SLOT, PARTY_SIZE
+	goto_if_eq CableClub_EventScript_SurfPichuFullParty
+	setflag FLAG_SURF_PICHU_EGG
+	call CableClub_EventScript_GiveSurfPichuEgg
+	message CableClub_Text_MysteryGiftEgg
+	waitmessage
+	waitbuttonpress
+	playfanfare MUS_OBTAIN_ITEM
+	waitfanfare
+	release
+	end
+
+CableClub_EventScript_SurfPichuFullParty::
+	msgbox CableClub_Text_SurfPichuFullParty, MSGBOX_DEFAULT
+	release
+	end
+
+CableClub_EventScript_GiveSurfPichuEgg::
+	giveegg SPECIES_PICHU, 1
+	setmonobedient VAR_EVENT_PICHU_SLOT
+	setmonmetlocation VAR_EVENT_PICHU_SLOT, METLOC_FATEFUL_ENCOUNTER
+	compare VAR_EVENT_PICHU_SLOT, 1
+	goto_if_eq CableClub_EventScript_SurfPichuSlot1
+	compare VAR_EVENT_PICHU_SLOT, 2
+	goto_if_eq CableClub_EventScript_SurfPichuSlot2
+	compare VAR_EVENT_PICHU_SLOT, 3
+	goto_if_eq CableClub_EventScript_SurfPichuSlot3
+	compare VAR_EVENT_PICHU_SLOT, 4
+	goto_if_eq CableClub_EventScript_SurfPichuSlot4
+	compare VAR_EVENT_PICHU_SLOT, 5
+	goto_if_eq CableClub_EventScript_SurfPichuSlot5
+	return
+
+CableClub_EventScript_SurfPichuSlot1::
+	setmonmove 1, 2, MOVE_SURF
+	setmonmove 1, 3, MOVE_VOLT_TACKLE
+	return
+
+CableClub_EventScript_SurfPichuSlot2::
+	setmonmove 2, 2, MOVE_SURF
+	setmonmove 2, 3, MOVE_VOLT_TACKLE
+	return
+
+CableClub_EventScript_SurfPichuSlot3::
+	setmonmove 3, 2, MOVE_SURF
+	setmonmove 3, 3, MOVE_VOLT_TACKLE
+	return
+
+CableClub_EventScript_SurfPichuSlot4::
+	setmonmove 4, 2, MOVE_SURF
+	setmonmove 4, 3, MOVE_VOLT_TACKLE
+	return
+
+CableClub_EventScript_SurfPichuSlot5::
+	setmonmove 5, 2, MOVE_SURF
+	setmonmove 5, 3, MOVE_VOLT_TACKLE
+	return
 
 @ Unused?
 CableClub_EventScript_MysteryGiftThankYou:: @ 8276B1A
@@ -53,6 +125,19 @@ CableClub_EventScript_MysteryGiftThankYou2:: @ 8276B62
 	msgbox gText_ThankYouForAccessingMysteryGift, MSGBOX_DEFAULT
 	release
 	end
+
+CableClub_Text_MysteryGiftEgg:
+	.string "Thank you for using the MYSTERY\n"
+	.string "GIFT System.\p"
+	.string "From the POKéMON CENTER we\n"
+	.string "have a gift--a POKéMON EGG!\p"
+	.string "Please raise it with love and\n"
+	.string "kindness.$"
+
+CableClub_Text_SurfPichuFullParty:
+	.string "Oh, your party appears to be full.\p"
+	.string "Please come see me after storing\n"
+	.string "a POKéMON on a PC.$"
 
 CableClub_OnWarp: @ 8276B6C
 	map_script_2 VAR_CABLE_CLUB_STATE, USING_SINGLE_BATTLE, CableClub_EventScript_CheckTurnAttendant

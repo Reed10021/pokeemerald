@@ -82,12 +82,12 @@ voicegroup116:: @ 8699E54
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869A208
 	voice_square_1_alt 60, 0, 0, 1, 0, 2, 7, 2  @ 869A214
 	voice_square_2_alt 60, 0, 3, 0, 3, 3, 0  @ 869A220
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4970, 0, 3, 6, 5  @ 869A22C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_21, 0, 3, 6, 5  @ 869A22C
 	voice_square_1_alt 60, 0, 0, 0, 0, 2, 7, 2  @ 869A238
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4970, 0, 7, 15, 0  @ 869A244
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_21, 0, 7, 15, 0  @ 869A244
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869A250
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869A25C
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 0  @ 869A268
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 0  @ 869A268
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869A274
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869A280
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869A28C

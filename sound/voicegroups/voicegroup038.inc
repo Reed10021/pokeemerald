@@ -81,5 +81,5 @@ voicegroup038:: @ 867E740
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867EAE8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867EAF4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867EB00
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4850, 0, 7, 15, 0  @ 867EB0C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_3, 0, 7, 15, 0  @ 867EB0C
 

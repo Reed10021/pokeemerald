@@ -224,7 +224,7 @@ RustboroCity_PokemonSchool_Text_ExplainParalysis: @ 82141D8
 	.string "It may also not be able to move while\n"
 	.string "it is in battle.\p"
 	.string "Paralysis remains after battle.\n"
-	.string "Cure it using a PARLYZ HEAL.$"
+	.string "Cure it using a PARALYZE HEAL.$"
 
 RustboroCity_PokemonSchool_Text_ExplainSleep: @ 821427D
 	.string "If a POKéMON falls asleep, it will be\n"

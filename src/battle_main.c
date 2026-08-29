@@ -1903,24 +1903,33 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
         u32 i;
         u32 evoCount = 0;
 
-        // First, count how many evos
+        // First, count how many usable evos.
         for (i = 0; i < EVOS_PER_MON; i++)
         {
-            if (gEvolutionTable[species][i].method != 0)
+            // Defensive checks for malformed randomizers
+            if (gEvolutionTable[species][i].method != 0
+             && gEvolutionTable[species][i].targetSpecies > SPECIES_NONE
+             && gEvolutionTable[species][i].targetSpecies < NUM_SPECIES)
                 evoCount += 1;
         }
 
         if (evoCount > 0) // If evoCount is zero, don't do any of this calculation and just return species.
         {
-            u32 validEvoArray[EVOS_PER_MON] = {0};
+            u16 validEvoArray[EVOS_PER_MON] = {0};
             u32 validCount = 0;
             
             // Second, collect all valid evolution species into an array.
-            for (i = 0; i < evoCount; i++)
+            for (i = 0; i < EVOS_PER_MON; i++)
             {
                 bool32 shouldAdd = FALSE;
                 u32 j;
                 u32 targetSpecies = gEvolutionTable[species][i].targetSpecies;
+
+                // More defensive checks for malformed randomizers
+                if (gEvolutionTable[species][i].method == 0
+                 || targetSpecies == SPECIES_NONE
+                 || targetSpecies >= NUM_SPECIES)
+                    continue;
 
                 if (gEvolutionTable[species][i].method == EVO_LEVEL ||
                     gEvolutionTable[species][i].method == EVO_LEVEL_ATK_LT_DEF ||
@@ -1958,13 +1967,14 @@ u16 HasEvolution(u16 species, u8 scaledLevel, u8 normalLevel)
                     validCount++;
                 }
             }
+            
+            // Doing this here protects against undefined modulo 0 operations
+            if (validCount == 0) // Has evolutions, but none are valid at this scaled level.
+                return species;
+
             // Third, return a random valid evolution.
             returnVal = validEvoArray[Random() % validCount]; // We could do more calculations here to determine what evolution we should return. Or we could just return a random valid one.
-            if (returnVal == 0) // If we have evolutions available but we don't have any valid evolutions (likely because of the +5), don't evolve.
-                return species;
-            else
-                return HasEvolution(returnVal, scaledLevel, normalLevel);
-            // If we can evolve, do recursion to see if we can evolve again.
+            return HasEvolution(returnVal, scaledLevel, normalLevel); // If we can evolve, do recursion to see if we can evolve again.
         }
     }
     // If we haven't seen this species, or if this species has no evolutions, return the species.
@@ -3407,6 +3417,8 @@ void SwitchInClearSetData(void)
     s32 i;
     u8 *ptr;
 
+    ClearRoostTypeChange(gActiveBattler);
+
     if (gBattleMoves[gCurrentMove].effect != EFFECT_BATON_PASS)
     {
         for (i = 0; i < NUM_BATTLE_STATS; i++)
@@ -3518,6 +3530,8 @@ void FaintClearSetData(void)
 {
     s32 i;
     u8 *ptr;
+
+    ClearRoostTypeChange(gActiveBattler);
 
     for (i = 0; i < NUM_BATTLE_STATS; i++)
         gBattleMons[gActiveBattler].statStages[i] = DEFAULT_STAT_STAGE;

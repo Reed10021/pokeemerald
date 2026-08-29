@@ -728,9 +728,14 @@ BattleScript_EffectRestoreHp::
 	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE
 	healthbarupdate BS_ATTACKER
 	datahpupdate BS_ATTACKER
+	jumpifmove MOVE_ROOST, BattleScript_RoostApplyTypeChange
+BattleScript_RestoreHpPrintString:
 	printstring STRINGID_PKMNREGAINEDHEALTH
 	waitmessage 0x40
 	goto BattleScript_MoveEnd
+BattleScript_RoostApplyTypeChange:
+	applyroosttypechange
+	goto BattleScript_RestoreHpPrintString
 
 BattleScript_EffectToxic::
 	attackcanceler
@@ -5492,7 +5497,8 @@ BattleScript_WhiteHerbRet::
 	return
 
 BattleScript_ItemHealHP_RemoveItem::
-	@playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_EFFECT, NULL
+	playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_EFFECT, NULL
+	playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_RESTORE_HP, NULL
 	printstring STRINGID_PKMNSITEMRESTOREDHEALTH
 	waitmessage 0x40
 	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE
@@ -5511,7 +5517,7 @@ BattleScript_EnigmaBerryHealRet::
 	return
 
 BattleScript_BerryPPHealEnd2::
-	@playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_EFFECT, NULL
+	playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_EFFECT, NULL
 	printstring STRINGID_PKMNSITEMRESTOREDPP
 	waitmessage 0x40
 	removeitem BS_ATTACKER
@@ -5522,7 +5528,8 @@ BattleScript_ItemHealHP_End2::
 	end2
 
 BattleScript_ItemHealHP_Ret::
-	@playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_EFFECT, NULL
+	playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_EFFECT, NULL
+	playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_RESTORE_HP, NULL
 	printstring STRINGID_PKMNSITEMRESTOREDHPALITTLE
 	waitmessage 0x40
 	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE
@@ -5576,7 +5583,7 @@ BattleScript_SturdiedMsg::
 	return
 
 BattleScript_BerryConfuseHealEnd2::
-	@playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_EFFECT, NULL
+	playanimation BS_ATTACKER, B_ANIM_HELD_ITEM_EFFECT, NULL
 	printstring STRINGID_PKMNSITEMRESTOREDHEALTH
 	waitmessage 0x40
 	orword gHitMarker, HITMARKER_IGNORE_SUBSTITUTE

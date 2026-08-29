@@ -252,6 +252,7 @@ extern const union AnimCmd* const gHealingBlueStarAnimTable[];
 extern const union AnimCmd* const gAnims_FlamethrowerFlame[];
 
 // battle_anim_flying.c
+void AnimFlyBallAttack(struct Sprite*);
 void DestroyAnimSpriteAfterTimer(struct Sprite *sprite);
 void AnimAirWaveCrescent(struct Sprite* sprite);
 extern const union AnimCmd* const gAffineAnims_AirWaveCrescent[];
@@ -269,6 +270,7 @@ extern const union AffineAnimCmd* const gAffineAnims_PsychoBoostOrb[];
 void AnimPsychoBoost(struct Sprite* sprite);
 
 // battle_anim_rock.c
+void AnimParticleInVortex(struct Sprite*);
 void AnimFallingRock(struct Sprite*);
 void AnimFallingRock_Step(struct Sprite*);
 extern const union AnimCmd* const gAnims_FlyingRock[];

@@ -1050,7 +1050,7 @@ static const u8 sMementoDescription[] = _(
     "the foe's abilities.");
 
 static const u8 sFacadeDescription[] = _(
-    "Boosts ATTACK when burned,\n"
+    "Boosted power when burned,\n"
     "paralyzed, or poisoned.");
 
 static const u8 sFocusPunchDescription[] = _(
@@ -1417,6 +1417,10 @@ static const u8 sPsychoBoostDescription[] = _(
     "Allows a full-power attack,\n"
     "but sharply lowers SP. ATK.");
 
+static const u8 sRoostDescription[] = _(
+    "The user lands for the turn\n"
+    "to recover 1/2 of its max HP.");
+
 static const u8 sGravityDescription[] = _(
     "Gravity is intensified\n"
     "negating levitation.");
@@ -1716,6 +1720,10 @@ static const u8 sIcicleCrashDescription[] = _(
 static const u8 sFreezeDryDescription[] = _(
     "Super effective on WATER-\n"
     "types. May cause freezing.");
+
+static const u8 sDragonAscentDescription[] = _(
+    "A strong attack but lowers\n"
+    "the defensive stats.");
 
 static const u8 sHighHorsepowerDescription[] = _(
     "Slams hard into the foe with\n"
@@ -2154,7 +2162,7 @@ const u8 *const gMoveDescriptionPointers[MOVES_COUNT - 1] =
     [MOVE_WATER_PULSE - 1] = sWaterPulseDescription,
     [MOVE_DOOM_DESIRE - 1] = sDoomDesireDescription,
     [MOVE_PSYCHO_BOOST - 1] = sPsychoBoostDescription,
-    [MOVE_ROOST - 1] = sNullDescription,
+    [MOVE_ROOST - 1] = sRoostDescription,
     [MOVE_GRAVITY - 1] = sGravityDescription,
     [MOVE_MIRACLE_EYE-1 ... MOVE_WAKE_UP_SLAP-1] = sNullDescription,
     [MOVE_HAMMER_ARM - 1] = sHammerArmDescription,
@@ -2251,7 +2259,8 @@ const u8 *const gMoveDescriptionPointers[MOVES_COUNT - 1] =
     [MOVE_FIERY_DANCE - 1] = sFieryDanceDescription,
     [MOVE_ICICLE_CRASH - 1] = sIcicleCrashDescription,
     [MOVE_FREEZE_DRY - 1] = sFreezeDryDescription,
-    [MOVE_ORIGIN_PULSE-1 ... MOVE_DRAGON_ASCENT-1] = sNullDescription,
+    [MOVE_ORIGIN_PULSE-1 ... MOVE_PRECIPICE_BLADES-1] = sNullDescription,
+    [MOVE_DRAGON_ASCENT - 1] = sDragonAscentDescription,
     [MOVE_HIGH_HORSEPOWER - 1] = sHighHorsepowerDescription,
     [MOVE_SOLAR_BLADE - 1] = sSolarBladeDescription,
     [MOVE_POLLEN_PUFF - 1] = sPollenPuffDescription,

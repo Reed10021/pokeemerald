@@ -324,6 +324,55 @@ const struct SpriteTemplate gDualChopImpactTemplate =
     .callback = AnimHitSplatBasic
 };
 
+// Dragon Ascent
+static const union AffineAnimCmd sSpriteAffineAnim_DrakeStrikePlayer[] =
+{
+    AFFINEANIMCMD_FRAME(0, 0, 0xb9, 1),
+    AFFINEANIMCMD_END,
+};
+static const union AffineAnimCmd sSpriteAffineAnim_DrakeStrikeOpponent[] =
+{
+    AFFINEANIMCMD_FRAME(0, 0, 0x50, 1),
+    AFFINEANIMCMD_END,
+};
+static const union AffineAnimCmd* const sAffineAnimCmdTable_DrakeStriking[] =  // Devestating Drake, Fusion Bolt
+{
+    sSpriteAffineAnim_DrakeStrikePlayer,
+    sSpriteAffineAnim_DrakeStrikeOpponent,
+};
+
+static const union AffineAnimCmd sAffineAnimCmd_Drake[] =
+{
+    AFFINEANIMCMD_FRAME(0, 0, 0, 1), //drake faces up
+    AFFINEANIMCMD_END,
+};
+static const union AffineAnimCmd* const sAffineAnimCmdTable_DrakeFaceNorth[] =
+{
+    sAffineAnimCmd_Drake,
+    sAffineAnimCmd_Drake,
+};
+const struct SpriteTemplate gDragonAscentFlyUpTemplate =
+{
+    .tileTag = ANIM_TAG_DRAGON_ASCENT,
+    .paletteTag = ANIM_TAG_DRAGON_ASCENT,
+    .oam = &gOamData_AffineNormal_ObjNormal_64x64,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = sAffineAnimCmdTable_DrakeFaceNorth,
+    .callback = AnimParticleInVortex
+};
+
+const struct SpriteTemplate gDragonAscentDrakeTemplate =
+{
+    .tileTag = ANIM_TAG_DRAGON_ASCENT,
+    .paletteTag = ANIM_TAG_DRAGON_ASCENT,
+    .oam = &gOamData_AffineNormal_ObjNormal_64x64,
+    .anims = gDummySpriteAnimTable,
+    .images = NULL,
+    .affineAnims = sAffineAnimCmdTable_DrakeStriking,
+    .callback = AnimFlyBallAttack
+};
+
 // Breaking Swipe
 const struct SpriteTemplate gBreakingSwipeCenteredElectricity =
 {

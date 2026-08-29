@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "name": "pokeemerald-agbcc",
+      "includePath": [
+        "${workspaceRoot}\\include",
+        "${workspaceRoot}\\gflib",
+        "${workspaceRoot}\\src",
+        "${workspaceRoot}\\tools\\agbcc\\include",
+        "${workspaceRoot}\\tools\\agbcc",
+        "${workspaceRoot}\\**"
+      ],
+      "defines": [
+        "MODERN=1",
+        "_MSC_VER"
+      ],
+      "intelliSenseMode": "linux-gcc-arm",
+      "compilerSwitches": "-Wno-trigraphs"
+    }
+  ]
+}

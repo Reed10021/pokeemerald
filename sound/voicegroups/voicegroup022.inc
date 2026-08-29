@@ -30,11 +30,11 @@ voicegroup022:: @ 867A438
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867A57C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867A588
 	voice_square_2_alt 60, 0, 0, 0, 1, 7, 0  @ 867A594
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4890, 0, 7, 15, 1  @ 867A5A0
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_7, 0, 7, 15, 1  @ 867A5A0
 	voice_square_1_alt 60, 0, 0, 0, 0, 1, 7, 0  @ 867A5AC
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4890, 0, 7, 15, 0  @ 867A5B8
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 7, 15, 0  @ 867A5C4
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 7, 15, 1  @ 867A5D0
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_7, 0, 7, 15, 0  @ 867A5B8
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 7, 15, 0  @ 867A5C4
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 7, 15, 1  @ 867A5D0
 	voice_square_1_alt 60, 0, 0, 0, 0, 0, 7, 0  @ 867A5DC
 	voice_directsound_no_resample 60, 64, DirectSoundWaveData_sc88pro_rnd_kick, 255, 0, 255, 242  @ 867A5E8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867A5F4

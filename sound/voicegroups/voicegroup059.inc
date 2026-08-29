@@ -5,8 +5,8 @@ voicegroup059:: @ 8685A48
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8685A60
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8685A6C
 	voice_square_2_alt 60, 0, 1, 1, 1, 6, 2  @ 8685A78
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 0  @ 8685A84
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 7, 15, 0  @ 8685A90
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_1, 0, 7, 15, 0  @ 8685A84
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 7, 15, 0  @ 8685A90
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8685A9C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8685AA8
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_glockenspiel, 255, 165, 51, 242  @ 8685AB4
@@ -82,11 +82,11 @@ voicegroup059:: @ 8685A48
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8685DFC
 	voice_square_1_alt 60, 0, 0, 2, 0, 1, 6, 2  @ 8685E08
 	voice_square_2_alt 60, 0, 2, 0, 1, 6, 0  @ 8685E14
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4840, 0, 7, 15, 0  @ 8685E20
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_2, 0, 7, 15, 0  @ 8685E20
 	voice_square_1_alt 60, 0, 0, 1, 0, 1, 4, 1  @ 8685E2C
 	voice_square_1_alt 60, 0, 0, 1, 1, 2, 4, 0  @ 8685E38
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8685E44
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8685E50
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 0  @ 8685E5C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 0  @ 8685E5C
 	voice_square_2_alt 60, 0, 3, 0, 1, 6, 2  @ 8685E68
 

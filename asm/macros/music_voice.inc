@@ -145,7 +145,7 @@
 	.byte 0xff, 0, 0xff, 0
 	.endm
 
-	.macro cry2 sample:req
+	.macro cry2 sample:req @cry_reverse
 	.byte 0x30, 60, 0, 0
 	.4byte \sample
 	.byte 0xff, 0, 0xff, 0
@@ -157,7 +157,7 @@
 	.byte 0xff, 0, 0xff, 0
 	.endm
 	
-	.macro cry2_uncompressed sample @ not compressed
+	.macro cry2_uncompressed sample @cry_reverse_uncomp @ not compressed 
 	.byte 0x10, 60, 0, 0
 	.4byte \sample
 	.byte 0xff, 0, 0xff, 0

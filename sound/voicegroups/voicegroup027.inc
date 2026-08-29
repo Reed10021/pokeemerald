@@ -73,7 +73,7 @@ voicegroup027:: @ 867B7A0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BAE8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BAF4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB00
-	voice_programmable_wave 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 0  @ 867BB0C
+	voice_programmable_wave 60, 0, ProgrammableWaveData_1, 0, 7, 15, 0  @ 867BB0C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB18
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB24
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB30
@@ -81,7 +81,7 @@ voicegroup027:: @ 867B7A0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB48
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB54
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB60
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 0  @ 867BB6C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 0  @ 867BB6C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB78
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB84
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867BB90

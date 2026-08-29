@@ -341,7 +341,7 @@
 #define ANIM_TAG_ALPHA_STONE                (ANIM_SPRITES_START + 329) // unused
 #define ANIM_TAG_BERRY_NORMAL               (ANIM_SPRITES_START + 330) // unused
 #define ANIM_TAG_BERRY_EATEN                (ANIM_SPRITES_START + 331) // unused
-#define ANIM_TAG_DRAGON_ASCENT              (ANIM_SPRITES_START + 332) // unused
+#define ANIM_TAG_DRAGON_ASCENT              (ANIM_SPRITES_START + 332)
 #define ANIM_TAG_PINK_DIAMOND               (ANIM_SPRITES_START + 333) // unused
 #define ANIM_TAG_STEAM_ERUPTION             (ANIM_SPRITES_START + 334) // unused
 #define ANIM_TAG_CONFIDE                    (ANIM_SPRITES_START + 335) // unused
@@ -456,6 +456,7 @@
 #define B_ANIM_WISH_HEAL                0x16
 #define B_ANIM_TOTEM_FLARE              0x17
 #define B_ANIM_TRICK_ROOM               0x18
+#define B_ANIM_HELD_ITEM_RESTORE_HP     0x19
 
 // special animations table
 #define B_ANIM_LVL_UP                   0x0

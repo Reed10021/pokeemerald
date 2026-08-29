@@ -3,7 +3,7 @@ voicegroup184:: @ 86B2244
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B2244
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B2250
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B225C
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 7, 15, 0  @ 86B2268
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 7, 15, 0  @ 86B2268
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B2274
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B2280
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B228C

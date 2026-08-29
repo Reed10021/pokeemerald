@@ -46,22 +46,27 @@ SurfPichu_GiveEgg: @ 8674D7E
 
 SurfPichu_Slot1: @ 8674DC0
 	setmonmove 1, 2, MOVE_SURF
+	setmonmove 1, 3, MOVE_VOLT_TACKLE
 	return
 
 SurfPichu_Slot2:: @ 8674DC6
 	setmonmove 2, 2, MOVE_SURF
+	setmonmove 2, 3, MOVE_VOLT_TACKLE
 	return
 
 SurfPichu_Slot3: @ 8674DCC
 	setmonmove 3, 2, MOVE_SURF
+	setmonmove 3, 3, MOVE_VOLT_TACKLE
 	return
 
 SurfPichu_Slot4: @ 8674DD2
 	setmonmove 4, 2, MOVE_SURF
+	setmonmove 4, 3, MOVE_VOLT_TACKLE
 	return
 
 SurfPichu_Slot5: @ 8674DD8
 	setmonmove 5, 2, MOVE_SURF
+	setmonmove 5, 3, MOVE_VOLT_TACKLE
 	return
 
 sText_MysteryGiftEgg:

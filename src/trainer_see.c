@@ -416,10 +416,15 @@ static u8 CheckPathBetweenTrainerAndPlayer(struct ObjectEvent *trainerObj, u8 ap
 
 static void TrainerApproachPlayer(struct ObjectEvent *trainerObj, u8 range)
 {
+    u8 taskId;
     struct Task *task;
 
-    gApproachingTrainers[gNoOfApproachingTrainers].taskId = CreateTask(Task_RunTrainerSeeFuncList, 0x50);
-    task = &gTasks[gApproachingTrainers[gNoOfApproachingTrainers].taskId];
+    taskId = CreateTaskIfSpace(Task_RunTrainerSeeFuncList, 0x50);
+    gApproachingTrainers[gNoOfApproachingTrainers].taskId = taskId;
+    if (taskId == NUM_TASKS)
+        return;
+
+    task = &gTasks[taskId];
     task->tTrainerRange = range;
     task->tTrainerObjectEventId = gApproachingTrainers[gNoOfApproachingTrainers].objectEventId;
 }
@@ -433,6 +438,12 @@ static void sub_80B40C8(TaskFunc followupFunc)
         taskId = gApproachingTrainers[0].taskId;
     else
         taskId = gApproachingTrainers[1].taskId;
+
+    if (taskId >= NUM_TASKS || !gTasks[taskId].isActive)
+    {
+        EnableBothScriptContexts();
+        return;
+    }
 
     taskFunc = Task_RunTrainerSeeFuncList;
     SetTaskFuncWithFollowupFunc(taskId, taskFunc, followupFunc);
@@ -694,6 +705,10 @@ u8 FldEff_ExclamationMarkIcon(void)
         SetIconSpriteData(&gSprites[spriteId], FLDEFF_EXCLAMATION_MARK_ICON, 0);
         UpdateSpritePaletteByTemplate(&sSpriteTemplate_ExclamationQuestionMark, &gSprites[spriteId]);
     }
+    else
+    {
+        FieldEffectActiveListRemove(FLDEFF_EXCLAMATION_MARK_ICON);
+    }
 
     return 0;
 }
@@ -706,6 +721,10 @@ u8 FldEff_QuestionMarkIcon(void)
     {
         SetIconSpriteData(&gSprites[spriteId], FLDEFF_QUESTION_MARK_ICON, 1);
         UpdateSpritePaletteByTemplate(&sSpriteTemplate_ExclamationQuestionMark, &gSprites[spriteId]);
+    }
+    else
+    {
+        FieldEffectActiveListRemove(FLDEFF_QUESTION_MARK_ICON);
     }
 
     return 0;
@@ -721,6 +740,10 @@ u8 FldEff_HeartIcon(void)
 
         SetIconSpriteData(sprite, FLDEFF_HEART_ICON, 0);
         UpdateSpritePaletteByTemplate(&sSpriteTemplate_HeartIcon, sprite);
+    }
+    else
+    {
+        FieldEffectActiveListRemove(FLDEFF_HEART_ICON);
     }
 
     return 0;

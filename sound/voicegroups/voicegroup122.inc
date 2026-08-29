@@ -81,7 +81,7 @@ voicegroup122:: @ 869B900
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869BCA8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869BCB4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869BCC0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4850, 0, 7, 15, 2  @ 869BCCC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_3, 0, 7, 15, 2  @ 869BCCC
 	voice_square_1 60, 0, 0, 3, 0, 1, 9, 1  @ 869BCD8
 	voice_square_1 60, 0, 0, 3, 0, 0, 9, 1  @ 869BCE4
 

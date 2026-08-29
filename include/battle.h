@@ -369,6 +369,8 @@ struct BattleStruct
     u8 unused_1;
     u8 wildVictorySong;
     u8 dynamicMoveType;
+    u8 roostedBattlers;
+    u8 roostTypes[MAX_BATTLERS_COUNT][2];
     u8 wrappedBy[MAX_BATTLERS_COUNT];
     u16 assistPossibleMoves[PARTY_SIZE * MAX_MON_MOVES]; // Each of mons can know max 4 moves.
     u8 focusPunchBattlerId;
@@ -493,11 +495,7 @@ struct BattleStruct
 #define TARGET_TURN_DAMAGED ((gSpecialStatuses[gBattlerTarget].physicalDmg != 0 || gSpecialStatuses[gBattlerTarget].specialDmg != 0))
 
 #define IS_BATTLER_OF_TYPE(battlerId, type)((gBattleMons[battlerId].type1 == type || gBattleMons[battlerId].type2 == type))
-#define SET_BATTLER_TYPE(battlerId, type)   \
-{                                           \
-    gBattleMons[battlerId].type1 = type;    \
-    gBattleMons[battlerId].type2 = type;    \
-}
+#define SET_BATTLER_TYPE(battlerId, type) SetBattlerTypes(battlerId, type, type)
 
 #define GET_STAT_BUFF_ID(n)((n & 0xF))              // first four bits 0x1, 0x2, 0x4, 0x8
 #define GET_STAT_BUFF_VALUE2(n)((n & 0xF0))

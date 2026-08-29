@@ -92,7 +92,7 @@ voicegroup139:: @ 86A3BD4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A4000
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A400C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A4018
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 7, 15, 0  @ 86A4024
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 7, 15, 0  @ 86A4024
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A4030
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A403C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A4048

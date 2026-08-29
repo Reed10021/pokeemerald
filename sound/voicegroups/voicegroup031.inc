@@ -26,7 +26,7 @@ voicegroup031:: @ 867C838
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867C94C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867C958
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867C964
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4850, 0, 7, 15, 1  @ 867C970
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_3, 0, 7, 15, 1  @ 867C970
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867C97C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867C988
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867C994

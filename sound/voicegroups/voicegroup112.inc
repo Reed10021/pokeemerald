@@ -4,7 +4,7 @@ voicegroup112:: @ 8698654
 	voice_keysplit voicegroup005, KeySplitTable1  @ 8698660
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869866C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8698678
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4970, 0, 7, 15, 1  @ 8698684
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_21, 0, 7, 15, 1  @ 8698684
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8698690
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869869C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86986A8

@@ -1310,7 +1310,7 @@ gTVHoennTreasureInvestigatorsText01:: @ 08284FA1
 	.string "{STR_VAR_1}. It made me envious.\p"
 	.string "…Well, good going, {STR_VAR_2}!\p"
 	.string "Viewers, let that motivate you to\n"
-	.string "fire up your ITEMFINDERS and search!\p"
+	.string "fire up your ITEM FINDERS and search!\p"
 	.string "I'll be waiting for exciting news\n"
 	.string "from all of you!$"
 
@@ -1324,7 +1324,7 @@ gTVHoennTreasureInvestigatorsText02:: @ 082850F5
 	.string "{STR_VAR_1}. It made me envious.\p"
 	.string "…Well, good going, {STR_VAR_2}!\p"
 	.string "Viewers, let that motivate you to\n"
-	.string "fire up your ITEMFINDERS and search!\p"
+	.string "fire up your ITEM FINDERS and search!\p"
 	.string "I'll be waiting for exciting news\n"
 	.string "from all of you!$"
 

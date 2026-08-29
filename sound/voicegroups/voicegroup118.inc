@@ -81,10 +81,10 @@ voicegroup118:: @ 869A82C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869ABD4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869ABE0
 	voice_square_2 60, 0, 2, 0, 1, 7, 1  @ 869ABEC
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4850, 0, 7, 15, 2  @ 869ABF8
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_3, 0, 7, 15, 2  @ 869ABF8
 	voice_square_1 60, 0, 0, 2, 0, 1, 7, 1  @ 869AC04
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869AC10
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 2  @ 869AC1C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 2  @ 869AC1C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869AC28
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869AC34
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869AC40

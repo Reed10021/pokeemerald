@@ -75,7 +75,7 @@ voicegroup058:: @ 8685448
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86857A8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86857B4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86857C0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4840, 0, 7, 15, 0  @ 86857CC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_2, 0, 7, 15, 0  @ 86857CC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86857D8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86857E4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86857F0

@@ -604,6 +604,10 @@ const u32 gBattleAnimSpritePal_QuickGuard[] = INCBIN_U32("graphics/battle_anims/
 const u32 gBattleAnimSpriteGfx_HydroPump[] = INCBIN_U32("graphics/battle_anims/sprites/hydro_pump.4bpp.lz");
 const u32 gBattleAnimSpritePal_HydroPump[] = INCBIN_U32("graphics/battle_anims/sprites/hydro_pump.gbapal.lz");
 
+const u32 gBattleAnimSpriteGfx_PurpleDrake[] = INCBIN_U32("graphics/battle_anims/sprites/purple_drake.4bpp.lz");
+const u32 gBattleAnimSpritePal_PurpleDrake[] = INCBIN_U32("graphics/battle_anims/sprites/purple_drake.gbapal.lz");
+const u32 gBattleAnimSpritePal_GreenDrake[] = INCBIN_U32("graphics/battle_anims/sprites/green_drake.gbapal.lz");
+
 const u32 gBattleAnimSpriteGfx_Arrows[] = INCBIN_U32("graphics/battle_anims/sprites/arrows.4bpp.lz");
 const u32 gBattleAnimSpritePal_FusionFlare[] = INCBIN_U32("graphics/battle_anims/sprites/fusion_flare.gbapal.lz");
 

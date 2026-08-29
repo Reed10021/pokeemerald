@@ -15,7 +15,6 @@ static void AnimGustToTarget(struct Sprite *);
 static void AnimGustToTarget_Step(struct Sprite *);
 static void AnimFlyBallUp(struct Sprite *);
 static void AnimFlyBallUp_Step(struct Sprite *);
-static void AnimFlyBallAttack(struct Sprite *);
 static void AnimFlyBallAttack_Step(struct Sprite *);
 static void AnimFallingFeather(struct Sprite *);
 static void sub_810E520(struct Sprite *);
@@ -509,11 +508,11 @@ static void AnimFlyBallUp_Step(struct Sprite *sprite)
         DestroyAnimSprite(sprite);
 }
 
-static void AnimFlyBallAttack(struct Sprite *sprite)
+void AnimFlyBallAttack(struct Sprite *sprite)
 {
-    if (GetBattlerSide(gBattleAnimAttacker) != B_SIDE_PLAYER)
+    if (!IsOnPlayerSide(gBattleAnimAttacker))
     {
-        sprite->pos1.x = 272;
+        sprite->pos1.x = DISPLAY_WIDTH + 32;
         sprite->pos1.y = -32;
         StartSpriteAffineAnim(sprite, 1);
     }
@@ -528,6 +527,7 @@ static void AnimFlyBallAttack(struct Sprite *sprite)
     sprite->data[2] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_X_2);
     sprite->data[3] = sprite->pos1.y;
     sprite->data[4] = GetBattlerSpriteCoord(gBattleAnimTarget, BATTLER_COORD_Y_PIC_OFFSET);
+    sprite->data[5] = gBattleAnimArgs[1]; // if sprite is to remain invisible
 
     InitAnimLinearTranslation(sprite);
     sprite->callback = AnimFlyBallAttack_Step;
@@ -545,10 +545,10 @@ static void AnimFlyBallAttack_Step(struct Sprite *sprite)
     }
 
     if (sprite->pos1.x + sprite->pos2.x < -32
-        || sprite->pos1.x + sprite->pos2.x > 272
-        || sprite->pos1.y + sprite->pos2.y > 160)
+        || sprite->pos1.x + sprite->pos2.x > DISPLAY_WIDTH + 32
+        || sprite->pos1.y + sprite->pos2.y > DISPLAY_HEIGHT)
     {
-        gSprites[GetAnimBattlerSpriteId(ANIM_ATTACKER)].invisible = FALSE;
+        gSprites[GetAnimBattlerSpriteId(ANIM_ATTACKER)].invisible = sprite->data[5];
         DestroyAnimSprite(sprite);
     }
 }

@@ -82,12 +82,12 @@ voicegroup157:: @ 86A98BC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A9C70
 	voice_square_1_alt 60, 0, 0, 1, 0, 2, 7, 2  @ 86A9C7C
 	voice_square_2_alt 60, 0, 3, 0, 3, 3, 0  @ 86A9C88
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4890, 0, 3, 6, 5  @ 86A9C94
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_7, 0, 3, 6, 5  @ 86A9C94
 	voice_square_1_alt 60, 0, 0, 0, 0, 2, 7, 2  @ 86A9CA0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 0  @ 86A9CAC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_1, 0, 7, 15, 0  @ 86A9CAC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A9CB8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A9CC4
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 0  @ 86A9CD0
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 0  @ 86A9CD0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A9CDC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A9CE8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A9CF4

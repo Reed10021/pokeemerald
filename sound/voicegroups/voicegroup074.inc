@@ -82,12 +82,12 @@ voicegroup074:: @ 868B274
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868B628
 	voice_square_1_alt 60, 0, 0, 2, 0, 1, 4, 0  @ 868B634
 	voice_square_2_alt 60, 0, 2, 0, 1, 4, 0  @ 868B640
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4840, 0, 7, 15, 0  @ 868B64C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_2, 0, 7, 15, 0  @ 868B64C
 	voice_square_2_alt 60, 0, 0, 0, 1, 4, 1  @ 868B658
 	voice_square_1_alt 60, 0, 0, 1, 0, 1, 4, 1  @ 868B664
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868B670
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868B67C
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 0  @ 868B688
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 0  @ 868B688
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868B694
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868B6A0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868B6AC

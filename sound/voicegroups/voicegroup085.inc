@@ -83,8 +83,8 @@ voicegroup085:: @ 868EC7C
 	voice_square_1_alt 60, 0, 0, 2, 1, 2, 4, 0  @ 868F03C
 	voice_square_2_alt 60, 0, 1, 0, 2, 4, 0  @ 868F048
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F054
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 1  @ 868F060
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 13, 1  @ 868F06C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_1, 0, 7, 15, 1  @ 868F060
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 13, 1  @ 868F06C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F078
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F084
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868F090

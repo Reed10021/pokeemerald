@@ -1,10 +1,10 @@
 	.align 2
 voicegroup046:: @ 86810B0
 	voice_keysplit voicegroup005, KeySplitTable1  @ 86810B0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4900, 0, 1, 12, 0  @ 86810BC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_14, 0, 1, 12, 0  @ 86810BC
 	voice_square_1_alt 60, 0, 0, 0, 1, 1, 9, 0  @ 86810C8
 	voice_square_2_alt 60, 0, 2, 0, 2, 6, 3  @ 86810D4
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4850, 0, 7, 15, 1  @ 86810E0
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_3, 0, 7, 15, 1  @ 86810E0
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_fretless_bass, 255, 253, 0, 216  @ 86810EC
 	voice_square_2_alt 60, 0, 1, 0, 2, 6, 3  @ 86810F8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8681104

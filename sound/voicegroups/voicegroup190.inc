@@ -1,6 +1,6 @@
 	.align 2
 voicegroup190:: @ 86B429C
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 2  @ 86B429C
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_1, 0, 7, 15, 2  @ 86B429C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B42A8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B42B4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B42C0
@@ -87,4 +87,4 @@ voicegroup190:: @ 86B429C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B468C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B4698
 	voice_directsound_no_resample 64, 104, DirectSoundWaveData_ethnic_flavours_atarigane, 255, 0, 255, 0  @ 86B46A4
-	voice_directsound 63, 64, DirectSoundWaveData_unknown_taiko, 255, 0, 255, 0  @ 86B46B0
+	voice_directsound 63, 64, DirectSoundWaveData_sc88pro_taiko, 255, 0, 255, 0  @ 86B46B0

@@ -2833,7 +2833,13 @@ const struct ContestMove gContestMoves[MOVES_COUNT] =
         .comboMoves = {COMBO_STARTER_CALM_MIND},
     },
 
-    [MOVE_ROOST] = { 0 },
+    [MOVE_ROOST] = 
+    {
+        .effect = CONTEST_EFFECT_HIGHLY_APPEALING,
+        .contestCategory = CONTEST_CATEGORY_SMART,
+        .comboStarterId = 0,
+        .comboMoves = {COMBO_STARTER_BRAVE_BIRD},
+    },
 
     [MOVE_GRAVITY] =
     {
@@ -3037,7 +3043,7 @@ const struct ContestMove gContestMoves[MOVES_COUNT] =
     {
         .effect = CONTEST_EFFECT_USER_MORE_EASILY_STARTLED,
         .contestCategory = CONTEST_CATEGORY_COOL,
-        .comboStarterId = 0,
+        .comboStarterId = COMBO_STARTER_BRAVE_BIRD,
         .comboMoves = {0},
     },
 
@@ -3491,7 +3497,15 @@ const struct ContestMove gContestMoves[MOVES_COUNT] =
         .comboMoves = {0},
     },
 
-    [MOVE_ORIGIN_PULSE ... MOVE_DRAGON_ASCENT] = { 0 },
+    [MOVE_ORIGIN_PULSE ... MOVE_PRECIPICE_BLADES] = { 0 },
+
+    [MOVE_DRAGON_ASCENT] =
+    {
+        .effect = CONTEST_EFFECT_USER_MORE_EASILY_STARTLED,
+        .contestCategory = CONTEST_CATEGORY_BEAUTY,
+        .comboStarterId = 0,
+        .comboMoves = {0},
+    },
 
     [MOVE_HIGH_HORSEPOWER] =
     {

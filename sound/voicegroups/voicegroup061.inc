@@ -83,8 +83,8 @@ voicegroup061:: @ 8686474
 	voice_square_1_alt 60, 0, 0, 2, 0, 1, 4, 1  @ 8686834
 	voice_square_2_alt 60, 0, 2, 0, 1, 4, 1  @ 8686840
 	voice_square_2_alt 60, 0, 0, 0, 1, 4, 1  @ 868684C
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4840, 0, 7, 15, 0  @ 8686858
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 0  @ 8686864
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_2, 0, 7, 15, 0  @ 8686858
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 0  @ 8686864
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8686870
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 868687C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8686888

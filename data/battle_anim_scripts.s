@@ -370,7 +370,7 @@ gBattleAnims_Moves::
 	.4byte Move_WATER_PULSE
 	.4byte Move_DOOM_DESIRE
 	.4byte Move_PSYCHO_BOOST
-	.4byte Move_NONE
+	.4byte Move_ROOST
 	.4byte Move_GRAVITY
 	.4byte Move_NONE
 	.4byte Move_NONE
@@ -515,7 +515,7 @@ gBattleAnims_Moves::
 	.4byte Move_FREEZE_DRY
 	.4byte Move_NONE
 	.4byte Move_NONE
-	.4byte Move_NONE
+	.4byte Move_DRAGON_ASCENT
 	.4byte Move_HIGH_HORSEPOWER
 	.4byte Move_SOLAR_BLADE
 	.4byte Move_POLLEN_PUFF
@@ -560,7 +560,7 @@ gBattleAnims_General::
 	.4byte General_PokeblockThrow
 	.4byte General_ItemKnockoff
 	.4byte General_TurnTrap
-	.4byte General_HeldItemEffect
+	.4byte General_HeldItemEffect  @ B_ANIM_HELD_ITEM_EFFECT
 	.4byte General_SmokeballEscape
 	.4byte General_FocusBand
 	.4byte General_Rain
@@ -578,6 +578,7 @@ gBattleAnims_General::
 	.4byte General_WishHeal
 	.4byte General_TotemFlare
 	.4byte General_TrickRoom
+	.4byte General_HeldItemRestoreHp @ B_ANIM_HELD_ITEM_RESTORE_HP
 
 	.align 2
 gBattleAnims_Special::
@@ -9853,6 +9854,31 @@ Move_AQUA_TAIL:
 	blendoff
 	end
 
+Move_ROOST:
+	loadspritegfx ANIM_TAG_WHITE_FEATHER
+	loadspritegfx ANIM_TAG_BLUE_STAR
+	monbg ANIM_ATTACKER
+	splitbgprio_all
+	playsewithpan SE_M_PETAL_DANCE, SOUND_PAN_TARGET
+	delay 0
+	createsprite gFallingFeatherSpriteTemplate, ANIM_ATTACKER, 0, 0, -16, 64, 2, 104, 11304, 32, 1
+	delay 6
+	createsprite gFallingFeatherSpriteTemplate, ANIM_ATTACKER, 0, 0, -16, 32, 2, 104, 11304, 32, 1
+	createsprite gFallingFeatherSpriteTemplate, ANIM_ATTACKER, 0, 0, -16, 0, 2, 104, 11304, 32, 1
+	delay 6
+	createsprite gFallingFeatherSpriteTemplate, ANIM_ATTACKER, 0, 0, -16, 224, 2, 104, 11304, 32, 1
+	createsprite gFallingFeatherSpriteTemplate, ANIM_ATTACKER, 0, 0, -16, 128, 2, 104, 11304, 32, 1
+	delay 6
+	createsprite gFallingFeatherSpriteTemplate, ANIM_ATTACKER, 0, 0, -16, 192, 2, 104, 11304, 32, 1
+	createsprite gFallingFeatherSpriteTemplate, ANIM_ATTACKER, 0, 0, -16, 160, 2, 104, 11304, 32, 1
+	delay 6
+	createsprite gFallingFeatherSpriteTemplate, ANIM_ATTACKER, 0, 0, -16, 96, 2, 104, 11304, 32, 1
+	waitforvisualfinish
+	clearmonbg ANIM_ATTACKER
+	call HealingEffect
+	waitforvisualfinish
+	end
+
 Move_GRAVITY:
 	fadetobg BG_COSMIC
 	waitbgfadein
@@ -12595,6 +12621,46 @@ Move_FREEZE_DRY:
 	blendoff
 	end
 
+Move_DRAGON_ASCENT:
+	loadspritegfx ANIM_TAG_DRAGON_ASCENT
+	loadspritegfx ANIM_TAG_IMPACT
+	createvisualtask AnimTask_BlendParticle, 5, ANIM_TAG_IMPACT, 0, 11, 11, RGB(16, 31, 16)
+	fadetobg BG_COSMIC
+	waitbgfadeout
+	createvisualtask AnimTask_StartSlidingBg, 0x2, 0, 128, 0, -1
+	waitbgfadein
+	playsewithpan SE_M_FLY, SOUND_PAN_ATTACKER
+	invisible ANIM_ATTACKER
+	createsprite gDragonAscentFlyUpTemplate, ANIM_ATTACKER, 2, 0x0, 0x0, 0x400, 0x24, 0x15, 0x1, ANIM_ATTACKER
+	waitforvisualfinish
+	createvisualtask AnimTask_BlendBattleAnimPal, 10, (F_PAL_ATTACKER | F_PAL_BG | F_PAL_ANIM_1 | F_PAL_ANIM_2), 4, 0, 14, RGB(21, 31, 27)
+	playsewithpan SE_M_MEGA_KICK, SOUND_PAN_ATTACKER
+	waitforvisualfinish
+	playsewithpan SE_M_DETECT, SOUND_PAN_ATTACKER
+	createvisualtask AnimTask_StartSlidingBg, 0x5, -7304, -784, 1, -1
+	delay 2
+	createvisualtask AnimTask_BlendBattleAnimPal, 10, (F_PAL_ATTACKER | F_PAL_BG | F_PAL_ANIM_1 | F_PAL_ANIM_2), 0, 14, 0, RGB(21, 31, 27)
+	waitforvisualfinish
+	delay 1
+	monbg ANIM_DEF_PARTNER
+	setalpha 12, 8
+	playsewithpan SE_M_DOUBLE_TEAM, SOUND_PAN_ATTACKER
+	createsprite gDragonAscentDrakeTemplate, ANIM_ATTACKER, 2, 5
+	delay 1
+	playsewithpan SE_M_MEGA_KICK2, SOUND_PAN_TARGET
+	create_basic_hitsplat_sprite ANIM_TARGET, 4, x=-10, y=0, relative_to=ANIM_TARGET, animation=0
+	createsprite gSlideMonToOffsetSpriteTemplate, ANIM_ATTACKER, 2, ANIM_TARGET, -32, 0, 0, 3
+	createvisualtask AnimTask_ShakeMonInPlace, 2, ANIM_TARGET, 6, 0, 12, 1
+	createvisualtask AnimTask_BlendBattleAnimPal, 10, (F_PAL_ATTACKER | F_PAL_BG | F_PAL_ANIM_1 | F_PAL_ANIM_2), 2, 16, 0, RGB(26, 31, 0)
+	waitforvisualfinish
+	delay 3
+	createsprite gSlideMonToOriginalPosSpriteTemplate, ANIM_ATTACKER, 2, 1, 0, 7
+	waitforvisualfinish
+	blendoff
+	clearmonbg ANIM_DEF_PARTNER
+	call UnsetPsychicBackground
+	end
+
 Move_HIGH_HORSEPOWER:
 	loadspritegfx ANIM_TAG_IMPACT @hit
 	loadspritegfx ANIM_TAG_HORSESHOE_SIDE_FIST @horseshoe
@@ -14418,21 +14484,37 @@ Status_SandTomb:
 Status_Thunder_Cage:
 	goto Move_THUNDER_CAGE
 
+@ Old Gen 3 Held Item Effect
+@General_HeldItemEffect:
+@	loadspritegfx ANIM_TAG_THIN_RING
+@	loadspritegfx ANIM_TAG_SPARKLE_2
+@	delay 0
+@	playsewithpan SE_M_TAKE_DOWN, SOUND_PAN_ATTACKER
+@	createvisualtask AnimTask_RotateMonToSideAndRestore, 2, 16, 128, ANIM_ATTACKER, 2
+@	waitforvisualfinish
+@	playsewithpan SE_M_TAKE_DOWN, SOUND_PAN_ATTACKER
+@	createvisualtask AnimTask_RotateMonToSideAndRestore, 2, 16, 128, ANIM_ATTACKER, 2
+@	waitforvisualfinish
+@	playsewithpan SE_M_TAKE_DOWN, SOUND_PAN_ATTACKER
+@	createvisualtask AnimTask_RotateMonToSideAndRestore, 2, 16, 128, ANIM_ATTACKER, 2
+@	waitforvisualfinish
+@	playsewithpan SE_M_MORNING_SUN, SOUND_PAN_ATTACKER
+@	call GrantingStarsEffect
+@	waitforvisualfinish
+@	playsewithpan SE_SHINY, SOUND_PAN_ATTACKER
+@	createsprite gSimplePaletteBlendSpriteTemplate, ANIM_ATTACKER, 2, 2, 3, 7, 0, RGB(17, 31, 25)
+@	createsprite gThinRingExpandingSpriteTemplate, ANIM_ATTACKER, 3, 0, 0, 0, 0
+@	waitforvisualfinish
+@	end
+
+@ New Gen 4 HG/SS-style Held Item Effect
 General_HeldItemEffect:
 	loadspritegfx ANIM_TAG_THIN_RING
 	loadspritegfx ANIM_TAG_SPARKLE_2
 	delay 0
-	playsewithpan SE_M_TAKE_DOWN, SOUND_PAN_ATTACKER
-	createvisualtask AnimTask_RotateMonToSideAndRestore, 2, 16, 128, ANIM_ATTACKER, 2
-	waitforvisualfinish
-	playsewithpan SE_M_TAKE_DOWN, SOUND_PAN_ATTACKER
-	createvisualtask AnimTask_RotateMonToSideAndRestore, 2, 16, 128, ANIM_ATTACKER, 2
-	waitforvisualfinish
-	playsewithpan SE_M_TAKE_DOWN, SOUND_PAN_ATTACKER
-	createvisualtask AnimTask_RotateMonToSideAndRestore, 2, 16, 128, ANIM_ATTACKER, 2
-	waitforvisualfinish
-	playsewithpan SE_M_MORNING_SUN, SOUND_PAN_ATTACKER
-	call GrantingStarsEffect
+	createvisualtask AnimTask_HeldItemSquish, 3, ANIM_ATTACKER, 2
+	createvisualtask AnimTask_BlendMonInAndOut, 3, ANIM_ATTACKER, RGB_WHITE, 12, 1, 2
+	loopsewithpan SE_M_SWAGGER, SOUND_PAN_ATTACKER, 24, 2
 	waitforvisualfinish
 	playsewithpan SE_SHINY, SOUND_PAN_ATTACKER
 	createsprite gSimplePaletteBlendSpriteTemplate, ANIM_ATTACKER, 2, 2, 3, 7, 0, RGB(17, 31, 25)
@@ -14659,7 +14741,7 @@ General_WishHeal:
 	createsprite gSimplePaletteBlendSpriteTemplate, ANIM_ATTACKER, 2, 1, 3, 10, 0, RGB_BLACK
 	end
 
-General_TotemFlare::
+General_TotemFlare:
 	loadspritegfx ANIM_TAG_FOCUS_ENERGY
 	loadspritegfx ANIM_TAG_WHIP_HIT @green color
 	loadspritegfx ANIM_TAG_SWEAT_BEAD @blue color
@@ -14689,6 +14771,20 @@ RainbowEndureEffect:
 	createsprite gYellowEndureEnergySpriteTemplate, ANIM_ATTACKER, 2, 0x0, 0x1c, 0x1a, 0x3
 	delay 0x3
 	return
+
+General_HeldItemRestoreHp:
+	loadspritegfx ANIM_TAG_BLUE_STAR
+	playsewithpan SE_M_ABSORB_2, SOUND_PAN_TARGET
+	createsprite gHealingBlueStarSpriteTemplate, ANIM_ATTACKER, 2, 0, -5, 1, 0
+	delay 7
+	createsprite gHealingBlueStarSpriteTemplate, ANIM_ATTACKER, 2, -15, 10, 1, 0
+	delay 7
+	createsprite gHealingBlueStarSpriteTemplate, ANIM_ATTACKER, 2, -15, -15, 1, 0
+	delay 7
+	createsprite gHealingBlueStarSpriteTemplate, ANIM_ATTACKER, 2, 10, -5, 1, 0
+	delay 7
+	waitforvisualfinish
+	end
 
 SnatchMoveTrySwapFromSubstitute:
 	createvisualtask AnimTask_IsAttackerBehindSubstitute, 2

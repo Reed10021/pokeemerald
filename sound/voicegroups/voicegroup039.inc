@@ -83,7 +83,7 @@ voicegroup039:: @ 867EB18
 	voice_square_1_alt 60, 0, 0, 2, 0, 2, 4, 0  @ 867EED8
 	voice_square_2_alt 60, 0, 1, 0, 2, 4, 0  @ 867EEE4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867EEF0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 0  @ 867EEFC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 0  @ 867EEFC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867EF08
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867EF14
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867EF20

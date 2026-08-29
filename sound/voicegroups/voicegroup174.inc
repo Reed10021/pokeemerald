@@ -92,7 +92,7 @@ voicegroup174:: @ 86AF76C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFB98
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFBA4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFBB0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4840, 0, 7, 15, 0  @ 86AFBBC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_2, 0, 7, 15, 0  @ 86AFBBC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFBC8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFBD4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFBE0
@@ -131,7 +131,7 @@ voicegroup174:: @ 86AF76C
 	voice_keysplit_all voicegroup177  @ 86AFD6C
 	voice_square_1_alt 60, 0, 0, 2, 0, 2, 9, 1  @ 86AFD78
 	voice_square_2_alt 60, 0, 2, 0, 2, 9, 1  @ 86AFD84
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 7, 15, 0  @ 86AFD90
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 7, 15, 0  @ 86AFD90
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFD9C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFDA8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AFDB4
@@ -156,5 +156,5 @@ voicegroup174:: @ 86AF76C
 	voice_keysplit_all voicegroup002  @ 86AFE98
 	voice_square_1_alt 60, 0, 0, 2, 0, 2, 3, 1  @ 86AFEA4
 	voice_square_2_alt 60, 0, 2, 0, 2, 3, 1  @ 86AFEB0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 7, 15, 0  @ 86AFEBC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 7, 15, 0  @ 86AFEBC
 

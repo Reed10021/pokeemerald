@@ -359,7 +359,7 @@
 #define MOVE_PSYCHO_BOOST 354
 
 // Gen 4 moves
-#define MOVE_ROOST        355 // Unused / Placeholder
+#define MOVE_ROOST        355
 #define MOVE_GRAVITY      356
 #define MOVE_MIRACLE_EYE  357 // Unused / Placeholder
 #define MOVE_WAKE_UP_SLAP 358 // Unused / Placeholder
@@ -509,7 +509,7 @@
 #define MOVE_FREEZE_DRY        497
 #define MOVE_ORIGIN_PULSE      498 // Unused / Placeholder
 #define MOVE_PRECIPICE_BLADES  499 // Unused / Placeholder
-#define MOVE_DRAGON_ASCENT     500 // Unused / Placeholder
+#define MOVE_DRAGON_ASCENT     500
 
 // Gen 7 Moves
 #define MOVE_HIGH_HORSEPOWER   501

@@ -8135,7 +8135,7 @@ static void Cmd_tryhealhalfhealth(void)
     if (gBattlescriptCurrInstr[5] == BS_ATTACKER)
         gBattlerTarget = gBattlerAttacker;
 
-    gBattleMoveDamage = gBattleMons[gBattlerTarget].maxHP / 2;
+    gBattleMoveDamage = (gBattleMons[gBattlerTarget].maxHP + 1) / 2; // Gen 5+: Round up instead of down.
     if (gBattleMoveDamage == 0)
         gBattleMoveDamage = 1;
     gBattleMoveDamage *= -1;
@@ -9422,6 +9422,8 @@ static void Cmd_transformdataexecution(void)
     {
         s32 i;
         u8 *battleMonAttacker, *battleMonTarget;
+        u8 targetType1;
+        u8 targetType2;
 
         gBattleMons[gBattlerAttacker].status2 |= STATUS2_TRANSFORMED;
         gDisableStructs[gBattlerAttacker].disabledMove = 0;
@@ -9432,11 +9434,14 @@ static void Cmd_transformdataexecution(void)
 
         PREPARE_SPECIES_BUFFER(gBattleTextBuff1, gBattleMons[gBattlerTarget].species)
 
+        GetBattlerUnderlyingTypes(gBattlerTarget, &targetType1, &targetType2);
         battleMonAttacker = (u8*)(&gBattleMons[gBattlerAttacker]);
         battleMonTarget = (u8*)(&gBattleMons[gBattlerTarget]);
 
         for (i = 0; i < offsetof(struct BattlePokemon, pp); i++)
             battleMonAttacker[i] = battleMonTarget[i];
+
+        SetBattlerTypes(gBattlerAttacker, targetType1, targetType2);
 
         for (i = 0; i < MAX_MON_MOVES; i++)
         {
@@ -9541,9 +9546,7 @@ static void Cmd_metronome(void)
         if (gCurrentMove >= MOVES_COUNT)
             continue;
         // Check for unused moves.
-        if (gCurrentMove == MOVE_ROOST)
-            continue;
-        else if (gCurrentMove >= MOVE_MIRACLE_EYE && gCurrentMove <= MOVE_WAKE_UP_SLAP)
+        if (gCurrentMove >= MOVE_MIRACLE_EYE && gCurrentMove <= MOVE_WAKE_UP_SLAP)
             continue;
         else if (gCurrentMove >= MOVE_GYRO_BALL && gCurrentMove <= MOVE_PLUCK)
             continue;
@@ -9579,7 +9582,7 @@ static void Cmd_metronome(void)
             continue;
         else if (gCurrentMove == MOVE_ACID_SPRAY)
             continue;
-        else if (gCurrentMove >= MOVE_ORIGIN_PULSE && gCurrentMove <= MOVE_DRAGON_ASCENT)
+        else if (gCurrentMove >= MOVE_ORIGIN_PULSE && gCurrentMove <= MOVE_PRECIPICE_BLADES)
             continue;
 
         i = -1;
@@ -12367,6 +12370,12 @@ void BS_TryHealQuarterHealth(void)
         gBattlescriptCurrInstr = failInstr;
     else
         gBattlescriptCurrInstr = args + 5; // 1 byte battler + 4 byte ptr
+}
+
+void BS_ApplyRoostTypeChange(void)
+{
+    ApplyRoostTypeChange(gBattlerAttacker);
+    gBattlescriptCurrInstr += 5;
 }
 
 void BS_TrySetGravity(void)

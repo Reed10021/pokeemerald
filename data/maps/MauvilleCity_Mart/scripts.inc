@@ -42,7 +42,7 @@ MauvilleCity_Mart_Text_ItemsToTemporarilyElevateStats: @ 821112E
 	.string "There are items that temporarily\n"
 	.string "elevate the stats of POKéMON.\p"
 	.string "The ones I know you use in battle\n"
-	.string "are X ATTACK and X DEFEND…\p"
+	.string "are X ATTACK and X DEFENSE…\p"
 	.string "I do believe that there are others\n"
 	.string "like them.$"
 

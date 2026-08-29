@@ -25,7 +25,7 @@ Route116_EventScript_SetWandasBoyfriendPos:: @ 81F2C47
 	return
 
 Route116_EventScript_HideDroughtShard::
-	setobjectxyperm LOCALID_DROUGHT_SHARD 69, 0
+	setobjectxyperm LOCALID_DROUGHT_SHARD 60, 0
 	return
 
 Route116_OnLoad: @ 81F2C4F

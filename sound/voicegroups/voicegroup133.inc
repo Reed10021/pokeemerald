@@ -87,12 +87,12 @@ voicegroup133:: @ 86A1BB8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A1FA8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A1FB4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A1FC0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 7, 15, 0  @ 86A1FCC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 7, 15, 0  @ 86A1FCC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A1FD8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A1FE4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A1FF0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A1FFC
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4830, 0, 0, 15, 0  @ 86A2008
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_1, 0, 0, 15, 0  @ 86A2008
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A2014
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A2020
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86A202C

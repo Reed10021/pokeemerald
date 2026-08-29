@@ -83,7 +83,7 @@ voicegroup050:: @ 86826D0
 	voice_square_2_alt 60, 0, 3, 0, 1, 4, 1  @ 8682A90
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8682A9C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8682AA8
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4880, 0, 7, 15, 1  @ 8682AB4
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_6, 0, 7, 15, 1  @ 8682AB4
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8682AC0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8682ACC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 8682AD8

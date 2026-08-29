@@ -81,7 +81,7 @@ voicegroup170:: @ 86AE338
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AE6E0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86AE6EC
 	voice_square_2_alt 60, 0, 1, 0, 1, 7, 1  @ 86AE6F8
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 1  @ 86AE704
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_1, 0, 7, 15, 1  @ 86AE704
 	voice_square_1_alt 60, 0, 0, 1, 0, 1, 7, 1  @ 86AE710
 	voice_square_2_alt 60, 0, 2, 0, 1, 0, 0  @ 86AE71C
 

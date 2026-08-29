@@ -73,7 +73,7 @@ voicegroup036:: @ 867DD14
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867E05C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867E068
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867E074
-	voice_programmable_wave 60, 0, ProgrammableWaveData_86B4830, 0, 7, 15, 0  @ 867E080
+	voice_programmable_wave 60, 0, ProgrammableWaveData_1, 0, 7, 15, 0  @ 867E080
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867E08C
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867E098
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 867E0A4

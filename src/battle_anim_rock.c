@@ -19,7 +19,6 @@ static void AnimRockTomb_Step(struct Sprite *sprite);
 static void AnimRockBlastRock(struct Sprite *);
 static void AnimRockScatter(struct Sprite *);
 static void AnimRockScatter_Step(struct Sprite *sprite);
-static void AnimParticleInVortex(struct Sprite *);
 static void AnimParticleInVortex_Step(struct Sprite *sprite);
 static void AnimTask_LoadSandstormBackground_Step(u8 taskId);
 static void sub_8111214(struct Task *task);
@@ -417,7 +416,7 @@ static void AnimRockFragment(struct Sprite *sprite)
 // args[4] - increments some sin parameter
 // args[5] - fixed sin parameter
 // args[6] - attacker or target
-static void AnimParticleInVortex(struct Sprite *sprite)
+void AnimParticleInVortex(struct Sprite *sprite)
 {
     s16 animBattler = gBattleAnimArgs[6];
     if (IsDoubleBattle() && gBattleMoves[gCurrentMove].target == MOVE_TARGET_BOTH)

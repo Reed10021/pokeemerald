@@ -81,7 +81,7 @@ voicegroup124:: @ 869C2F0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869C698
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869C6A4
 	voice_square_2 60, 0, 3, 0, 1, 7, 1  @ 869C6B0
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4850, 0, 7, 15, 2  @ 869C6BC
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_3, 0, 7, 15, 2  @ 869C6BC
 	voice_square_1 60, 0, 0, 3, 0, 1, 7, 1  @ 869C6C8
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 869C6D4
 	voice_square_2 60, 0, 2, 0, 1, 7, 1  @ 869C6E0

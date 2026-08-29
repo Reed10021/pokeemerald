@@ -110,7 +110,8 @@ const u16 gEggMoves[] = {
               MOVE_TAILWIND,
               MOVE_OMINOUS_WIND,
               MOVE_WORK_UP,
-              MOVE_U_TURN),
+              MOVE_U_TURN,
+              MOVE_ROOST),
 
     egg_moves(EKANS,
               MOVE_PURSUIT,
@@ -228,7 +229,8 @@ const u16 gEggMoves[] = {
               MOVE_OMINOUS_WIND,
               MOVE_HEX,
               MOVE_U_TURN,
-              MOVE_ACROBATICS),
+              MOVE_ACROBATICS,
+              MOVE_ROOST),
 
     egg_moves(ODDISH,
               MOVE_SWORDS_DANCE,
@@ -535,7 +537,8 @@ const u16 gEggMoves[] = {
               MOVE_VACUUM_WAVE,
               MOVE_SOLAR_BLADE,
               MOVE_U_TURN,
-              MOVE_ACROBATICS),
+              MOVE_ACROBATICS,
+              MOVE_ROOST),
 
     egg_moves(DODUO,
               MOVE_QUICK_ATTACK,
@@ -549,7 +552,8 @@ const u16 gEggMoves[] = {
               MOVE_DOUBLE_HIT,
               MOVE_WORK_UP,
               MOVE_ACROBATICS,
-              MOVE_LUNGE),
+              MOVE_LUNGE,
+              MOVE_ROOST),
 
     egg_moves(SEEL,
               MOVE_LICK,
@@ -883,7 +887,8 @@ const u16 gEggMoves[] = {
               MOVE_U_TURN,
               MOVE_ACROBATICS,
               MOVE_LUNGE,
-              MOVE_SKITTER_SMACK),
+              MOVE_SKITTER_SMACK,
+              MOVE_ROOST),
 
     egg_moves(PINSIR,
               MOVE_FURY_ATTACK,
@@ -992,7 +997,8 @@ const u16 gEggMoves[] = {
               MOVE_AQUA_TAIL,
               MOVE_OMINOUS_WIND,
               MOVE_HURRICANE,
-              MOVE_STONE_EDGE),
+              MOVE_STONE_EDGE,
+              MOVE_ROOST),
 
     egg_moves(SNORLAX,
               MOVE_LICK,
@@ -1299,7 +1305,8 @@ const u16 gEggMoves[] = {
               MOVE_TAILWIND,
               MOVE_OMINOUS_WIND,
               MOVE_U_TURN,
-              MOVE_GRASS_KNOT),
+              MOVE_GRASS_KNOT,
+              MOVE_ROOST),
 
     egg_moves(MAREEP,
               MOVE_TAKE_DOWN,
@@ -1411,7 +1418,8 @@ const u16 gEggMoves[] = {
               MOVE_OMINOUS_WIND,
               MOVE_U_TURN,
               MOVE_LUNGE,
-              MOVE_SKITTER_SMACK),
+              MOVE_SKITTER_SMACK,
+              MOVE_ROOST),
 
     egg_moves(WOOPER,
               MOVE_BODY_SLAM,
@@ -1452,7 +1460,8 @@ const u16 gEggMoves[] = {
               MOVE_HEX,
               MOVE_HURRICANE,
               MOVE_U_TURN,
-              MOVE_ACROBATICS),
+              MOVE_ACROBATICS,
+              MOVE_ROOST),
 
     egg_moves(MISDREAVUS,
               MOVE_CURSE,
@@ -1793,7 +1802,8 @@ const u16 gEggMoves[] = {
               MOVE_MAGNET_BOMB,
               MOVE_NIGHT_SLASH,
               MOVE_OMINOUS_WIND,
-              MOVE_HURRICANE),
+              MOVE_HURRICANE,
+              MOVE_ROOST),
 
     egg_moves(HOUNDOUR,
               MOVE_FIRE_SPIN,
@@ -2130,7 +2140,8 @@ const u16 gEggMoves[] = {
               MOVE_OMINOUS_WIND,
               MOVE_WORK_UP,
               MOVE_HURRICANE,
-              MOVE_U_TURN),
+              MOVE_U_TURN,
+              MOVE_ROOST),
 
     egg_moves(SHROOMISH,
               MOVE_FAKE_TEARS,
@@ -2182,7 +2193,8 @@ const u16 gEggMoves[] = {
               MOVE_HURRICANE,
               MOVE_U_TURN,
               MOVE_ACROBATICS,
-              MOVE_SCALD),
+              MOVE_SCALD,
+              MOVE_ROOST),
 
     egg_moves(SURSKIT,
               MOVE_FORESIGHT,
@@ -2610,7 +2622,8 @@ const u16 gEggMoves[] = {
               MOVE_OMINOUS_WIND,
               MOVE_DRAGON_RUSH,
               MOVE_HURRICANE,
-              MOVE_ACROBATICS),
+              MOVE_ACROBATICS,
+              MOVE_ROOST),
 
     egg_moves(DUSKULL,
               MOVE_IMPRISON,
@@ -2695,7 +2708,8 @@ const u16 gEggMoves[] = {
               MOVE_SOLAR_BLADE,
               MOVE_HURRICANE,
               MOVE_U_TURN,
-              MOVE_GRASS_KNOT),
+              MOVE_GRASS_KNOT,
+              MOVE_ROOST),
 
     egg_moves(WHISMUR,
               MOVE_TAKE_DOWN,
@@ -2878,7 +2892,8 @@ const u16 gEggMoves[] = {
               MOVE_U_TURN,
               MOVE_ACROBATICS,
               MOVE_LUNGE,
-              MOVE_SKITTER_SMACK),
+              MOVE_SKITTER_SMACK,
+              MOVE_ROOST),
 
     egg_moves(ILLUMISE,
               MOVE_BATON_PASS,
@@ -2891,7 +2906,8 @@ const u16 gEggMoves[] = {
               MOVE_OMINOUS_WIND,
               MOVE_U_TURN,
               MOVE_ACROBATICS,
-              MOVE_SKITTER_SMACK),
+              MOVE_SKITTER_SMACK,
+              MOVE_ROOST),
 
     egg_moves(LILEEP,
               MOVE_BARRIER,
@@ -2964,6 +2980,16 @@ const u16 gEggMoves[] = {
               MOVE_DRAGON_RUSH,
               MOVE_FLAME_CHARGE,
               MOVE_STONE_EDGE),
+
+    egg_moves(RAYQUAZA,
+              MOVE_HELPING_HAND,
+              MOVE_STONE_EDGE,
+              MOVE_U_TURN,
+              MOVE_ENERGY_BALL,
+              MOVE_FOCUS_BLAST,
+              MOVE_AQUA_TAIL,
+              MOVE_WILD_CHARGE,
+              MOVE_IRON_HEAD),
 
     egg_moves(CHIMECHO,
               MOVE_DISABLE,

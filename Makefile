@@ -31,8 +31,8 @@ else
 EXE :=
 endif
 
-# VERSION: 1.6.0
-TITLE       := POKE EMRR160
+# VERSION: 1.6.1
+TITLE       := POKE EMRR161
 GAME_CODE   := BPEE
 MAKER_CODE  := 01
 REVISION    := 0
@@ -50,9 +50,6 @@ DATA_SRC_SUBDIR = src/data
 DATA_ASM_SUBDIR = data
 SONG_SUBDIR = sound/songs
 MID_SUBDIR = sound/songs/midi
-SAMPLE_SUBDIR = sound/direct_sound_samples
-CRY_SUBDIR = sound/direct_sound_samples/cries
-CRY_UNCOMPRESSED_SUBDIR = sound/direct_sound_samples/cries_uncompressed
 
 C_BUILDDIR = $(OBJ_DIR)/$(C_SUBDIR)
 GFLIB_BUILDDIR = $(OBJ_DIR)/$(GFLIB_SUBDIR)
@@ -89,7 +86,7 @@ LIB := $(LIBPATH) -lgcc -lc -L../../libagbsyscall -lagbsyscall
 
 SHA1 := $(shell { command -v sha1sum || command -v shasum; } 2>/dev/null) -c
 GFX := tools/gbagfx/gbagfx$(EXE)
-AIF := tools/aif2pcm/aif2pcm$(EXE)
+WAV2AGB := tools/wav2agb/wav2agb$(EXE)
 MID := tools/mid2agb/mid2agb$(EXE)
 SCANINC := tools/scaninc/scaninc$(EXE)
 PREPROC := tools/preproc/preproc$(EXE)
@@ -98,7 +95,8 @@ FIX := tools/gbafix/gbafix$(EXE)
 MAPJSON := tools/mapjson/mapjson$(EXE)
 JSONPROC := tools/jsonproc/jsonproc$(EXE)
 
-TOOLDIRS := $(filter-out tools/agbcc tools/binutils,$(wildcard tools/*))
+TOOLPATHS := $(wildcard tools/*)
+TOOLDIRS := $(filter-out tools/agbcc tools/binutils,$(foreach tool,$(TOOLPATHS),$(if $(wildcard $(tool)/Makefile),$(tool))))
 TOOLBASE = $(TOOLDIRS:tools/%=%)
 TOOLS = $(foreach tool,$(TOOLBASE),tools/$(tool)/$(tool)$(EXE))
 
@@ -114,13 +112,13 @@ MAKEFLAGS += --print-directory
 # Secondary expansion is required for dependency variables in object rules.
 .SECONDEXPANSION:
 
-.PHONY: all rom clean compare tidy tools mostlyclean clean-tools $(TOOLDIRS) berry_fix libagbsyscall modern
+.PHONY: all rom clean compare tidy tools mostlyclean clean-tools $(TOOLDIRS) berry_fix libagbsyscall modern upr-offsets upr-offsets-dry rom-upr
 
 infoshell = $(foreach line, $(shell $1 | sed "s/ /__SPACE__/g"), $(info $(subst __SPACE__, ,$(line))))
 
 # Build tools when building the rom
 # Disable dependency scanning for clean/tidy/tools
-ifeq (,$(filter-out all rom compare modern berry_fix libagbsyscall,$(MAKECMDGOALS)))
+ifeq (,$(filter-out all rom compare modern berry_fix libagbsyscall upr-offsets upr-offsets-dry rom-upr,$(MAKECMDGOALS)))
 $(call infoshell, $(MAKE) tools)
 else
 NODEP := 1
@@ -169,6 +167,14 @@ ifeq ($(COMPARE),1)
 	@$(SHA1) rom.sha1
 endif
 
+rom-upr: rom upr-offsets
+
+upr-offsets: $(ROM)
+	python3 tools/update_upr_gen3_offsets.py --rom $(ROM) --map $(MAP) --elf $(ELF)
+
+upr-offsets-dry: $(ROM)
+	python3 tools/update_upr_gen3_offsets.py --rom $(ROM) --map $(MAP) --elf $(ELF) --dry-run
+
 # For contributors to make sure a change didn't affect the contents of the ROM.
 compare: ; @$(MAKE) COMPARE=1
 
@@ -178,10 +184,8 @@ clean-tools:
 	@$(foreach tooldir,$(TOOLDIRS),$(MAKE) clean -C $(tooldir);)
 
 mostlyclean: tidy
-	rm -f $(SAMPLE_SUBDIR)/*.bin
-	rm -f $(CRY_SUBDIR)/*.bin
-	rm -f $(CRY_UNCOMPRESSED_SUBDIR)/*.bin
 	rm -f $(MID_SUBDIR)/*.s
+	find sound -iname '*.bin' -exec rm {} +
 	find . \( -iname '*.1bpp' -o -iname '*.4bpp' -o -iname '*.8bpp' -o -iname '*.gbapal' -o -iname '*.lz' -o -iname '*.latfont' -o -iname '*.hwjpnfont' -o -iname '*.fwjpnfont' \) -exec rm {} +
 	rm -f $(DATA_ASM_SUBDIR)/layouts/layouts.inc $(DATA_ASM_SUBDIR)/layouts/layouts_table.inc
 	rm -f $(DATA_ASM_SUBDIR)/maps/connections.inc $(DATA_ASM_SUBDIR)/maps/events.inc $(DATA_ASM_SUBDIR)/maps/groups.inc $(DATA_ASM_SUBDIR)/maps/headers.inc
@@ -205,12 +209,12 @@ include graphics_file_rules.mk
 include map_data_rules.mk
 include spritesheet_rules.mk
 include json_data_rules.mk
-include songs.mk
+include audio_rules.mk
 
 %.s: ;
 %.png: ;
 %.pal: ;
-%.aif: ;
+%.wav: ;
 
 %.1bpp: %.png  ; $(GFX) $< $@
 %.4bpp: %.png  ; $(GFX) $< $@
@@ -219,9 +223,6 @@ include songs.mk
 %.gbapal: %.png ; $(GFX) $< $@
 %.lz: % ; $(GFX) $< $@
 %.rl: % ; $(GFX) $< $@
-$(CRY_SUBDIR)/%.bin: $(CRY_SUBDIR)/%.aif ; $(AIF) $< $@ --compress
-$(CRY_UNCOMPRESSED_SUBDIR)/%.bin: $(CRY_UNCOMPRESSED_SUBDIR)/%.aif ; $(AIF) $< $@
-sound/%.bin: sound/%.aif ; $(AIF) $< $@
 
 
 ifeq ($(MODERN),0)
@@ -297,9 +298,6 @@ endif
 
 $(DATA_ASM_BUILDDIR)/%.o: $(DATA_ASM_SUBDIR)/%.s $$(data_dep)
 	$(PREPROC) $< charmap.txt | $(CPP) -I include | $(AS) $(ASFLAGS) -o $@
-
-$(SONG_BUILDDIR)/%.o: $(SONG_SUBDIR)/%.s
-	$(AS) $(ASFLAGS) -I sound -o $@ $<
 
 $(OBJ_DIR)/sym_bss.ld: sym_bss.txt
 	$(RAMSCRGEN) .bss $< ENGLISH > $@

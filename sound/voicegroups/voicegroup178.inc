@@ -87,5 +87,5 @@ voicegroup178:: @ 86B07B0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B0BA0
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B0BAC
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0  @ 86B0BB8
-	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_86B4870, 0, 0, 15, 1  @ 86B0BC4
+	voice_programmable_wave_alt 60, 0, ProgrammableWaveData_5, 0, 0, 15, 1  @ 86B0BC4
 
